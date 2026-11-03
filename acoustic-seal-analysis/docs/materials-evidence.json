@@ -1,0 +1,105 @@
+{
+  "previewEngine": "headless Chromium print-to-PDF",
+  "previewPdfPages": 16,
+  "pages": [
+    {
+      "page": 1,
+      "hanCharacters": 430,
+      "textPresent": true,
+      "contentFits": true
+    },
+    {
+      "page": 2,
+      "hanCharacters": 307,
+      "textPresent": true,
+      "contentFits": true
+    },
+    {
+      "page": 3,
+      "hanCharacters": 343,
+      "textPresent": true,
+      "contentFits": true
+    },
+    {
+      "page": 4,
+      "hanCharacters": 356,
+      "textPresent": true,
+      "contentFits": true
+    },
+    {
+      "page": 5,
+      "hanCharacters": 335,
+      "textPresent": true,
+      "contentFits": true
+    },
+    {
+      "page": 6,
+      "hanCharacters": 369,
+      "textPresent": true,
+      "contentFits": true
+    },
+    {
+      "page": 7,
+      "hanCharacters": 343,
+      "textPresent": true,
+      "contentFits": true
+    },
+    {
+      "page": 8,
+      "hanCharacters": 345,
+      "textPresent": true,
+      "contentFits": true
+    },
+    {
+      "page": 9,
+      "hanCharacters": 362,
+      "textPresent": true,
+      "contentFits": true
+    },
+    {
+      "page": 10,
+      "hanCharacters": 329,
+      "textPresent": true,
+      "contentFits": true
+    },
+    {
+      "page": 11,
+      "hanCharacters": 389,
+      "textPresent": true,
+      "contentFits": true
+    },
+    {
+      "page": 12,
+      "hanCharacters": 364,
+      "textPresent": true,
+      "contentFits": true
+    },
+    {
+      "page": 13,
+      "hanCharacters": 420,
+      "textPresent": true,
+      "contentFits": true
+    },
+    {
+      "page": 14,
+      "hanCharacters": 358,
+      "textPresent": true,
+      "contentFits": true
+    },
+    {
+      "page": 15,
+      "hanCharacters": 362,
+      "textPresent": true,
+      "contentFits": true
+    },
+    {
+      "page": 16,
+      "hanCharacters": 376,
+      "textPresent": true,
+      "contentFits": true
+    }
+  ],
+  "figures": 15,
+  "wordActualPagination": "未执行；此PDF并非Microsoft Word导出，正式验收仍需Word实际分页与版式复核",
+  "applicantTemplate": "未提供；当前为A4通用可编辑稿"
+}

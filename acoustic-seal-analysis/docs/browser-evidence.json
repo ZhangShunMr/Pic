@@ -1,0 +1,68 @@
+{
+  "date": "2026-11-03T05:03:23.376613+00:00",
+  "environment": "Linux Python 3.12; headless system Chromium; 1440x1000 and 390x844",
+  "browser": "154.0.8037.57",
+  "steps": [
+    {
+      "step": "普通启动为空白",
+      "actual": "0 个试验，未自动载入样例",
+      "status": "passed"
+    },
+    {
+      "step": "空白到显式配对",
+      "actual": "创建位置、完整工况、基线和单项；125Hz=3dB，250Hz保持缺失",
+      "status": "passed"
+    },
+    {
+      "step": "保存搬迁重开",
+      "actual": "实际下载到独立目录并重新选择文件；2个试验及配对保留",
+      "status": "passed"
+    },
+    {
+      "step": "三类成果导出",
+      "actual": "HTML报告、结果CSV及原始频带CSV均实际下载成功",
+      "status": "passed"
+    },
+    {
+      "step": "模拟样例",
+      "actual": "8个试验、6个配对，组合125Hz差4.5dB",
+      "status": "passed"
+    },
+    {
+      "step": "CSV预检与确认",
+      "actual": "2行合并导入；覆盖2个频带，保留其他频带",
+      "status": "passed"
+    },
+    {
+      "step": "频带扫描",
+      "actual": "200至300Hz范围仅显示250Hz矩阵行",
+      "status": "passed"
+    },
+    {
+      "step": "条件缺失阻断",
+      "actual": "清空车辆标识后6个配对全部阻断，差值为空，原因可见",
+      "status": "passed"
+    },
+    {
+      "step": "归档保护",
+      "actual": "归档表单禁用，解除归档后可编辑",
+      "status": "passed"
+    },
+    {
+      "step": "窄屏布局",
+      "actual": "390px宽度无整页横向溢出；表格在各自容器内滚动",
+      "status": "passed"
+    },
+    {
+      "step": "浏览器异常",
+      "actual": "无 JavaScript pageerror",
+      "status": "passed"
+    }
+  ],
+  "javascriptErrors": [],
+  "limitations": [
+    "未在Windows/macOS执行",
+    "未使用真实车辆数据",
+    "未验证Microsoft Word分页"
+  ]
+}

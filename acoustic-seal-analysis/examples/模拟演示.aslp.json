@@ -1,0 +1,262 @@
+{
+  "schemaVersion": 1,
+  "softwareVersion": "1.0.0",
+  "id": "demo-project",
+  "name": "模拟演示 · 车门密封与线束孔封堵",
+  "owner": "演示操作员（虚构）",
+  "description": "纯模拟数据，按固定数列构造用于验证流程，不来自车辆测量，不证明实际降噪效果。",
+  "createdAt": "2026-11-03T04:59:20+00:00",
+  "updatedAt": "2026-11-03T04:59:20+00:00",
+  "revision": 0,
+  "status": "active",
+  "sites": [
+    {
+      "id": "site-door",
+      "name": "左前门上沿密封",
+      "zone": "左前门",
+      "material": "模拟胶带",
+      "procedure": "演示：沿密封边缘临时封堵，记录覆盖范围。",
+      "notes": "位置及工艺均为模拟。"
+    },
+    {
+      "id": "site-harness",
+      "name": "前围线束孔",
+      "zone": "前围",
+      "material": "模拟密封泥",
+      "procedure": "演示：覆盖孔周围间隙，恢复时移除。",
+      "notes": "不构成真实车辆作业指导。"
+    }
+  ],
+  "conditions": [
+    {
+      "id": "condition-demo",
+      "name": "模拟静态激励工况",
+      "notes": "所有数值模拟；频带预先声明为互不重叠。",
+      "independentBands": true,
+      "vehicle": "SIM-001",
+      "microphone": "模拟驾驶员耳旁固定测点",
+      "excitation": "模拟宽带外部声源",
+      "surface": "模拟半消声室",
+      "gear": "P",
+      "weighting": "Z",
+      "timeWeighting": "Leq",
+      "bandType": "octave",
+      "instrument": "SIM-METER",
+      "calibration": "模拟标定记录，仅验证字段一致性",
+      "unit": "dB re 20 µPa",
+      "speed": 0.0,
+      "rpm": 0.0,
+      "temperature": 23.0,
+      "duration": 30.0
+    }
+  ],
+  "trials": [
+    {
+      "id": "b1",
+      "name": "基线 1",
+      "type": "baseline",
+      "conditionId": "condition-demo",
+      "siteIds": [],
+      "timestamp": "2026-01-01T10:00:00+00:00",
+      "repeatGroup": "baseline-series",
+      "sourceKind": "simulation",
+      "sourceNote": "软件内置固定模拟数列；acoustic/demo.py；非实测。",
+      "operator": "模拟操作员",
+      "notes": "用于功能和数值验证。",
+      "bands": {
+        "125": 70.0,
+        "250": 68.0,
+        "500": 66.0
+      }
+    },
+    {
+      "id": "b2",
+      "name": "基线 2",
+      "type": "baseline",
+      "conditionId": "condition-demo",
+      "siteIds": [],
+      "timestamp": "2026-01-01T10:01:00+00:00",
+      "repeatGroup": "baseline-series",
+      "sourceKind": "simulation",
+      "sourceNote": "软件内置固定模拟数列；acoustic/demo.py；非实测。",
+      "operator": "模拟操作员",
+      "notes": "用于功能和数值验证。",
+      "bands": {
+        "125": 70.2,
+        "250": 68.1,
+        "500": 66.2
+      }
+    },
+    {
+      "id": "s1",
+      "name": "门密封单项 1",
+      "type": "single",
+      "conditionId": "condition-demo",
+      "siteIds": [
+        "site-door"
+      ],
+      "timestamp": "2026-01-01T10:02:00+00:00",
+      "repeatGroup": "door-series",
+      "sourceKind": "simulation",
+      "sourceNote": "软件内置固定模拟数列；acoustic/demo.py；非实测。",
+      "operator": "模拟操作员",
+      "notes": "用于功能和数值验证。",
+      "bands": {
+        "125": 67.0,
+        "250": 66.0,
+        "500": 65.0
+      }
+    },
+    {
+      "id": "s2",
+      "name": "门密封单项 2",
+      "type": "single",
+      "conditionId": "condition-demo",
+      "siteIds": [
+        "site-door"
+      ],
+      "timestamp": "2026-01-01T10:03:00+00:00",
+      "repeatGroup": "door-series",
+      "sourceKind": "simulation",
+      "sourceNote": "软件内置固定模拟数列；acoustic/demo.py；非实测。",
+      "operator": "模拟操作员",
+      "notes": "用于功能和数值验证。",
+      "bands": {
+        "125": 67.1,
+        "250": 66.2,
+        "500": 65.1
+      }
+    },
+    {
+      "id": "h1",
+      "name": "线束孔单项",
+      "type": "single",
+      "conditionId": "condition-demo",
+      "siteIds": [
+        "site-harness"
+      ],
+      "timestamp": "2026-01-01T10:04:00+00:00",
+      "repeatGroup": "",
+      "sourceKind": "simulation",
+      "sourceNote": "软件内置固定模拟数列；acoustic/demo.py；非实测。",
+      "operator": "模拟操作员",
+      "notes": "用于功能和数值验证。",
+      "bands": {
+        "125": 68.0,
+        "250": 66.5,
+        "500": 65.5
+      }
+    },
+    {
+      "id": "c1",
+      "name": "两位置组合测量值（模拟）",
+      "type": "combination",
+      "conditionId": "condition-demo",
+      "siteIds": [
+        "site-door",
+        "site-harness"
+      ],
+      "timestamp": "2026-01-01T10:05:00+00:00",
+      "repeatGroup": "",
+      "sourceKind": "simulation",
+      "sourceNote": "软件内置固定模拟数列；acoustic/demo.py；非实测。",
+      "operator": "模拟操作员",
+      "notes": "用于功能和数值验证。",
+      "bands": {
+        "125": 65.5,
+        "250": 64.5,
+        "500": 64.0
+      }
+    },
+    {
+      "id": "b3",
+      "name": "结束基线",
+      "type": "baseline",
+      "conditionId": "condition-demo",
+      "siteIds": [],
+      "timestamp": "2026-01-01T10:06:00+00:00",
+      "repeatGroup": "baseline-series",
+      "sourceKind": "simulation",
+      "sourceNote": "软件内置固定模拟数列；acoustic/demo.py；非实测。",
+      "operator": "模拟操作员",
+      "notes": "用于功能和数值验证。",
+      "bands": {
+        "125": 70.4,
+        "250": 68.2,
+        "500": 66.3
+      }
+    },
+    {
+      "id": "r1",
+      "name": "解除封堵恢复",
+      "type": "recovery",
+      "conditionId": "condition-demo",
+      "siteIds": [],
+      "timestamp": "2026-01-01T10:07:00+00:00",
+      "repeatGroup": "",
+      "sourceKind": "simulation",
+      "sourceNote": "软件内置固定模拟数列；acoustic/demo.py；非实测。",
+      "operator": "模拟操作员",
+      "notes": "用于功能和数值验证。",
+      "bands": {
+        "125": 70.1,
+        "250": 68.2,
+        "500": 66.1
+      }
+    }
+  ],
+  "pairs": [
+    {
+      "id": "p1",
+      "baselineId": "b1",
+      "targetId": "s1",
+      "purpose": "effect",
+      "notes": "演示中显式指定，不按名称或顺序自动配对。"
+    },
+    {
+      "id": "p2",
+      "baselineId": "b2",
+      "targetId": "s2",
+      "purpose": "effect",
+      "notes": "演示中显式指定，不按名称或顺序自动配对。"
+    },
+    {
+      "id": "p3",
+      "baselineId": "b1",
+      "targetId": "h1",
+      "purpose": "effect",
+      "notes": "演示中显式指定，不按名称或顺序自动配对。"
+    },
+    {
+      "id": "p4",
+      "baselineId": "b1",
+      "targetId": "c1",
+      "purpose": "effect",
+      "notes": "演示中显式指定，不按名称或顺序自动配对。"
+    },
+    {
+      "id": "p5",
+      "baselineId": "b1",
+      "targetId": "b3",
+      "purpose": "drift",
+      "notes": "演示中显式指定，不按名称或顺序自动配对。"
+    },
+    {
+      "id": "p6",
+      "baselineId": "b1",
+      "targetId": "r1",
+      "purpose": "recovery",
+      "notes": "演示中显式指定，不按名称或顺序自动配对。"
+    }
+  ],
+  "parameters": {
+    "speedTolerance": 0.5,
+    "rpmTolerance": 20.0,
+    "temperatureTolerance": 2.0,
+    "durationTolerance": 0.01,
+    "driftThreshold": 1.0,
+    "recoveryThreshold": 1.0,
+    "repeatabilityThreshold": 1.0
+  },
+  "audit": []
+}

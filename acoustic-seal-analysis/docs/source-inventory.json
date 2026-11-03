@@ -1,0 +1,119 @@
+{
+  "scope": [
+    "acoustic/*.py",
+    "web/*.js",
+    "web/*.css",
+    "web/*.html"
+  ],
+  "baseline": 0,
+  "minimum": 3500,
+  "productionNonblank": 3523,
+  "includes": "手写生产源码非空行（含必要注释及样式，不含测试、工具、文档、示例及生成物）",
+  "files": [
+    {
+      "path": "acoustic/__init__.py",
+      "purpose": "软件身份与格式版本",
+      "lines": 5,
+      "nonblank": 4,
+      "sha256": "b5a973cef14e168715e06373824d41ba51a387bf8af4c333634bf1694ed87127"
+    },
+    {
+      "path": "acoustic/analysis.py",
+      "purpose": "声级差、重复统计和筛查",
+      "lines": 377,
+      "nonblank": 347,
+      "sha256": "b2514b25b9fea76b2cc8e46dafd3111e7292bb378d680d229706b8ddfaa2dd1a"
+    },
+    {
+      "path": "acoustic/commands.py",
+      "purpose": "项目事务、引用保护、归档和审计",
+      "lines": 168,
+      "nonblank": 147,
+      "sha256": "dc99de41ae193498a32135221f2c001037b46218a611cb4b7fecff8c89822fda"
+    },
+    {
+      "path": "acoustic/demo.py",
+      "purpose": "用户主动载入的固定模拟样例",
+      "lines": 91,
+      "nonblank": 88,
+      "sha256": "1909ad2f3b617515e65068097c47b4c85895a3bfd03ff2bebb900b79fc0178db"
+    },
+    {
+      "path": "acoustic/imports.py",
+      "purpose": "CSV预检、整体导入与明细输出",
+      "lines": 145,
+      "nonblank": 131,
+      "sha256": "0b5e43b986e358dddd64ef4394e42c3e48011b46ae94d99e2e179f1b60a1ed05"
+    },
+    {
+      "path": "acoustic/models.py",
+      "purpose": "领域对象、输入边界与项目验证",
+      "lines": 398,
+      "nonblank": 350,
+      "sha256": "2dd9a7ac361c68d3edb9e843c00fdda0d569838817600b942c141aed7152c4cb"
+    },
+    {
+      "path": "acoustic/report.py",
+      "purpose": "自包含报告、图表和溯源附录",
+      "lines": 288,
+      "nonblank": 274,
+      "sha256": "398086167a243870618705011022121d3350077d0c6856a00e8c3f7405ac84ea"
+    },
+    {
+      "path": "acoustic/review.py",
+      "purpose": "覆盖、时间线与测得差值矩阵",
+      "lines": 126,
+      "nonblank": 118,
+      "sha256": "f857ebf210b8690ad56615b2021d0f34c80eb3efc0ed1b72ef1274da4ca3cd8d"
+    },
+    {
+      "path": "acoustic/server.py",
+      "purpose": "本机HTTP接口、静态界面与请求边界",
+      "lines": 181,
+      "nonblank": 158,
+      "sha256": "e75a9ddc3b5593a0a64a0cf67b733788ec1bf3f1b177559772704aa80c086d1c"
+    },
+    {
+      "path": "web/app.js",
+      "purpose": "事件适配、表单解析与ViewModel绑定",
+      "lines": 367,
+      "nonblank": 339,
+      "sha256": "9e43525c2a2c309e2ed4f1331b990246b9abf2402141695bffcff41c08f6e758"
+    },
+    {
+      "path": "web/index.html",
+      "purpose": "本地应用入口与无脚本提示",
+      "lines": 19,
+      "nonblank": 19,
+      "sha256": "ee2788ca4cb46b178b90618f4f2932fce99d1b15ae78e49cb2ff78e2c74e233a"
+    },
+    {
+      "path": "web/service.js",
+      "purpose": "浏览器服务调用和文件下载边界",
+      "lines": 74,
+      "nonblank": 68,
+      "sha256": "da858ae70c5f8822c0298fd879e2e062d43167dcf18a236c85dc5b619373617f"
+    },
+    {
+      "path": "web/styles.css",
+      "purpose": "响应式布局、交互状态与图表样式",
+      "lines": 764,
+      "nonblank": 764,
+      "sha256": "cdefed5583bf92aa8060f974ed734ed85d4c876ed53d8d881e64f6b939b4a82a"
+    },
+    {
+      "path": "web/viewmodel.js",
+      "purpose": "MVVM可观察状态及命令",
+      "lines": 289,
+      "nonblank": 257,
+      "sha256": "5a296507421b108242351a5df215f289e457ecdc82dd89eec3d66773700b9653"
+    },
+    {
+      "path": "web/views.js",
+      "purpose": "工作页、表格、图表与表单视图",
+      "lines": 491,
+      "nonblank": 459,
+      "sha256": "8b8142ec6de0224ba9f66ed98c8e333481a6c4a2b7aba5c1a05baa1e326598f1"
+    }
+  ]
+}

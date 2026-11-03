@@ -1,0 +1,3843 @@
+
+================================================================================
+acoustic/__init__.py
+================================================================================
+0001  """车身声学泄漏路径与封堵试验分析软件。"""
+0002
+0003  VERSION = "1.0.0"
+0004  SCHEMA_VERSION = 1
+0005  SOFTWARE_NAME = "车身声学泄漏路径与封堵试验分析软件"
+
+================================================================================
+acoustic/analysis.py
+================================================================================
+0001  """Measured level differences and engineering screening, with no path inference."""
+0002
+0003  from __future__ import annotations
+0004
+0005  import math
+0006  import statistics
+0007  from collections import defaultdict
+0008  from datetime import datetime
+0009
+0010  from acoustic.models import CONDITION_TEXT, validate_project
+0011  from acoustic.review import project_coverage, scenario_matrix
+0012
+0013  # Two-sided Student t 0.975 quantiles, degrees of freedom 1 through 30.
+0014  # Algorithm reference is documented in docs/算法与文件格式.md.
+0015  T975 = (
+0016      12.706204736, 4.30265273, 3.182446305, 2.776445105, 2.570581836,
+0017      2.446911851, 2.364624252, 2.306004135, 2.262157163, 2.228138852,
+0018      2.20098516, 2.17881283, 2.160368656, 2.144786688, 2.131449546,
+0019      2.119905299, 2.109815578, 2.10092204, 2.093024054, 2.085963447,
+0020      2.079613845, 2.073873068, 2.06865761, 2.063898562, 2.059538553,
+0021      2.055529439, 2.051830516, 2.048407142, 2.045229642, 2.042272456,
+0022  )
+0023  LIMITATION = (
+0024      "结果为封堵前后测得声级差，受试验条件、测量不确定性和路径耦合影响；"
+0025      "不是路径独立能量贡献。单项分贝不可相加预测组合，组合效果须使用组合实测。"
+0026  )
+0027
+0028
+0029  def energy_mean(levels):
+0030      """Equal-weight energetic mean, stable across the allowed level range."""
+0031      if not levels:
+0032          return None
+0033      peak = max(levels)
+0034      scaled = math.fsum(10 ** ((level - peak) / 10) for level in levels)
+0035      return peak + 10 * math.log10(scaled / len(levels))
+0036
+0037
+0038  def energy_sum(levels):
+0039      """Sum of nonoverlapping band energies; never a sum of effect differences."""
+0040      if not levels:
+0041          return None
+0042      peak = max(levels)
+0043      return peak + 10 * math.log10(math.fsum(10 ** ((level - peak) / 10) for level in levels))
+0044
+0045
+0046  def describe(values):
+0047      count = len(values)
+0048      if not count:
+0049          return {
+0050              "n": 0,
+0051              "mean": None,
+0052              "energyMean": None,
+0053              "sd": None,
+0054              "range": None,
+0055              "minimum": None,
+0056              "maximum": None,
+0057          }
+0058      return {
+0059          "n": count,
+0060          "mean": statistics.mean(values),
+0061          "energyMean": energy_mean(values),
+0062          "sd": statistics.stdev(values) if count > 1 else None,
+0063          "range": max(values) - min(values),
+0064          "minimum": min(values),
+0065          "maximum": max(values),
+0066      }
+0067
+0068
+0069  def paired_summary(differences, independent=True):
+0070      count = len(differences)
+0071      mean = statistics.mean(differences) if count else None
+0072      sd = statistics.stdev(differences) if count > 1 else None
+0073      result = {
+0074          "n": count,
+0075          "meanDifference": mean,
+0076          "sdDifference": sd,
+0077          "ci95": None,
+0078          "ciNote": "n < 2，不生成置信区间",
+0079      }
+0080      if count > 1 and not independent:
+0081          result["ciNote"] = "配对复用试验，独立性不满足，不生成置信区间"
+0082      elif count > 1:
+0083          # For df > 30 use the conservative df=30 critical value explicitly.
+0084          critical = T975[min(count - 1, 30) - 1]
+0085          half = critical * sd / math.sqrt(count)
+0086          result["ci95"] = [mean - half, mean + half]
+0087          result["ciNote"] = (
+0088              "基于独立配对差近似正态的双侧 95% Student t 区间；"
+0089              + ("自由度大于30时保守使用df=30" if count > 31 else f"df={count - 1}")
+0090              + "；未计仪器系统不确定性"
+0091          )
+0092      return result
+0093
+0094
+0095  def compatible(left, right, parameters):
+0096      reasons = []
+0097      for key, label in CONDITION_TEXT.items():
+0098          a = left[key]
+0099          b = right[key]
+0100          if not a or not b:
+0101              reasons.append(f"{label}缺失，无法确认可比性")
+0102          elif a != b:
+0103              reasons.append(f"{label}不同：{a} / {b}")
+0104      tolerances = {
+0105          "speed": ("speedTolerance", "车速", "km/h"),
+0106          "rpm": ("rpmTolerance", "转速", "r/min"),
+0107          "temperature": ("temperatureTolerance", "温度", "°C"),
+0108          "duration": ("durationTolerance", "积分时长", "s"),
+0109      }
+0110      for field, (parameter, label, unit) in tolerances.items():
+0111          a = left[field]
+0112          b = right[field]
+0113          if a is None or b is None:
+0114              reasons.append(f"{label}缺失，无法确认可比性")
+0115          elif abs(a - b) > parameters[parameter] + 1e-10:
+0116              reasons.append(f"{label}差 {abs(a - b):.6g} {unit} 超过容差 {parameters[parameter]:.6g}")
+0117      if left["independentBands"] != right["independentBands"]:
+0118          reasons.append("互不重叠频带声明不同")
+0119      return reasons
+0120
+0121
+0122  def sorted_bands(*trials):
+0123      keys = set()
+0124      for trial in trials:
+0125          keys.update(trial["bands"])
+0126      return sorted(keys, key=float)
+0127
+0128
+0129  def trial_total(trial, condition):
+0130      bands = trial["bands"]
+0131      if not condition["independentBands"]:
+0132          return None, "未声明互不重叠频带，不计算频带合成声级"
+0133      if not bands:
+0134          return None, "无频带数据"
+0135      if any(value is None for value in bands.values()):
+0136          return None, "存在缺失频带，不计算频带合成声级"
+0137      return energy_sum(list(bands.values())), "已录入频带范围的能量和，并非全频总声级"
+0138
+0139
+0140  def compare_pair(pair, trial_map, condition_map, parameters):
+0141      baseline = trial_map[pair["baselineId"]]
+0142      target = trial_map[pair["targetId"]]
+0143      left_condition = condition_map[baseline["conditionId"]]
+0144      right_condition = condition_map[target["conditionId"]]
+0145      reasons = compatible(left_condition, right_condition, parameters)
+0146      source_warning = None
+0147      if baseline["sourceKind"] != target["sourceKind"]:
+0148          reasons.append("来源类别不同，禁止将模拟、人工和实测混合作为同一配对")
+0149      if baseline["sourceKind"] != "measured":
+0150          source_warning = "包含模拟或人工填写数据，不能证明实际应用效果"
+0151      bands = []
+0152      valid_count = 0
+0153      for frequency in sorted_bands(baseline, target):
+0154          before = baseline["bands"].get(frequency)
+0155          after = target["bands"].get(frequency)
+0156          missing = before is None or after is None
+0157          difference = None
+0158          if not missing and not reasons:
+0159              difference = before - after
+0160              valid_count += 1
+0161          bands.append({
+0162              "frequency": float(frequency),
+0163              "baseline": before,
+0164              "target": after,
+0165              "difference": difference,
+0166              "status": "blocked" if reasons else "missing" if missing else "valid",
+0167          })
+0168      base_total, base_note = trial_total(baseline, left_condition)
+0169      target_total, target_note = trial_total(target, right_condition)
+0170      total_difference = None
+0171      total_note = base_note
+0172      if set(baseline["bands"]) != set(target["bands"]):
+0173          total_note = "两次试验频带集合不同，不比较合成声级"
+0174      elif reasons:
+0175          total_note = "工况或来源不可比，不比较合成声级"
+0176      elif base_total is not None and target_total is not None:
+0177          total_difference = base_total - target_total
+0178      elif target_total is None:
+0179          total_note = target_note
+0180      timestamp_order = (
+0181          datetime.fromisoformat(target["timestamp"].replace("Z", "+00:00"))
+0182          - datetime.fromisoformat(baseline["timestamp"].replace("Z", "+00:00"))
+0183      ).total_seconds()
+0184      warnings = []
+0185      if source_warning:
+0186          warnings.append(source_warning)
+0187      if timestamp_order < 0:
+0188          warnings.append("目标时间早于基线，检查试验顺序")
+0189      if any(band["status"] == "missing" for band in bands):
+0190          warnings.append("缺失频带已保留为空；仅计算共同有效频带")
+0191      if not valid_count and not reasons:
+0192          warnings.append("没有共同有效频带")
+0193      screening = None
+0194      if pair["purpose"] in ("drift", "recovery"):
+0195          threshold_key = "driftThreshold" if pair["purpose"] == "drift" else "recoveryThreshold"
+0196          values = [abs(band["difference"]) for band in bands if band["difference"] is not None]
+0197          screening = {
+0198              "threshold": parameters[threshold_key],
+0199              "maximumAbsoluteDifference": max(values) if values else None,
+0200              "status": "unavailable" if not values else "alert" if max(values) > parameters[threshold_key] else "within",
+0201              "meaning": "用户工程筛查阈值，不是标准合格判定",
+0202          }
+0203      return {
+0204          "id": pair["id"],
+0205          "baselineId": baseline["id"],
+0206          "targetId": target["id"],
+0207          "baselineName": baseline["name"],
+0208          "targetName": target["name"],
+0209          "targetType": target["type"],
+0210          "siteIds": target["siteIds"],
+0211          "purpose": pair["purpose"],
+0212          "sourceKind": baseline["sourceKind"],
+0213          "baselineSource": baseline["sourceNote"],
+0214          "targetSource": target["sourceNote"],
+0215          "status": "blocked" if reasons else "valid" if valid_count else "empty",
+0216          "reasons": reasons,
+0217          "warnings": warnings,
+0218          "bands": bands,
+0219          "baselineTotal": base_total,
+0220          "targetTotal": target_total,
+0221          "totalDifference": total_difference,
+0222          "totalNote": total_note,
+0223          "elapsedSeconds": timestamp_order,
+0224          "screening": screening,
+0225      }
+0226
+0227
+0228  def summarize_effects(results):
+0229      groups = defaultdict(list)
+0230      for result in results:
+0231          if result["purpose"] == "effect" and result["status"] == "valid":
+0232              # Different source kinds cannot be pooled. Conditions must also be
+0233              # checked across pairs before a repeated effect summary is accepted.
+0234              key = (tuple(sorted(result["siteIds"])), result["sourceKind"])
+0235              groups[key].append(result)
+0236      return groups
+0237
+0238
+0239  def effect_statistics(results, trial_map, condition_map, parameters):
+0240      summaries = []
+0241      for (site_ids, source), group in summarize_effects(results).items():
+0242          first = group[0]
+0243          anchor = condition_map[trial_map[first["baselineId"]]["conditionId"]]
+0244          reasons = []
+0245          for result in group[1:]:
+0246              other = condition_map[trial_map[result["baselineId"]]["conditionId"]]
+0247              reasons.extend(compatible(anchor, other, parameters))
+0248          used_ids = [entry[key] for entry in group for key in ("baselineId", "targetId")]
+0249          independent = len(set(used_ids)) == len(used_ids)
+0250          band_keys = sorted({band["frequency"] for result in group for band in result["bands"]})
+0251          band_results = []
+0252          for frequency in band_keys:
+0253              before = []
+0254              after = []
+0255              differences = []
+0256              for result in group:
+0257                  for band in result["bands"]:
+0258                      if band["frequency"] == frequency and band["difference"] is not None:
+0259                          before.append(band["baseline"])
+0260                          after.append(band["target"])
+0261                          differences.append(band["difference"])
+0262              summary = paired_summary(differences, independent)
+0263              summary["frequency"] = frequency
+0264              summary["groupEnergyMeanDifference"] = (
+0265                  energy_mean(before) - energy_mean(after) if before else None
+0266              )
+0267              if reasons:
+0268                  summary["meanDifference"] = None
+0269                  summary["sdDifference"] = None
+0270                  summary["ci95"] = None
+0271                  summary["groupEnergyMeanDifference"] = None
+0272                  summary["ciNote"] = "跨配对工况不一致，禁止汇总"
+0273              band_results.append(summary)
+0274          summaries.append({
+0275              "siteIds": list(site_ids),
+0276              "sourceKind": source,
+0277              "pairIds": [result["id"] for result in group],
+0278              "status": "blocked" if reasons else "valid",
+0279              "reasons": sorted(set(reasons)),
+0280              "independentPairs": independent,
+0281              "bands": band_results,
+0282          })
+0283      return summaries
+0284
+0285
+0286  def repeatability(project, condition_map):
+0287      groups = defaultdict(list)
+0288      for trial in project["trials"]:
+0289          if trial["repeatGroup"]:
+0290              key = (trial["repeatGroup"], trial["type"], tuple(sorted(trial["siteIds"])), trial["sourceKind"])
+0291              groups[key].append(trial)
+0292      output = []
+0293      for (name, kind, sites, source), trials in groups.items():
+0294          reference = condition_map[trials[0]["conditionId"]]
+0295          reasons = []
+0296          for trial in trials[1:]:
+0297              reasons.extend(compatible(reference, condition_map[trial["conditionId"]], project["parameters"]))
+0298          rows = []
+0299          for frequency in sorted_bands(*trials):
+0300              values = [trial["bands"].get(frequency) for trial in trials]
+0301              available = [value for value in values if value is not None]
+0302              summary = describe(available)
+0303              summary["frequency"] = float(frequency)
+0304              summary["missing"] = len(values) - len(available)
+0305              summary["status"] = (
+0306                  "blocked" if reasons else "insufficient" if len(available) < 2
+0307                  else "alert" if summary["sd"] > project["parameters"]["repeatabilityThreshold"] else "within"
+0308              )
+0309              if reasons:
+0310                  for key in ("mean", "energyMean", "sd", "range", "minimum", "maximum"):
+0311                      summary[key] = None
+0312              rows.append(summary)
+0313          output.append({
+0314              "name": name,
+0315              "type": kind,
+0316              "siteIds": list(sites),
+0317              "sourceKind": source,
+0318              "trialIds": [trial["id"] for trial in trials],
+0319              "reasons": sorted(set(reasons)),
+0320              "bands": rows,
+0321              "threshold": project["parameters"]["repeatabilityThreshold"],
+0322          })
+0323      return output
+0324
+0325
+0326  def quality_issues(project, results):
+0327      issues = []
+0328      paired = {pair[key] for pair in project["pairs"] for key in ("baselineId", "targetId")}
+0329      for trial in project["trials"]:
+0330          if not trial["bands"] or all(value is None for value in trial["bands"].values()):
+0331              issues.append({"level": "warning", "object": trial["id"], "message": f"{trial['name']} 没有有效频带"})
+0332          if trial["id"] not in paired:
+0333              issues.append({"level": "info", "object": trial["id"], "message": f"{trial['name']} 尚未显式配对"})
+0334          if trial["sourceKind"] != "measured":
+0335              issues.append({"level": "info", "object": trial["id"], "message": f"{trial['name']} 为模拟或人工填写"})
+0336      for result in results:
+0337          for reason in result["reasons"]:
+0338              issues.append({"level": "error", "object": result["id"], "message": reason})
+0339          for warning in result["warnings"]:
+0340              issues.append({"level": "warning", "object": result["id"], "message": warning})
+0341          if result["screening"] and result["screening"]["status"] == "alert":
+0342              issues.append({"level": "warning", "object": result["id"], "message": f"{result['targetName']} 超过用户筛查阈值"})
+0343      if not any(pair["purpose"] == "drift" for pair in project["pairs"]):
+0344          issues.append({"level": "warning", "object": project["id"], "message": "未设置漂移配对，无法评估基线稳定性"})
+0345      if not any(pair["purpose"] == "recovery" for pair in project["pairs"]):
+0346          issues.append({"level": "warning", "object": project["id"], "message": "未设置恢复配对，无法检查解除封堵后的恢复情况"})
+0347      return issues
+0348
+0349
+0350  def analyze(raw):
+0351      project = validate_project(raw)
+0352      trial_map = {trial["id"]: trial for trial in project["trials"]}
+0353      condition_map = {condition["id"]: condition for condition in project["conditions"]}
+0354      results = [
+0355          compare_pair(pair, trial_map, condition_map, project["parameters"])
+0356          for pair in project["pairs"]
+0357      ]
+0358      return {
+0359          "projectId": project["id"],
+0360          "revision": project["revision"],
+0361          "limitation": LIMITATION,
+0362          "pairs": results,
+0363          "effects": effect_statistics(results, trial_map, condition_map, project["parameters"]),
+0364          "repeatability": repeatability(project, condition_map),
+0365          "issues": quality_issues(project, results),
+0366          "coverage": project_coverage(project, results),
+0367          "matrix": scenario_matrix(results),
+0368          "counts": {
+0369              "sites": len(project["sites"]),
+0370              "conditions": len(project["conditions"]),
+0371              "trials": len(project["trials"]),
+0372              "pairs": len(results),
+0373              "valid": sum(result["status"] == "valid" for result in results),
+0374              "blocked": sum(result["status"] == "blocked" for result in results),
+0375              "simulation": sum(trial["sourceKind"] == "simulation" for trial in project["trials"]),
+0376          },
+0377      }
+
+================================================================================
+acoustic/commands.py
+================================================================================
+0001  """Project mutations are isolated, validated transactions with reference guards."""
+0002
+0003  import copy
+0004
+0005  from acoustic.analysis import analyze
+0006  from acoustic.imports import csv_preview
+0007  from acoustic.models import (
+0008      ValidationError,
+0009      append_audit,
+0010      clone_project,
+0011      identifier,
+0012      validate_project,
+0013  )
+0014
+0015  COLLECTIONS = ("sites", "conditions", "trials", "pairs")
+0016
+0017
+0018  def find_item(project, collection, item_id):
+0019      for item in project[collection]:
+0020          if item["id"] == item_id:
+0021              return item
+0022      raise ValidationError("对象不存在，可能已删除", f"{collection}.{item_id}")
+0023
+0024
+0025  def ensure_active(project):
+0026      if project["status"] == "archived":
+0027          raise ValidationError("归档项目只读，请先在项目页解除归档或复制项目", "status")
+0028
+0029
+0030  def upsert(project, collection, payload):
+0031      if collection not in COLLECTIONS:
+0032          raise ValidationError("对象集合无效", "collection")
+0033      if not isinstance(payload, dict):
+0034          raise ValidationError("对象必须为 JSON 对象", "payload")
+0035      item = copy.deepcopy(payload)
+0036      item_id = item.get("id") or identifier()
+0037      item["id"] = item_id
+0038      found = False
+0039      changed = []
+0040      for index, existing in enumerate(project[collection]):
+0041          if existing["id"] == item_id:
+0042              changed = [key for key in set(existing) | set(item) if existing.get(key) != item.get(key)]
+0043              project[collection][index] = item
+0044              found = True
+0045              break
+0046      if not found:
+0047          project[collection].append(item)
+0048      verb = "更新" if found else "新增"
+0049      detail = str(item.get("name", item_id))
+0050      if changed:
+0051          detail += "；修改字段=" + ",".join(sorted(changed))
+0052      append_audit(project, verb + collection, detail)
+0053      return item_id
+0054
+0055
+0056  def remove(project, collection, item_id):
+0057      if collection not in COLLECTIONS:
+0058          raise ValidationError("对象集合无效", "collection")
+0059      item = find_item(project, collection, item_id)
+0060      if collection == "sites":
+0061          related = [trial["name"] for trial in project["trials"] if item_id in trial["siteIds"]]
+0062      elif collection == "conditions":
+0063          related = [trial["name"] for trial in project["trials"] if trial["conditionId"] == item_id]
+0064      elif collection == "trials":
+0065          related = [pair["id"] for pair in project["pairs"] if item_id in (pair["baselineId"], pair["targetId"])]
+0066      else:
+0067          related = []
+0068      if related:
+0069          raise ValidationError("仍被引用，先修改或删除关联对象：" + "、".join(related[:10]), collection)
+0070      project[collection] = [entry for entry in project[collection] if entry["id"] != item_id]
+0071      append_audit(project, "删除" + collection, item.get("name", item_id))
+0072
+0073
+0074  def change_metadata(project, payload):
+0075      if not isinstance(payload, dict):
+0076          raise ValidationError("项目信息须为对象", "payload")
+0077      allowed = {"name", "owner", "description"}
+0078      if set(payload) - allowed:
+0079          raise ValidationError("项目信息含未知字段", "payload")
+0080      project.update(payload)
+0081      append_audit(project, "修改项目信息", project["name"])
+0082
+0083
+0084  def change_parameters(project, payload):
+0085      if not isinstance(payload, dict):
+0086          raise ValidationError("分析参数须为对象", "payload")
+0087      previous = copy.deepcopy(project["parameters"])
+0088      project["parameters"].update(payload)
+0089      append_audit(project, "修改分析参数", f"原值 {previous}；现值 {project['parameters']}；全部结果重新计算")
+0090
+0091
+0092  def import_measurements(project, payload):
+0093      if not isinstance(payload, dict):
+0094          raise ValidationError("导入请求须为对象", "payload")
+0095      preview = csv_preview(project, payload.get("content"), payload.get("mode"))
+0096      for trial in project["trials"]:
+0097          update = preview["updates"].get(trial["id"])
+0098          if update is not None:
+0099              if preview["mode"] == "replace":
+0100                  trial["bands"] = {}
+0101              trial["bands"].update(update)
+0102      append_audit(
+0103          project,
+0104          "CSV频带导入",
+0105          f"模式 {preview['mode']}；{preview['rows']} 行；{preview['trials']} 试验；"
+0106          f"缺失 {preview['missing']}；同频带覆盖 {preview['overwritten']}；来源沿用试验元数据",
+0107      )
+0108
+0109
+0110  def duplicate_trial(project, trial_id):
+0111      original = find_item(project, "trials", trial_id)
+0112      trial = copy.deepcopy(original)
+0113      trial["id"] = identifier()
+0114      trial["name"] = (trial["name"] + " 副本（未录入测量）")[:160]
+0115      trial["bands"] = {}
+0116      trial["repeatGroup"] = ""
+0117      trial["notes"] = ("从试验复制结构；时间和来源须复核。\n" + trial["notes"])[:4000]
+0118      project["trials"].append(trial)
+0119      append_audit(project, "复制试验结构", f"{original['id']} → {trial['id']}；未复制测量和配对")
+0120      return trial["id"]
+0121
+0122
+0123  def execute(raw, action, payload=None):
+0124      project = copy.deepcopy(validate_project(raw))
+0125      payload = {} if payload is None else payload
+0126      if not isinstance(payload, dict):
+0127          raise ValidationError("命令参数必须为对象", "payload")
+0128      if not isinstance(action, str):
+0129          raise ValidationError("命令名称必须为文本", "action")
+0130      result_id = None
+0131      if action == "clone":
+0132          project = clone_project(project)
+0133      elif action == "archive":
+0134          if project["status"] != "active":
+0135              raise ValidationError("项目已经归档", "status")
+0136          project["status"] = "archived"
+0137          append_audit(project, "归档项目", "项目进入只读状态")
+0138      elif action == "restore":
+0139          if project["status"] != "archived":
+0140              raise ValidationError("项目未归档", "status")
+0141          project["status"] = "active"
+0142          append_audit(project, "解除归档", "恢复编辑")
+0143      else:
+0144          ensure_active(project)
+0145          if action == "metadata":
+0146              change_metadata(project, payload)
+0147          elif action == "parameters":
+0148              change_parameters(project, payload)
+0149          elif action == "upsert":
+0150              result_id = upsert(project, payload.get("collection"), payload.get("item"))
+0151          elif action == "delete":
+0152              remove(project, payload.get("collection"), payload.get("id"))
+0153          elif action == "import":
+0154              import_measurements(project, payload)
+0155          elif action == "duplicateTrial":
+0156              result_id = duplicate_trial(project, payload.get("id"))
+0157          elif action == "recordAnalysis":
+0158              analysis = analyze(project)
+0159              blocked = [f"{item['id']}: {'；'.join(item['reasons'])}" for item in analysis["pairs"] if item["reasons"]]
+0160              append_audit(project, "记录分析复核", "阻断原因：" + (" | ".join(blocked) or "无") + "; 参数=" + str(project["parameters"]))
+0161          else:
+0162              raise ValidationError("未知命令", "action")
+0163      project = validate_project(project)
+0164      return {
+0165          "project": project,
+0166          "analysis": analyze(project),
+0167          "resultId": result_id,
+0168      }
+
+================================================================================
+acoustic/demo.py
+================================================================================
+0001  """Deterministic synthetic fixture. No real vehicle or registration facts."""
+0002
+0003  from acoustic.models import empty_project, validate_project
+0004
+0005
+0006  def demonstration():
+0007      project = empty_project("模拟演示 · 车门密封与线束孔封堵")
+0008      project["id"] = "demo-project"
+0009      project["owner"] = "演示操作员（虚构）"
+0010      project["description"] = "纯模拟数据，按固定数列构造用于验证流程，不来自车辆测量，不证明实际降噪效果。"
+0011      project["sites"] = [
+0012          {
+0013              "id": "site-door",
+0014              "name": "左前门上沿密封",
+0015              "zone": "左前门",
+0016              "material": "模拟胶带",
+0017              "procedure": "演示：沿密封边缘临时封堵，记录覆盖范围。",
+0018              "notes": "位置及工艺均为模拟。",
+0019          },
+0020          {
+0021              "id": "site-harness",
+0022              "name": "前围线束孔",
+0023              "zone": "前围",
+0024              "material": "模拟密封泥",
+0025              "procedure": "演示：覆盖孔周围间隙，恢复时移除。",
+0026              "notes": "不构成真实车辆作业指导。",
+0027          },
+0028      ]
+0029      project["conditions"] = [{
+0030          "id": "condition-demo",
+0031          "name": "模拟静态激励工况",
+0032          "vehicle": "SIM-001",
+0033          "microphone": "模拟驾驶员耳旁固定测点",
+0034          "excitation": "模拟宽带外部声源",
+0035          "surface": "模拟半消声室",
+0036          "gear": "P",
+0037          "weighting": "Z",
+0038          "timeWeighting": "Leq",
+0039          "bandType": "octave",
+0040          "instrument": "SIM-METER",
+0041          "calibration": "模拟标定记录，仅验证字段一致性",
+0042          "unit": "dB re 20 µPa",
+0043          "speed": 0,
+0044          "rpm": 0,
+0045          "temperature": 23,
+0046          "duration": 30,
+0047          "independentBands": True,
+0048          "notes": "所有数值模拟；频带预先声明为互不重叠。",
+0049      }]
+0050      records = [
+0051          ("b1", "基线 1", "baseline", [], "baseline-series", [70, 68, 66], 0),
+0052          ("b2", "基线 2", "baseline", [], "baseline-series", [70.2, 68.1, 66.2], 1),
+0053          ("s1", "门密封单项 1", "single", ["site-door"], "door-series", [67, 66, 65], 2),
+0054          ("s2", "门密封单项 2", "single", ["site-door"], "door-series", [67.1, 66.2, 65.1], 3),
+0055          ("h1", "线束孔单项", "single", ["site-harness"], "", [68, 66.5, 65.5], 4),
+0056          ("c1", "两位置组合测量值（模拟）", "combination", ["site-door", "site-harness"], "", [65.5, 64.5, 64], 5),
+0057          ("b3", "结束基线", "baseline", [], "baseline-series", [70.4, 68.2, 66.3], 6),
+0058          ("r1", "解除封堵恢复", "recovery", [], "", [70.1, 68.2, 66.1], 7),
+0059      ]
+0060      for trial_id, name, kind, sites, repeat_group, levels, minute in records:
+0061          project["trials"].append({
+0062              "id": trial_id,
+0063              "name": name,
+0064              "type": kind,
+0065              "conditionId": "condition-demo",
+0066              "siteIds": sites,
+0067              "timestamp": f"2026-01-01T10:{minute:02d}:00+00:00",
+0068              "repeatGroup": repeat_group,
+0069              "sourceKind": "simulation",
+0070              "sourceNote": "软件内置固定模拟数列；acoustic/demo.py；非实测。",
+0071              "operator": "模拟操作员",
+0072              "notes": "用于功能和数值验证。",
+0073              "bands": {str(frequency): level for frequency, level in zip([125, 250, 500], levels)},
+0074          })
+0075      definitions = [
+0076          ("p1", "b1", "s1", "effect"),
+0077          ("p2", "b2", "s2", "effect"),
+0078          ("p3", "b1", "h1", "effect"),
+0079          ("p4", "b1", "c1", "effect"),
+0080          ("p5", "b1", "b3", "drift"),
+0081          ("p6", "b1", "r1", "recovery"),
+0082      ]
+0083      for pair_id, baseline, target, purpose in definitions:
+0084          project["pairs"].append({
+0085              "id": pair_id,
+0086              "baselineId": baseline,
+0087              "targetId": target,
+0088              "purpose": purpose,
+0089              "notes": "演示中显式指定，不按名称或顺序自动配对。",
+0090          })
+0091      return validate_project(project)
+
+================================================================================
+acoustic/imports.py
+================================================================================
+0001  """Transactional, long-format UTF-8 CSV import with explicit missing values."""
+0002
+0003  import csv
+0004  import io
+0005  import json
+0006
+0007  from acoustic import VERSION
+0008  import math
+0009
+0010  from acoustic.models import ValidationError
+0011
+0012  COLUMNS = ("trial_id", "frequency_hz", "level_db")
+0013
+0014
+0015  def parse_csv(content, trial_map):
+0016      if not isinstance(content, str):
+0017          raise ValidationError("CSV 内容必须为文本", "csv")
+0018      if len(content.encode("utf-8")) > 5 * 1024 * 1024:
+0019          raise ValidationError("CSV 不得超过 5 MiB", "csv")
+0020      stream = io.StringIO(content.lstrip("\ufeff"), newline="")
+0021      reader = csv.DictReader(stream, strict=True)
+0022      if reader.fieldnames != list(COLUMNS):
+0023          raise ValidationError("表头必须严格为 trial_id,frequency_hz,level_db，使用逗号分隔", "csv.header")
+0024      result = {}
+0025      seen = set()
+0026      missing = 0
+0027      row_count = 0
+0028      try:
+0029          for row_number, row in enumerate(reader, start=2):
+0030              row_count += 1
+0031              if row_count > 100000:
+0032                  raise ValidationError("CSV 最多 100000 行", "csv")
+0033              if None in row or any(value is None for value in row.values()):
+0034                  raise ValidationError("列数不匹配", f"csv.line[{row_number}]")
+0035              trial_id = row["trial_id"].strip()
+0036              if trial_id not in trial_map:
+0037                  raise ValidationError(f"试验标识不存在：{trial_id}，请先建试验", f"csv.line[{row_number}].trial_id")
+0038              try:
+0039                  frequency = float(row["frequency_hz"].strip())
+0040              except ValueError as error:
+0041                  raise ValidationError("频率必须为数值 Hz", f"csv.line[{row_number}].frequency_hz") from error
+0042              if not math.isfinite(frequency) or not 1 <= frequency <= 100000:
+0043                  raise ValidationError("频率须在 1—100000 Hz", f"csv.line[{row_number}].frequency_hz")
+0044              key = format(frequency, ".12g")
+0045              row_key = (trial_id, key)
+0046              if row_key in seen:
+0047                  raise ValidationError("同一试验频带重复，导入已整体取消", f"csv.line[{row_number}]")
+0048              seen.add(row_key)
+0049              value = row["level_db"].strip()
+0050              if value in ("", "NA", "N/A", "null"):
+0051                  level = None
+0052                  missing += 1
+0053              else:
+0054                  try:
+0055                      level = float(value)
+0056                  except ValueError as error:
+0057                      raise ValidationError("声级必须为数值或空白/NA/N/A/null", f"csv.line[{row_number}].level_db") from error
+0058                  if not math.isfinite(level) or not -100 <= level <= 200:
+0059                      raise ValidationError("声级须在 -100—200 dB", f"csv.line[{row_number}].level_db")
+0060              result.setdefault(trial_id, {})[key] = level
+0061      except csv.Error as error:
+0062          raise ValidationError(f"CSV 格式错误：{error}", f"csv.line[{reader.line_num}]") from error
+0063      if not row_count:
+0064          raise ValidationError("CSV 没有数据行", "csv")
+0065      for trial_id, bands in result.items():
+0066          if len(bands) > 200:
+0067              raise ValidationError("每个试验最多 200 个频带", f"csv.{trial_id}")
+0068      return {
+0069          "updates": result,
+0070          "rows": row_count,
+0071          "trials": len(result),
+0072          "missing": missing,
+0073      }
+0074
+0075
+0076  def csv_preview(project, content, mode):
+0077      if mode not in ("merge", "replace"):
+0078          raise ValidationError("导入模式请选择 merge 或 replace", "mode")
+0079      trial_map = {trial["id"]: trial for trial in project["trials"]}
+0080      parsed = parse_csv(content, trial_map)
+0081      overwritten = 0
+0082      for trial_id, bands in parsed["updates"].items():
+0083          original = trial_map[trial_id]["bands"]
+0084          overwritten += sum(key in original for key in bands)
+0085          merged = {} if mode == "replace" else original.copy()
+0086          merged.update(bands)
+0087          if len(merged) > 200:
+0088              raise ValidationError("合并后超过每试验 200 个频带", f"csv.{trial_id}")
+0089      return {
+0090          **parsed,
+0091          "mode": mode,
+0092          "overwritten": overwritten,
+0093          "meaning": "replace 清空受影响试验的旧频带后导入；merge 保留其他频带并覆盖同名频带",
+0094      }
+0095
+0096
+0097  def measurements_csv(project):
+0098      output = io.StringIO(newline="")
+0099      writer = csv.writer(output)
+0100      writer.writerow(COLUMNS)
+0101      for trial in project["trials"]:
+0102          for frequency, value in sorted(trial["bands"].items(), key=lambda item: float(item[0])):
+0103              writer.writerow([trial["id"], frequency, "" if value is None else value])
+0104      return "\ufeff" + output.getvalue()
+0105
+0106
+0107  def safe_csv_cell(value):
+0108      if isinstance(value, str) and value.startswith(("=", "+", "-", "@", "\t", "\r")):
+0109          return "'" + value
+0110      return value
+0111
+0112
+0113  def results_csv(project, analysis):
+0114      output = io.StringIO(newline="")
+0115      writer = csv.writer(output)
+0116      writer.writerow([
+0117          "project", "revision", "pair_id", "purpose", "baseline", "target",
+0118          "source_kind", "baseline_source", "target_source", "frequency_hz",
+0119          "baseline_db", "target_db", "measured_difference_db", "status", "reason",
+0120          "software_version", "schema_version", "project_id", "baseline_condition_id",
+0121          "target_condition_id", "level_unit", "parameters_json",
+0122      ])
+0123      trial_map = {trial["id"]: trial for trial in project["trials"]}
+0124      for pair in analysis["pairs"]:
+0125          rows = pair["bands"] or [{
+0126              "frequency": None,
+0127              "baseline": None,
+0128              "target": None,
+0129              "difference": None,
+0130              "status": pair["status"],
+0131          }]
+0132          for band in rows:
+0133              row = [
+0134                  project["name"], project["revision"], pair["id"], pair["purpose"],
+0135                  pair["baselineName"], pair["targetName"], pair["sourceKind"],
+0136                  pair["baselineSource"], pair["targetSource"], band["frequency"],
+0137                  band["baseline"], band["target"], band["difference"], band["status"],
+0138                  "；".join(pair["reasons"] + pair["warnings"]),
+0139                  VERSION, project["schemaVersion"], project["id"],
+0140                  trial_map[pair["baselineId"]]["conditionId"],
+0141                  trial_map[pair["targetId"]]["conditionId"],
+0142                  "dB re 20 µPa", json.dumps(project["parameters"], ensure_ascii=False, sort_keys=True),
+0143              ]
+0144              writer.writerow([safe_csv_cell(value) for value in row])
+0145      return "\ufeff" + output.getvalue()
+
+================================================================================
+acoustic/models.py
+================================================================================
+0001  """Domain validation boundary for projects, imports and every command."""
+0002
+0003  from __future__ import annotations
+0004
+0005  import copy
+0006  import math
+0007  import re
+0008  import uuid
+0009  from datetime import datetime, timezone
+0010
+0011  from acoustic import SCHEMA_VERSION, VERSION
+0012
+0013  TRIAL_TYPES = {
+0014      "baseline": "基线",
+0015      "single": "单项封堵",
+0016      "combination": "组合封堵",
+0017      "recovery": "恢复",
+0018  }
+0019  SOURCES = {
+0020      "simulation": "模拟",
+0021      "measured": "实测",
+0022      "manual": "人工填写",
+0023  }
+0024  CONDITION_TEXT = {
+0025      "vehicle": "车辆标识",
+0026      "microphone": "测点及安装位置",
+0027      "excitation": "声源或激励方式",
+0028      "surface": "路面或试验场",
+0029      "gear": "挡位",
+0030      "weighting": "频率计权",
+0031      "timeWeighting": "时间计权",
+0032      "bandType": "频带制",
+0033      "instrument": "仪器标识",
+0034      "calibration": "标定链路及状态",
+0035      "unit": "声级单位",
+0036  }
+0037  CONDITION_NUMBERS = {
+0038      "speed": (0, 500, "车速 km/h"),
+0039      "rpm": (0, 30000, "转速 r/min"),
+0040      "temperature": (-80, 100, "温度 °C"),
+0041      "duration": (0.001, 86400, "积分时长 s"),
+0042  }
+0043  PARAMETERS = {
+0044      "speedTolerance": (0, 50, 0.5),
+0045      "rpmTolerance": (0, 5000, 20),
+0046      "temperatureTolerance": (0, 30, 2),
+0047      "durationTolerance": (0, 3600, 0.01),
+0048      "driftThreshold": (0, 30, 1),
+0049      "recoveryThreshold": (0, 30, 1),
+0050      "repeatabilityThreshold": (0, 30, 1),
+0051  }
+0052  MAX_TRIALS = 2000
+0053  MAX_BANDS = 200
+0054  MAX_PAIRS = 5000
+0055  ID_PATTERN = re.compile(r"^[A-Za-z0-9_-]{1,80}$")
+0056
+0057
+0058  class ValidationError(ValueError):
+0059      """An actionable input error with a stable field path."""
+0060
+0061      def __init__(self, message, path="project"):
+0062          self.path = path
+0063          self.message = message
+0064          super().__init__(f"{path}: {message}")
+0065
+0066      def as_dict(self):
+0067          return {
+0068              "path": self.path,
+0069              "message": self.message,
+0070          }
+0071
+0072
+0073  def now():
+0074      return datetime.now(timezone.utc).isoformat(timespec="seconds")
+0075
+0076
+0077  def identifier():
+0078      return uuid.uuid4().hex
+0079
+0080
+0081  def object_value(value, path):
+0082      if not isinstance(value, dict):
+0083          raise ValidationError("必须为对象", path)
+0084      return value
+0085
+0086
+0087  def array_value(value, path, maximum=MAX_TRIALS):
+0088      if not isinstance(value, list):
+0089          raise ValidationError("必须为数组", path)
+0090      if len(value) > maximum:
+0091          raise ValidationError(f"最多允许 {maximum} 项", path)
+0092      return value
+0093
+0094
+0095  def text_value(value, path, required=True, limit=1000):
+0096      if not isinstance(value, str):
+0097          raise ValidationError("必须为文本", path)
+0098      cleaned = value.strip()
+0099      if required and not cleaned:
+0100          raise ValidationError("不能为空", path)
+0101      if len(cleaned) > limit:
+0102          raise ValidationError(f"长度不得超过 {limit}", path)
+0103      if any(ord(char) < 32 and char not in "\n\t\r" for char in cleaned):
+0104          raise ValidationError("包含无效控制字符", path)
+0105      return cleaned
+0106
+0107
+0108  def number_value(value, path, low, high, nullable=False):
+0109      if nullable and value is None:
+0110          return None
+0111      if isinstance(value, bool) or not isinstance(value, (int, float)):
+0112          raise ValidationError("必须为有限数值", path)
+0113      result = float(value)
+0114      if not math.isfinite(result):
+0115          raise ValidationError("必须为有限数值", path)
+0116      if not low <= result <= high:
+0117          raise ValidationError(f"允许范围 {low} 至 {high}", path)
+0118      return result
+0119
+0120
+0121  def enum_value(value, options, path):
+0122      if value not in options:
+0123          raise ValidationError(f"允许值：{', '.join(options)}", path)
+0124      return value
+0125
+0126
+0127  def bool_value(value, path):
+0128      if not isinstance(value, bool):
+0129          raise ValidationError("必须为布尔值", path)
+0130      return value
+0131
+0132
+0133  def id_value(value, path):
+0134      if not isinstance(value, str) or not ID_PATTERN.fullmatch(value):
+0135          raise ValidationError("标识须为 1—80 位字母、数字、下划线或连字符", path)
+0136      return value
+0137
+0138
+0139  def date_value(value, path):
+0140      value = text_value(value, path, limit=80)
+0141      try:
+0142          parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+0143      except ValueError as error:
+0144          raise ValidationError("请输入 ISO 8601 日期时间", path) from error
+0145      if parsed.tzinfo is None:
+0146          raise ValidationError("日期时间须带时区，例如 +08:00 或 Z", path)
+0147      return value
+0148
+0149
+0150  def fields_only(value, allowed, path):
+0151      unexpected = set(value) - set(allowed)
+0152      if unexpected:
+0153          raise ValidationError(f"未知字段 {', '.join(sorted(unexpected))}", path)
+0154
+0155
+0156  def validate_site(raw, path="site"):
+0157      raw = object_value(raw, path)
+0158      fields_only(raw, ["id", "name", "zone", "material", "procedure", "notes"], path)
+0159      return {
+0160          "id": id_value(raw.get("id"), f"{path}.id"),
+0161          "name": text_value(raw.get("name"), f"{path}.name", limit=120),
+0162          "zone": text_value(raw.get("zone", ""), f"{path}.zone", False, 120),
+0163          "material": text_value(raw.get("material", ""), f"{path}.material", False),
+0164          "procedure": text_value(raw.get("procedure", ""), f"{path}.procedure", False, 4000),
+0165          "notes": text_value(raw.get("notes", ""), f"{path}.notes", False, 4000),
+0166      }
+0167
+0168
+0169  def validate_condition(raw, path="condition"):
+0170      raw = object_value(raw, path)
+0171      allowed = ["id", "name", "notes", "independentBands"]
+0172      allowed.extend(CONDITION_TEXT)
+0173      allowed.extend(CONDITION_NUMBERS)
+0174      fields_only(raw, allowed, path)
+0175      result = {
+0176          "id": id_value(raw.get("id"), f"{path}.id"),
+0177          "name": text_value(raw.get("name"), f"{path}.name", limit=120),
+0178          "notes": text_value(raw.get("notes", ""), f"{path}.notes", False, 4000),
+0179          "independentBands": bool_value(raw.get("independentBands", False), f"{path}.independentBands"),
+0180      }
+0181      for key in CONDITION_TEXT:
+0182          result[key] = text_value(raw.get(key, ""), f"{path}.{key}", False, 200)
+0183      for key, (low, high, _) in CONDITION_NUMBERS.items():
+0184          result[key] = number_value(raw.get(key), f"{path}.{key}", low, high, True)
+0185      if result["weighting"] not in ("", "A", "C", "Z"):
+0186          raise ValidationError("频率计权请选择 A、C、Z", f"{path}.weighting")
+0187      if result["unit"] not in ("", "dB re 20 µPa"):
+0188          raise ValidationError("仅支持 dB re 20 µPa", f"{path}.unit")
+0189      if result["bandType"] not in ("", "octave", "third-octave", "custom"):
+0190          raise ValidationError("频带制无效", f"{path}.bandType")
+0191      return result
+0192
+0193
+0194  def validate_trial(raw, site_ids, condition_ids, path="trial"):
+0195      raw = object_value(raw, path)
+0196      allowed = [
+0197          "id", "name", "type", "conditionId", "siteIds", "timestamp",
+0198          "repeatGroup", "sourceKind", "sourceNote", "operator", "notes", "bands",
+0199      ]
+0200      fields_only(raw, allowed, path)
+0201      condition_id = id_value(raw.get("conditionId"), f"{path}.conditionId")
+0202      if condition_id not in condition_ids:
+0203          raise ValidationError("引用的工况不存在", f"{path}.conditionId")
+0204      trial_type = enum_value(raw.get("type"), TRIAL_TYPES, f"{path}.type")
+0205      sites = array_value(raw.get("siteIds"), f"{path}.siteIds", 200)
+0206      for index, site in enumerate(sites):
+0207          id_value(site, f"{path}.siteIds[{index}]")
+0208      if len(set(sites)) != len(sites):
+0209          raise ValidationError("封堵位置不可重复", f"{path}.siteIds")
+0210      for site in sites:
+0211          if site not in site_ids:
+0212              raise ValidationError(f"封堵位置不存在：{site}", f"{path}.siteIds")
+0213      if trial_type in ("baseline", "recovery") and sites:
+0214          raise ValidationError("基线或恢复试验不得含封堵位置", f"{path}.siteIds")
+0215      if trial_type == "single" and len(sites) != 1:
+0216          raise ValidationError("单项封堵须选择一个位置", f"{path}.siteIds")
+0217      if trial_type == "combination" and len(sites) < 2:
+0218          raise ValidationError("组合封堵须至少选择两个位置", f"{path}.siteIds")
+0219      bands = object_value(raw.get("bands"), f"{path}.bands")
+0220      if len(bands) > MAX_BANDS:
+0221          raise ValidationError(f"最多 {MAX_BANDS} 个频带", f"{path}.bands")
+0222      normalized = {}
+0223      for frequency, level in bands.items():
+0224          try:
+0225              hz = float(frequency)
+0226          except (TypeError, ValueError) as error:
+0227              raise ValidationError("频率键必须为 Hz 数值", f"{path}.bands") from error
+0228          if not math.isfinite(hz) or not 1 <= hz <= 100000:
+0229              raise ValidationError("频率允许 1—100000 Hz", f"{path}.bands.{frequency}")
+0230          key = format(hz, ".12g")
+0231          if key in normalized:
+0232              raise ValidationError("规范化后的频率重复", f"{path}.bands.{frequency}")
+0233          normalized[key] = number_value(level, f"{path}.bands.{frequency}", -100, 200, True)
+0234      return {
+0235          "id": id_value(raw.get("id"), f"{path}.id"),
+0236          "name": text_value(raw.get("name"), f"{path}.name", limit=160),
+0237          "type": trial_type,
+0238          "conditionId": condition_id,
+0239          "siteIds": sites,
+0240          "timestamp": date_value(raw.get("timestamp"), f"{path}.timestamp"),
+0241          "repeatGroup": text_value(raw.get("repeatGroup", ""), f"{path}.repeatGroup", False, 120),
+0242          "sourceKind": enum_value(raw.get("sourceKind"), SOURCES, f"{path}.sourceKind"),
+0243          "sourceNote": text_value(raw.get("sourceNote"), f"{path}.sourceNote", limit=4000),
+0244          "operator": text_value(raw.get("operator", ""), f"{path}.operator", False, 120),
+0245          "notes": text_value(raw.get("notes", ""), f"{path}.notes", False, 4000),
+0246          "bands": normalized,
+0247      }
+0248
+0249
+0250  def validate_pair(raw, trial_map, path="pair"):
+0251      raw = object_value(raw, path)
+0252      fields_only(raw, ["id", "baselineId", "targetId", "purpose", "notes"], path)
+0253      base_id = id_value(raw.get("baselineId"), f"{path}.baselineId")
+0254      target_id = id_value(raw.get("targetId"), f"{path}.targetId")
+0255      if base_id not in trial_map or target_id not in trial_map:
+0256          raise ValidationError("配对引用的试验不存在", path)
+0257      if base_id == target_id:
+0258          raise ValidationError("试验不能与自身配对", path)
+0259      if trial_map[base_id]["type"] != "baseline":
+0260          raise ValidationError("配对基准必须是基线试验", f"{path}.baselineId")
+0261      purpose = enum_value(raw.get("purpose"), ["effect", "drift", "recovery"], f"{path}.purpose")
+0262      target_type = trial_map[target_id]["type"]
+0263      allowed = {
+0264          "effect": ("single", "combination"),
+0265          "drift": ("baseline",),
+0266          "recovery": ("recovery",),
+0267      }
+0268      if target_type not in allowed[purpose]:
+0269          raise ValidationError("目标试验类型与配对用途不一致", f"{path}.purpose")
+0270      return {
+0271          "id": id_value(raw.get("id"), f"{path}.id"),
+0272          "baselineId": base_id,
+0273          "targetId": target_id,
+0274          "purpose": purpose,
+0275          "notes": text_value(raw.get("notes", ""), f"{path}.notes", False, 4000),
+0276      }
+0277
+0278
+0279  def unique_items(items, path):
+0280      ids = [item["id"] for item in items]
+0281      if len(ids) != len(set(ids)):
+0282          raise ValidationError("对象标识重复", path)
+0283      return {item["id"]: item for item in items}
+0284
+0285
+0286  def validate_project(raw):
+0287      raw = object_value(raw, "project")
+0288      allowed = [
+0289          "schemaVersion", "softwareVersion", "id", "name", "owner", "description",
+0290          "createdAt", "updatedAt", "revision", "status", "sites", "conditions",
+0291          "trials", "pairs", "parameters", "audit",
+0292      ]
+0293      fields_only(raw, allowed, "project")
+0294      if type(raw.get("schemaVersion")) is not int or raw.get("schemaVersion") != SCHEMA_VERSION:
+0295          raise ValidationError("不支持的项目格式版本，请保留原文件并使用匹配版本", "schemaVersion")
+0296      revision = raw.get("revision", 0)
+0297      if isinstance(revision, bool) or not isinstance(revision, int) or revision < 0:
+0298          raise ValidationError("修订号必须为非负整数", "revision")
+0299      sites = [
+0300          validate_site(item, f"sites[{index}]")
+0301          for index, item in enumerate(array_value(raw.get("sites"), "sites", 200))
+0302      ]
+0303      site_map = unique_items(sites, "sites")
+0304      conditions = [
+0305          validate_condition(item, f"conditions[{index}]")
+0306          for index, item in enumerate(array_value(raw.get("conditions"), "conditions", 500))
+0307      ]
+0308      condition_map = unique_items(conditions, "conditions")
+0309      trials = [
+0310          validate_trial(item, site_map, condition_map, f"trials[{index}]")
+0311          for index, item in enumerate(array_value(raw.get("trials"), "trials"))
+0312      ]
+0313      trial_map = unique_items(trials, "trials")
+0314      pairs = [
+0315          validate_pair(item, trial_map, f"pairs[{index}]")
+0316          for index, item in enumerate(array_value(raw.get("pairs"), "pairs", MAX_PAIRS))
+0317      ]
+0318      unique_items(pairs, "pairs")
+0319      pair_keys = [(item["baselineId"], item["targetId"], item["purpose"]) for item in pairs]
+0320      if len(pair_keys) != len(set(pair_keys)):
+0321          raise ValidationError("同一用途的试验配对不可重复", "pairs")
+0322      parameters = object_value(raw.get("parameters"), "parameters")
+0323      fields_only(parameters, PARAMETERS, "parameters")
+0324      normalized_parameters = {}
+0325      for key, (low, high, default) in PARAMETERS.items():
+0326          normalized_parameters[key] = number_value(parameters.get(key, default), f"parameters.{key}", low, high)
+0327      audit = array_value(raw.get("audit", []), "audit", 10000)
+0328      normalized_audit = []
+0329      for index, entry in enumerate(audit):
+0330          path = f"audit[{index}]"
+0331          entry = object_value(entry, path)
+0332          fields_only(entry, ["time", "action", "detail"], path)
+0333          normalized_audit.append({
+0334              "time": date_value(entry.get("time"), f"{path}.time"),
+0335              "action": text_value(entry.get("action"), f"{path}.action", limit=120),
+0336              "detail": text_value(entry.get("detail", ""), f"{path}.detail", False, 4000),
+0337          })
+0338      return {
+0339          "schemaVersion": SCHEMA_VERSION,
+0340          "softwareVersion": text_value(raw.get("softwareVersion"), "softwareVersion", limit=40),
+0341          "id": id_value(raw.get("id"), "id"),
+0342          "name": text_value(raw.get("name"), "name", limit=160),
+0343          "owner": text_value(raw.get("owner", ""), "owner", False, 120),
+0344          "description": text_value(raw.get("description", ""), "description", False, 8000),
+0345          "createdAt": date_value(raw.get("createdAt"), "createdAt"),
+0346          "updatedAt": date_value(raw.get("updatedAt"), "updatedAt"),
+0347          "revision": revision,
+0348          "status": enum_value(raw.get("status", "active"), ["active", "archived"], "status"),
+0349          "sites": sites,
+0350          "conditions": conditions,
+0351          "trials": trials,
+0352          "pairs": pairs,
+0353          "parameters": normalized_parameters,
+0354          "audit": normalized_audit,
+0355      }
+0356
+0357
+0358  def empty_project(name="未命名声学项目"):
+0359      timestamp = now()
+0360      return {
+0361          "schemaVersion": SCHEMA_VERSION,
+0362          "softwareVersion": VERSION,
+0363          "id": identifier(),
+0364          "name": name,
+0365          "owner": "",
+0366          "description": "",
+0367          "createdAt": timestamp,
+0368          "updatedAt": timestamp,
+0369          "revision": 0,
+0370          "status": "active",
+0371          "sites": [],
+0372          "conditions": [],
+0373          "trials": [],
+0374          "pairs": [],
+0375          "parameters": {key: bounds[2] for key, bounds in PARAMETERS.items()},
+0376          "audit": [],
+0377      }
+0378
+0379
+0380  def append_audit(project, action, detail):
+0381      project["audit"].append({
+0382          "time": now(),
+0383          "action": action,
+0384          "detail": str(detail)[:4000],
+0385      })
+0386      project["audit"] = project["audit"][-10000:]
+0387      project["updatedAt"] = now()
+0388      project["revision"] += 1
+0389      project["softwareVersion"] = VERSION
+0390
+0391
+0392  def clone_project(raw):
+0393      project = copy.deepcopy(validate_project(raw))
+0394      project["id"] = identifier()
+0395      project["name"] = (project["name"] + " 副本")[:160]
+0396      project["status"] = "active"
+0397      append_audit(project, "复制项目", "生成新项目标识，保留原始来源与配对")
+0398      return project
+
+================================================================================
+acoustic/report.py
+================================================================================
+0001  """Self-contained report with provenance, conditions, blocked results and audit."""
+0002
+0003  import html
+0004
+0005  from acoustic import SOFTWARE_NAME, VERSION
+0006  from acoustic.analysis import LIMITATION, analyze
+0007  from acoustic.models import CONDITION_TEXT, SOURCES, TRIAL_TYPES, now, validate_project
+0008
+0009
+0010  def escape(value):
+0011      return html.escape(str(value), quote=True)
+0012
+0013
+0014  def number(value):
+0015      return "—" if value is None else f"{value:.6f}"
+0016
+0017
+0018  def table(headers, rows):
+0019      head = "".join(f"<th>{escape(value)}</th>" for value in headers)
+0020      body = []
+0021      for row in rows:
+0022          body.append("<tr>" + "".join(f"<td>{escape(value)}</td>" for value in row) + "</tr>")
+0023      if not body:
+0024          body.append(f'<tr><td colspan="{len(headers)}">暂无记录</td></tr>')
+0025      return f"<table><thead><tr>{head}</tr></thead><tbody>{''.join(body)}</tbody></table>"
+0026
+0027
+0028  def level_chart(pair):
+0029      rows = [band for band in pair["bands"] if band["difference"] is not None]
+0030      if not rows:
+0031          return "<p>无可比较数据，不绘图。</p>"
+0032      values = [band[key] for band in rows for key in ("baseline", "target")]
+0033      minimum = min(values) - 3
+0034      span = max(max(values) - minimum + 3, 10)
+0035      width = 760
+0036      height = 280
+0037      left = 64
+0038      plot_width = width - left - 20
+0039      elements = [
+0040          f'<svg viewBox="0 0 {width} {height}" role="img" aria-label="基线和目标频带声级，单位dB">',
+0041          '<rect width="100%" height="100%" fill="#f8fafc"/>',
+0042      ]
+0043      for step in range(5):
+0044          value = minimum + span * step / 4
+0045          y = 220 - step * 45
+0046          elements.append(f'<line x1="{left}" y1="{y}" x2="740" y2="{y}" stroke="#dbe3ec"/>')
+0047          elements.append(f'<text x="5" y="{y + 4}" font-size="12">{value:.1f}</text>')
+0048      for index, band in enumerate(rows):
+0049          x = left + (index + 0.5) * plot_width / len(rows)
+0050          for offset, key, color in [(-9, "baseline", "#64748b"), (9, "target", "#0d9488")]:
+0051              y = 220 - (band[key] - minimum) / span * 180
+0052              elements.append(f'<rect x="{x + offset - 6:.2f}" y="{y:.2f}" width="12" height="{220 - y:.2f}" fill="{color}"/>')
+0053          elements.append(f'<text x="{x:.2f}" y="242" text-anchor="middle" font-size="11">{band["frequency"]:g}</text>')
+0054      elements.extend([
+0055          '<text x="5" y="18" font-size="12">dB re 20 µPa（截断纵轴）</text>',
+0056          '<text x="650" y="268" font-size="12">频率 Hz</text>',
+0057          '<text x="160" y="268" font-size="12" fill="#64748b">■ 基线</text>',
+0058          '<text x="250" y="268" font-size="12" fill="#0d9488">■ 目标</text>',
+0059          '</svg>',
+0060      ])
+0061      return "".join(elements)
+0062
+0063
+0064  def report_html(raw):
+0065      project = validate_project(raw)
+0066      analysis = analyze(project)
+0067      site_names = {site["id"]: site["name"] for site in project["sites"]}
+0068      sections = [
+0069          '<!doctype html><html lang="zh-CN"><meta charset="utf-8">',
+0070          '<meta name="viewport" content="width=device-width,initial-scale=1">',
+0071          '<title>' + escape(project["name"]) + ' · 分析报告</title>',
+0072          '<style>',
+0073          'body{font:15px/1.65 "Noto Sans CJK SC","Microsoft YaHei",sans-serif;color:#173042;margin:32px auto;max-width:1100px;padding:0 24px}',
+0074          'h1{font-size:28px}h2{border-bottom:2px solid #0d9488;padding-bottom:8px;margin-top:36px}',
+0075          'h3{margin-top:25px}table{width:100%;border-collapse:collapse;margin:14px 0;font-size:12px;overflow-wrap:anywhere}',
+0076          'td,th{padding:7px;border:1px solid #cad5df;text-align:left}th{background:#edf4f7}',
+0077          '.notice{background:#fff4db;border-left:5px solid #b7791f;padding:14px}.blocked{color:#a12626}',
+0078          'svg{max-width:100%;height:auto}.meta{color:#53697a}pre{white-space:pre-wrap;overflow-wrap:anywhere}',
+0079          '@media print{body{margin:0;max-width:none;font-size:11px}h2{break-after:avoid}tr{break-inside:avoid}svg{max-height:230px}}',
+0080          '</style><body>',
+0081          '<h1>' + escape(project["name"]) + '</h1>',
+0082          f'<p class="meta">{SOFTWARE_NAME} V{VERSION} · 报告生成时间 {escape(now())} · 项目修订 {project["revision"]}</p>',
+0083          '<p class="notice">' + escape(LIMITATION) + '</p>',
+0084          '<h2>1 项目信息与来源</h2>',
+0085          table(["字段", "内容"], [
+0086              ["项目标识", project["id"]],
+0087              ["负责人（用户填写）", project["owner"]],
+0088              ["项目说明", project["description"]],
+0089              ["状态", project["status"]],
+0090              ["格式版本", project["schemaVersion"]],
+0091              ["来源分类", "、".join(sorted({SOURCES[trial['sourceKind']] for trial in project['trials']})) or "无试验"],
+0092              ["有效/阻断配对", f"{analysis['counts']['valid']} / {analysis['counts']['blocked']}"],
+0093          ]),
+0094          '<h2>2 封堵位置</h2>',
+0095          table(["标识", "名称", "区域", "材料", "操作记录", "备注"], [
+0096              [site[key] for key in ("id", "name", "zone", "material", "procedure", "notes")]
+0097              for site in project["sites"]
+0098          ]),
+0099          '<h2>3 工况与测量口径</h2>',
+0100      ]
+0101      for condition in project["conditions"]:
+0102          rows = [[label, condition[key] or "未填写"] for key, label in CONDITION_TEXT.items()]
+0103          rows.extend([
+0104              ["车速 km/h", condition["speed"]],
+0105              ["转速 r/min", condition["rpm"]],
+0106              ["温度 °C", condition["temperature"]],
+0107              ["积分时长 s", condition["duration"]],
+0108              ["互不重叠频带声明", condition["independentBands"]],
+0109              ["备注", condition["notes"]],
+0110          ])
+0111          sections.append('<h3>' + escape(condition["name"]) + '</h3>')
+0112          sections.append(table(["字段", "值"], rows))
+0113      sections.extend([
+0114          '<h2>4 试验原始频带记录</h2>',
+0115          '<p>空值表示未提供，不按零声级补齐。频带声级已采用工况中所写频率计权，不再重复加权。</p>',
+0116      ])
+0117      for trial in project["trials"]:
+0118          sections.append('<h3>' + escape(trial["name"]) + ' · ' + TRIAL_TYPES[trial["type"]] + '</h3>')
+0119          sections.append(table(["项目", "内容"], [
+0120              ["标识", trial["id"]],
+0121              ["来源", SOURCES[trial["sourceKind"]] + "；" + trial["sourceNote"]],
+0122              ["工况标识", trial["conditionId"]],
+0123              ["时间", trial["timestamp"]],
+0124              ["封堵位置", "、".join(site_names[key] for key in trial["siteIds"]) or "无"],
+0125              ["重复组", trial["repeatGroup"] or "未分组"],
+0126              ["操作员", trial["operator"]],
+0127              ["备注", trial["notes"]],
+0128          ]))
+0129          sections.append(table(["中心频率 Hz", "声级 dB re 20 µPa"], [
+0130              [frequency, number(value)] for frequency, value in sorted(trial["bands"].items(), key=lambda item: float(item[0]))
+0131          ]))
+0132      sections.append('<h2>5 显式配对与测得声级差</h2>')
+0133      for pair in analysis["pairs"]:
+0134          sections.append('<h3>' + escape(pair["baselineName"] + " → " + pair["targetName"]) + '</h3>')
+0135          sections.append('<p>配对标识 ' + escape(pair["id"]) + '；用途 ' + escape(pair["purpose"]) + '；状态 ' + escape(pair["status"]) + '</p>')
+0136          sections.append('<p>来源：' + escape(SOURCES[pair["sourceKind"]]) + '</p>')
+0137          if pair["reasons"]:
+0138              sections.append('<p class="blocked">阻断：' + escape("；".join(pair["reasons"])) + '</p>')
+0139          if pair["warnings"]:
+0140              sections.append('<p class="notice">' + escape("；".join(pair["warnings"])) + '</p>')
+0141          sections.append(level_chart(pair))
+0142          sections.append(table(["Hz", "基线 dB", "目标 dB", "基线减目标 dB", "状态"], [
+0143              [band["frequency"], number(band["baseline"]), number(band["target"]), number(band["difference"]), band["status"]]
+0144              for band in pair["bands"]
+0145          ]))
+0146          sections.append('<p>录入频带合成声级差：' + number(pair["totalDifference"]) + ' dB；' + escape(pair["totalNote"]) + '</p>')
+0147          if pair["screening"]:
+0148              screen = pair["screening"]
+0149              sections.append('<p>最大频带绝对差 ' + number(screen["maximumAbsoluteDifference"]) + ' dB；阈值 ' + number(screen["threshold"]) + ' dB；' + escape(screen["status"]) + '。' + escape(screen["meaning"]) + '</p>')
+0150      sections.extend([
+0151          '<h2>6 重复配对统计</h2>',
+0152          '<p>配对差算术均值与两组等权能量平均声级之差是两个不同统计量。双侧 95% 区间要求独立配对及近似正态；n=1或复用试验不生成区间。</p>',
+0153      ])
+0154      for effect in analysis["effects"]:
+0155          sections.append('<h3>' + escape(" + ".join(site_names[key] for key in effect["siteIds"])) + ' · ' + escape(SOURCES[effect["sourceKind"]]) + '</h3>')
+0156          sections.append('<p>' + escape("；".join(effect["reasons"])) + '</p>')
+0157          sections.append(table(["Hz", "n", "配对差均值 dB", "配对差SD dB", "组能量均值差 dB", "95%区间", "说明"], [
+0158              [row["frequency"], row["n"], number(row["meanDifference"]), number(row["sdDifference"]), number(row["groupEnergyMeanDifference"]),
+0159               "—" if row["ci95"] is None else " / ".join(number(value) for value in row["ci95"]), row["ciNote"]]
+0160              for row in effect["bands"]
+0161          ]))
+0162      sections.append('<h2>7 重复性检查</h2>')
+0163      for group in analysis["repeatability"]:
+0164          sections.append('<h3>' + escape(group["name"]) + ' · ' + TRIAL_TYPES[group["type"]] + '</h3>')
+0165          sections.append('<p>来源 ' + escape(SOURCES[group["sourceKind"]]) + '；用户样本标准差阈值 ' + number(group["threshold"]) + ' dB。' + escape("；".join(group["reasons"])) + '</p>')
+0166          sections.append(table(["Hz", "n", "缺失", "算术均值 dB", "能量均值 dB", "样本SD dB", "极差 dB", "状态"], [
+0167              [row["frequency"], row["n"], row["missing"], number(row["mean"]), number(row["energyMean"]), number(row["sd"]), number(row["range"]), row["status"]]
+0168              for row in group["bands"]
+0169          ]))
+0170      sections.extend([
+0171          '<h2>8 参数、质量问题与审计</h2>',
+0172          table(["参数", "值"], [[key, value] for key, value in project["parameters"].items()]),
+0173          table(["级别", "对象", "问题"], [[issue["level"], issue["object"], issue["message"]] for issue in analysis["issues"]]),
+0174          table(["时间", "操作", "详情"], [[entry["time"], entry["action"], entry["detail"]] for entry in project["audit"]]),
+0175          '<h2>9 方法及使用边界</h2>',
+0176          '<p>频带差 ΔL = L基线 − L目标；正值表示该配对下目标声级较低，负值表示较高。等权能量均值为 10 log10(Σ10^(L/10)/n)。互不重叠频带合成去除分母 n。所有合成只覆盖录入频带。</p>',
+0177          '<p>未提供测量不确定度预算，不作统计显著性或因果保证。工况容差和筛查阈值由用户设定，不代表国家标准。实测来源说明由操作者提供，软件不自动认证数据真实性。</p>',
+0178          '<p>' + escape(LIMITATION) + '</p>',
+0179          review_appendix(project, analysis),
+0180          '</body></html>',
+0181      ])
+0182      return "\n".join(sections)
+0183
+0184
+0185  def review_appendix(project, analysis):
+0186      """Export the same coverage and actual-pair matrix exposed by the UI."""
+0187      coverage = analysis["coverage"]
+0188      matrix = analysis["matrix"]
+0189      parts = [
+0190          '<h2>10 数据覆盖与试验时间线</h2>',
+0191          '<p>' + escape(coverage["note"]) + '</p>',
+0192      ]
+0193      type_rows = []
+0194      for trial_type, count in coverage["typeCounts"].items():
+0195          type_rows.append([
+0196              TRIAL_TYPES[trial_type],
+0197              count,
+0198          ])
+0199      parts.append(table(["试验类型", "记录数"], type_rows))
+0200      condition_rows = []
+0201      for condition in coverage["conditions"]:
+0202          condition_rows.append([
+0203              condition["name"],
+0204              condition["trialCount"],
+0205              "字段齐全" if condition["complete"] else "有缺失",
+0206              "、".join(condition["missing"]),
+0207          ])
+0208      parts.append('<h3>工况字段完整性</h3>')
+0209      parts.append(table([
+0210          "工况",
+0211          "关联试验数",
+0212          "字段状态",
+0213          "缺失字段",
+0214      ], condition_rows))
+0215      site_rows = []
+0216      for site in coverage["sites"]:
+0217          site_rows.append([
+0218              site["name"],
+0219              site["singleTrials"],
+0220              site["combinationTrials"],
+0221              site["validEffectPairs"],
+0222          ])
+0223      parts.append('<h3>封堵位置覆盖</h3>')
+0224      parts.append(table([
+0225          "位置",
+0226          "单项试验数",
+0227          "组合试验数",
+0228          "可比较配对数",
+0229      ], site_rows))
+0230      frequency_rows = []
+0231      for frequency in coverage["frequencies"]:
+0232          frequency_rows.append([
+0233              frequency["frequency"],
+0234              frequency["valid"],
+0235              frequency["missing"],
+0236              frequency["absent"],
+0237          ])
+0238      parts.append('<h3>频带完整性</h3>')
+0239      parts.append(table([
+0240          "Hz",
+0241          "有效记录数",
+0242          "明确缺失数",
+0243          "未声明频带数",
+0244      ], frequency_rows))
+0245      timeline_rows = []
+0246      for trial in coverage["timeline"]:
+0247          timeline_rows.append([
+0248              trial["timestamp"],
+0249              trial["name"],
+0250              TRIAL_TYPES[trial["type"]],
+0251              SOURCES[trial["sourceKind"]],
+0252              trial["validBands"],
+0253              trial["validTargetPairs"],
+0254          ])
+0255      parts.append('<h3>按带时区时间排序的试验记录</h3>')
+0256      parts.append(table([
+0257          "时间",
+0258          "试验",
+0259          "类型",
+0260          "来源",
+0261          "有效频带数",
+0262          "作为目标的可比较配对数",
+0263      ], timeline_rows))
+0264      parts.append('<h2>11 单项与组合测得差值矩阵</h2>')
+0265      parts.append('<p>' + escape(matrix["note"]) + '</p>')
+0266      headings = ["频率 Hz"]
+0267      for column in matrix["columns"]:
+0268          headings.append(
+0269              column["targetName"]
+0270              + "；基线=" + column["baselineName"]
+0271              + "；来源=" + SOURCES[column["sourceKind"]]
+0272          )
+0273      matrix_rows = []
+0274      for record in matrix["rows"]:
+0275          values = [record["frequency"]]
+0276          for cell in record["cells"]:
+0277              values.append(
+0278                  number(cell["difference"])
+0279                  if cell["difference"] is not None
+0280                  else cell["status"]
+0281              )
+0282          matrix_rows.append(values)
+0283      parts.append(table(headings, matrix_rows))
+0284      parts.append(
+0285          '<p>矩阵数值单位 dB，为各列自己的基线减目标。'
+0286          '本表没有相加预测，也不提供路径独立能量贡献排序。</p>'
+0287      )
+0288      return "\n".join(parts)
+
+================================================================================
+acoustic/review.py
+================================================================================
+0001  """Coverage, completeness and measured scenario matrix for review screens."""
+0002
+0003  from collections import defaultdict
+0004  from datetime import datetime
+0005
+0006  from acoustic.models import CONDITION_NUMBERS, CONDITION_TEXT, SOURCES, TRIAL_TYPES
+0007
+0008
+0009  def condition_completeness(condition):
+0010      missing = []
+0011      for key, label in CONDITION_TEXT.items():
+0012          if not condition[key]:
+0013              missing.append(label)
+0014      for key, (_, _, label) in CONDITION_NUMBERS.items():
+0015          if condition[key] is None:
+0016              missing.append(label)
+0017      return {
+0018          "id": condition["id"],
+0019          "name": condition["name"],
+0020          "complete": not missing,
+0021          "missing": missing,
+0022          "trialCount": 0,
+0023      }
+0024
+0025
+0026  def project_coverage(project, results):
+0027      """Coverage is descriptive and never an experimental sufficiency guarantee."""
+0028      paired_targets = defaultdict(list)
+0029      for pair in project["pairs"]:
+0030          paired_targets[pair["targetId"]].append(pair["id"])
+0031      result_map = {result["id"]: result for result in results}
+0032      condition_rows = [condition_completeness(condition) for condition in project["conditions"]]
+0033      condition_rows_map = {condition["id"]: condition for condition in condition_rows}
+0034      type_counts = {key: 0 for key in TRIAL_TYPES}
+0035      source_counts = {key: 0 for key in SOURCES}
+0036      frequency_counts = defaultdict(lambda: {"trials": 0, "missing": 0})
+0037      timeline = []
+0038      for trial in project["trials"]:
+0039          type_counts[trial["type"]] += 1
+0040          source_counts[trial["sourceKind"]] += 1
+0041          condition_rows_map[trial["conditionId"]]["trialCount"] += 1
+0042          for frequency, value in trial["bands"].items():
+0043              frequency_counts[frequency]["trials"] += 1
+0044              if value is None:
+0045                  frequency_counts[frequency]["missing"] += 1
+0046          valid = sum(value is not None for value in trial["bands"].values())
+0047          pair_ids = paired_targets[trial["id"]]
+0048          timeline.append({
+0049              "id": trial["id"],
+0050              "name": trial["name"],
+0051              "timestamp": trial["timestamp"],
+0052              "type": trial["type"],
+0053              "sourceKind": trial["sourceKind"],
+0054              "conditionId": trial["conditionId"],
+0055              "validBands": valid,
+0056              "declaredBands": len(trial["bands"]),
+0057              "targetPairs": len(pair_ids),
+0058              "validTargetPairs": sum(result_map[pair_id]["status"] == "valid" for pair_id in pair_ids),
+0059          })
+0060      timeline.sort(key=lambda trial: datetime.fromisoformat(trial["timestamp"].replace("Z", "+00:00")))
+0061      sites = []
+0062      for site in project["sites"]:
+0063          single = [trial for trial in project["trials"] if trial["type"] == "single" and site["id"] in trial["siteIds"]]
+0064          combination = [trial for trial in project["trials"] if trial["type"] == "combination" and site["id"] in trial["siteIds"]]
+0065          valid_effects = [result for result in results if result["purpose"] == "effect" and result["status"] == "valid" and site["id"] in result["siteIds"]]
+0066          sites.append({
+0067              "id": site["id"],
+0068              "name": site["name"],
+0069              "singleTrials": len(single),
+0070              "combinationTrials": len(combination),
+0071              "validEffectPairs": len(valid_effects),
+0072              "missingSingle": not single,
+0073              "missingCombination": not combination,
+0074          })
+0075      frequencies = []
+0076      for frequency, counts in sorted(frequency_counts.items(), key=lambda item: float(item[0])):
+0077          frequencies.append({
+0078              "frequency": float(frequency),
+0079              "declared": counts["trials"],
+0080              "missing": counts["missing"],
+0081              "absent": len(project["trials"]) - counts["trials"],
+0082              "valid": counts["trials"] - counts["missing"],
+0083          })
+0084      return {
+0085          "typeCounts": type_counts,
+0086          "sourceCounts": source_counts,
+0087          "conditions": condition_rows,
+0088          "sites": sites,
+0089          "frequencies": frequencies,
+0090          "timeline": timeline,
+0091          "note": "覆盖统计只描述已录入记录，不能证明样本充分、工况有效或封堵可复现。",
+0092      }
+0093
+0094
+0095  def scenario_matrix(results):
+0096      """Keep per-pair results separate: no additive prediction or pooled ranking."""
+0097      effects = [result for result in results if result["purpose"] == "effect"]
+0098      frequencies = sorted({band["frequency"] for result in effects for band in result["bands"]})
+0099      columns = []
+0100      for result in effects:
+0101          columns.append({
+0102              "pairId": result["id"],
+0103              "baselineName": result["baselineName"],
+0104              "targetName": result["targetName"],
+0105              "sourceKind": result["sourceKind"],
+0106              "targetType": result["targetType"],
+0107              "siteIds": result["siteIds"],
+0108              "status": result["status"],
+0109              "reasons": result["reasons"],
+0110          })
+0111      rows = []
+0112      for frequency in frequencies:
+0113          cells = []
+0114          for result in effects:
+0115              band = next((item for item in result["bands"] if item["frequency"] == frequency), None)
+0116              cells.append({
+0117                  "pairId": result["id"],
+0118                  "difference": band["difference"] if band else None,
+0119                  "status": band["status"] if band else "missing",
+0120              })
+0121          rows.append({"frequency": frequency, "cells": cells})
+0122      return {
+0123          "columns": columns,
+0124          "rows": rows,
+0125          "note": "横向展示各显式配对的测得声级差；各列基线、工况和来源可能不同，不作独立贡献排序。",
+0126      }
+
+================================================================================
+acoustic/server.py
+================================================================================
+0001  """Loopback-only, stateless application server with bounded JSON requests."""
+0002
+0003  import argparse
+0004  import json
+0005  import mimetypes
+0006  import sys
+0007  import traceback
+0008  from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+0009  from pathlib import Path
+0010  from urllib.parse import urlparse
+0011
+0012  from acoustic import SOFTWARE_NAME, VERSION
+0013  from acoustic.analysis import analyze
+0014  from acoustic.commands import execute
+0015  from acoustic.demo import demonstration
+0016  from acoustic.imports import csv_preview, measurements_csv, results_csv
+0017  from acoustic.models import ValidationError, empty_project, validate_project
+0018  from acoustic.report import report_html
+0019
+0020  WEB_ROOT = Path(__file__).resolve().parent.parent / "web"
+0021  MAX_REQUEST = 12 * 1024 * 1024
+0022
+0023
+0024  def reject_constant(value):
+0025      raise ValidationError(f"不允许非有限 JSON 数值 {value}", "json")
+0026
+0027
+0028  def reject_duplicate_fields(pairs):
+0029      output = {}
+0030      for key, value in pairs:
+0031          if key in output:
+0032              raise ValidationError(f"重复 JSON 字段 {key}", "json")
+0033          output[key] = value
+0034      return output
+0035
+0036
+0037  def load_json(text):
+0038      try:
+0039          return json.loads(text, parse_constant=reject_constant, object_pairs_hook=reject_duplicate_fields)
+0040      except json.JSONDecodeError as error:
+0041          raise ValidationError(f"JSON 第 {error.lineno} 行第 {error.colno} 列格式错误", "json") from error
+0042
+0043
+0044  def dispatch(route, body):
+0045      if not isinstance(body, dict):
+0046          raise ValidationError("请求必须为 JSON 对象", "request")
+0047      if route == "/api/new":
+0048          project = empty_project()
+0049          return {"project": project, "analysis": analyze(project)}
+0050      if route == "/api/demo":
+0051          project = demonstration()
+0052          return {"project": project, "analysis": analyze(project)}
+0053      if route == "/api/open-text":
+0054          text = body.get("content")
+0055          if not isinstance(text, str):
+0056              raise ValidationError("项目内容须为文本", "content")
+0057          project = validate_project(load_json(text))
+0058          return {"project": project, "analysis": analyze(project)}
+0059      if route == "/api/open":
+0060          project = validate_project(body.get("project"))
+0061          return {"project": project, "analysis": analyze(project)}
+0062      if route == "/api/command":
+0063          return execute(body.get("project"), body.get("action"), body.get("payload"))
+0064      if route == "/api/analyze":
+0065          return {"analysis": analyze(body.get("project"))}
+0066      if route == "/api/import-preview":
+0067          project = validate_project(body.get("project"))
+0068          return {"preview": csv_preview(project, body.get("content"), body.get("mode"))}
+0069      if route == "/api/export":
+0070          project = validate_project(body.get("project"))
+0071          kind = body.get("kind")
+0072          analysis = analyze(project)
+0073          if kind == "report":
+0074              return {"content": report_html(project), "extension": ".report.html", "mime": "text/html;charset=utf-8"}
+0075          if kind == "results":
+0076              return {"content": results_csv(project, analysis), "extension": ".results.csv", "mime": "text/csv;charset=utf-8"}
+0077          if kind == "measurements":
+0078              return {"content": measurements_csv(project), "extension": ".measurements.csv", "mime": "text/csv;charset=utf-8"}
+0079          if kind == "project":
+0080              return {"content": json.dumps(project, ensure_ascii=False, indent=2, allow_nan=False), "extension": ".aslp.json", "mime": "application/json;charset=utf-8"}
+0081          raise ValidationError("未知导出类型", "kind")
+0082      raise ValidationError("未知接口", "route")
+0083
+0084
+0085  class Handler(BaseHTTPRequestHandler):
+0086      server_version = "AcousticSeal/1.0"
+0087
+0088      def allowed_request(self):
+0089          expected = f"127.0.0.1:{self.server.server_port}"
+0090          if self.headers.get("Host") not in (expected, f"localhost:{self.server.server_port}"):
+0091              self.respond(403, {"error": {"path": "host", "message": "仅接受本机地址访问"}})
+0092              return False
+0093          origin = self.headers.get("Origin")
+0094          if origin and origin not in (f"http://{expected}", f"http://localhost:{self.server.server_port}"):
+0095              self.respond(403, {"error": {"path": "origin", "message": "拒绝跨站请求"}})
+0096              return False
+0097          return True
+0098
+0099      def headers_for(self, status, content_type, size):
+0100          self.send_response(status)
+0101          self.send_header("Content-Type", content_type)
+0102          self.send_header("Content-Length", str(size))
+0103          self.send_header("X-Content-Type-Options", "nosniff")
+0104          self.send_header("Cache-Control", "no-store")
+0105          self.send_header("Referrer-Policy", "no-referrer")
+0106          self.send_header("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' blob: data:; object-src 'none'; base-uri 'none'; frame-ancestors 'none'")
+0107          self.end_headers()
+0108
+0109      def respond(self, status, payload):
+0110          data = json.dumps(payload, ensure_ascii=False, allow_nan=False).encode("utf-8")
+0111          self.headers_for(status, "application/json;charset=utf-8", len(data))
+0112          self.wfile.write(data)
+0113
+0114      def do_GET(self):
+0115          if not self.allowed_request():
+0116              return
+0117          route = urlparse(self.path).path
+0118          if route == "/api/health":
+0119              self.respond(200, {"name": SOFTWARE_NAME, "version": VERSION, "status": "ready"})
+0120              return
+0121          if route == "/":
+0122              route = "/index.html"
+0123          target = (WEB_ROOT / route.lstrip("/")).resolve()
+0124          if WEB_ROOT not in target.parents or not target.is_file():
+0125              self.respond(404, {"error": {"path": "route", "message": "文件不存在"}})
+0126              return
+0127          content = target.read_bytes()
+0128          content_type = mimetypes.guess_type(target)[0] or "application/octet-stream"
+0129          if content_type.startswith("text/") or target.suffix == ".js":
+0130              content_type += ";charset=utf-8"
+0131          self.headers_for(200, content_type, len(content))
+0132          self.wfile.write(content)
+0133
+0134      def do_POST(self):
+0135          if not self.allowed_request():
+0136              return
+0137          try:
+0138              if self.headers.get("Content-Type", "").split(";")[0] != "application/json":
+0139                  raise ValidationError("请求须使用 application/json", "contentType")
+0140              length = int(self.headers.get("Content-Length", "0"))
+0141              if not 0 < length <= MAX_REQUEST:
+0142                  raise ValidationError("请求必须为 1 字节至 12 MiB", "contentLength")
+0143              if self.headers.get("Transfer-Encoding"):
+0144                  raise ValidationError("不支持分块请求", "transferEncoding")
+0145              text = self.rfile.read(length).decode("utf-8")
+0146              payload = load_json(text)
+0147              result = dispatch(urlparse(self.path).path, payload)
+0148              self.respond(200, result)
+0149          except ValidationError as error:
+0150              self.respond(422, {"error": error.as_dict()})
+0151          except (UnicodeDecodeError, ValueError, TypeError, KeyError) as error:
+0152              self.respond(422, {"error": {"path": "request", "message": "请求结构或编码无效：" + str(error)[:200]}})
+0153          except Exception:
+0154              traceback.print_exc()
+0155              self.respond(500, {"error": {"path": "server", "message": "服务内部错误，请保留项目文件与终端日志"}})
+0156
+0157      def log_message(self, message, *args):
+0158          # No request bodies, project content or credentials are logged.
+0159          sys.stderr.write(f"{self.log_date_time_string()} {message % args}\n")
+0160
+0161
+0162  def main():
+0163      parser = argparse.ArgumentParser(description=SOFTWARE_NAME)
+0164      parser.add_argument("--port", type=int, default=8765)
+0165      args = parser.parse_args()
+0166      if not 1024 <= args.port <= 65535:
+0167          parser.error("端口允许 1024—65535")
+0168      server = ThreadingHTTPServer(("127.0.0.1", args.port), Handler)
+0169      server.daemon_threads = True
+0170      print(f"{SOFTWARE_NAME} V{VERSION}", flush=True)
+0171      print(f"打开 http://127.0.0.1:{args.port}；按 Ctrl+C 退出。项目须显式下载保存。", flush=True)
+0172      try:
+0173          server.serve_forever()
+0174      except KeyboardInterrupt:
+0175          print("服务已停止。")
+0176      finally:
+0177          server.server_close()
+0178
+0179
+0180  if __name__ == "__main__":
+0181      main()
+
+================================================================================
+web/app.js
+================================================================================
+0001  /** View event adapters: translate controls into ViewModel commands. */
+0002
+0003  import { ViewModel } from './viewmodel.js';
+0004  import { render } from './views.js';
+0005  import { readCsv } from './service.js';
+0006
+0007  const vm = new ViewModel();
+0008  const app = document.querySelector('#app');
+0009  const toast = document.querySelector('#toast');
+0010  let toastTimer;
+0011
+0012  function update() {
+0013    app.innerHTML = render(vm);
+0014    if (vm.project?.status === 'archived') {
+0015      for (const form of app.querySelectorAll('form')) {
+0016        if (form.id !== 'metadata-form') {
+0017          for (const control of form.elements) {
+0018            control.disabled = true;
+0019          }
+0020        } else {
+0021          for (const control of form.elements) {
+0022            if (!['restore', 'clone'].includes(control.dataset.action)) {
+0023              control.disabled = true;
+0024            }
+0025          }
+0026        }
+0027      }
+0028    }
+0029  }
+0030
+0031  vm.subscribe(update);
+0032  vm.onNotice((message, error) => {
+0033    toast.textContent = message;
+0034    toast.hidden = false;
+0035    toast.className = error ? 'error' : 'success';
+0036    toast.setAttribute('role', error ? 'alert' : 'status');
+0037    clearTimeout(toastTimer);
+0038    toastTimer = setTimeout(() => {
+0039      toast.hidden = true;
+0040    }, error ? 16000 : 9000);
+0041  });
+0042
+0043  function dataOf(form) {
+0044    return new FormData(form);
+0045  }
+0046
+0047  function string(data, key) {
+0048    return String(data.get(key) ?? '').trim();
+0049  }
+0050
+0051  function numeric(data, key, nullable = false) {
+0052    const text = string(data, key);
+0053    if (!text && nullable) {
+0054      return null;
+0055    }
+0056    if (!text || !Number.isFinite(Number(text))) {
+0057      throw new Error(`${key} 必须为有限数值。`);
+0058    }
+0059    return Number(text);
+0060  }
+0061
+0062  function bandsFromText(text) {
+0063    const output = {};
+0064    if (!text.trim()) {
+0065      return output;
+0066    }
+0067    for (const [index, line] of text.split(/\r?\n/).entries()) {
+0068      if (!line.trim()) {
+0069        continue;
+0070      }
+0071      const columns = line.split(',');
+0072      if (columns.length !== 2) {
+0073        throw new Error(`频带第 ${index + 1} 行应为 Hz,声级dB 两列。`);
+0074      }
+0075      const frequency = columns[0].trim();
+0076      const level = columns[1].trim();
+0077      if (!frequency || !Number.isFinite(Number(frequency))) {
+0078        throw new Error(`频带第 ${index + 1} 行频率无效。`);
+0079      }
+0080      const key = String(Number(frequency));
+0081      if (Object.hasOwn(output, key)) {
+0082        throw new Error(`频带第 ${index + 1} 行频率重复，未应用输入。`);
+0083      }
+0084      if (['', 'NA', 'N/A', 'null'].includes(level)) {
+0085        output[key] = null;
+0086      } else if (!Number.isFinite(Number(level))) {
+0087        throw new Error(`频带第 ${index + 1} 行声级无效。`);
+0088      } else {
+0089        output[key] = Number(level);
+0090      }
+0091    }
+0092    return output;
+0093  }
+0094
+0095  function itemIdentity(form) {
+0096    return form.dataset.id || undefined;
+0097  }
+0098
+0099  async function submitMetadata(form) {
+0100    const data = dataOf(form);
+0101    await vm.command('metadata', {
+0102      name: string(data, 'name'),
+0103      owner: string(data, 'owner'),
+0104      description: string(data, 'description'),
+0105    }, '项目信息已应用。');
+0106  }
+0107
+0108  async function submitSite(form) {
+0109    const data = dataOf(form);
+0110    await vm.saveItem('sites', {
+0111      id: itemIdentity(form),
+0112      name: string(data, 'name'),
+0113      zone: string(data, 'zone'),
+0114      material: string(data, 'material'),
+0115      procedure: string(data, 'procedure'),
+0116      notes: string(data, 'notes'),
+0117    });
+0118  }
+0119
+0120  async function submitCondition(form) {
+0121    const data = dataOf(form);
+0122    const condition = {
+0123      id: itemIdentity(form),
+0124      name: string(data, 'name'),
+0125      notes: string(data, 'notes'),
+0126      independentBands: data.has('independentBands'),
+0127    };
+0128    const textFields = [
+0129      'vehicle',
+0130      'microphone',
+0131      'excitation',
+0132      'surface',
+0133      'gear',
+0134      'weighting',
+0135      'timeWeighting',
+0136      'bandType',
+0137      'instrument',
+0138      'calibration',
+0139      'unit',
+0140    ];
+0141    for (const key of textFields) {
+0142      condition[key] = string(data, key);
+0143    }
+0144    for (const key of ['speed', 'rpm', 'temperature', 'duration']) {
+0145      condition[key] = numeric(data, key, true);
+0146    }
+0147    await vm.saveItem('conditions', condition);
+0148  }
+0149
+0150  async function submitTrial(form) {
+0151    const data = dataOf(form);
+0152    const trial = {
+0153      id: itemIdentity(form),
+0154      name: string(data, 'name'),
+0155      type: string(data, 'type'),
+0156      conditionId: string(data, 'conditionId'),
+0157      siteIds: data.getAll('siteIds'),
+0158      timestamp: string(data, 'timestamp'),
+0159      repeatGroup: string(data, 'repeatGroup'),
+0160      sourceKind: string(data, 'sourceKind'),
+0161      sourceNote: string(data, 'sourceNote'),
+0162      operator: string(data, 'operator'),
+0163      notes: string(data, 'notes'),
+0164      bands: bandsFromText(string(data, 'bandsText')),
+0165    };
+0166    await vm.saveItem('trials', trial);
+0167  }
+0168
+0169  async function submitPair(form) {
+0170    const data = dataOf(form);
+0171    await vm.saveItem('pairs', {
+0172      id: itemIdentity(form),
+0173      baselineId: string(data, 'baselineId'),
+0174      targetId: string(data, 'targetId'),
+0175      purpose: string(data, 'purpose'),
+0176      notes: string(data, 'notes'),
+0177    });
+0178  }
+0179
+0180  async function submitParameters(form) {
+0181    const data = dataOf(form);
+0182    const payload = {};
+0183    for (const key of Object.keys(vm.project.parameters)) {
+0184      payload[key] = numeric(data, key);
+0185    }
+0186    await vm.command('parameters', payload, '参数已应用，全部结果已重新计算。');
+0187  }
+0188
+0189  async function submitImport(form) {
+0190    const data = dataOf(form);
+0191    vm.csvText = String(data.get('csvText') || '');
+0192    vm.csvMode = string(data, 'csvMode');
+0193    await vm.previewCsv();
+0194  }
+0195
+0196  async function submitScan(form) {
+0197    const data = dataOf(form);
+0198    const low = numeric(data, 'scanLow', true);
+0199    const high = numeric(data, 'scanHigh', true);
+0200    if (low !== null && high !== null && low > high) {
+0201      throw new Error('频带下限不得大于上限。');
+0202    }
+0203    vm.scanLow = low;
+0204    vm.scanHigh = high;
+0205    vm.formDirty = false;
+0206    vm.emit();
+0207  }
+0208
+0209  const submitters = {
+0210    'metadata-form': submitMetadata,
+0211    'site-form': submitSite,
+0212    'condition-form': submitCondition,
+0213    'trial-form': submitTrial,
+0214    'pair-form': submitPair,
+0215    'parameters-form': submitParameters,
+0216    'import-form': submitImport,
+0217    'scan-form': submitScan,
+0218  };
+0219
+0220  app.addEventListener('submit', async event => {
+0221    event.preventDefault();
+0222    if (vm.busy) {
+0223      return;
+0224    }
+0225    const form = event.target;
+0226    try {
+0227      await submitters[form.id]?.(form);
+0228    } catch (error) {
+0229      vm.notify(error.message, true);
+0230    }
+0231  });
+0232
+0233  app.addEventListener('input', event => {
+0234    const control = event.target;
+0235    if (control.closest('form')) {
+0236      vm.formDirty = true;
+0237    }
+0238    if (control.name === 'csvText' || control.name === 'csvMode') {
+0239      vm.csvText = app.querySelector('[name="csvText"]').value;
+0240      vm.csvMode = app.querySelector('[name="csvMode"]').value;
+0241      vm.csvPreview = null;
+0242      const apply = app.querySelector('[data-action="apply-csv"]');
+0243      if (apply) {
+0244        apply.disabled = true;
+0245      }
+0246    }
+0247  });
+0248
+0249  app.addEventListener('change', event => {
+0250    const control = event.target;
+0251    if (control.name === 'trialFilter') {
+0252      if (!vm.mayDiscardForm()) {
+0253        control.value = vm.trialFilter;
+0254        return;
+0255      }
+0256      vm.trialFilter = control.value;
+0257      vm.formDirty = false;
+0258      vm.emit();
+0259    }
+0260    if (control.name === 'pairFilter') {
+0261      vm.pairFilter = control.value;
+0262      vm.emit();
+0263    }
+0264  });
+0265
+0266  app.addEventListener('keydown', event => {
+0267    if (event.target.id === 'trial-search' && event.key === 'Enter') {
+0268      event.preventDefault();
+0269      if (!vm.mayDiscardForm()) {
+0270        return;
+0271      }
+0272      vm.trialSearch = event.target.value;
+0273      vm.formDirty = false;
+0274      vm.emit();
+0275    }
+0276  });
+0277
+0278  const actions = {
+0279    navigate: button => vm.navigate(button.dataset.page),
+0280    select: button => vm.select(button.dataset.collection, button.dataset.id),
+0281    delete: button => vm.deleteItem(button.dataset.collection, button.dataset.id),
+0282    new: () => vm.newProject(),
+0283    demo: () => vm.loadDemo(),
+0284    open: () => document.querySelector('#open-file').click(),
+0285    save: () => vm.export('project'),
+0286    export: button => vm.export(button.dataset.kind),
+0287    clone: () => {
+0288      if (vm.mayDiscardForm()) {
+0289        return vm.command('clone', {}, '已生成独立项目副本。');
+0290      }
+0291    },
+0292    archive: () => {
+0293      if (vm.formDirty) {
+0294        vm.notify('请先应用或取消表单输入，再归档项目。', true);
+0295        return;
+0296      }
+0297      if (window.confirm('归档后项目只读，可在项目页解除归档。继续？')) {
+0298        return vm.command('archive', {}, '项目已归档。');
+0299      }
+0300    },
+0301    restore: () => vm.command('restore', {}, '已解除归档。'),
+0302    'choose-csv': () => document.querySelector('#csv-file').click(),
+0303    'apply-csv': () => vm.applyCsv(),
+0304    'duplicate-trial': button => {
+0305      if (vm.mayDiscardForm()) {
+0306        return vm.duplicateTrial(button.dataset.id);
+0307      }
+0308    },
+0309    'record-analysis': () => {
+0310      if (vm.formDirty) {
+0311        vm.notify('请先应用表单，复核记录只针对已应用的数据和参数。', true);
+0312        return;
+0313      }
+0314      return vm.recordAnalysis();
+0315    },
+0316    'reset-scan': () => {
+0317      vm.scanLow = null;
+0318      vm.scanHigh = null;
+0319      vm.formDirty = false;
+0320      vm.emit();
+0321    },
+0322  };
+0323
+0324  app.addEventListener('click', async event => {
+0325    const button = event.target.closest('[data-action]');
+0326    if (!button || button.disabled || vm.busy) {
+0327      return;
+0328    }
+0329    try {
+0330      await actions[button.dataset.action]?.(button);
+0331    } catch (error) {
+0332      vm.notify(error.message, true);
+0333    }
+0334  });
+0335
+0336  document.querySelector('#open-file').addEventListener('change', async event => {
+0337    await vm.openFile(event.target.files[0]);
+0338    event.target.value = '';
+0339  });
+0340
+0341  document.querySelector('#csv-file').addEventListener('change', async event => {
+0342    const file = event.target.files[0];
+0343    if (!file) {
+0344      return;
+0345    }
+0346    try {
+0347      vm.csvText = await readCsv(file);
+0348      vm.csvPreview = null;
+0349      vm.formDirty = true;
+0350      vm.emit();
+0351      vm.notify(`已读取 ${file.name}，请预检后导入。`);
+0352    } catch (error) {
+0353      vm.notify(error.message, true);
+0354    } finally {
+0355      event.target.value = '';
+0356    }
+0357  });
+0358
+0359  window.addEventListener('beforeunload', event => {
+0360    if (vm.dirty || vm.formDirty) {
+0361      event.preventDefault();
+0362      event.returnValue = '';
+0363    }
+0364  });
+0365
+0366  update();
+0367  await vm.initialize();
+
+================================================================================
+web/index.html
+================================================================================
+0001  <!doctype html>
+0002  <html lang="zh-CN">
+0003  <head>
+0004    <meta charset="utf-8">
+0005    <meta name="viewport" content="width=device-width,initial-scale=1">
+0006    <meta name="description" content="车身声学封堵试验组织、显式配对及测得声级差分析">
+0007    <title>车身声学泄漏路径与封堵试验分析软件 V1.0</title>
+0008    <link rel="stylesheet" href="/styles.css">
+0009    <script type="module" src="/app.js"></script>
+0010  </head>
+0011  <body>
+0012    <div id="app" aria-live="polite"></div>
+0013    <div id="toast" role="status" aria-live="polite" hidden></div>
+0014    <div id="busy" role="status" hidden>正在处理，请稍候…</div>
+0015    <input id="open-file" type="file" accept=".json,.aslp.json,application/json" hidden>
+0016    <input id="csv-file" type="file" accept=".csv,text/csv" hidden>
+0017    <noscript>请启用浏览器 JavaScript 后重新打开本地页面。</noscript>
+0018  </body>
+0019  </html>
+
+================================================================================
+web/service.js
+================================================================================
+0001  /** Transport and file boundary. No business calculations live in views. */
+0002
+0003  export class ApiService {
+0004    async post(route, body = {}) {
+0005      let response;
+0006      try {
+0007        response = await fetch(`/api/${route}`, {
+0008          method: 'POST',
+0009          headers: { 'Content-Type': 'application/json' },
+0010          body: JSON.stringify(body),
+0011        });
+0012      } catch (error) {
+0013        throw new Error('无法连接本地服务。请保留当前页面，确认 Python 服务仍在运行后重试。');
+0014      }
+0015      let data;
+0016      try {
+0017        data = await response.json();
+0018      } catch (error) {
+0019        throw new Error('服务返回无效内容，请检查终端日志。');
+0020      }
+0021      if (!response.ok) {
+0022        const problem = data.error;
+0023        throw new Error(problem ? `${problem.path}：${problem.message}` : `请求失败 ${response.status}`);
+0024      }
+0025      return data;
+0026    }
+0027
+0028    async open(file) {
+0029      if (file.size > 12 * 1024 * 1024) {
+0030        throw new Error('项目文件不得超过 12 MiB。');
+0031      }
+0032      try {
+0033        const buffer = await file.arrayBuffer();
+0034        const text = new TextDecoder('utf-8', { fatal: true }).decode(buffer);
+0035        // Send text as an API string so the Python strict JSON decoder can detect
+0036        // duplicate fields rather than losing them through browser JSON.parse.
+0037        return await this.post('open-text', { content: text });
+0038      } catch (error) {
+0039        throw new Error(`打开失败：${error.message}`);
+0040      }
+0041    }
+0042
+0043    async export(project, kind) {
+0044      return this.post('export', { project, kind });
+0045    }
+0046  }
+0047
+0048  export function download(content, filename, mime) {
+0049    const blob = new Blob([content], { type: mime });
+0050    const url = URL.createObjectURL(blob);
+0051    const anchor = document.createElement('a');
+0052    anchor.href = url;
+0053    anchor.download = filename;
+0054    document.body.append(anchor);
+0055    anchor.click();
+0056    anchor.remove();
+0057    setTimeout(() => URL.revokeObjectURL(url), 30000);
+0058  }
+0059
+0060  export function filename(value) {
+0061    return value.replace(/[<>:"/\\|?*\x00-\x1f]/g, '_').slice(0, 100) || '声学项目';
+0062  }
+0063
+0064  export async function readCsv(file) {
+0065    if (file.size > 5 * 1024 * 1024) {
+0066      throw new Error('CSV 文件不得超过 5 MiB。');
+0067    }
+0068    const buffer = await file.arrayBuffer();
+0069    try {
+0070      return new TextDecoder('utf-8', { fatal: true }).decode(buffer);
+0071    } catch (error) {
+0072      throw new Error('CSV 必须为 UTF-8 编码。请在表格软件中另存为 CSV UTF-8 后重试。');
+0073    }
+0074  }
+
+================================================================================
+web/styles.css
+================================================================================
+0001  :root {
+0002    color-scheme: light;
+0003    font-family: "Noto Sans CJK SC", "Microsoft YaHei", system-ui, sans-serif;
+0004    color: #193246;
+0005    background: #eef3f7;
+0006    font-size: 14px;
+0007    line-height: 1.6;
+0008    --teal: #087f81;
+0009    --border: #d7e2e9;
+0010    --muted: #63778a;
+0011  }
+0012  * {
+0013    box-sizing: border-box;
+0014  }
+0015  body {
+0016    margin: 0;
+0017  }
+0018  button, input, select, textarea {
+0019    font: inherit;
+0020  }
+0021  button {
+0022    padding: 8px 15px;
+0023    border: 1px solid #c7d6df;
+0024    border-radius: 6px;
+0025    background: white;
+0026    color: #294357;
+0027    cursor: pointer;
+0028    transition: background 120ms, border-color 120ms;
+0029  }
+0030  button:hover {
+0031    background: #edf8f7;
+0032    border-color: #57a3a3;
+0033  }
+0034  button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+0035    outline: 3px solid #7dc7dc;
+0036    outline-offset: 2px;
+0037  }
+0038  button:disabled {
+0039    opacity: .5;
+0040    cursor: not-allowed;
+0041  }
+0042  button.primary {
+0043    color: white;
+0044    background: var(--teal);
+0045    border-color: var(--teal);
+0046  }
+0047  button.primary:hover {
+0048    background: #08696b;
+0049  }
+0050  button.danger {
+0051    color: #a72e36;
+0052    border-color: #e6bbc0;
+0053  }
+0054  .app-shell {
+0055    display: grid;
+0056    grid-template-columns: 250px minmax(0, 1fr);
+0057    min-height: 100vh;
+0058  }
+0059  .sidebar {
+0060    background: #132c3c;
+0061    color: #e2eef4;
+0062    padding: 28px 18px;
+0063    position: sticky;
+0064    height: 100vh;
+0065    top: 0;
+0066    display: flex;
+0067    flex-direction: column;
+0068    overflow: auto;
+0069  }
+0070  .brand {
+0071    display: flex;
+0072    align-items: center;
+0073    gap: 12px;
+0074    margin-bottom: 30px;
+0075  }
+0076  .brand-mark {
+0077    background: #1c9392;
+0078    border-radius: 9px;
+0079    padding: 10px;
+0080    font-weight: 800;
+0081    letter-spacing: 1px;
+0082  }
+0083  .brand strong {
+0084    font-size: 17px;
+0085  }
+0086  .brand small, .project-tag small {
+0087    display: block;
+0088    color: #9ab1c1;
+0089    font-size: 10px;
+0090  }
+0091  .project-tag {
+0092    padding: 13px;
+0093    background: #1c394b;
+0094    border: 1px solid #345163;
+0095    border-radius: 8px;
+0096    margin-bottom: 22px;
+0097    overflow-wrap: anywhere;
+0098  }
+0099  .project-tag strong {
+0100    font-size: 12px;
+0101  }
+0102  .project-tag small {
+0103    margin-top: 7px;
+0104  }
+0105  .status-dot {
+0106    display: inline-block;
+0107    width: 7px;
+0108    height: 7px;
+0109    border-radius: 50%;
+0110    background: #51d4be;
+0111    margin-right: 6px;
+0112  }
+0113  nav {
+0114    display: flex;
+0115    flex-direction: column;
+0116    gap: 6px;
+0117  }
+0118  .nav-item {
+0119    border: none;
+0120    text-align: left;
+0121    background: transparent;
+0122    color: #b9ccd8;
+0123    padding: 12px;
+0124  }
+0125  .nav-item span {
+0126    color: #7996a9;
+0127    margin-right: 14px;
+0128    font-size: 11px;
+0129  }
+0130  .nav-item:hover, .nav-item.active {
+0131    color: white;
+0132    background: #254a5a;
+0133  }
+0134  .nav-item.active {
+0135    box-shadow: inset 3px 0 #4dc8b5;
+0136  }
+0137  .sidebar-bottom {
+0138    margin-top: auto;
+0139    padding-top: 28px;
+0140    color: #9ab1c1;
+0141    font-size: 11px;
+0142  }
+0143  .sidebar-bottom p {
+0144    color: #e2eef4;
+0145    font-weight: 600;
+0146  }
+0147  .workspace {
+0148    min-width: 0;
+0149  }
+0150  .topbar {
+0151    background: white;
+0152    min-height: 73px;
+0153    border-bottom: 1px solid var(--border);
+0154    padding: 15px 32px;
+0155    display: flex;
+0156    align-items: center;
+0157    justify-content: space-between;
+0158    gap: 15px;
+0159    font-size: 12px;
+0160  }
+0161  .actions {
+0162    display: flex;
+0163    flex-wrap: wrap;
+0164    gap: 9px;
+0165    align-items: center;
+0166  }
+0167  .save-state {
+0168    color: #6b7f8d;
+0169    font-size: 11px;
+0170  }
+0171  .unsaved {
+0172    color: #9b6514;
+0173  }
+0174  .source-strip {
+0175    background: #e2efee;
+0176    color: #236260;
+0177    padding: 8px 32px;
+0178    display: flex;
+0179    justify-content: space-between;
+0180    gap: 10px;
+0181    font-size: 11px;
+0182  }
+0183  main {
+0184    padding: 32px;
+0185    max-width: 1700px;
+0186    margin: auto;
+0187  }
+0188  .page-heading {
+0189    display: flex;
+0190    justify-content: space-between;
+0191    gap: 20px;
+0192    align-items: center;
+0193    margin-bottom: 25px;
+0194  }
+0195  h1 {
+0196    margin: 2px 0 8px;
+0197    font-size: 29px;
+0198    letter-spacing: -.5px;
+0199  }
+0200  h2 {
+0201    font-size: 17px;
+0202    margin: 0 0 16px;
+0203  }
+0204  h3 {
+0205    font-size: 15px;
+0206    margin-top: 24px;
+0207  }
+0208  p {
+0209    margin: 8px 0 16px;
+0210  }
+0211  .eyebrow {
+0212    font-size: 10px;
+0213    letter-spacing: 1.6px;
+0214    font-weight: 700;
+0215    color: var(--teal);
+0216    margin: 0;
+0217  }
+0218  .muted, small {
+0219    color: var(--muted);
+0220  }
+0221  .metrics {
+0222    display: grid;
+0223    grid-template-columns: repeat(4, minmax(0, 1fr));
+0224    gap: 18px;
+0225    margin-bottom: 24px;
+0226  }
+0227  .metric {
+0228    background: white;
+0229    padding: 20px 24px;
+0230    border-radius: 9px;
+0231    border: 1px solid var(--border);
+0232    border-top: 3px solid #47a8a4;
+0233  }
+0234  .metric span {
+0235    display: block;
+0236    font-size: 12px;
+0237    color: var(--muted);
+0238  }
+0239  .metric strong {
+0240    font-size: 35px;
+0241    font-weight: 650;
+0242  }
+0243  .panel {
+0244    background: white;
+0245    border: 1px solid var(--border);
+0246    border-radius: 9px;
+0247    padding: 24px;
+0248    margin-bottom: 22px;
+0249    min-width: 0;
+0250  }
+0251  .two-columns {
+0252    display: grid;
+0253    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+0254    gap: 22px;
+0255    align-items: start;
+0256  }
+0257  .form-grid {
+0258    display: grid;
+0259    grid-template-columns: repeat(2, minmax(0, 1fr));
+0260    gap: 18px;
+0261  }
+0262  .form-grid.three {
+0263    grid-template-columns: repeat(3, minmax(0, 1fr));
+0264  }
+0265  .field {
+0266    display: flex;
+0267    flex-direction: column;
+0268    gap: 6px;
+0269    min-width: 0;
+0270  }
+0271  .field span {
+0272    font-size: 12px;
+0273    font-weight: 600;
+0274  }
+0275  .field small {
+0276    font-size: 10px;
+0277    line-height: 1.6;
+0278  }
+0279  input, textarea, select {
+0280    border: 1px solid #c9d6df;
+0281    border-radius: 5px;
+0282    padding: 9px 11px;
+0283    width: 100%;
+0284    background: #fbfdfe;
+0285    color: #173447;
+0286    min-width: 0;
+0287  }
+0288  textarea {
+0289    min-height: 85px;
+0290    resize: vertical;
+0291  }
+0292  input:disabled, textarea:disabled, select:disabled {
+0293    background: #f0f3f6;
+0294  }
+0295  .wide, .form-actions {
+0296    grid-column: 1 / -1;
+0297  }
+0298  .form-actions {
+0299    display: flex;
+0300    align-items: center;
+0301    flex-wrap: wrap;
+0302    gap: 10px;
+0303    padding-top: 12px;
+0304    border-top: 1px solid #e5edf2;
+0305    font-size: 11px;
+0306  }
+0307  .check {
+0308    display: flex;
+0309    align-items: flex-start;
+0310    gap: 8px;
+0311    font-size: 12px;
+0312  }
+0313  .check input {
+0314    width: 16px;
+0315    margin-top: 4px;
+0316  }
+0317  .site-checks {
+0318    display: flex;
+0319    flex-wrap: wrap;
+0320    gap: 16px;
+0321    padding: 16px;
+0322    border: 1px solid var(--border);
+0323    border-radius: 6px;
+0324  }
+0325  legend {
+0326    font-size: 11px;
+0327    color: var(--muted);
+0328  }
+0329  .details {
+0330    display: grid;
+0331    grid-template-columns: 100px minmax(0, 1fr);
+0332    font-size: 11px;
+0333    gap: 9px;
+0334    border-top: 1px solid var(--border);
+0335    margin-top: 24px;
+0336    padding-top: 20px;
+0337  }
+0338  dt {
+0339    color: var(--muted);
+0340  }
+0341  dd {
+0342    margin: 0;
+0343    overflow-wrap: anywhere;
+0344  }
+0345  .mono {
+0346    font-family: ui-monospace, Consolas, monospace;
+0347    font-size: 10px;
+0348    overflow-wrap: anywhere;
+0349  }
+0350  .workflow ol {
+0351    padding-left: 23px;
+0352  }
+0353  .workflow li {
+0354    padding-left: 7px;
+0355    margin-bottom: 24px;
+0356  }
+0357  .workflow li p {
+0358    color: var(--muted);
+0359    font-size: 12px;
+0360  }
+0361  .notice, .help-box, .success-box, .error-box {
+0362    padding: 14px 18px;
+0363    border-radius: 6px;
+0364    font-size: 12px;
+0365    line-height: 1.8;
+0366    margin-bottom: 18px;
+0367  }
+0368  .notice {
+0369    background: #fff7e7;
+0370    border-left: 4px solid #d09b39;
+0371    color: #7f5a1c;
+0372  }
+0373  .help-box {
+0374    background: #eef5f9;
+0375    color: #4b6679;
+0376  }
+0377  .error-box {
+0378    background: #fdf0ef;
+0379    color: #9e3131;
+0380    border-left: 4px solid #cc5c5c;
+0381  }
+0382  .success-box {
+0383    background: #e8f6ef;
+0384    color: #286c4c;
+0385  }
+0386  .editor-layout {
+0387    display: grid;
+0388    grid-template-columns: 260px minmax(0, 1fr);
+0389    gap: 22px;
+0390    align-items: start;
+0391  }
+0392  .object-list {
+0393    background: #e4ecf2;
+0394    border-radius: 8px;
+0395    padding: 14px;
+0396  }
+0397  .object-list h2 {
+0398    font-size: 13px;
+0399  }
+0400  .section-title {
+0401    display: flex;
+0402    align-items: center;
+0403    justify-content: space-between;
+0404    gap: 15px;
+0405    margin-bottom: 18px;
+0406  }
+0407  .section-title h2 {
+0408    margin: 0;
+0409  }
+0410  .object {
+0411    width: 100%;
+0412    text-align: left;
+0413    margin-bottom: 9px;
+0414    border: 1px solid transparent;
+0415    padding: 14px;
+0416  }
+0417  .object.selected {
+0418    border-color: var(--teal);
+0419    background: #eefbf8;
+0420  }
+0421  .object strong, .object small {
+0422    display: block;
+0423    overflow-wrap: anywhere;
+0424  }
+0425  .object small {
+0426    font-size: 10px;
+0427    margin-top: 5px;
+0428  }
+0429  .empty {
+0430    border: 1px dashed #c3d1dc;
+0431    text-align: center;
+0432    padding: 35px 20px;
+0433    border-radius: 7px;
+0434    color: #627b8d;
+0435    background: #f8fbfd;
+0436    font-size: 12px;
+0437  }
+0438  .empty p {
+0439    margin: 10px 0 0;
+0440  }
+0441  .table-wrap {
+0442    width: 100%;
+0443    overflow: auto;
+0444    margin-top: 10px;
+0445  }
+0446  table {
+0447    width: 100%;
+0448    border-collapse: collapse;
+0449    font-size: 12px;
+0450  }
+0451  th, td {
+0452    text-align: left;
+0453    border-bottom: 1px solid #e1e9ef;
+0454    padding: 12px 14px;
+0455    vertical-align: top;
+0456    overflow-wrap: anywhere;
+0457  }
+0458  th {
+0459    background: #f2f6f9;
+0460    color: #547084;
+0461    font-size: 11px;
+0462    font-weight: 600;
+0463    white-space: nowrap;
+0464  }
+0465  tr:hover td {
+0466    background: #fbfdfd;
+0467  }
+0468  .badge, .source {
+0469    display: inline-block;
+0470    padding: 3px 8px;
+0471    border-radius: 4px;
+0472    background: #ecf1f5;
+0473    color: #5b7184;
+0474    font-size: 10px;
+0475    white-space: nowrap;
+0476  }
+0477  .badge.valid, .badge.within {
+0478    background: #def3e9;
+0479    color: #226948;
+0480  }
+0481  .badge.blocked, .badge.alert {
+0482    background: #fbe5e2;
+0483    color: #a53b34;
+0484  }
+0485  .source.simulation, .badge.missing, .badge.insufficient {
+0486    background: #fff0d2;
+0487    color: #805c12;
+0488  }
+0489  .source.measured {
+0490    background: #dceff6;
+0491    color: #24617c;
+0492  }
+0493  .text-button {
+0494    border: none;
+0495    background: none;
+0496    padding: 0;
+0497    color: #087f81;
+0498    text-align: left;
+0499  }
+0500  .block {
+0501    display: block;
+0502    margin-top: 5px;
+0503  }
+0504  .error-text {
+0505    color: #a53b34;
+0506  }
+0507  .filters {
+0508    display: flex;
+0509    align-items: end;
+0510    flex-wrap: wrap;
+0511    gap: 18px;
+0512    margin-bottom: 16px;
+0513  }
+0514  .filters label {
+0515    min-width: 180px;
+0516    font-size: 11px;
+0517  }
+0518  .filters input {
+0519    margin-top: 6px;
+0520  }
+0521  .code-sample {
+0522    background: #163446;
+0523    color: #d4e9ef;
+0524    padding: 18px;
+0525    border-radius: 6px;
+0526    overflow: auto;
+0527    font-size: 12px;
+0528  }
+0529  .chart {
+0530    width: 100%;
+0531    max-height: 300px;
+0532    background: #f8fbfc;
+0533    border-radius: 6px;
+0534    padding: 16px;
+0535  }
+0536  .chart text {
+0537    fill: #61788b;
+0538    font-size: 11px;
+0539  }
+0540  .zero-line {
+0541    stroke: #9fb1bd;
+0542    stroke-width: 1;
+0543  }
+0544  .positive-bar {
+0545    fill: #229c91;
+0546  }
+0547  .negative-bar {
+0548    fill: #d28a36;
+0549  }
+0550  .result-note {
+0551    display: flex;
+0552    flex-wrap: wrap;
+0553    gap: 12px;
+0554    padding: 16px 0;
+0555    font-size: 11px;
+0556    color: #546e80;
+0557  }
+0558  .screening {
+0559    font-size: 12px;
+0560    padding: 12px;
+0561    background: #f6f9fb;
+0562  }
+0563  details {
+0564    font-size: 11px;
+0565    color: #617889;
+0566    margin-top: 15px;
+0567  }
+0568  summary {
+0569    cursor: pointer;
+0570  }
+0571  .export-grid {
+0572    display: grid;
+0573    grid-template-columns: repeat(2, minmax(0, 1fr));
+0574    gap: 22px;
+0575  }
+0576  .export-card {
+0577    margin: 0;
+0578    padding: 28px;
+0579  }
+0580  .export-card p {
+0581    font-size: 12px;
+0582    color: var(--muted);
+0583    min-height: 60px;
+0584  }
+0585  .file-type {
+0586    display: block;
+0587    font-size: 11px;
+0588    font-weight: 700;
+0589    color: var(--teal);
+0590    letter-spacing: 2px;
+0591    margin-bottom: 13px;
+0592  }
+0593  .export-grid + div, .export-grid + section {
+0594    margin-top: 22px;
+0595  }
+0596  .steps li {
+0597    padding: 6px 0;
+0598    font-size: 12px;
+0599  }
+0600  footer {
+0601    padding: 12px 32px 25px;
+0602    color: #758b9b;
+0603    font-size: 10px;
+0604  }
+0605  #toast {
+0606    position: fixed;
+0607    right: 24px;
+0608    bottom: 24px;
+0609    max-width: min(650px, calc(100vw - 48px));
+0610    color: white;
+0611    background: #236c61;
+0612    padding: 16px 22px;
+0613    border-radius: 8px;
+0614    box-shadow: 0 5px 25px #153d4938;
+0615    z-index: 20;
+0616    overflow-wrap: anywhere;
+0617  }
+0618  #toast.error {
+0619    background: #963e3b;
+0620  }
+0621  #busy {
+0622    position: fixed;
+0623    right: 25px;
+0624    top: 85px;
+0625    background: #173b4e;
+0626    color: white;
+0627    padding: 10px 18px;
+0628    border-radius: 5px;
+0629    z-index: 30;
+0630  }
+0631  .startup {
+0632    max-width: 800px;
+0633    margin: 100px auto;
+0634    padding: 30px;
+0635  }
+0636  [hidden] {
+0637    display: none !important;
+0638  }
+0639  @media (max-width: 1150px) {
+0640    .app-shell {
+0641      grid-template-columns: 210px minmax(0, 1fr);
+0642    }
+0643    main {
+0644      padding: 24px;
+0645    }
+0646    .two-columns {
+0647      grid-template-columns: minmax(0, 1fr);
+0648    }
+0649    .editor-layout {
+0650      grid-template-columns: 200px minmax(0, 1fr);
+0651    }
+0652    .form-grid.three {
+0653      grid-template-columns: repeat(2, minmax(0, 1fr));
+0654    }
+0655  }
+0656  @media (max-width: 800px) {
+0657    .app-shell {
+0658      display: block;
+0659    }
+0660    .sidebar {
+0661      height: auto;
+0662      position: static;
+0663      padding: 15px;
+0664    }
+0665    .brand {
+0666      margin-bottom: 12px;
+0667    }
+0668    .project-tag, .sidebar-bottom {
+0669      display: none;
+0670    }
+0671    nav {
+0672      display: grid;
+0673      grid-template-columns: repeat(3, minmax(0, 1fr));
+0674    }
+0675    .nav-item {
+0676      padding: 8px;
+0677      font-size: 11px;
+0678    }
+0679    .nav-item span {
+0680      margin-right: 5px;
+0681    }
+0682    .topbar, .source-strip, .page-heading {
+0683      align-items: start;
+0684      flex-direction: column;
+0685    }
+0686    .topbar, .source-strip {
+0687      padding-left: 20px;
+0688      padding-right: 20px;
+0689    }
+0690    main {
+0691      padding: 20px;
+0692    }
+0693    .editor-layout, .export-grid {
+0694      grid-template-columns: minmax(0, 1fr);
+0695    }
+0696    .metrics {
+0697      grid-template-columns: repeat(2, minmax(0, 1fr));
+0698    }
+0699    .form-grid, .form-grid.three {
+0700      grid-template-columns: minmax(0, 1fr);
+0701    }
+0702    .object-list {
+0703      max-height: 260px;
+0704      overflow: auto;
+0705    }
+0706    h1 {
+0707      font-size: 24px;
+0708    }
+0709    .panel {
+0710      padding: 18px;
+0711    }
+0712  }
+0713  @media print {
+0714    .sidebar, .topbar, footer, #toast, #busy {
+0715      display: none;
+0716    }
+0717    .app-shell {
+0718      display: block;
+0719    }
+0720    main {
+0721      padding: 0;
+0722    }
+0723    .panel {
+0724      break-inside: avoid;
+0725    }
+0726  }
+0727  .coverage-types {
+0728    display: grid;
+0729    grid-template-columns: repeat(4, minmax(0, 1fr));
+0730    gap: 12px;
+0731    margin: 20px 0;
+0732  }
+0733  .coverage-types div {
+0734    padding: 15px;
+0735    border: 1px solid var(--border);
+0736    border-radius: 6px;
+0737    background: #f5fafb;
+0738  }
+0739  .coverage-types strong {
+0740    display: block;
+0741    font-size: 24px;
+0742    color: #147b79;
+0743  }
+0744  .coverage-types span {
+0745    font-size: 11px;
+0746    color: var(--muted);
+0747  }
+0748  .scan-form {
+0749    display: flex;
+0750    flex-wrap: wrap;
+0751    align-items: end;
+0752    gap: 14px;
+0753    margin: 18px 0;
+0754  }
+0755  .scan-form .field {
+0756    min-width: 180px;
+0757    max-width: 240px;
+0758  }
+0759  .increase-value {
+0760    color: #a6661d;
+0761  }
+0762  .decrease-value {
+0763    color: #087a70;
+0764  }
+
+================================================================================
+web/viewmodel.js
+================================================================================
+0001  /** Observable state and commands: the ViewModel in the local MVVM application. */
+0002
+0003  import { ApiService, download, filename } from './service.js';
+0004
+0005  export const trialTypes = {
+0006    baseline: '基线',
+0007    single: '单项封堵',
+0008    combination: '组合封堵',
+0009    recovery: '恢复',
+0010  };
+0011
+0012  export const sourceTypes = {
+0013    simulation: '模拟',
+0014    measured: '实测',
+0015    manual: '人工填写',
+0016  };
+0017
+0018  export const purposes = {
+0019    effect: '封堵声级差',
+0020    drift: '基线漂移',
+0021    recovery: '解除封堵恢复',
+0022  };
+0023
+0024  export const statuses = {
+0025    valid: '可比较',
+0026    blocked: '已阻断',
+0027    missing: '缺失',
+0028    empty: '无有效数据',
+0029    within: '阈值内',
+0030    alert: '超出阈值',
+0031    unavailable: '无法检查',
+0032    insufficient: '样本不足',
+0033  };
+0034
+0035  export class ViewModel {
+0036    constructor() {
+0037      this.api = new ApiService();
+0038      this.listeners = new Set();
+0039      this.project = null;
+0040      this.analysis = null;
+0041      this.page = 'project';
+0042      this.selected = {};
+0043      this.dirty = false;
+0044      this.formDirty = false;
+0045      this.busy = false;
+0046      this.csvText = '';
+0047      this.csvMode = 'merge';
+0048      this.csvPreview = null;
+0049      this.trialSearch = '';
+0050      this.trialFilter = '';
+0051      this.pairFilter = '';
+0052      this.scanLow = null;
+0053      this.scanHigh = null;
+0054      this.exportMessage = '';
+0055      this.lastDownload = '';
+0056      this.noticeListeners = new Set();
+0057    }
+0058
+0059    subscribe(listener) {
+0060      this.listeners.add(listener);
+0061      return () => this.listeners.delete(listener);
+0062    }
+0063
+0064    onNotice(listener) {
+0065      this.noticeListeners.add(listener);
+0066    }
+0067
+0068    notify(message, error = false) {
+0069      for (const listener of this.noticeListeners) {
+0070        listener(message, error);
+0071      }
+0072    }
+0073
+0074    emit() {
+0075      for (const listener of this.listeners) {
+0076        listener(this);
+0077      }
+0078    }
+0079
+0080    async run(task) {
+0081      if (this.busy) {
+0082        return;
+0083      }
+0084      this.busy = true;
+0085      document.querySelector('#busy').hidden = false;
+0086      try {
+0087        await task();
+0088      } catch (error) {
+0089        this.notify(error.message, true);
+0090      } finally {
+0091        this.busy = false;
+0092        document.querySelector('#busy').hidden = true;
+0093      }
+0094    }
+0095
+0096    accept(response, dirty = true) {
+0097      this.project = response.project;
+0098      this.analysis = response.analysis;
+0099      this.dirty = dirty;
+0100      this.formDirty = false;
+0101      this.csvPreview = null;
+0102      this.emit();
+0103    }
+0104
+0105    async initialize() {
+0106      await this.run(async () => {
+0107        this.accept(await this.api.post('new'), false);
+0108      });
+0109    }
+0110
+0111    mayDiscardForm() {
+0112      return !this.formDirty || window.confirm('表单中有尚未应用的输入。确定放弃这些输入吗？');
+0113    }
+0114
+0115    mayReplace() {
+0116      return (!this.dirty && !this.formDirty) || window.confirm('当前项目或表单有未保存内容。请先下载项目文件；确定放弃当前工作副本并继续吗？');
+0117    }
+0118
+0119    navigate(page) {
+0120      if (!this.mayDiscardForm()) {
+0121        return;
+0122      }
+0123      this.page = page;
+0124      this.formDirty = false;
+0125      this.emit();
+0126      window.scrollTo({ top: 0 });
+0127    }
+0128
+0129    select(collection, id) {
+0130      if (!this.mayDiscardForm()) {
+0131        return;
+0132      }
+0133      this.selected[collection] = id;
+0134      this.formDirty = false;
+0135      this.emit();
+0136    }
+0137
+0138    item(collection) {
+0139      return this.project?.[collection]?.find(item => item.id === this.selected[collection]) || null;
+0140    }
+0141
+0142    async newProject() {
+0143      if (!this.mayReplace()) {
+0144        return;
+0145      }
+0146      await this.run(async () => {
+0147        this.selected = {};
+0148        this.page = 'project';
+0149        this.accept(await this.api.post('new'), false);
+0150        this.notify('已建立空白项目。');
+0151      });
+0152    }
+0153
+0154    async loadDemo() {
+0155      if (!this.mayReplace()) {
+0156        return;
+0157      }
+0158      if (!window.confirm('载入固定模拟样例：2 个封堵位置、1 个工况、8 个试验和 6 个显式配对。数据全部模拟，不能作为实测依据。继续？')) {
+0159        return;
+0160      }
+0161      await this.run(async () => {
+0162        this.selected = {};
+0163        this.page = 'results';
+0164        this.accept(await this.api.post('demo'));
+0165        this.notify('模拟样例已载入。界面和导出均保留模拟标识。');
+0166      });
+0167    }
+0168
+0169    async openFile(file) {
+0170      if (!file || !this.mayReplace()) {
+0171        return;
+0172      }
+0173      await this.run(async () => {
+0174        const response = await this.api.open(file);
+0175        this.selected = {};
+0176        this.page = 'project';
+0177        this.accept(response, false);
+0178        this.notify(`已打开 ${file.name}；项目修订 ${this.project.revision}。`);
+0179      });
+0180    }
+0181
+0182    async command(action, payload = {}, message = '操作完成') {
+0183      await this.run(async () => {
+0184        const response = await this.api.post('command', {
+0185          project: this.project,
+0186          action,
+0187          payload,
+0188        });
+0189        if (action === 'upsert' && response.resultId) {
+0190          this.selected[payload.collection] = response.resultId;
+0191        }
+0192        if (action === 'duplicateTrial') {
+0193          this.selected.trials = response.resultId;
+0194        }
+0195        this.accept(response);
+0196        this.notify(message);
+0197      });
+0198    }
+0199
+0200    async saveItem(collection, item) {
+0201      await this.command('upsert', { collection, item }, '对象已应用到项目。请下载项目以持久保存。');
+0202    }
+0203
+0204    async deleteItem(collection, id) {
+0205      const item = this.project[collection].find(entry => entry.id === id);
+0206      if (!item || !window.confirm(`确定删除“${item.name || id}”？被引用的对象将阻止删除。`)) {
+0207        return;
+0208      }
+0209      await this.command('delete', { collection, id }, '对象已删除。');
+0210    }
+0211
+0212    async duplicateTrial(id) {
+0213      await this.command('duplicateTrial', { id }, '已复制试验结构，测量和配对未复制，请复核时间与来源。');
+0214    }
+0215
+0216    async previewCsv() {
+0217      await this.run(async () => {
+0218        const response = await this.api.post('import-preview', {
+0219          project: this.project,
+0220          content: this.csvText,
+0221          mode: this.csvMode,
+0222        });
+0223        this.csvPreview = response.preview;
+0224        this.formDirty = false;
+0225        this.emit();
+0226        this.notify('预检通过，尚未更改测量。核对覆盖范围后确认导入。');
+0227      });
+0228    }
+0229
+0230    async applyCsv() {
+0231      if (!this.csvPreview) {
+0232        this.notify('请先预检 CSV。', true);
+0233        return;
+0234      }
+0235      if (!window.confirm(`将修改 ${this.csvPreview.trials} 个试验、${this.csvPreview.rows} 行频带，覆盖 ${this.csvPreview.overwritten} 个已有频带。确定导入？`)) {
+0236        return;
+0237      }
+0238      await this.command('import', {
+0239        content: this.csvText,
+0240        mode: this.csvMode,
+0241      }, 'CSV 已整体导入；来源沿用试验元数据。');
+0242    }
+0243
+0244    async export(kind) {
+0245      if (this.formDirty) {
+0246        this.notify('请先应用或取消表单输入，导出只包含已应用的项目数据。', true);
+0247        return;
+0248      }
+0249      await this.run(async () => {
+0250        const response = await this.api.export(this.project, kind);
+0251        const target = filename(this.project.name) + response.extension;
+0252        download(response.content, target, response.mime);
+0253        this.lastDownload = target;
+0254        this.exportMessage = `已发起下载：${target}。实际路径由浏览器下载设置决定，请在下载记录中确认文件存在。`;
+0255        if (kind === 'project') {
+0256          this.dirty = false;
+0257        }
+0258        this.emit();
+0259        this.notify(this.exportMessage);
+0260      });
+0261    }
+0262
+0263    async recordAnalysis() {
+0264      await this.command('recordAnalysis', {}, '已将当前阻断原因与参数写入项目审计。');
+0265    }
+0266
+0267    sourceSummary() {
+0268      const counts = { simulation: 0, measured: 0, manual: 0 };
+0269      for (const trial of this.project?.trials || []) {
+0270        counts[trial.sourceKind] += 1;
+0271      }
+0272      return Object.entries(counts)
+0273        .filter(([, count]) => count)
+0274        .map(([kind, count]) => `${sourceTypes[kind]} ${count}`)
+0275        .join(' · ') || '尚无试验数据';
+0276    }
+0277
+0278    visibleTrials() {
+0279      const query = this.trialSearch.trim().toLowerCase();
+0280      return this.project.trials.filter(trial => {
+0281        const matchesText = `${trial.name} ${trial.id} ${trial.repeatGroup}`.toLowerCase().includes(query);
+0282        return matchesText && (!this.trialFilter || trial.type === this.trialFilter);
+0283      });
+0284    }
+0285
+0286    visiblePairs() {
+0287      return this.analysis.pairs.filter(pair => !this.pairFilter || pair.purpose === this.pairFilter);
+0288    }
+0289  }
+
+================================================================================
+web/views.js
+================================================================================
+0001  /** Pure rendering functions. All user strings pass through escape(). */
+0002
+0003  import { trialTypes, sourceTypes, purposes, statuses } from './viewmodel.js';
+0004
+0005  export function escape(value = '') {
+0006    return String(value ?? '').replace(/[&<>"']/g, char => ({
+0007      '&': '&amp;',
+0008      '<': '&lt;',
+0009      '>': '&gt;',
+0010      '"': '&quot;',
+0011      "'": '&#39;',
+0012    })[char]);
+0013  }
+0014
+0015  export function number(value, digits = 3) {
+0016    return value === null || value === undefined ? '—' : Number(value).toFixed(digits);
+0017  }
+0018
+0019  function button(label, action, extra = '', className = '') {
+0020    return `<button type="button" class="${className}" data-action="${action}" ${extra}>${label}</button>`;
+0021  }
+0022
+0023  function field(label, name, value = '', options = {}) {
+0024    const required = options.required ? 'required' : '';
+0025    const type = options.type || 'text';
+0026    const attributes = options.attributes || '';
+0027    const help = options.help ? `<small>${escape(options.help)}</small>` : '';
+0028    if (options.area) {
+0029      return `<label class="field ${options.wide ? 'wide' : ''}"><span>${label}</span><textarea name="${name}" ${required} ${attributes}>${escape(value)}</textarea>${help}</label>`;
+0030    }
+0031    return `<label class="field ${options.wide ? 'wide' : ''}"><span>${label}</span><input name="${name}" type="${type}" value="${escape(value)}" ${required} ${attributes}>${help}</label>`;
+0032  }
+0033
+0034  function select(label, name, value, options, help = '') {
+0035    const items = Object.entries(options).map(([key, text]) => {
+0036      return `<option value="${escape(key)}" ${value === key ? 'selected' : ''}>${escape(text)}</option>`;
+0037    }).join('');
+0038    return `<label class="field"><span>${label}</span><select name="${name}">${items}</select>${help ? `<small>${escape(help)}</small>` : ''}</label>`;
+0039  }
+0040
+0041  function check(label, name, checked = false) {
+0042    return `<label class="check"><input type="checkbox" name="${name}" ${checked ? 'checked' : ''}>${label}</label>`;
+0043  }
+0044
+0045  function empty(message, detail = '') {
+0046    return `<div class="empty"><strong>${escape(message)}</strong><p>${escape(detail)}</p></div>`;
+0047  }
+0048
+0049  function badge(status) {
+0050    return `<span class="badge ${escape(status)}">${escape(statuses[status] || status)}</span>`;
+0051  }
+0052
+0053  function table(headers, rows, emptyMessage = '暂无数据') {
+0054    return `<div class="table-wrap"><table><thead><tr>${headers.map(header => `<th>${header}</th>`).join('')}</tr></thead><tbody>${rows.length ? rows.join('') : `<tr><td colspan="${headers.length}" class="muted">${escape(emptyMessage)}</td></tr>`}</tbody></table></div>`;
+0055  }
+0056
+0057  function row(cells) {
+0058    return `<tr>${cells.map(cell => `<td>${cell}</td>`).join('')}</tr>`;
+0059  }
+0060
+0061  function heading(eyebrow, title, description, actions = '') {
+0062    return `<div class="page-heading"><div><p class="eyebrow">${eyebrow}</p><h1>${title}</h1><p class="muted">${description}</p></div><div class="actions">${actions}</div></div>`;
+0063  }
+0064
+0065  function editorTitle(item, noun) {
+0066    return `<div class="section-title"><h2>${item ? '编辑' : '新增'}${noun}</h2>${item ? `<span class="mono">${escape(item.id)}</span>` : '<span class="muted">保存后自动生成标识</span>'}</div>`;
+0067  }
+0068
+0069  function formActions(collection, item) {
+0070    return `<div class="form-actions"><button class="primary" type="submit">应用${item ? '修改' : '新增'}</button>${button('清空 / 新增', 'select', `data-collection="${collection}" data-id=""`)}${item ? button('删除', 'delete', `data-collection="${collection}" data-id="${escape(item.id)}"`, 'danger') : ''}<span class="muted">应用后请下载项目文件</span></div>`;
+0071  }
+0072
+0073  function objectList(vm, collection, description) {
+0074    const items = vm.project[collection];
+0075    return `<aside class="object-list"><div class="section-title"><h2>${description}</h2><span>${items.length}</span></div>${items.length ? items.map(item => `<button class="object ${vm.selected[collection] === item.id ? 'selected' : ''}" type="button" data-action="select" data-collection="${collection}" data-id="${escape(item.id)}"><strong>${escape(item.name || item.id)}</strong><small>${escape(item.zone || item.vehicle || item.id)}</small></button>`).join('') : empty('尚无记录', '在右侧填写并应用新增。')}</aside>`;
+0076  }
+0077
+0078  const pages = [
+0079    ['project', '01', '项目工作台'],
+0080    ['sites', '02', '封堵位置'],
+0081    ['conditions', '03', '工况与口径'],
+0082    ['trials', '04', '试验与频带'],
+0083    ['import', '05', '批量导入'],
+0084    ['pairs', '06', '显式配对'],
+0085    ['results', '07', '比较与统计'],
+0086    ['quality', '08', '质量与复核'],
+0087    ['export', '09', '保存与报告'],
+0088  ];
+0089
+0090  export function shell(vm, content) {
+0091    const archived = vm.project.status === 'archived';
+0092    return `<div class="app-shell">
+0093      <aside class="sidebar">
+0094        <div class="brand"><span class="brand-mark">AS</span><div><strong>车身声学试验</strong><small>泄漏路径与封堵分析 · V1.0</small></div></div>
+0095        <div class="project-tag"><span class="status-dot"></span><strong>${escape(vm.project.name)}</strong><small>修订 ${vm.project.revision} · ${archived ? '已归档，只读' : '编辑中'}</small></div>
+0096        <nav aria-label="工作流程">${pages.map(([key, index, title]) => `<button data-action="navigate" data-page="${key}" class="nav-item ${vm.page === key ? 'active' : ''}" ${vm.page === key ? 'aria-current="page"' : ''}><span>${index}</span>${title}</button>`).join('')}</nav>
+0097        <div class="sidebar-bottom"><p>本机工作副本</p><small>下载 .aslp.json 才能持久保存。<br>无外部服务与网络资源依赖。</small></div>
+0098      </aside>
+0099      <div class="workspace">
+0100        <header class="topbar"><span>封堵试验分析 / ${pages.find(page => page[0] === vm.page)?.[2]}</span><div class="actions"><span class="save-state ${vm.dirty ? 'unsaved' : ''}">${vm.dirty ? '● 有未下载修改' : '工作副本已载入 / 下载已发起'}</span>${button('打开项目', 'open')}${button('下载项目', 'save', '', 'primary')}</div></header>
+0101        <div class="source-strip"><span>${escape(vm.sourceSummary())}</span><span>${archived ? '归档只读' : 'ΔL = 基线 − 目标，单位 dB'}</span></div>
+0102        <main id="main-content">${content}</main>
+0103        <footer>车身声学泄漏路径与封堵试验分析软件 V1.0 · 结果为测得声级差；单项分贝不可相加预测组合。</footer>
+0104      </div>
+0105    </div>`;
+0106  }
+0107
+0108  export function projectPage(vm) {
+0109    const project = vm.project;
+0110    const counts = vm.analysis.counts;
+0111    const metrics = [
+0112      [counts.sites, '封堵位置'],
+0113      [counts.trials, '试验记录'],
+0114      [counts.valid, '可比较配对'],
+0115      [counts.blocked, '已阻断配对'],
+0116    ];
+0117    return heading('PROJECT / 项目管理', '项目工作台', '建立可追溯的试验对象，从工况确认到成果归档。', button('新建空白项目', 'new') + button('载入模拟样例', 'demo')) + `
+0118      <div class="metrics">${metrics.map(([value, label]) => `<div class="metric"><span>${label}</span><strong>${value}</strong></div>`).join('')}</div>
+0119      <div class="two-columns"><section class="panel">
+0120        <h2>项目信息</h2>
+0121        <form id="metadata-form" class="form-grid">
+0122          ${field('项目名称 *', 'name', project.name, { required: true, wide: true, attributes: 'maxlength="160"' })}
+0123          ${field('负责人（用户填写）', 'owner', project.owner, { attributes: 'maxlength="120"' })}
+0124          ${field('项目状态', 'statusDisplay', project.status === 'archived' ? '归档只读' : '活动项目', { attributes: 'disabled' })}
+0125          ${field('项目背景、试验目标及数据说明', 'description', project.description, { area: true, wide: true, attributes: 'maxlength="8000" rows="5"' })}
+0126          <div class="form-actions"><button type="submit" class="primary">应用项目信息</button>${button('复制项目', 'clone')}${button(project.status === 'archived' ? '解除归档' : '归档为只读', project.status === 'archived' ? 'restore' : 'archive')}</div>
+0127        </form>
+0128        <dl class="details"><dt>项目标识</dt><dd class="mono">${escape(project.id)}</dd><dt>创建时间</dt><dd>${escape(project.createdAt)}</dd><dt>最近修改</dt><dd>${escape(project.updatedAt)}</dd><dt>文件格式</dt><dd>.aslp.json · schema ${project.schemaVersion}</dd></dl>
+0129      </section><section class="panel workflow">
+0130        <h2>建议操作顺序</h2>
+0131        <ol><li><strong>定义位置与工况</strong><p>记录材料、封堵工艺、测点、标定和计权；缺少口径将阻断比较。</p></li><li><strong>组织试验和输入频带</strong><p>基线、单项、组合、恢复分别建档，明确来源。可逐项录入或使用 CSV。</p></li><li><strong>显式配对并复核</strong><p>为每条目标试验选择基线；检查重复性、漂移与恢复。</p></li><li><strong>保存、重开、输出</strong><p>下载项目，在新会话打开核对；导出带来源的报告和明细。</p></li></ol>
+0132        <div class="notice">${escape(vm.analysis.limitation)}</div>
+0133      </section></div>`;
+0134  }
+0135
+0136  export function sitesPage(vm) {
+0137    const item = vm.item('sites');
+0138    const site = item || {};
+0139    return heading('LOCATIONS / 封堵对象', '封堵位置管理', '描述可复现的位置、材料和覆盖范围；被试验引用的位置不可直接删除。') + `
+0140      <div class="editor-layout">${objectList(vm, 'sites', '位置列表')}<section class="panel">
+0141        ${editorTitle(item, '封堵位置')}
+0142        <form id="site-form" class="form-grid" data-id="${escape(site.id || '')}">
+0143          ${field('位置名称 *', 'name', site.name, { required: true, attributes: 'maxlength="120"' })}
+0144          ${field('车身区域', 'zone', site.zone, { attributes: 'maxlength="120"' })}
+0145          ${field('材料与规格', 'material', site.material, { wide: true, help: '按实际使用填写；示例内容不得当作实物记录。' })}
+0146          ${field('封堵步骤与覆盖范围', 'procedure', site.procedure, { area: true, wide: true, attributes: 'rows="5" maxlength="4000"' })}
+0147          ${field('备注与恢复注意事项', 'notes', site.notes, { area: true, wide: true, attributes: 'maxlength="4000"' })}
+0148          ${formActions('sites', item)}
+0149        </form>
+0150      </section></div>`;
+0151  }
+0152
+0153  export function conditionsPage(vm) {
+0154    const item = vm.item('conditions');
+0155    const condition = item || {
+0156      weighting: 'Z',
+0157      timeWeighting: 'Leq',
+0158      bandType: 'octave',
+0159      unit: 'dB re 20 µPa',
+0160      independentBands: false,
+0161    };
+0162    return heading('CONDITIONS / 可比性基础', '工况与测量口径', '可先存草稿；必要字段缺失会阻断配对。修改被引用工况会重新计算关联结果，并写入审计。') + `
+0163      <div class="editor-layout">${objectList(vm, 'conditions', '工况列表')}<section class="panel">
+0164        ${editorTitle(item, '工况')}
+0165        <form id="condition-form" class="form-grid" data-id="${escape(condition.id || '')}">
+0166          ${field('工况名称 *', 'name', condition.name, { required: true, wide: true, attributes: 'maxlength="120"' })}
+0167          ${field('车辆标识', 'vehicle', condition.vehicle, { help: '必须一致；请按项目隐私要求使用代号。' })}
+0168          ${field('测点及安装位置', 'microphone', condition.microphone)}
+0169          ${field('声源 / 激励方式', 'excitation', condition.excitation)}
+0170          ${field('路面 / 试验场', 'surface', condition.surface)}
+0171          ${field('挡位', 'gear', condition.gear)}
+0172          ${field('车速 km/h', 'speed', condition.speed, { type: 'number', attributes: 'min="0" max="500" step="any"', help: '静态试验可填 0；空白表示未知。' })}
+0173          ${field('转速 r/min', 'rpm', condition.rpm, { type: 'number', attributes: 'min="0" max="30000" step="any"' })}
+0174          ${field('温度 °C', 'temperature', condition.temperature, { type: 'number', attributes: 'min="-80" max="100" step="any"' })}
+0175          ${field('积分时长 s', 'duration', condition.duration, { type: 'number', attributes: 'min="0.001" max="86400" step="any"' })}
+0176          ${select('频率计权', 'weighting', condition.weighting, { '': '未填写', Z: 'Z', A: 'A', C: 'C' }, '录入数据须已采用此计权，软件不再次加权。')}
+0177          ${field('时间计权 / 积分定义', 'timeWeighting', condition.timeWeighting, { help: '例如 Leq。必须与仪器数据口径一致。' })}
+0178          ${select('频带制', 'bandType', condition.bandType, { '': '未填写', octave: '倍频程', 'third-octave': '三分之一倍频程', custom: '自定义' })}
+0179          ${field('仪器标识', 'instrument', condition.instrument)}
+0180          ${field('标定链路及状态', 'calibration', condition.calibration, { help: '可填写标定记录编号和状态；软件不认证有效性。' })}
+0181          ${select('声级单位及参考', 'unit', condition.unit, { '': '未填写', 'dB re 20 µPa': 'dB re 20 µPa' })}
+0182          <div class="wide">${check('确认输入频带互不重叠，允许计算“录入频带范围”的合成声级', 'independentBands', condition.independentBands)}</div>
+0183          ${field('工况备注', 'notes', condition.notes, { area: true, wide: true })}
+0184          ${formActions('conditions', item)}
+0185        </form>
+0186      </section></div>`;
+0187  }
+0188
+0189  function bandRows(trial) {
+0190    return Object.entries(trial.bands || {}).sort((a, b) => Number(a[0]) - Number(b[0])).map(([frequency, level]) => `${frequency},${level ?? ''}`).join('\n');
+0191  }
+0192
+0193  export function trialsPage(vm) {
+0194    const item = vm.item('trials');
+0195    const trial = item || {
+0196      type: 'baseline',
+0197      sourceKind: 'manual',
+0198      timestamp: new Date().toISOString(),
+0199      conditionId: vm.project.conditions[0]?.id || '',
+0200      siteIds: [],
+0201      bands: {},
+0202    };
+0203    const conditions = Object.fromEntries(vm.project.conditions.map(entry => [entry.id, entry.name]));
+0204    const trialRows = vm.visibleTrials().map(entry => row([
+0205      `<button class="text-button" data-action="select" data-collection="trials" data-id="${escape(entry.id)}">${escape(entry.name)}</button><small class="mono block">${escape(entry.id)}</small>`,
+0206      trialTypes[entry.type],
+0207      `<span class="source ${entry.sourceKind}">${sourceTypes[entry.sourceKind]}</span>`,
+0208      escape(vm.project.conditions.find(condition => condition.id === entry.conditionId)?.name),
+0209      String(Object.values(entry.bands).filter(value => value !== null).length),
+0210      escape(entry.repeatGroup || '—'),
+0211    ]));
+0212    return heading('TRIALS / 试验档案', '试验与频带数据', '逐次记录实际测量；复制试验只复制结构，避免复制数值被误认作独立重复。', button('新增试验', 'select', 'data-collection="trials" data-id=""')) + `
+0213      <section class="panel"><div class="filters">
+0214        <label>查找名称、标识或重复组 <input id="trial-search" type="search" value="${escape(vm.trialSearch)}" placeholder="输入后按回车搜索"></label>
+0215        ${select('类型筛选', 'trialFilter', vm.trialFilter, { '': '全部类型', ...trialTypes })}
+0216        <span class="muted">${vm.visibleTrials().length} / ${vm.project.trials.length} 条</span>
+0217      </div>${table(['试验', '类型', '来源', '工况', '有效频带', '重复组'], trialRows)}</section>
+0218      <section class="panel trial-editor">
+0219        ${editorTitle(item, '试验')}
+0220        ${!vm.project.conditions.length ? '<div class="notice">请先在“工况与口径”建立工况，再应用试验。</div>' : ''}
+0221        <form id="trial-form" class="form-grid" data-id="${escape(trial.id || '')}">
+0222          ${field('试验名称 *', 'name', trial.name, { required: true, wide: true, attributes: 'maxlength="160"' })}
+0223          ${select('试验类型', 'type', trial.type, trialTypes)}
+0224          ${select('关联工况', 'conditionId', trial.conditionId, { '': '请选择工况', ...conditions })}
+0225          <fieldset class="wide site-checks"><legend>封堵位置（基线/恢复不选；单项选一；组合至少选二）</legend>${vm.project.sites.map(site => `<label class="check"><input type="checkbox" name="siteIds" value="${escape(site.id)}" ${trial.siteIds.includes(site.id) ? 'checked' : ''}>${escape(site.name)}</label>`).join('') || '<span class="muted">还没有封堵位置。</span>'}</fieldset>
+0226          ${field('试验时间 ISO 8601 *', 'timestamp', trial.timestamp, { required: true, help: '包含时区，例如 2026-01-01T10:00:00+08:00。' })}
+0227          ${field('重复组', 'repeatGroup', trial.repeatGroup, { help: '同名组内按类型、位置、来源分开检查，工况仍须一致。' })}
+0228          ${select('数据来源类别', 'sourceKind', trial.sourceKind, sourceTypes)}
+0229          ${field('操作员', 'operator', trial.operator)}
+0230          ${field('来源说明 *', 'sourceNote', trial.sourceNote, { area: true, required: true, wide: true, help: '实测填写数据文件/试验记录来源；模拟说明生成方法，人工填写说明依据。' })}
+0231          ${field('频带数据（每行 Hz,声级dB）', 'bandsText', bandRows(trial), { area: true, wide: true, attributes: 'rows="7" spellcheck="false"', help: '例如 125,70。声级空白或 NA 表示缺失，绝不补零；不带表头。频率 1—100000 Hz；声级 -100—200 dB。' })}
+0232          ${field('试验备注', 'notes', trial.notes, { area: true, wide: true })}
+0233          ${formActions('trials', item)}
+0234          ${item ? `<div class="wide">${button('复制试验结构（不复制测量）', 'duplicate-trial', `data-id="${escape(item.id)}"`)}</div>` : ''}
+0235        </form>
+0236      </section>`;
+0237  }
+0238
+0239  export function importPage(vm) {
+0240    const preview = vm.csvPreview;
+0241    const trialMap = new Map(vm.project.trials.map(trial => [trial.id, trial]));
+0242    return heading('IMPORT / 批量输入', 'CSV 频带导入', '先建立试验元数据，再以试验标识导入频带。预检不改项目，错误会取消整次导入。') + `
+0243      <div class="two-columns"><section class="panel">
+0244        <h2>选择或粘贴 CSV</h2>
+0245        <div class="actions">${button('选择 UTF-8 CSV 文件', 'choose-csv')}${button('下载当前原始频带 CSV', 'export', 'data-kind="measurements"')}</div>
+0246        <form id="import-form" class="form-grid">
+0247          ${select('导入模式', 'csvMode', vm.csvMode, { merge: '合并：保留其他频带，覆盖同频带', replace: '替换：清空受影响试验全部旧频带' })}
+0248          ${field('CSV 内容', 'csvText', vm.csvText, { area: true, wide: true, attributes: 'rows="15" spellcheck="false"', help: '表头严格为 trial_id,frequency_hz,level_db；逗号分隔，句点小数。' })}
+0249          <div class="form-actions"><button class="primary" type="submit">预检 CSV</button>${button('确认导入', 'apply-csv', preview ? '' : 'disabled')}</div>
+0250        </form>
+0251      </section><section class="panel">
+0252        <h2>格式与预检结果</h2>
+0253        <pre class="code-sample">trial_id,frequency_hz,level_db\nb1,125,70\nb1,250,\ns1,125,67</pre>
+0254        <p>示例中的 b1 和 s1 必须替换成当前试验标识。声级缺失允许空白、NA、N/A、null。重复频带、未知试验、越界数值会指出行号。</p>
+0255        <div class="notice">来源类别和说明沿用试验档案。导入不认证数据来源；请先在“试验与频带”复核。</div>
+0256        ${preview ? `<dl class="details"><dt>数据行</dt><dd>${preview.rows}</dd><dt>受影响试验</dt><dd>${preview.trials}</dd><dt>缺失值</dt><dd>${preview.missing}</dd><dt>同频带覆盖</dt><dd>${preview.overwritten}</dd><dt>模式</dt><dd>${escape(preview.mode)}</dd></dl>${table(['试验', '导入频带数'], Object.entries(preview.updates).map(([id, bands]) => row([escape(trialMap.get(id).name), String(Object.keys(bands).length)])))}` : empty('尚未预检', '预检通过后核对覆盖数，再确认导入。')}
+0257      </section></div>`;
+0258  }
+0259
+0260  export function pairsPage(vm) {
+0261    const item = vm.item('pairs');
+0262    const pair = item || { purpose: 'effect' };
+0263    const baselines = Object.fromEntries(vm.project.trials.filter(trial => trial.type === 'baseline').map(trial => [trial.id, `${trial.name} [${sourceTypes[trial.sourceKind]}]`]));
+0264    const targets = Object.fromEntries(vm.project.trials.map(trial => [trial.id, `${trial.name} · ${trialTypes[trial.type]}`]));
+0265    return heading('PAIRING / 明确基准', '显式试验配对', '选择基线和目标，不依赖试验名称、导入顺序或时间自动推断对应关系。') + `
+0266      <section class="panel">
+0267        ${table(['基线 → 目标', '用途', '可比状态', '操作'], vm.analysis.pairs.map(result => row([
+0268          `${escape(result.baselineName)} → ${escape(result.targetName)}`,
+0269          purposes[result.purpose],
+0270          `${badge(result.status)}${result.reasons.length ? `<small class="block error-text">${escape(result.reasons.join('；'))}</small>` : ''}`,
+0271          button('编辑', 'select', `data-collection="pairs" data-id="${escape(result.id)}"`),
+0272        ])))}
+0273      </section><section class="panel">
+0274        ${editorTitle(item, '配对')}
+0275        <form id="pair-form" class="form-grid" data-id="${escape(pair.id || '')}">
+0276          ${select('用途', 'purpose', pair.purpose, purposes)}
+0277          ${select('基准：基线试验', 'baselineId', pair.baselineId, { '': '请选择基线', ...baselines })}
+0278          ${select('目标试验', 'targetId', pair.targetId, { '': '请选择目标', ...targets })}
+0279          <div class="help-box">封堵声级差：目标为单项或组合；基线漂移：目标为另一基线；恢复：目标为解除封堵后的恢复试验。类型不匹配会拒绝保存。</div>
+0280          ${field('配对理由和备注', 'notes', pair.notes, { area: true, wide: true })}
+0281          ${formActions('pairs', item)}
+0282        </form>
+0283      </section>`;
+0284  }
+0285
+0286  function pairChart(pair) {
+0287    const bands = pair.bands.filter(band => band.difference !== null);
+0288    if (!bands.length) {
+0289      return empty('无可绘制结果', pair.reasons.join('；') || '请录入共同有效频带。');
+0290    }
+0291    const width = 760;
+0292    const height = 240;
+0293    const left = 55;
+0294    const right = 740;
+0295    const baselineY = 132;
+0296    const maximum = Math.max(1, ...bands.map(band => Math.abs(band.difference)));
+0297    const scale = 85 / maximum;
+0298    const parts = [
+0299      `<svg class="chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="封堵前后测得声级差，横轴Hz，纵轴dB">`,
+0300      `<line x1="${left}" y1="${baselineY}" x2="${right}" y2="${baselineY}" class="zero-line"/>`,
+0301      '<text x="5" y="20">ΔL / dB</text>',
+0302      `<text x="8" y="50">${number(maximum, 1)}</text>`,
+0303      `<text x="20" y="136">0</text>`,
+0304      `<text x="5" y="220">${number(-maximum, 1)}</text>`,
+0305    ];
+0306    for (const [index, band] of bands.entries()) {
+0307      const x = left + (index + 0.5) * (right - left) / bands.length;
+0308      const barWidth = Math.min(50, (right - left) / bands.length * 0.55);
+0309      const barHeight = Math.abs(band.difference) * scale;
+0310      const y = band.difference >= 0 ? baselineY - barHeight : baselineY;
+0311      parts.push(`<rect x="${x - barWidth / 2}" y="${y}" width="${barWidth}" height="${barHeight}" class="${band.difference >= 0 ? 'positive-bar' : 'negative-bar'}"><title>${band.frequency} Hz：${number(band.difference)} dB</title></rect>`);
+0312      parts.push(`<text x="${x}" y="${band.difference >= 0 ? y - 8 : y + barHeight + 15}" text-anchor="middle">${number(band.difference, 2)}</text>`);
+0313      parts.push(`<text x="${x}" y="238" text-anchor="middle">${band.frequency}</text>`);
+0314    }
+0315    parts.push('<text x="705" y="20">Hz</text>', '</svg>');
+0316    return parts.join('');
+0317  }
+0318
+0319  export function resultsPage(vm) {
+0320    const analysis = vm.analysis;
+0321    const siteNames = ids => ids.map(id => vm.project.sites.find(site => site.id === id)?.name || id).join(' + ');
+0322    const pairs = vm.visiblePairs();
+0323    return heading('ANALYSIS / 测得声级差', '比较与统计', '正值表示目标声级低于基线；负值表示目标较高。组合由组合试验实测数据计算。', button('记录当前分析复核', 'record-analysis')) + `
+0324      <div class="notice">${escape(analysis.limitation)}</div>
+0325      <section class="panel filters">${select('配对用途', 'pairFilter', vm.pairFilter, { '': '全部用途', ...purposes })}<span class="muted">当前修订 ${vm.project.revision} · 参数修改后自动重新计算</span></section>
+0326      ${pairs.length ? pairs.map(pair => `<section class="panel result-card">
+0327        <div class="section-title"><div><p class="eyebrow">${purposes[pair.purpose]} · ${sourceTypes[pair.sourceKind]}</p><h2>${escape(pair.baselineName)} → ${escape(pair.targetName)}</h2></div>${badge(pair.status)}</div>
+0328        ${pair.reasons.length ? `<div class="error-box">阻断原因：${escape(pair.reasons.join('；'))}</div>` : ''}
+0329        ${pair.warnings.length ? `<p class="muted">${escape(pair.warnings.join('；'))}</p>` : ''}
+0330        ${pairChart(pair)}
+0331        ${table(['频率 Hz', '基线 dB', '目标 dB', '基线 − 目标 dB', '状态'], pair.bands.map(band => row([
+0332          String(band.frequency), number(band.baseline), number(band.target), `<strong>${number(band.difference)}</strong>`, badge(band.status),
+0333        ])))}
+0334        <div class="result-note"><strong>录入频带合成声级差：${number(pair.totalDifference)} dB</strong><span>${escape(pair.totalNote)}</span></div>
+0335        ${pair.screening ? `<div class="screening">${badge(pair.screening.status)} 最大频带绝对差 ${number(pair.screening.maximumAbsoluteDifference)} dB / 用户阈值 ${number(pair.screening.threshold)} dB。${escape(pair.screening.meaning)}</div>` : ''}
+0336        <details><summary>查看配对来源与时间顺序</summary><p>基线：${escape(pair.baselineSource)}</p><p>目标：${escape(pair.targetSource)}</p><p>目标减基线时间：${pair.elapsedSeconds} s</p><p class="mono">配对 ${escape(pair.id)}</p></details>
+0337      </section>`).join('') : empty('暂无配对结果', '先建试验并到“显式配对”建立基准与目标。')}
+0338      ${matrixSection(vm)}
+0339      <section class="panel"><h2>同封堵方案的重复配对统计</h2><p class="muted">配对差算术均值与两组能量平均声级之差分别列出，不可混用。95% 区间仅描述独立配对差均值，未包含仪器系统不确定性。</p>
+0340        ${analysis.effects.map(effect => `<h3>${escape(siteNames(effect.siteIds))} · ${sourceTypes[effect.sourceKind]}</h3>${effect.reasons.length ? `<div class="error-box">${escape(effect.reasons.join('；'))}</div>` : ''}${table(['Hz', 'n', '配对差均值 dB', '差值SD dB', '组能量均值差 dB', '95% 区间 dB'], effect.bands.map(band => row([
+0341          String(band.frequency), String(band.n), number(band.meanDifference), number(band.sdDifference), number(band.groupEnergyMeanDifference), band.ci95 ? `${number(band.ci95[0])} 至 ${number(band.ci95[1])}` : '不生成',
+0342        ])))}<p class="muted">${escape(effect.bands[0]?.ciNote || '')}</p>`).join('') || '<p>尚无可用封堵配对。</p>'}
+0343      </section>`;
+0344  }
+0345
+0346  const parameterDefinitions = [
+0347    ['speedTolerance', '车速容差 km/h', 0, 50, '默认 0.5；绝对差超出即阻断。'],
+0348    ['rpmTolerance', '转速容差 r/min', 0, 5000, '默认 20；静态试验也需明确填写转速。'],
+0349    ['temperatureTolerance', '温度容差 °C', 0, 30, '默认 2；是工程设定，非标准限值。'],
+0350    ['durationTolerance', '积分时长容差 s', 0, 3600, '默认 0.01；确保统计时段口径一致。'],
+0351    ['driftThreshold', '漂移绝对差阈值 dB', 0, 30, '默认 1；逐频带绝对差最大值筛查。'],
+0352    ['recoveryThreshold', '恢复绝对差阈值 dB', 0, 30, '默认 1；仅作工程筛查。'],
+0353    ['repeatabilityThreshold', '重复性样本SD阈值 dB', 0, 30, '默认 1；n<2 不判定重复性。'],
+0354  ];
+0355
+0356  export function qualityPage(vm) {
+0357    const analysis = vm.analysis;
+0358    return heading('REVIEW / 质量复核', '重复性、漂移与恢复', '所有阈值为用户工程设置；不代表标准判定。异常和阻断原因随报告保留。') + `
+0359      <section class="panel"><h2>分析参数</h2><form id="parameters-form" class="form-grid three">
+0360        ${parameterDefinitions.map(([key, label, low, high, help]) => field(label, key, vm.project.parameters[key], { type: 'number', required: true, attributes: `min="${low}" max="${high}" step="any"`, help })).join('')}
+0361        <div class="form-actions"><button type="submit" class="primary">应用参数并重新计算</button>${button('记录当前分析复核', 'record-analysis')}</div>
+0362      </form></section>
+0363      <section class="panel"><h2>逐组重复性</h2><p class="muted">对同重复组、同类型、同封堵位置、同来源且工况可比的试验统计。SD 为 dB 数值样本标准差；能量均值另列。</p>
+0364        ${analysis.repeatability.map(group => `<h3>${escape(group.name)} · ${trialTypes[group.type]} · ${sourceTypes[group.sourceKind]}</h3>${group.reasons.length ? `<div class="error-box">${escape(group.reasons.join('；'))}</div>` : ''}${table(['Hz', 'n', '缺失', '算术均值 dB', '能量均值 dB', '样本SD dB', '极差 dB', '状态'], group.bands.map(band => row([
+0365          String(band.frequency), String(band.n), String(band.missing), number(band.mean), number(band.energyMean), number(band.sd), number(band.range), badge(band.status),
+0366        ])))}`).join('') || empty('还没有重复组', '在试验档案填写重复组名称。')}
+0367      </section>
+0368      <section class="panel"><h2>漂移与恢复摘要</h2>
+0369        ${table(['配对', '用途', '最大频带绝对差 dB', '用户阈值 dB', '状态'], analysis.pairs.filter(pair => pair.screening).map(pair => row([
+0370          `${escape(pair.baselineName)} → ${escape(pair.targetName)}`, purposes[pair.purpose], number(pair.screening.maximumAbsoluteDifference), number(pair.screening.threshold), badge(pair.screening.status),
+0371        ])))}
+0372        <p class="muted">详细频带值见“比较与统计”；未设置对应配对时不能推断稳定或恢复。</p>
+0373      </section>
+0374      ${coverageSection(vm)}
+0375      <section class="panel"><h2>数据质量提示</h2>${table(['级别', '对象标识', '原因与处理线索'], analysis.issues.map(issue => row([
+0376        escape({ error: '阻断', warning: '警示', info: '提示' }[issue.level]), `<span class="mono">${escape(issue.object)}</span>`, escape(issue.message),
+0377      ])))}</section>
+0378      <section class="panel"><h2>操作审计（最近 100 条）</h2><p class="muted">完整审计随项目和报告保留；这是本地操作记录，不提供防篡改签名。</p>${table(['时间', '操作', '详情'], vm.project.audit.slice(-100).reverse().map(entry => row([
+0379        escape(entry.time), escape(entry.action), escape(entry.detail),
+0380      ])))}</section>`;
+0381  }
+0382
+0383  export function exportPage(vm) {
+0384    return heading('DELIVERY / 保存与输出', '保存、重开与报告', '下载后的项目包含全部频带和来源，不依赖原始 CSV 路径；浏览器不会自动保存当前工作副本。') + `
+0385      <div class="export-grid">
+0386        <section class="panel export-card"><span class="file-type">JSON</span><h2>项目文件</h2><p>保存元数据、位置、工况、试验、显式配对、参数和审计。下次用“打开项目”恢复。</p>${button('下载 .aslp.json 项目', 'save', '', 'primary')}</section>
+0387        <section class="panel export-card"><span class="file-type">HTML</span><h2>自包含分析报告</h2><p>包含原始频带、配对差、图表、重复性、漂移、恢复、阻断原因和来源。浏览器打开可打印为 PDF。</p>${button('导出 HTML 报告', 'export', 'data-kind="report"', 'primary')}</section>
+0388        <section class="panel export-card"><span class="file-type">CSV</span><h2>结果明细</h2><p>逐配对、逐频带列出基线、目标、测得声级差、状态和原因。UTF-8 BOM 便于表格软件识别中文。</p>${button('导出结果 CSV', 'export', 'data-kind="results"')}</section>
+0389        <section class="panel export-card"><span class="file-type">CSV</span><h2>原始频带</h2><p>标准长表可重新导入；缺失值导出为空白。试验来源元数据保存在项目文件和报告中。</p>${button('导出原始频带 CSV', 'export', 'data-kind="measurements"')}</section>
+0390      </div>
+0391      ${vm.exportMessage ? `<div class="success-box">${escape(vm.exportMessage)}</div>` : ''}
+0392      <section class="panel"><h2>保存后重开核对</h2><ol class="steps"><li>先应用所有表单输入，再点击“下载项目”。</li><li>在浏览器下载记录中确认文件已落盘，记录实际目录；软件无法读取浏览器下载设置。</li><li>点击“打开项目”，选择刚下载的 .aslp.json，核对项目名、修订号、试验数和配对结果。</li><li>将项目文件复制到另一目录后再打开，可验证内嵌数据的可搬迁性。</li><li>导出报告并核对来源标签、Hz、dB、工况、阈值和阻断原因。报告不替代项目文件。</li></ol></section>
+0393      <section class="panel"><h2>使用边界</h2><p>${escape(vm.analysis.limitation)}</p><p>本版本处理已提取的频带声级，不读取音频、不自动标定、不重算 A/C/Z 计权、不管理多人并发。实际测量、封堵作业和数据合规由试验人员负责。敏感试验资料请按本单位要求保存。</p></section>`;
+0394  }
+0395
+0396  export function render(vm) {
+0397    if (!vm.project) {
+0398      return '<div class="startup"><h1>正在连接本地声学分析服务…</h1><p>若长时间无响应，请确认 Python 服务已启动。</p></div>';
+0399    }
+0400    const renderers = {
+0401      project: projectPage,
+0402      sites: sitesPage,
+0403      conditions: conditionsPage,
+0404      trials: trialsPage,
+0405      import: importPage,
+0406      pairs: pairsPage,
+0407      results: resultsPage,
+0408      quality: qualityPage,
+0409      export: exportPage,
+0410    };
+0411    return shell(vm, (renderers[vm.page] || projectPage)(vm));
+0412  }
+0413
+0414  function coverageSection(vm) {
+0415    const coverage = vm.analysis.coverage;
+0416    const trialRows = coverage.timeline.map(trial => row([
+0417      escape(trial.timestamp),
+0418      escape(trial.name),
+0419      trialTypes[trial.type],
+0420      sourceTypes[trial.sourceKind],
+0421      `${trial.validBands} / ${trial.declaredBands}`,
+0422      `${trial.validTargetPairs} / ${trial.targetPairs}`,
+0423    ]));
+0424    const conditionRows = coverage.conditions.map(condition => row([
+0425      escape(condition.name),
+0426      String(condition.trialCount),
+0427      condition.complete ? badge('valid') : badge('blocked'),
+0428      escape(condition.missing.join('、') || '已填齐必要字段；仍需复核实际记录'),
+0429    ]));
+0430    const siteRows = coverage.sites.map(site => row([
+0431      escape(site.name),
+0432      String(site.singleTrials),
+0433      String(site.combinationTrials),
+0434      String(site.validEffectPairs),
+0435      site.missingSingle ? '尚无单项试验' : '已有单项记录',
+0436    ]));
+0437    const frequencyRows = coverage.frequencies.map(frequency => row([
+0438      String(frequency.frequency),
+0439      String(frequency.valid),
+0440      String(frequency.missing),
+0441      String(frequency.absent),
+0442      String(frequency.declared),
+0443    ]));
+0444    return `
+0445      <section class="panel">
+0446        <h2>试验覆盖与数据完整性</h2>
+0447        <p class="muted">${escape(coverage.note)}</p>
+0448        <div class="coverage-types">
+0449          ${Object.entries(coverage.typeCounts).map(([type, count]) => `<div><strong>${count}</strong><span>${trialTypes[type]}</span></div>`).join('')}
+0450        </div>
+0451        <h3>工况字段完整性</h3>
+0452        ${table(['工况', '关联试验数', '字段状态', '缺失内容 / 提示'], conditionRows)}
+0453        <h3>位置覆盖</h3>
+0454        ${table(['位置', '单项试验数', '组合试验数', '可比较封堵配对数', '提示'], siteRows)}
+0455        <h3>频带覆盖</h3>
+0456        <p class="muted">明确缺失表示频带键存在但声级为空；未声明表示该试验没有此频带键。两者均不补零。</p>
+0457        ${table(['Hz', '有效记录数', '明确缺失数', '未声明数', '声明记录数'], frequencyRows)}
+0458        <h3>试验时间线</h3>
+0459        <p class="muted">时间排序仅供复核，不自动生成配对；可比较数只统计本试验作为目标的配对。</p>
+0460        ${table(['带时区时间', '试验', '类型', '来源', '有效 / 声明频带', '可比较 / 目标配对'], trialRows)}
+0461      </section>`;
+0462  }
+0463
+0464  function matrixSection(vm) {
+0465    const matrix = vm.analysis.matrix;
+0466    const low = vm.scanLow;
+0467    const high = vm.scanHigh;
+0468    const rows = matrix.rows.filter(row => (low === null || row.frequency >= low) && (high === null || row.frequency <= high));
+0469    const headings = ['频率 Hz'];
+0470    for (const column of matrix.columns) {
+0471      headings.push(`${escape(column.targetName)}<small class="block">基线：${escape(column.baselineName)} · ${sourceTypes[column.sourceKind]}</small>`);
+0472    }
+0473    const cells = rows.map(record => row([
+0474      String(record.frequency),
+0475      ...record.cells.map(cell => cell.difference === null ? badge(cell.status) : `<strong class="${cell.difference < 0 ? 'increase-value' : 'decrease-value'}">${number(cell.difference)}</strong>`),
+0476    ]));
+0477    return `
+0478      <section class="panel">
+0479        <h2>单项与组合测得差值矩阵</h2>
+0480        <p class="muted">${escape(matrix.note)}</p>
+0481        <form id="scan-form" class="scan-form">
+0482          ${field('扫描下限 Hz（空白不限）', 'scanLow', low, { type: 'number', attributes: 'min="1" max="100000" step="any"' })}
+0483          ${field('扫描上限 Hz（空白不限）', 'scanHigh', high, { type: 'number', attributes: 'min="1" max="100000" step="any"' })}
+0484          <button type="submit">筛选显示频带</button>
+0485          ${button('显示全部频带', 'reset-scan')}
+0486        </form>
+0487        <p class="muted">显示 ${rows.length} / ${matrix.rows.length} 个频带。筛选只影响当前矩阵，不修改原始数据或报告。</p>
+0488        ${table(headings, cells, '没有符合范围的频带或尚无封堵配对')}
+0489        <p class="muted">表内数值单位 dB，正值为目标较低，负值为目标较高；缺失或阻断单独显示。矩阵不会计算“单项相加”列。</p>
+0490      </section>`;
+0491  }
