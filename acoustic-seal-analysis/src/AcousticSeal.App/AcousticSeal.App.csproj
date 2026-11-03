@@ -1,0 +1,4 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup><AssemblyName>AcousticSeal.App</AssemblyName></PropertyGroup>
+  <ItemGroup><ProjectReference Include="../AcousticSeal.Core/AcousticSeal.Core.csproj" /></ItemGroup>
+</Project>

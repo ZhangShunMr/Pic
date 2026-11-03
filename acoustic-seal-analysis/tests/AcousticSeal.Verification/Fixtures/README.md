@@ -1,0 +1,3 @@
+# 旧格式迁移测试夹具
+
+legacy-v1.json来自本仓库V1提交bf7de5ebc0fad67453e01e72db52367c9c92bade的固定模拟样例，原数列生成位置为当时的acoustic/demo.py。此文件只测试schema1到schema2迁移，不是V2生产软件或真实测量数据，不计入源码量。旧来源文字保留以验证迁移没有篡改来源，当前生产演示数据来自C# Demonstration.cs。

@@ -1,0 +1,43 @@
+@inherits VmComponent
+<div class="editor-layout">
+    <aside class="object-list">
+        <div class="section-heading"><h2>工况列表</h2><span>@Vm.Project.Conditions.Count</span></div>
+        <button class="add-object" @onclick="() => Vm.SelectCondition(null)">+ 新增工况</button>
+        @foreach (var item in Vm.Project.Conditions)
+        {
+            <button class="object @(Vm.Condition.Id == item.Id ? "active" : "")"
+                    data-condition="@item.Id" @onclick="() => Vm.SelectCondition(item.Id)">
+                <strong>@item.Name</strong><small>@item.Vehicle · @item.Weighting</small>
+            </button>
+        }
+    </aside>
+    <section class="panel">
+        <div class="section-heading"><h2>@(Vm.Condition.IsExisting ? "编辑" : "新增")工况</h2><code>@Vm.Condition.IdentityLabel</code></div>
+        <div class="notice">允许保存工况草稿；必要字段缺失时阻断比较。修改已引用工况会重新计算全部相关结果。</div>
+        <form @onsubmit="Vm.SaveCondition" @onsubmit:preventDefault novalidate>
+            <fieldset class="form-grid" disabled="@Vm.Archived">
+                <EditorField Label="工况名称 *" Name="condition-name" @bind-Value="Vm.Condition.Name" Wide MaximumLength="120" />
+                <EditorField Label="车辆标识" Name="condition-vehicle" @bind-Value="Vm.Condition.Vehicle" MaximumLength="500" />
+                <EditorField Label="测点及安装位置" Name="condition-microphone" @bind-Value="Vm.Condition.Microphone" MaximumLength="500" />
+                <EditorField Label="声源 / 激励方式" Name="condition-excitation" @bind-Value="Vm.Condition.Excitation" MaximumLength="500" />
+                <EditorField Label="路面 / 试验场" Name="condition-surface" @bind-Value="Vm.Condition.Surface" MaximumLength="500" />
+                <EditorField Label="挡位" Name="condition-gear" @bind-Value="Vm.Condition.Gear" MaximumLength="500" />
+                <EditorField Label="车速 km/h" Name="condition-speed" @bind-Value="Vm.Condition.Speed" InputMode="decimal" Help="0—500；静态可填0，未知留空。" />
+                <EditorField Label="转速 r/min" Name="condition-rpm" @bind-Value="Vm.Condition.Rpm" InputMode="decimal" Help="0—30000；未知不补零。" />
+                <EditorField Label="温度 °C" Name="condition-temperature" @bind-Value="Vm.Condition.Temperature" InputMode="decimal" Help="-80—100，按实际记录填写。" />
+                <EditorField Label="积分时长 s" Name="condition-duration" @bind-Value="Vm.Condition.Duration" InputMode="decimal" Help="0.001—86400；须与统计定义对应。" />
+                <label class="field"><span>频率计权</span><select name="condition-weighting" @bind="Vm.Condition.Weighting" @bind:after="Vm.MarkEditorDirty"><option value="">未填写</option><option>A</option><option>C</option><option>Z</option></select><small>输入须已采用该计权，软件不重复加权。</small></label>
+                <EditorField Label="时间计权 / 积分定义" Name="condition-time" @bind-Value="Vm.Condition.TimeDefinition" MaximumLength="500" Help="例如Leq，必须与仪器统计口径一致。" />
+                <label class="field"><span>频带制</span><select name="condition-band-type" @bind="Vm.Condition.BandType" @bind:after="Vm.MarkEditorDirty"><option value="">未填写</option><option value="octave">倍频程</option><option value="third-octave">三分之一倍频程</option><option value="custom">自定义</option></select></label>
+                <EditorField Label="仪器标识" Name="condition-instrument" @bind-Value="Vm.Condition.Instrument" MaximumLength="500" />
+                <EditorField Label="标定链路及状态" Name="condition-calibration" @bind-Value="Vm.Condition.Calibration" MaximumLength="500" Help="按真实标定记录填写；软件不认证标定有效性。" />
+                <label class="field"><span>声级单位及参考</span><select name="condition-unit" @bind="Vm.Condition.Unit" @bind:after="Vm.MarkEditorDirty"><option value="">未填写</option><option>@Software.LevelUnit</option></select></label>
+                <EditorField Label="采样率 Hz（条件规则可选检查）" Name="condition-sample-rate" @bind-Value="Vm.Condition.SampleRate" InputMode="decimal" />
+                <EditorField Label="时钟与同步定义（条件规则可选检查）" Name="condition-sync" @bind-Value="Vm.Condition.Synchronization" MaximumLength="500" />
+                <label class="check wide"><input name="condition-nonoverlap" type="checkbox" @bind="Vm.Condition.NonOverlappingBands" @bind:after="Vm.MarkEditorDirty" />确认输入频带互不重叠，允许计算录入频带范围的合成声级</label>
+                <EditorField Label="工况备注" Name="condition-notes" @bind-Value="Vm.Condition.Notes" Area Wide />
+                <EditorActions Existing="Vm.Condition.IsExisting" New="() => Vm.SelectCondition(null)" Delete='() => Vm.DeleteSelected("condition", Vm.Condition.Id)' />
+            </fieldset>
+        </form>
+    </section>
+</div>

@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "AcousticSeal.App": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "applicationUrl": "http://127.0.0.1:8765",
+      "environmentVariables": {"ASPNETCORE_ENVIRONMENT":"Development"}
+    }
+  }
+}

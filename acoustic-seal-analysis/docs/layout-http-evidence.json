@@ -1,0 +1,52 @@
+{
+  "date": "2026-11-03T06:13:50.417084+00:00",
+  "layout": [
+    {
+      "width": 1440,
+      "height": 1000,
+      "longLabels": true,
+      "trialRows": 200,
+      "pagination": 40,
+      "pageOverflow": false
+    },
+    {
+      "width": 1024,
+      "height": 768,
+      "longLabels": true,
+      "trialRows": 200,
+      "pagination": 40,
+      "pageOverflow": false
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "longLabels": true,
+      "trialRows": 200,
+      "pagination": 40,
+      "pageOverflow": false
+    }
+  ],
+  "http": [
+    {
+      "check": "health",
+      "expected": 200,
+      "actual": 200
+    },
+    {
+      "check": "wrong-host",
+      "expected": 403,
+      "actual": 403
+    },
+    {
+      "check": "cross-origin",
+      "expected": 403,
+      "actual": 403
+    },
+    {
+      "check": "private-source",
+      "expected": 404,
+      "actual": 404
+    }
+  ],
+  "limit": "仅200行布局及本机HTTP边界，不是最大规模性能、远程或多用户安全验收"
+}

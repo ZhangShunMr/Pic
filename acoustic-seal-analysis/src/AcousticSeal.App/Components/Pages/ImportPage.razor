@@ -1,0 +1,115 @@
+@inherits VmComponent
+<div class="columns">
+    <section class="panel">
+        <h2>CSV输入与格式设置</h2>
+        <p>先在试验页建立档案并填写来源，CSV只输入频带。每行使用试验GUID，不自动按名称建立或匹配试验。</p>
+        <fieldset disabled="@Vm.Archived">
+            <label class="upload">
+                选择UTF-8 CSV文件（不超过5MiB）
+                <InputFile id="csv-upload" OnChange="ReadCsvAsync" accept=".csv,text/csv" />
+            </label>
+            <p class="muted">@Vm.Import.Filename</p>
+            <div class="form-grid">
+                <label class="field">
+                    <span>导入模式</span>
+                    <select name="import-mode" @bind="Vm.Import.Mode" @bind:after="Vm.Import.Invalidate">
+                        <option value="@ImportMode.Merge">合并：保留其他频带，覆盖同名频带</option>
+                        <option value="@ImportMode.Replace">替换：清空本次涉及试验的旧频带</option>
+                    </select>
+                </label>
+                <label class="field">
+                    <span>字段分隔符</span>
+                    <select name="import-delimiter" @bind="Vm.Import.Delimiter" @bind:after="Vm.Import.Invalidate">
+                        <option value=",">英文逗号</option>
+                        <option value=";">分号</option>
+                        <option value="tab">制表符</option>
+                    </select>
+                </label>
+                <label class="field wide">
+                    <span>CSV内容</span>
+                    <textarea name="import-content" rows="16" @bind="Vm.Import.Content" @bind:event="oninput"
+                              @bind:after="Vm.Import.Invalidate" spellcheck="false"></textarea>
+                    <small>表头固定为trial_id、frequency_hz、level_db；数据为Hz、dB，句点小数。表头列顺序固定。</small>
+                </label>
+            </div>
+            <div class="editor-actions">
+                <button class="primary" data-testid="preview-csv" @onclick="Vm.PreviewCsv">预检CSV</button>
+                <button data-testid="apply-csv" @onclick="Vm.ApplyCsv" disabled="@(Vm.Import.Preview?.CanApply != true)">核对后确认导入</button>
+            </div>
+        </fieldset>
+        <details>
+            <summary>查看当前试验标识，复制到CSV第一列</summary>
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>试验</th><th>GUID</th><th>来源</th></tr></thead>
+                    <tbody>
+                        @foreach (var trial in Vm.Project.Trials)
+                        {
+                            <tr><td>@trial.Name</td><td><code>@trial.Id</code></td><td>@trial.Source.Text()</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </details>
+    </section>
+    <section class="panel">
+        <h2>预检结果与覆盖范围</h2>
+        <div class="notice">来源沿用试验档案。合并覆盖同频带；替换清空受影响试验的旧频带。预检后改变项目或文本必须重新预检。</div>
+        <pre class="code-sample">trial_id,frequency_hz,level_db
+00000000-0000-4000-8000-000000000030,125,70
+00000000-0000-4000-8000-000000000030,250,</pre>
+        <p class="muted">示例GUID只对应内置模拟基线1，普通项目须替换为自己的标识。声级空白、NA、N/A、null表示缺失，零声级为有效数值。</p>
+        @if (Vm.Import.Preview is { } preview)
+        {
+            <dl class="details">
+                <dt>数据行</dt><dd>@preview.Rows</dd>
+                <dt>受影响试验</dt><dd>@preview.Changes.Count</dd>
+                <dt>同频带覆盖</dt><dd>@preview.Replaced</dd>
+                <dt>明确缺失</dt><dd>@preview.Missing</dd>
+                <dt>可整体应用</dt><dd>@(preview.CanApply ? "是，仍需确认" : "否，先修复错误")</dd>
+            </dl>
+            <div class="table-wrap">
+                <table data-testid="csv-preview-table">
+                    <thead><tr><th>试验</th><th>新增频率</th><th>覆盖频率</th><th>缺失声级</th></tr></thead>
+                    <tbody>
+                        @foreach (var change in preview.Changes)
+                        {
+                            <tr><td>@change.TrialName</td><td>@change.Added</td><td>@change.Replaced</td><td>@change.Missing</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            @if (preview.Problems.Count > 0)
+            {
+                <section class="error-list">
+                    <strong>整批未应用，以下错误须修正：</strong>
+                    <ul>
+                        @foreach (var problem in preview.Problems)
+                        {
+                            <li>@problem.Path：@problem.Message</li>
+                        }
+                    </ul>
+                </section>
+            }
+        }
+        else
+        {
+            <div class="empty">尚未预检。请先输入文件，核对模式与分隔符，再点击预检。</div>
+        }
+    </section>
+</div>
+
+@code {
+    private async Task ReadCsvAsync(InputFileChangeEventArgs args)
+    {
+        try
+        {
+            var bytes = await UploadBoundary.ReadAsync(args.File, 5 * 1024 * 1024);
+            Vm.LoadCsv(bytes, args.File.Name);
+        }
+        catch (Exception error) when (error is IOException or DomainValidationException or InvalidOperationException)
+        {
+            Vm.Edit(() => throw new DomainValidationException("csv.file", error.Message));
+        }
+    }
+}

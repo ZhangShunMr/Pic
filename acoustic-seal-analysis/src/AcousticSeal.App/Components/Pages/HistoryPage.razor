@@ -1,0 +1,49 @@
+@inherits VmComponent
+<section class="panel" @oninput="Vm.MarkReviewDirty">
+    <h2>记录当前分析复核快照</h2>
+    <p>输入复核人及本次判断。记录保存当前输入修订、参数、有效与阻断配对数量、全部阻断原因和SHA-256。哈希用于内容核对，不是签名；本地项目可被用户编辑。</p>
+    <div class="form-grid">
+        <EditorField Label="复核人 *（实际填写）" Name="reviewer" @bind-Value="Vm.Reviewer" TrackDirty="false" MaximumLength="120" />
+        <div class="help-box">当前输入修订 @Vm.Project.Revision；有效 @Vm.Analysis.ValidPairCount，阻断 @Vm.Analysis.BlockedPairCount。</div>
+        <EditorField Label="复核意见与后续补测安排" Name="review-comment" @bind-Value="Vm.ReviewComment" TrackDirty="false" Area Wide />
+        <div class="wide"><button class="primary" data-testid="record-review" @onclick="Vm.RecordReview" disabled="@Vm.Archived">记录当前分析复核</button></div>
+    </div>
+</section>
+<section class="panel">
+    <h2>复核记录</h2>
+    @if (Vm.Project.Reviews.Count == 0)
+    {
+        <div class="empty">还没有复核记录。复核只代表用户记录的判断，不代表软件已认证测量有效。</div>
+    }
+    @foreach (var review in Vm.Project.Reviews.AsEnumerable().Reverse())
+    {
+        <details class="review-card">
+            <summary>@Software.Time(review.Time) · @review.Reviewer · 输入修订 @review.InputRevision</summary>
+            <p>@review.Comment</p>
+            <p>有效 @review.ValidPairs；阻断 @review.BlockedPairs。输入 <code>@review.InputHash</code></p>
+            <h3>复核当时的阻断原因</h3>
+            <ul>@foreach (var reason in review.BlockingReasons) { <li>@reason</li> }</ul>
+            <h3>复核当时的参数</h3>
+            <pre>@review.SettingsJson</pre>
+        </details>
+    }
+</section>
+<section class="panel">
+    <div class="section-heading"><h2>操作审计</h2><span>展示最近200条 / 共 @Vm.Project.Audit.Count 条</span></div>
+    <p class="muted">项目最多保留10000条审计。撤销/重做只影响当前会话的数据状态，累计审计和复核记录保留；打开项目后不恢复撤销栈。</p>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>时间</th><th>修订</th><th>操作</th><th>对象与修改范围</th><th>输入指纹</th></tr></thead>
+            <tbody>
+                @foreach (var entry in Vm.Project.Audit.TakeLast(200).Reverse())
+                {
+                    <tr>
+                        <td>@Software.Time(entry.Time)</td><td>@entry.Revision</td><td>@entry.Action</td>
+                        <td><code>@entry.Entity</code><small class="block">@entry.Detail</small></td>
+                        <td><code>@entry.InputHash</code></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>

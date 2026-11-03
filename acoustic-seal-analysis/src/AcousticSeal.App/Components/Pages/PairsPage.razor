@@ -1,0 +1,111 @@
+@inherits VmComponent
+<section class="panel">
+    <h2>已建立的显式对应关系</h2>
+    <p class="muted">基准必须是基线，目标类型由用途决定。条件不符的配对可以保留，但不生成差值。</p>
+    <div class="table-wrap">
+        <table data-testid="pair-list">
+            <thead><tr><th>基线 → 目标</th><th>用途</th><th>状态与原因</th><th>操作</th></tr></thead>
+            <tbody>
+                @if (Vm.Analysis.Pairs.Count == 0)
+                {
+                    <tr><td colspan="4" class="empty-cell">暂无配对。下方逐条建立，或显式勾选目标后批量确认。</td></tr>
+                }
+                @foreach (var pair in Vm.Analysis.Pairs)
+                {
+                    <tr>
+                        <td>@pair.Title<small class="block">@pair.Source.Text()</small></td>
+                        <td>@pair.Purpose.Text()</td>
+                        <td><StatusBadge Status="pair.Status" />@foreach (var reason in pair.BlockingReasons) { <small class="block error-text">@reason</small> }</td>
+                        <td><button data-pair="@pair.PairId" @onclick="() => Vm.SelectPair(pair.PairId)">编辑配对</button></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>
+<section class="panel">
+    <div class="section-heading"><h2>@(Vm.Pair.IsExisting ? "编辑" : "新增")配对</h2><code>@Vm.Pair.IdentityLabel</code></div>
+    <form @onsubmit="Vm.SavePair" @onsubmit:preventDefault novalidate>
+        <fieldset class="form-grid" disabled="@Vm.Archived">
+            <label class="field">
+                <span>用途</span>
+                <select name="pair-purpose" @bind="Vm.Pair.Purpose" @bind:after="Vm.MarkEditorDirty">
+                    @foreach (var purpose in Enum.GetValues<PairPurpose>())
+                    {
+                        <option value="@purpose">@purpose.Text()</option>
+                    }
+                </select>
+            </label>
+            <label class="field">
+                <span>基准：基线试验</span>
+                <select name="pair-baseline" @bind="Vm.Pair.BaselineId" @bind:after="Vm.MarkEditorDirty">
+                    <option value="@Guid.Empty">请选择基线</option>
+                    @foreach (var trial in Vm.Project.Trials.Where(trial => trial.Kind == TrialKind.Baseline))
+                    {
+                        <option value="@trial.Id">@trial.Name · @trial.Source.Text()</option>
+                    }
+                </select>
+            </label>
+            <label class="field">
+                <span>目标试验</span>
+                <select name="pair-target" @bind="Vm.Pair.TargetId" @bind:after="Vm.MarkEditorDirty">
+                    <option value="@Guid.Empty">请选择目标</option>
+                    @foreach (var trial in Vm.Project.Trials)
+                    {
+                        <option value="@trial.Id">@trial.Name · @trial.Kind.Text()</option>
+                    }
+                </select>
+            </label>
+            <div class="help-box">封堵声级差：目标为单项或组合；漂移：目标为另一基线；恢复：目标为恢复试验。不能自配对，不能重复同一对应关系。</div>
+            <EditorField Label="选择此基线的依据与备注" Name="pair-notes" @bind-Value="Vm.Pair.Notes" Area Wide />
+            <EditorActions Existing="Vm.Pair.IsExisting" New="() => Vm.SelectPair(null)" Delete='() => Vm.DeleteSelected("pair", Vm.Pair.Id)' />
+        </fieldset>
+    </form>
+</section>
+<section class="panel">
+    <h2>显式批量配对</h2>
+    <p>选择一个基线、用途，再勾选每个目标。预检展示每行条件，不按名称、顺序或时间自动推断。共享基线的重复配对不能视为独立样本生成区间。</p>
+    <fieldset disabled="@Vm.Archived">
+        <div class="form-grid">
+            <label class="field"><span>批量基线</span><select name="batch-baseline" @bind="Vm.Batch.BaselineId" @bind:after="Vm.Batch.Invalidate"><option value="@Guid.Empty">请选择</option>@foreach (var trial in Vm.Project.Trials.Where(trial => trial.Kind == TrialKind.Baseline)) { <option value="@trial.Id">@trial.Name</option> }</select></label>
+            <label class="field"><span>批量用途</span><select name="batch-purpose" @bind="Vm.Batch.Purpose" @bind:after="Vm.Batch.Invalidate">@foreach (var purpose in Enum.GetValues<PairPurpose>()) { <option value="@purpose">@purpose.Text()</option> }</select></label>
+        </div>
+        <div class="target-checks">
+            @foreach (var trial in Vm.Project.Trials.Where(trial => Eligible(trial.Kind, Vm.Batch.Purpose)))
+            {
+                <label class="check"><input type="checkbox" name="batch-target" value="@trial.Id" checked="@Vm.Batch.TargetIds.Contains(trial.Id)" @onchange="args => Vm.Batch.Toggle(trial.Id, (bool)args.Value!)" />@trial.Name · @trial.Source.Text()</label>
+            }
+        </div>
+        <div class="toolbar">
+            <button data-testid="preview-batch" @onclick="Vm.PreviewBatch">预检批量对应关系</button>
+            <button class="primary" data-testid="apply-batch" disabled="@(Vm.Batch.Preview?.CanApply != true)" @onclick="Vm.ApplyBatch">逐行核对后确认建立</button>
+        </div>
+        @if (Vm.Batch.Preview is { } preview)
+        {
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>基线</th><th>目标</th><th>重复</th><th>条件阻断原因</th></tr></thead>
+                    <tbody>
+                        @foreach (var proposal in preview.Rows)
+                        {
+                            <tr><td>@proposal.Baseline</td><td>@proposal.Target</td><td>@(proposal.Duplicate ? "已存在，禁止应用" : "否")</td><td>@(proposal.Reasons.Count == 0 ? "未发现条件冲突" : string.Join("；", proposal.Reasons))</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </fieldset>
+</section>
+
+@code {
+    private static bool Eligible(TrialKind kind, PairPurpose purpose)
+    {
+        return purpose switch
+        {
+            PairPurpose.Effect => kind is TrialKind.Single or TrialKind.Combination,
+            PairPurpose.Drift => kind == TrialKind.Baseline,
+            PairPurpose.Recovery => kind == TrialKind.Recovery,
+            _ => false
+        };
+    }
+}

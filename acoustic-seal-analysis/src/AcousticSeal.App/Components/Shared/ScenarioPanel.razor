@@ -1,0 +1,57 @@
+@inherits VmComponent
+<section class="panel">
+    <h2>工程规则情景核对</h2>
+    <p>用相同原始输入试算不同规则参数对“阻断/筛查警示”的影响。当前项目参数不变，不改变任何测量数据，不推荐用放宽阈值消除问题。</p>
+    <div class="form-grid">
+        <label class="field">
+            <span>单个参数</span>
+            <select name="scenario-parameter" @bind="Vm.Scenario.Parameter">
+                @foreach (var setting in Vm.Project.Settings.Describe())
+                {
+                    <option value="@setting.Key">@setting.Label (@setting.Unit)；允许@setting.Minimum—@setting.Maximum</option>
+                }
+            </select>
+        </label>
+        <label class="field">
+            <span>假设值，英文逗号分隔，最多20项</span>
+            <input name="scenario-values" @bind="Vm.Scenario.Values" />
+            <small>示例为工程假设，不是标准限值或测量推荐。</small>
+        </label>
+    </div>
+    <div class="editor-actions">
+        <button data-testid="calculate-scenarios" @onclick="() => Vm.Edit(() => Vm.Scenario.Calculate(Vm.Project))">运行规则情景</button>
+        <button @onclick="() => Vm.Edit(Vm.ExportScenario)" disabled="@(Vm.Scenario.Result is null)">准备情景JSON</button>
+        <button @onclick="Vm.Scenario.Clear">清空情景结果</button>
+    </div>
+    @if (Vm.Scenario.Result is { } result)
+    {
+        <div class="notice">@result.Note</div>
+        <p>参数：@result.Label；原值 @result.Original @result.Unit。输入指纹 <code>@result.InputHash</code></p>
+        @if (Vm.Scenario.IsStale(Vm.Project) || Vm.Scenario.DraftChanged)
+        {
+            <p class="error-text">请求或项目输入已改变；下表是旧情景，请重新运行。</p>
+        }
+        <div class="table-wrap">
+            <table data-testid="scenario-table">
+                <thead><tr><th>假设值 @result.Unit</th><th>可比较配对</th><th>阻断配对</th><th>漂移/恢复警示数</th><th>重复性警示频带数</th></tr></thead>
+                <tbody>
+                    @foreach (var scenario in result.Scenarios)
+                    {
+                        <tr><td>@scenario.Value</td><td>@scenario.ValidPairs</td><td>@scenario.BlockedPairs</td><td>@scenario.ScreeningAlerts</td><td>@scenario.RepeatabilityAlerts</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @foreach (var scenario in result.Scenarios)
+        {
+            <details>
+                <summary>查看假设值 @scenario.Value @result.Unit 的逐配对状态</summary>
+                <ul>@foreach (var pair in scenario.Pairs) { <li>@pair.Title：@pair.Status.Text()；@(pair.Screening?.Text()) @string.Join("；", pair.Reasons)</li> }</ul>
+            </details>
+        }
+        @if (Vm.Scenario.DownloadUrl.Length > 0)
+        {
+            <a class="button" href="@Vm.Scenario.DownloadUrl" download="工程规则情景.analysis.json">下载工程规则情景JSON</a>
+        }
+    }
+</section>

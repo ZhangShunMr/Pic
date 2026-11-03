@@ -1,0 +1,106 @@
+@page "/"
+@rendermode InteractiveServer
+@inherits VmComponent
+<NavigationLock ConfirmExternalNavigation="Vm.HasUnsaved" />
+<div class="app-shell" data-interactive="@interactive.ToString().ToLowerInvariant()" data-unsaved="@Vm.HasUnsaved.ToString().ToLowerInvariant()">
+    <aside class="sidebar">
+        <div class="brand"><span>AS</span><div><strong>车身声学试验</strong><small>C# / MVVM · @Software.DisplayVersion</small></div></div>
+        <div class="project-identity">
+            <strong>@Vm.Project.Name</strong>
+            <small>修订 @Vm.Project.Revision · @(Vm.Archived ? "归档只读" : "活动项目")</small>
+        </div>
+        <nav aria-label="工作流程">
+            @foreach (var navigationItem in Navigation.Pages)
+            {
+                <button class="nav-button @(Vm.Page == navigationItem.Key ? "selected" : "")"
+                        data-page="@navigationItem.Key" @onclick="() => Vm.Navigate(navigationItem.Key)">
+                    <span>@navigationItem.Number</span>@navigationItem.Title
+                </button>
+            }
+        </nav>
+        <div class="sidebar-note">本机运行 · 数据内嵌<br />@Software.Limitation</div>
+    </aside>
+    <div class="workspace">
+        <header class="topbar">
+            <span>声学封堵试验 / @Vm.CurrentPage.Title</span>
+            <div class="toolbar">
+                <span class="save-indicator">@(Vm.HasDraft ? "有未应用表单" : Vm.Session.Dirty ? "有未保存修改" : "工作副本已载入 / 已保存")</span>
+                <button @onclick="Vm.Undo" disabled="@(!Vm.Session.CanUndo || Vm.Busy)" title="@Vm.Session.UndoLabel">撤销</button>
+                <button @onclick="Vm.Redo" disabled="@(!Vm.Session.CanRedo || Vm.Busy)" title="@Vm.Session.RedoLabel">重做</button>
+                <button class="primary" data-testid="save-project" @onclick="Vm.SaveAsync" disabled="@Vm.Busy">保存项目</button>
+            </div>
+        </header>
+        <div class="source-strip"><span>@Vm.Project.SourceSummary()</span><span>ΔL = 基线 − 目标 / dB</span></div>
+        <main>
+            <div class="page-heading">
+                <div><p class="eyebrow">@Vm.CurrentPage.Number / ACOUSTIC SEAL ANALYSIS</p><h1>@Vm.CurrentPage.Title</h1><p>@Vm.CurrentPage.Description</p></div>
+                @if (Vm.Busy)
+                {
+                    <span role="status">正在处理，请稍候…</span>
+                }
+            </div>
+            @if (Vm.Notice is { } notice)
+            {
+                <div class="notice @(notice.Error ? "error" : "success")" role="@(notice.Error ? "alert" : "status")" data-testid="notice">
+                    <span>@notice.Text</span><button class="quiet" @onclick="Vm.ClearNotice" aria-label="关闭提示">×</button>
+                </div>
+            }
+            @if (Vm.Problems.Count > 0)
+            {
+                <section class="error-list" role="alert">
+                    <strong>请修正以下输入，项目尚未改变：</strong>
+                    <ul>@foreach (var problem in Vm.Problems) { <li><code>@problem.Path</code>：@problem.Message</li> }</ul>
+                </section>
+            }
+            @if (Vm.MigrationNotes.Count > 0)
+            {
+                <section class="notice"><ul>@foreach (var note in Vm.MigrationNotes) { <li>@note</li> }</ul></section>
+            }
+            @switch (Vm.Page)
+            {
+                case "locations": <LocationsPage /> break;
+                case "conditions": <ConditionsPage /> break;
+                case "trials": <TrialsPage /> break;
+                case "import": <ImportPage /> break;
+                case "pairs": <PairsPage /> break;
+                case "analysis": <AnalysisPage /> break;
+                case "quality": <QualityPage /> break;
+                case "history": <HistoryPage /> break;
+                case "revision": <RevisionPage /> break;
+                case "delivery": <DeliveryPage /> break;
+                default: <ProjectPage /> break;
+            }
+        </main>
+        <footer>@Software.Name @Software.DisplayVersion · 本机C#应用 · .sealproj项目</footer>
+    </div>
+</div>
+@if (!string.IsNullOrEmpty(Vm.Confirmation))
+{
+    <div class="modal-backdrop">
+        <section class="confirmation" role="dialog" aria-modal="true" aria-labelledby="confirmation-title">
+            <p class="eyebrow">请核对操作范围</p>
+            <h2 id="confirmation-title">@Vm.ConfirmationTitle</h2>
+            <p>@Vm.Confirmation</p>
+            <div class="toolbar"><button @onclick="Vm.CancelConfirmation">取消，保留当前工作</button><button class="primary" data-testid="confirm-action" @onclick="Vm.ConfirmAsync">确认执行</button></div>
+        </section>
+    </div>
+}
+<div id="blazor-error-ui">界面连接发生错误。先检查服务终端；刷新会丢失未保存工作副本。<a href="/">重新连接</a></div>
+
+@code {
+    private bool interactive;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            interactive = true;
+            StateHasChanged();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Vm.InitializeAsync();
+    }
+}

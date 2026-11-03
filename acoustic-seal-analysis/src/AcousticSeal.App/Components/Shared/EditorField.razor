@@ -1,0 +1,41 @@
+@inject WorkspaceViewModel Workspace
+<label class="field @(Wide ? "wide" : "")">
+    <span>@Label</span>
+    @if (Area)
+    {
+        <textarea name="@Name" rows="@Rows" maxlength="@MaximumLength"
+                  value="@Value" @oninput="ChangeAsync" spellcheck="false"></textarea>
+    }
+    else
+    {
+        <input name="@Name" type="text" value="@Value" maxlength="@MaximumLength"
+               inputmode="@InputMode" @oninput="ChangeAsync" autocomplete="off" />
+    }
+    @if (!string.IsNullOrEmpty(Help))
+    {
+        <small>@Help</small>
+    }
+</label>
+
+@code {
+    [Parameter] public string Label { get; set; } = "";
+    [Parameter] public string Name { get; set; } = "";
+    [Parameter] public string Value { get; set; } = "";
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    [Parameter] public string Help { get; set; } = "";
+    [Parameter] public bool Area { get; set; }
+    [Parameter] public bool Wide { get; set; }
+    [Parameter] public int Rows { get; set; } = 3;
+    [Parameter] public int MaximumLength { get; set; } = 4000;
+    [Parameter] public string InputMode { get; set; } = "text";
+    [Parameter] public bool TrackDirty { get; set; } = true;
+
+    private async Task ChangeAsync(ChangeEventArgs args)
+    {
+        await ValueChanged.InvokeAsync(args.Value?.ToString() ?? "");
+        if (TrackDirty)
+        {
+            Workspace.MarkEditorDirty();
+        }
+    }
+}

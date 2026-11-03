@@ -1,0 +1,86 @@
+@inherits VmComponent
+<section class="panel">
+    <div class="toolbar filters">
+        <label>名称、GUID或重复组<input name="trial-search" @bind="Vm.TrialSearch" /></label>
+        <label>试验类型<select name="trial-filter" @bind="Vm.TrialFilter"><option value="">全部</option>@foreach (var kind in Enum.GetValues<TrialKind>()) { <option value="@kind">@kind.Text()</option> }</select></label>
+        <button @onclick="Vm.ApplyTrialFilter">筛选列表</button>
+        <button class="primary" data-testid="new-trial" @onclick="() => Vm.SelectTrial(null)">新增试验</button>
+        <span class="muted">@Vm.FilteredTrials().Count / @Vm.Project.Trials.Count 条</span>
+    </div>
+    <div class="table-wrap">
+        <table data-testid="trial-table">
+            <thead><tr><th>试验</th><th>类型</th><th>来源</th><th>工况</th><th>有效 / 声明频带</th><th>重复组</th></tr></thead>
+            <tbody>
+                @if (Vm.VisibleTrials().Count == 0)
+                {
+                    <tr><td colspan="6" class="empty-cell">暂无符合条件的试验。先建立工况，再新增档案。</td></tr>
+                }
+                @foreach (var item in Vm.VisibleTrials())
+                {
+                    <tr>
+                        <td><button class="text-button" data-trial="@item.Id" @onclick="() => Vm.SelectTrial(item.Id)">@item.Name</button><code class="block">@item.Id</code></td>
+                        <td>@item.Kind.Text()</td><td><span class="source">@item.Source.Text()</span></td>
+                        <td>@Vm.Project.ConditionName(item.ConditionId)</td><td>@item.ValidBandCount / @item.Bands.Count</td><td>@item.RepeatGroup</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="pagination"><button @onclick="() => Vm.NextTrials(-1)" disabled="@(Vm.TrialPage == 0)">上一页</button><span>第 @(Vm.TrialPage + 1) 页 · 每页40条</span><button @onclick="() => Vm.NextTrials(1)" disabled="@((Vm.TrialPage + 1) * WorkspaceViewModel.PageSize >= Vm.FilteredTrials().Count)">下一页</button></div>
+</section>
+<section class="panel">
+    <div class="section-heading"><h2>@(Vm.Trial.IsExisting ? "编辑" : "新增")试验</h2><code>@Vm.Trial.IdentityLabel</code></div>
+    @if (Vm.Project.Conditions.Count == 0)
+    {
+        <div class="notice">请先到“工况与测量口径”建立工况；必要口径缺失可以存草稿，但比较会阻断。</div>
+    }
+    <form @onsubmit="Vm.SaveTrial" @onsubmit:preventDefault novalidate>
+        <fieldset class="form-grid" disabled="@Vm.Archived">
+            <EditorField Label="试验名称 *" Name="trial-name" @bind-Value="Vm.Trial.Name" Wide MaximumLength="160" />
+            <label class="field"><span>试验类型</span><select name="trial-kind" @bind="Vm.Trial.Kind" @bind:after="Vm.MarkEditorDirty">@foreach (var kind in Enum.GetValues<TrialKind>()) { <option value="@kind">@kind.Text()</option> }</select></label>
+            <label class="field"><span>关联工况 *</span><select name="trial-condition" @bind="Vm.Trial.ConditionId" @bind:after="Vm.MarkEditorDirty"><option value="@Guid.Empty">请选择</option>@foreach (var condition in Vm.Project.Conditions) { <option value="@condition.Id">@condition.Name</option> }</select></label>
+            <div class="wide location-checks">
+                <strong>封堵位置</strong><small>基线和恢复不选；单项一个；组合至少两个。</small>
+                @foreach (var location in Vm.Project.Locations)
+                {
+                    <label class="check"><input type="checkbox" name="trial-location" value="@location.Id" checked="@Vm.Trial.LocationIds.Contains(location.Id)" @onchange="args => Vm.Trial.ToggleLocation(location.Id, (bool)args.Value!)" />@location.Name</label>
+                }
+            </div>
+            <EditorField Label="带时区试验时间 *" Name="trial-time" @bind-Value="Vm.Trial.Timestamp" Help="ISO 8601，例如2026-01-01T10:00:00+08:00。" MaximumLength="80" />
+            <EditorField Label="重复组" Name="trial-repeat-group" @bind-Value="Vm.Trial.RepeatGroup" Help="同组还需类型、位置、来源与工况可比。" MaximumLength="120" />
+            <label class="field"><span>来源类别 *</span><select name="trial-source" @bind="Vm.Trial.Source" @bind:after="Vm.MarkEditorDirty">@foreach (var source in Enum.GetValues<SourceKind>()) { <option value="@source">@source.Text()</option> }</select></label>
+            <EditorField Label="操作员" Name="trial-operator" @bind-Value="Vm.Trial.Operator" MaximumLength="120" />
+            <EditorField Label="来源说明 *" Name="trial-source-note" @bind-Value="Vm.Trial.SourceNote" Area Wide Rows="3" Help="实测说明文件/采集记录；模拟、估算或人工填写说明构造方法和依据。" />
+            <EditorField Label="原始文件或试验记录编号（文字）" Name="trial-original-file" @bind-Value="Vm.Trial.OriginalFile" Wide MaximumLength="1000" Help="这是来源文字，不是附件；项目内嵌的是频带数值。" />
+            <EditorField Label="试验准备与边界状态" Name="trial-preparation" @bind-Value="Vm.Trial.Preparation" Area Wide />
+            <section class="wide band-editor">
+                <div class="section-heading"><div><h3>结构化频带数据</h3><small>频率1—100000Hz，声级-100—200dB；声级留空为缺失，0dB是有效数值。</small></div><button type="button" data-testid="add-band" @onclick="() => Vm.Edit(() => Vm.Trial.AddBand())">新增频带行</button></div>
+                <div class="table-wrap">
+                    <table data-testid="band-editor-table">
+                        <thead><tr><th>选中</th><th>中心频率 Hz</th><th>声级 dB re 20 µPa</th><th>频带备注</th><th>操作</th></tr></thead>
+                        <tbody>
+                            @foreach (var band in Vm.Trial.Bands)
+                            {
+                                <tr @key="band.RowId">
+                                    <td><input type="checkbox" @bind="band.Selected" aria-label="选择频带行" /></td>
+                                    <td><input name="band-frequency" @bind="band.Frequency" @bind:event="oninput" @bind:after="Vm.Trial.MarkDirty" inputmode="decimal" aria-label="频率Hz" /></td>
+                                    <td><input name="band-level" @bind="band.Level" @bind:event="oninput" @bind:after="Vm.Trial.MarkDirty" inputmode="decimal" aria-label="声级dB" /></td>
+                                    <td><input name="band-note" @bind="band.Note" @bind:event="oninput" @bind:after="Vm.Trial.MarkDirty" maxlength="1000" aria-label="频带备注" /></td>
+                                    <td><button type="button" @onclick="() => Vm.Trial.RemoveBand(band.RowId)">移除此草稿行</button></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="toolbar"><button type="button" @onclick="Vm.Trial.RemoveSelectedBands">移除选中草稿行</button><small>只有应用试验后才更新项目。删除草稿行前可取消整份表单。</small></div>
+                <details><summary>粘贴 Hz,声级 两列以替换本表草稿</summary><textarea name="band-paste" @bind="Vm.Trial.PasteText" rows="5" placeholder="125,70&#10;250,60"></textarea><button type="button" data-testid="paste-bands" @onclick="() => Vm.Edit(Vm.Trial.PasteBands)">解析并替换草稿表</button><small>不带表头，空白/NA/N/A/null为缺失；解析失败原表不变。</small></details>
+            </section>
+            <EditorField Label="试验备注" Name="trial-notes" @bind-Value="Vm.Trial.Notes" Area Wide />
+            <EditorActions Existing="Vm.Trial.IsExisting" New="() => Vm.SelectTrial(null)" Delete='() => Vm.DeleteSelected("trial", Vm.Trial.Id)' />
+            @if (Vm.Trial.IsExisting)
+            {
+                <div class="wide"><button type="button" @onclick="Vm.DuplicateTrial">复制试验结构，不复制测量与配对</button></div>
+            }
+        </fieldset>
+    </form>
+</section>

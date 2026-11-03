@@ -1,0 +1,388 @@
+{
+  "schemaVersion": 2,
+  "softwareVersion": "2.0.0",
+  "id": "00000000-0000-4000-8000-000000000001",
+  "name": "模拟演示 · 车门密封与前围孔封堵",
+  "owner": "演示操作员（虚构）",
+  "vehicleProgramme": "SIM-ONLY",
+  "objective": "验证工作流与数值；不证明真实车辆降噪效果",
+  "description": "全部数值为固定模拟数列，来源：Demonstration.cs。无真实车辆、采集或登记事实。",
+  "createdAt": "2026-01-01T09:00:00.0000000+00:00",
+  "updatedAt": "2026-01-01T09:00:00.0000000+00:00",
+  "revision": 0,
+  "status": "active",
+  "locations": [
+    {
+      "id": "00000000-0000-4000-8000-000000000010",
+      "name": "左前门上沿密封（模拟）",
+      "zone": "左前门",
+      "material": "模拟胶带",
+      "extent": "模拟上沿范围A至B",
+      "procedure": "模拟记录：连续覆盖间隙，记录覆盖起止位置。",
+      "recoveryProcedure": "模拟记录：移除胶带后复核原有边界。",
+      "reference": "SIM-LOCATION-01",
+      "notes": "不构成真实车辆作业指导。"
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000011",
+      "name": "前围线束孔（模拟）",
+      "zone": "前围",
+      "material": "模拟密封泥",
+      "extent": "模拟孔周边间隙",
+      "procedure": "模拟记录：覆盖孔周围间隙。",
+      "recoveryProcedure": "模拟记录：移除临时材料。",
+      "reference": "SIM-LOCATION-02",
+      "notes": "全部为模拟对象。"
+    }
+  ],
+  "conditions": [
+    {
+      "id": "00000000-0000-4000-8000-000000000020",
+      "name": "模拟静态宽带激励",
+      "vehicle": "SIM-001",
+      "microphone": "模拟驾驶员耳旁固定测点",
+      "excitation": "模拟宽带外部声源",
+      "surface": "模拟半消声室",
+      "gear": "P",
+      "weighting": "Z",
+      "timeDefinition": "Leq",
+      "bandType": "octave",
+      "instrument": "SIM-METER",
+      "calibration": "模拟标定记录，只验证口径字段",
+      "unit": "dB re 20 µPa",
+      "speed": 0,
+      "rpm": 0,
+      "temperature": 23,
+      "duration": 30,
+      "sampleRate": 48000,
+      "synchronization": "模拟共用时钟",
+      "nonOverlappingBands": true,
+      "notes": "所有条件值为模拟，不表示仪器已真实标定。"
+    }
+  ],
+  "trials": [
+    {
+      "id": "00000000-0000-4000-8000-000000000030",
+      "name": "基线1",
+      "kind": "baseline",
+      "conditionId": "00000000-0000-4000-8000-000000000020",
+      "locationIds": [],
+      "timestamp": "2026-01-01T10:00:00.0000000+00:00",
+      "repeatGroup": "baseline",
+      "source": "simulation",
+      "sourceNote": "固定模拟数列；AcousticSeal.Core/Domain/Demonstration.cs；非实测。",
+      "originalFile": "SIM-NO-REAL-FILE",
+      "operator": "模拟操作员",
+      "preparation": "模拟准备记录，不表示真实试验已执行。",
+      "notes": "仅用于软件流程和数值核验。",
+      "bands": [
+        {
+          "frequency": 125,
+          "level": 70,
+          "note": ""
+        },
+        {
+          "frequency": 250,
+          "level": 68,
+          "note": ""
+        },
+        {
+          "frequency": 500,
+          "level": 66,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000031",
+      "name": "基线2",
+      "kind": "baseline",
+      "conditionId": "00000000-0000-4000-8000-000000000020",
+      "locationIds": [],
+      "timestamp": "2026-01-01T10:01:00.0000000+00:00",
+      "repeatGroup": "baseline",
+      "source": "simulation",
+      "sourceNote": "固定模拟数列；AcousticSeal.Core/Domain/Demonstration.cs；非实测。",
+      "originalFile": "SIM-NO-REAL-FILE",
+      "operator": "模拟操作员",
+      "preparation": "模拟准备记录，不表示真实试验已执行。",
+      "notes": "仅用于软件流程和数值核验。",
+      "bands": [
+        {
+          "frequency": 125,
+          "level": 70.2,
+          "note": ""
+        },
+        {
+          "frequency": 250,
+          "level": 68.1,
+          "note": ""
+        },
+        {
+          "frequency": 500,
+          "level": 66.2,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000032",
+      "name": "门密封单项1",
+      "kind": "single",
+      "conditionId": "00000000-0000-4000-8000-000000000020",
+      "locationIds": [
+        "00000000-0000-4000-8000-000000000010"
+      ],
+      "timestamp": "2026-01-01T10:02:00.0000000+00:00",
+      "repeatGroup": "door",
+      "source": "simulation",
+      "sourceNote": "固定模拟数列；AcousticSeal.Core/Domain/Demonstration.cs；非实测。",
+      "originalFile": "SIM-NO-REAL-FILE",
+      "operator": "模拟操作员",
+      "preparation": "模拟准备记录，不表示真实试验已执行。",
+      "notes": "仅用于软件流程和数值核验。",
+      "bands": [
+        {
+          "frequency": 125,
+          "level": 67,
+          "note": ""
+        },
+        {
+          "frequency": 250,
+          "level": 66,
+          "note": ""
+        },
+        {
+          "frequency": 500,
+          "level": 65,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000033",
+      "name": "门密封单项2",
+      "kind": "single",
+      "conditionId": "00000000-0000-4000-8000-000000000020",
+      "locationIds": [
+        "00000000-0000-4000-8000-000000000010"
+      ],
+      "timestamp": "2026-01-01T10:03:00.0000000+00:00",
+      "repeatGroup": "door",
+      "source": "simulation",
+      "sourceNote": "固定模拟数列；AcousticSeal.Core/Domain/Demonstration.cs；非实测。",
+      "originalFile": "SIM-NO-REAL-FILE",
+      "operator": "模拟操作员",
+      "preparation": "模拟准备记录，不表示真实试验已执行。",
+      "notes": "仅用于软件流程和数值核验。",
+      "bands": [
+        {
+          "frequency": 125,
+          "level": 67.1,
+          "note": ""
+        },
+        {
+          "frequency": 250,
+          "level": 66.2,
+          "note": ""
+        },
+        {
+          "frequency": 500,
+          "level": 65.1,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000034",
+      "name": "线束孔单项",
+      "kind": "single",
+      "conditionId": "00000000-0000-4000-8000-000000000020",
+      "locationIds": [
+        "00000000-0000-4000-8000-000000000011"
+      ],
+      "timestamp": "2026-01-01T10:04:00.0000000+00:00",
+      "repeatGroup": "",
+      "source": "simulation",
+      "sourceNote": "固定模拟数列；AcousticSeal.Core/Domain/Demonstration.cs；非实测。",
+      "originalFile": "SIM-NO-REAL-FILE",
+      "operator": "模拟操作员",
+      "preparation": "模拟准备记录，不表示真实试验已执行。",
+      "notes": "仅用于软件流程和数值核验。",
+      "bands": [
+        {
+          "frequency": 125,
+          "level": 68,
+          "note": ""
+        },
+        {
+          "frequency": 250,
+          "level": 66.5,
+          "note": ""
+        },
+        {
+          "frequency": 500,
+          "level": 65.5,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000035",
+      "name": "两位置组合测量（模拟）",
+      "kind": "combination",
+      "conditionId": "00000000-0000-4000-8000-000000000020",
+      "locationIds": [
+        "00000000-0000-4000-8000-000000000010",
+        "00000000-0000-4000-8000-000000000011"
+      ],
+      "timestamp": "2026-01-01T10:05:00.0000000+00:00",
+      "repeatGroup": "",
+      "source": "simulation",
+      "sourceNote": "固定模拟数列；AcousticSeal.Core/Domain/Demonstration.cs；非实测。",
+      "originalFile": "SIM-NO-REAL-FILE",
+      "operator": "模拟操作员",
+      "preparation": "模拟准备记录，不表示真实试验已执行。",
+      "notes": "仅用于软件流程和数值核验。",
+      "bands": [
+        {
+          "frequency": 125,
+          "level": 65.5,
+          "note": ""
+        },
+        {
+          "frequency": 250,
+          "level": 64.5,
+          "note": ""
+        },
+        {
+          "frequency": 500,
+          "level": 64,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000036",
+      "name": "结束基线",
+      "kind": "baseline",
+      "conditionId": "00000000-0000-4000-8000-000000000020",
+      "locationIds": [],
+      "timestamp": "2026-01-01T10:06:00.0000000+00:00",
+      "repeatGroup": "baseline",
+      "source": "simulation",
+      "sourceNote": "固定模拟数列；AcousticSeal.Core/Domain/Demonstration.cs；非实测。",
+      "originalFile": "SIM-NO-REAL-FILE",
+      "operator": "模拟操作员",
+      "preparation": "模拟准备记录，不表示真实试验已执行。",
+      "notes": "仅用于软件流程和数值核验。",
+      "bands": [
+        {
+          "frequency": 125,
+          "level": 70.4,
+          "note": ""
+        },
+        {
+          "frequency": 250,
+          "level": 68.2,
+          "note": ""
+        },
+        {
+          "frequency": 500,
+          "level": 66.3,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000037",
+      "name": "解除封堵恢复",
+      "kind": "recovery",
+      "conditionId": "00000000-0000-4000-8000-000000000020",
+      "locationIds": [],
+      "timestamp": "2026-01-01T10:07:00.0000000+00:00",
+      "repeatGroup": "",
+      "source": "simulation",
+      "sourceNote": "固定模拟数列；AcousticSeal.Core/Domain/Demonstration.cs；非实测。",
+      "originalFile": "SIM-NO-REAL-FILE",
+      "operator": "模拟操作员",
+      "preparation": "模拟准备记录，不表示真实试验已执行。",
+      "notes": "仅用于软件流程和数值核验。",
+      "bands": [
+        {
+          "frequency": 125,
+          "level": 70.1,
+          "note": ""
+        },
+        {
+          "frequency": 250,
+          "level": 68.2,
+          "note": ""
+        },
+        {
+          "frequency": 500,
+          "level": 66.1,
+          "note": ""
+        }
+      ]
+    }
+  ],
+  "pairs": [
+    {
+      "id": "00000000-0000-4000-8000-000000000040",
+      "baselineId": "00000000-0000-4000-8000-000000000030",
+      "targetId": "00000000-0000-4000-8000-000000000032",
+      "purpose": "effect",
+      "notes": "模拟案例显式指定，不依赖名称或时间自动配对。"
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000041",
+      "baselineId": "00000000-0000-4000-8000-000000000031",
+      "targetId": "00000000-0000-4000-8000-000000000033",
+      "purpose": "effect",
+      "notes": "模拟案例显式指定，不依赖名称或时间自动配对。"
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000042",
+      "baselineId": "00000000-0000-4000-8000-000000000030",
+      "targetId": "00000000-0000-4000-8000-000000000034",
+      "purpose": "effect",
+      "notes": "模拟案例显式指定，不依赖名称或时间自动配对。"
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000043",
+      "baselineId": "00000000-0000-4000-8000-000000000030",
+      "targetId": "00000000-0000-4000-8000-000000000035",
+      "purpose": "effect",
+      "notes": "模拟案例显式指定，不依赖名称或时间自动配对。"
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000044",
+      "baselineId": "00000000-0000-4000-8000-000000000030",
+      "targetId": "00000000-0000-4000-8000-000000000036",
+      "purpose": "drift",
+      "notes": "模拟案例显式指定，不依赖名称或时间自动配对。"
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000045",
+      "baselineId": "00000000-0000-4000-8000-000000000030",
+      "targetId": "00000000-0000-4000-8000-000000000037",
+      "purpose": "recovery",
+      "notes": "模拟案例显式指定，不依赖名称或时间自动配对。"
+    }
+  ],
+  "settings": {
+    "speedTolerance": 0.5,
+    "rpmTolerance": 20,
+    "temperatureTolerance": 2,
+    "durationTolerance": 0.01,
+    "driftThreshold": 1,
+    "recoveryThreshold": 1,
+    "repeatabilityThreshold": 1,
+    "minimumEffectDisplay": 0,
+    "requireSampleRateMatch": false,
+    "requireSynchronizationMatch": false
+  },
+  "audit": [],
+  "reviews": []
+}

@@ -1,4 +1,4 @@
 @echo off
 cd /d "%~dp0"
-python -m acoustic.server %*
+dotnet run --project src/AcousticSeal.App -- %*
 pause

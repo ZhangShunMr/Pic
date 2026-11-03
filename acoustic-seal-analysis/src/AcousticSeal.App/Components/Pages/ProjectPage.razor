@@ -1,0 +1,90 @@
+@inherits VmComponent
+<div class="toolbar page-tools">
+    <button data-testid="new-project" @onclick="Vm.NewProject">新建空白项目</button>
+    <button data-testid="load-demo" @onclick="Vm.LoadDemo">载入模拟案例</button>
+    <button @onclick="Vm.CloneProject">复制为新项目</button>
+    <button @onclick="Vm.ToggleArchive">@(Vm.Archived ? "解除归档" : "归档为只读")</button>
+</div>
+<div class="metric-grid">
+    <article><span>封堵位置</span><strong>@Vm.Project.Locations.Count</strong></article>
+    <article><span>试验档案</span><strong data-testid="trial-count">@Vm.Project.Trials.Count</strong></article>
+    <article><span>可比较配对</span><strong>@Vm.Analysis.ValidPairCount</strong></article>
+    <article><span>已阻断配对</span><strong>@Vm.Analysis.BlockedPairCount</strong></article>
+</div>
+<div class="columns">
+    <section class="panel">
+        <h2>项目信息与试验目标</h2>
+        <form @onsubmit="Vm.SaveMetadata" @onsubmit:preventDefault novalidate>
+            <fieldset class="form-grid" disabled="@Vm.Archived">
+                <EditorField Label="项目名称 *" Name="project-name" @bind-Value="Vm.Metadata.Name" MaximumLength="160" Wide />
+                <EditorField Label="负责人（按实际填写）" Name="project-owner" @bind-Value="Vm.Metadata.Owner" MaximumLength="120" />
+                <EditorField Label="车辆项目或试验代号" Name="vehicle-programme" @bind-Value="Vm.Metadata.VehicleProgramme" MaximumLength="200" />
+                <EditorField Label="试验目标与需要核对的问题" Name="project-objective" @bind-Value="Vm.Metadata.Objective" Area Wide Rows="3" />
+                <EditorField Label="项目说明与数据来源" Name="project-description" @bind-Value="Vm.Metadata.Description" Area Wide Rows="4" MaximumLength="8000" />
+                <div class="wide"><button type="submit" class="primary" data-testid="apply-metadata">应用项目信息</button></div>
+            </fieldset>
+        </form>
+        <dl class="details">
+            <dt>项目标识</dt><dd><code>@Vm.Project.Id</code></dd>
+            <dt>创建时间</dt><dd>@Software.Time(Vm.Project.CreatedAt)</dd>
+            <dt>最近修改</dt><dd>@Software.Time(Vm.Project.UpdatedAt)</dd>
+            <dt>软件 / 格式</dt><dd>@Software.Version / schema @Vm.Project.SchemaVersion</dd>
+            <dt>保存位置</dt><dd>@(string.IsNullOrEmpty(Vm.Session.SavedPath) ? "尚未保存" : Vm.Session.SavedPath)</dd>
+        </dl>
+    </section>
+    <section class="panel workflow">
+        <h2>按试验任务组织工作</h2>
+        <ol>
+            <li><strong>定义位置和完整测量口径</strong><p>位置记录覆盖和恢复工艺，工况记录车辆、测点、计权和标定。</p></li>
+            <li><strong>逐次建立试验与来源</strong><p>基线、单项、组合和恢复分开建档。每次测量保持独立记录。</p></li>
+            <li><strong>明确配对并核查稳定性</strong><p>用户显式指定基准；检查重复性、漂移、恢复和阻断原因。</p></li>
+            <li><strong>实际保存、重开和输出</strong><p>保存写入本机目录并产生备份；报告与CSV保留来源和计算口径。</p></li>
+        </ol>
+        <div class="notice">@Software.Limitation</div>
+        <p class="muted">普通启动为空白。内置案例是模拟数列，不是实测车辆结果。</p>
+    </section>
+</div>
+<section class="panel">
+    <div class="section-heading"><div><h2>本机项目库</h2><small>目录：@Vm.StoreDirectory</small></div><button data-testid="refresh-library" @onclick="Vm.RefreshLibraryAsync">刷新项目库</button></div>
+    <p class="muted">这里列出软件实际保存的.sealproj。打开会确认替换工作副本，外部修改冲突会阻止保存覆盖。</p>
+    <label class="upload">导入已有 .sealproj / 旧版 .aslp.json
+        <InputFile id="project-upload" OnChange="UploadAsync" accept=".sealproj,.json" />
+    </label>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>名称与文件</th><th>修订</th><th>修改时间</th><th>读取状态</th><th>操作</th></tr></thead>
+            <tbody>
+                @if (Vm.Library.Count == 0)
+                {
+                    <tr><td colspan="5" class="empty-cell">项目库为空。应用输入后点击顶栏“保存项目”。</td></tr>
+                }
+                @foreach (var card in Vm.Library)
+                {
+                    <tr>
+                        <td><strong>@card.Name</strong><small class="block path">@card.Path</small></td>
+                        <td>@card.Revision</td>
+                        <td>@Software.Time(card.Modified)</td>
+                        <td>@(card.Error.Length == 0 ? "可读取" : card.Error)</td>
+                        <td><div class="toolbar"><button @onclick="() => Vm.OpenStored(card.Id)">打开</button>@if (card.HasBackup) { <button @onclick="() => Vm.OpenStored(card.Id, true)">打开上次备份</button> }</div></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>
+
+@code {
+    private async Task UploadAsync(InputFileChangeEventArgs args)
+    {
+        try
+        {
+            var file = args.File;
+            var bytes = await UploadBoundary.ReadAsync(file, Software.MaximumFileBytes);
+            Vm.ImportProject(bytes, file.Name);
+        }
+        catch (Exception error) when (error is IOException or DomainValidationException or InvalidOperationException)
+        {
+            Vm.Edit(() => throw new DomainValidationException("file", error.Message));
+        }
+    }
+}

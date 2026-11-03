@@ -1,0 +1,114 @@
+@inherits VmComponent
+<div class="notice">@Software.Limitation 正值表示目标较低，负值表示目标较高；不能据此保证因果或路径独立性。</div>
+<section class="panel">
+    <h2>显示筛选与频带扫描</h2>
+    <div class="filter-grid">
+        <label class="field"><span>用途</span><select name="analysis-purpose" @bind="Vm.Filter.Purpose"><option value="">全部</option>@foreach (var purpose in Enum.GetValues<PairPurpose>()) { <option value="@purpose">@purpose.Text()</option> }</select></label>
+        <label class="field"><span>来源</span><select @bind="Vm.Filter.Source"><option value="">全部</option>@foreach (var source in Enum.GetValues<SourceKind>()) { <option value="@source">@source.Text()</option> }</select></label>
+        <label class="field"><span>配对状态</span><select @bind="Vm.Filter.Status"><option value="">全部</option><option value="@ResultStatus.Valid">可比较</option><option value="@ResultStatus.Blocked">已阻断</option><option value="@ResultStatus.Empty">无有效数据</option></select></label>
+        <label class="field"><span>目标位置</span><select @bind="Vm.Filter.Location"><option value="">全部</option>@foreach (var location in Vm.Project.Locations) { <option value="@location.Id">@location.Name</option> }</select></label>
+        <label class="field"><span>名称查找</span><input name="analysis-search" @bind="Vm.Filter.Search" /></label>
+        <label class="field"><span>频率下限 Hz</span><input name="scan-min" inputmode="decimal" @bind="Vm.Filter.MinimumFrequency" /></label>
+        <label class="field"><span>频率上限 Hz</span><input name="scan-max" inputmode="decimal" @bind="Vm.Filter.MaximumFrequency" /></label>
+    </div>
+    <div class="toolbar"><button class="primary" data-testid="apply-scan" @onclick="Vm.ApplyScan">应用显示筛选</button><button @onclick="Vm.Filter.Reset">恢复全部</button><small>@Vm.Filter.AppliedDescription；显示筛选不改变原始数据和导出报告。</small></div>
+</section>
+@if (Vm.Filter.Pairs(Vm.Analysis).Count == 0)
+{
+    <div class="empty">暂无符合条件的配对。先在“显式试验配对”建立对应关系，或恢复全部筛选。</div>
+}
+@foreach (var pair in Vm.Filter.Pairs(Vm.Analysis))
+{
+    <section class="panel result-card" data-result-pair="@pair.PairId">
+        <div class="section-heading">
+            <div><p class="eyebrow">@pair.Purpose.Text() · @pair.Source.Text()</p><h2>@pair.Title</h2></div>
+            <StatusBadge Status="pair.Status" />
+        </div>
+        @if (pair.BlockingReasons.Count > 0)
+        {
+            <div class="error-list"><strong>阻断原因</strong><ul>@foreach (var reason in pair.BlockingReasons) { <li>@reason</li> }</ul></div>
+        }
+        @if (pair.Warnings.Count > 0)
+        {
+            <p class="muted">@string.Join("；", pair.Warnings)</p>
+        }
+        <PairChart Pair="Vm.Filter.ChartPair(pair)" />
+        <div class="table-wrap">
+            <table data-testid="pair-bands">
+                <thead><tr><th>Hz</th><th>基线 dB</th><th>目标 dB</th><th>基线−目标 dB</th><th>状态与解释</th></tr></thead>
+                <tbody>
+                    @foreach (var band in Vm.Filter.Bands(pair))
+                    {
+                        <tr>
+                            <td>@band.Frequency</td><td>@Software.Format(band.Baseline)</td><td>@Software.Format(band.Target)</td>
+                            <td><strong>@Software.Format(band.Difference)</strong></td><td><StatusBadge Status="band.Status" /><small class="block">@band.Interpretation</small></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="result-note"><strong>录入频带合成差 @Software.Format(pair.TotalDifference) dB</strong><span>@pair.TotalNote</span></div>
+        @if (pair.Screening is { } screening)
+        {
+            <div class="screening"><StatusBadge Status="screening.Status" />最大频带绝对差 @Software.Format(screening.MaximumAbsoluteDifference) dB；最差频率 @Software.Format(screening.WorstFrequency) Hz；阈值 @Software.Format(screening.Threshold) dB。@Software.ScreeningNote</div>
+        }
+        <details>
+            <summary>来源、顺序及配对身份</summary>
+            <p>基线来源：@pair.BaselineSource</p><p>目标来源：@pair.TargetSource</p>
+            <p>目标减基线时间 @pair.ElapsedSeconds s；配对 <code>@pair.PairId</code></p>
+        </details>
+    </section>
+}
+<section class="panel">
+    <h2>单项与组合测得差值矩阵</h2>
+    <p class="muted">每列使用各自的显式配对。条件与来源可能不同；这里只并列展示测得差值，不作独立贡献排序，不生成“单项相加预测”列。</p>
+    @{ var matrixPairs = Vm.Filter.Pairs(Vm.Analysis).Where(pair => pair.Purpose == PairPurpose.Effect).ToList(); }
+    <div class="table-wrap">
+        <table data-testid="matrix">
+            <thead>
+                <tr><th>频率 Hz</th>@foreach (var pair in matrixPairs) { <th>@pair.TargetName<small class="block">基线：@pair.BaselineName · @pair.Source.Text()</small></th> }</tr>
+            </thead>
+            <tbody>
+                @foreach (var frequency in Vm.Filter.MatrixFrequencies(matrixPairs))
+                {
+                    <tr>
+                        <td>@frequency</td>
+                        @foreach (var pair in matrixPairs)
+                        {
+                            var band = pair.Bands.FirstOrDefault(item => item.Frequency == frequency);
+                            <td>@if (band?.Difference is { } difference) { <strong>@Software.Format(difference)</strong> } else if (band is not null) { <StatusBadge Status="band.Status" /> } else { <span>未声明</span> }</td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>
+<section class="panel">
+    <h2>同方案重复配对统计</h2>
+    <p class="muted">按位置集合和来源分组，所有配对之间再检查工况。配对差的算术均值与组能量平均声级之差是两个指标，不能混同。区间未计仪器系统不确定性。</p>
+    @foreach (var effect in Vm.Analysis.Effects)
+    {
+        <h3>@Vm.Project.LocationNames(effect.LocationIds) · @effect.Source.Text()</h3>
+        @if (effect.BlockingReasons.Count > 0)
+        {
+            <div class="error-list">@string.Join("；", effect.BlockingReasons)</div>
+        }
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Hz</th><th>n</th><th>配对差均值 dB</th><th>差值SD dB</th><th>组能量均值差 dB</th><th>双侧95%区间 dB</th></tr></thead>
+                <tbody>
+                    @foreach (var band in effect.Bands.Where(band => Vm.Filter.IncludesFrequency(band.Frequency)))
+                    {
+                        <tr>
+                            <td>@band.Frequency</td><td>@band.Statistics.Count</td><td>@Software.Format(band.Statistics.MeanDifference)</td>
+                            <td>@Software.Format(band.Statistics.StandardDeviation)</td><td>@Software.Format(band.Statistics.GroupEnergyMeanDifference)</td>
+                            <td>@(band.Statistics.Lower95.HasValue ? Software.Format(band.Statistics.Lower95) + " 至 " + Software.Format(band.Statistics.Upper95) : "不生成")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <p class="muted">@(effect.Bands.FirstOrDefault()?.Statistics.IntervalNote)</p>
+    }
+</section>

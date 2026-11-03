@@ -1,9 +1,0 @@
-[project]
-name = "acoustic-seal-analysis"
-version = "1.0.0"
-description = "车身声学泄漏路径与封堵试验分析软件"
-requires-python = ">=3.12"
-dependencies = []
-
-[tool.acoustic-seal]
-production-line-minimum = 3500

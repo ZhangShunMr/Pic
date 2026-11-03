@@ -1,0 +1,13 @@
+<div class="toolbar page-tools">
+    <button @onclick="() => spectrum = false">测得差值图</button>
+    <button @onclick="() => spectrum = true">基线与目标频谱</button>
+</div>
+<div class="pair-chart">
+    @((MarkupString)(spectrum ? SpectrumChart.Build(Pair) : HtmlReport.Chart(Pair)))
+</div>
+<small>来源：@Pair.Source.Text()；ΔL=基线−目标；频带图只显示有效输入，不插值补数。</small>
+
+@code {
+    [Parameter, EditorRequired] public PairResult Pair { get; set; } = new();
+    private bool spectrum;
+}

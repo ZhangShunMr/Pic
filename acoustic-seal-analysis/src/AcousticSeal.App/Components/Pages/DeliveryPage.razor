@@ -1,0 +1,63 @@
+@inherits VmComponent
+<section class="panel">
+    <div class="section-heading"><div><h2>保存当前工作副本到本机</h2><p>先应用表单，再显式保存。软件不会在关闭页面时自动落盘。</p></div><button class="primary" @onclick="Vm.SaveAsync">保存项目到本机目录</button></div>
+    <dl class="details">
+        <dt>项目目录</dt><dd class="path">@Vm.StoreDirectory</dd>
+        <dt>当前文件</dt><dd class="path">@(string.IsNullOrEmpty(Vm.Session.SavedPath) ? "尚未保存" : Vm.Session.SavedPath)</dd>
+        <dt>最近保存位置</dt><dd class="path">@Vm.LastSavedPath</dd>
+        <dt>上次版本备份</dt><dd class="path">@(string.IsNullOrEmpty(Vm.LastBackupPath) ? "首次保存没有旧文件备份" : Vm.LastBackupPath)</dd>
+        <dt>保存方式</dt><dd>同目录临时文件写入并刷新后替换；覆盖前保留.bak。外部修改与ETag不符时阻止覆盖。</dd>
+    </dl>
+    <div class="notice">冲突时不要反复覆盖。可先“复制为新项目”保存独立文件，或回项目库重新打开磁盘版后编辑。备份打开会标为未保存，复核后再显式保存。</div>
+</section>
+<div class="export-grid">
+    <section class="panel export-card">
+        <p class="eyebrow">SEALPROJ / 项目</p><h2>搬迁与归档文件</h2>
+        <p>下载内嵌全部对象、频带、来源、配对、参数、审计和复核的.sealproj。下载不替代本机保存。</p>
+        <button @onclick='() => Vm.PrepareExport("project")'>准备项目下载</button>
+    </section>
+    <section class="panel export-card">
+        <p class="eyebrow">HTML / 报告</p><h2>自包含分析报告</h2>
+        <p>原始数据、工况、图表、测得差值、重复统计、漂移恢复、覆盖、来源、问题与审计。浏览器可打印PDF。</p>
+        <button data-testid="prepare-report" @onclick='() => Vm.PrepareExport("report")'>准备HTML分析报告</button>
+    </section>
+    <section class="panel export-card">
+        <p class="eyebrow">CSV / 结果</p><h2>可追溯频带结果</h2>
+        <p>逐配对逐频带差值、状态、原因、来源、单位、项目/工况标识、软件版本、参数JSON和输入哈希。</p>
+        <button data-testid="prepare-results" @onclick='() => Vm.PrepareExport("results")'>准备结果CSV</button>
+    </section>
+    <section class="panel export-card">
+        <p class="eyebrow">CSV / 交换</p><h2>原始频带长表</h2>
+        <p>trial_id、frequency_hz、level_db三列，缺失为空，UTF-8。仅交换频带，不含全部项目元数据。</p>
+        <button @onclick='() => Vm.PrepareExport("measurements")'>准备原始频带CSV</button>
+    </section>
+    <section class="panel export-card">
+        <p class="eyebrow">JSON / 分析快照</p><h2>机器可检查的完整结果</h2>
+        <p>包含项目输入、所有计算输出、版本、时间、单位、限制和输入哈希，便于独立核对；该文件不作为项目文件重新打开。</p>
+        <button @onclick='() => Vm.PrepareExport("analysis")'>准备分析JSON</button>
+    </section>
+</div>
+@if (Vm.DownloadUrl.Length > 0)
+{
+    <section class="panel download-ready">
+        <h2>下载已准备</h2>
+        <a class="button primary" data-testid="download-export" href="@Vm.DownloadUrl" download="@Vm.DownloadFilename">下载 @Vm.DownloadFilename</a>
+        <p>点击链接后在浏览器下载记录确认实际路径。链接保留约10分钟；过期请重新准备。</p>
+    </section>
+}
+<section class="panel">
+    <h2>保存、搬迁、重开核对</h2>
+    <ol class="steps">
+        <li>应用当前表单，点击“保存项目”。查看成功消息和实际路径。</li>
+        <li>回“项目工作台”，刷新本机项目库，选择刚保存的项目打开，核对修订、试验数和配对结果。</li>
+        <li>准备并下载.sealproj，把文件复制到另一目录。通过项目页“导入已有文件”重新打开，确认不依赖原CSV路径。</li>
+        <li>导入的同标识项目不会直接覆盖本机现有文件。要保存到新文件，先复制为新项目；要续改原文件，先从项目库打开。</li>
+        <li>导出HTML报告与结果CSV，核对来源、Hz、dB参考、参数、版本和阻断原因。报告与项目修订应一致。</li>
+    </ol>
+</section>
+<section class="panel">
+    <h2>使用边界</h2>
+    <p>@Software.Limitation</p>
+    <p>本版本处理已经提取且完成所声明计权的频带声级。没有音频频谱、声源分离、自动标定、标准认证、账号权限或远程协作功能。来源真实性由操作者按原始记录核实。</p>
+    <p>软件仅监听本机。本机保存目录与下载文件由用户按数据权限、备份和留存要求管理；不在报告中填写未知的申请人、权属或开发发表日期。</p>
+</section>

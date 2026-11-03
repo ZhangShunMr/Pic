@@ -1,0 +1,5 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  AcousticSeal.Core -> /workspace/Pic/acoustic-seal-analysis/src/AcousticSeal.Core/bin/Release/net10.0/AcousticSeal.Core.dll
+  AcousticSeal.App -> /workspace/Pic/acoustic-seal-analysis/src/AcousticSeal.App/bin/Release/net10.0/AcousticSeal.App.dll
+  AcousticSeal.App -> /workspace/Pic/acoustic-seal-analysis/.runtime/publish/

@@ -1,68 +1,88 @@
 {
-  "date": "2026-11-03T05:03:23.376613+00:00",
-  "environment": "Linux Python 3.12; headless system Chromium; 1440x1000 and 390x844",
+  "date": "2026-11-03T06:13:45.373957+00:00",
   "browser": "154.0.8037.57",
+  "application": "C#/.NET10 Blazor Server MVVM V2.0",
   "steps": [
     {
-      "step": "普通启动为空白",
-      "actual": "0 个试验，未自动载入样例",
+      "title": "普通启动",
+      "actual": "空白工作台，零试验，无自动演示数据",
       "status": "passed"
     },
     {
-      "step": "空白到显式配对",
-      "actual": "创建位置、完整工况、基线和单项；125Hz=3dB，250Hz保持缺失",
+      "title": "空白输入到计算",
+      "actual": "建立位置/工况/基线/单项/显式配对，125Hz得到3.000dB",
       "status": "passed"
     },
     {
-      "step": "保存搬迁重开",
-      "actual": "实际下载到独立目录并重新选择文件；2个试验及配对保留",
+      "title": "实际落盘",
+      "actual": "确认83854e960d6647afbf7ddea7413ed0bf.sealproj存在，内含2试验和1配对",
       "status": "passed"
     },
     {
-      "step": "三类成果导出",
-      "actual": "HTML报告、结果CSV及原始频带CSV均实际下载成功",
+      "title": "撤销重做与备份",
+      "actual": "负责人可撤销/重做，二次保存实际生成.bak",
       "status": "passed"
     },
     {
-      "step": "模拟样例",
-      "actual": "8个试验、6个配对，组合125Hz差4.5dB",
+      "title": "项目库重开",
+      "actual": "从实际文件重新打开，负责人、试验及配对保留",
       "status": "passed"
     },
     {
-      "step": "CSV预检与确认",
-      "actual": "2行合并导入；覆盖2个频带，保留其他频带",
+      "title": "未应用频带保护",
+      "actual": "编辑69后顶栏标记草稿；切页可取消保留，确认放弃后计算仍是已应用70减67",
       "status": "passed"
     },
     {
-      "step": "频带扫描",
-      "actual": "200至300Hz范围仅显示250Hz矩阵行",
+      "title": "导出和搬迁导入",
+      "actual": "实际下载HTML/CSV/项目；搬迁项目重开仍有2个试验",
       "status": "passed"
     },
     {
-      "step": "条件缺失阻断",
-      "actual": "清空车辆标识后6个配对全部阻断，差值为空，原因可见",
+      "title": "模拟案例与频谱",
+      "actual": "8试验6配对，差值图/原始频谱均加载，图中文字和来源可见",
       "status": "passed"
     },
     {
-      "step": "归档保护",
-      "actual": "归档表单禁用，解除归档后可编辑",
+      "title": "CSV预检事务",
+      "actual": "2行模拟数据预检并显式确认，沿用来源，其他频带保留",
       "status": "passed"
     },
     {
-      "step": "窄屏布局",
-      "actual": "390px宽度无整页横向溢出；表格在各自容器内滚动",
+      "title": "核对表和规则情景",
+      "actual": "显式选择2试验生成3频带工作表；3组阈值情景不改项目参数",
       "status": "passed"
     },
     {
-      "step": "浏览器异常",
-      "actual": "无 JavaScript pageerror",
+      "title": "复核和版本核对",
+      "actual": "用户复核写入参数/哈希；相同快照无数据变化，未覆盖当前项目",
+      "status": "passed"
+    },
+    {
+      "title": "条件缺失阻断",
+      "actual": "车辆标识缺失，6条配对阻断，差值不生成，原因可见",
+      "status": "passed"
+    },
+    {
+      "title": "归档保护",
+      "actual": "归档禁用编辑，解除归档恢复",
+      "status": "passed"
+    },
+    {
+      "title": "窄屏",
+      "actual": "390px工作台无整页水平溢出",
+      "status": "passed"
+    },
+    {
+      "title": "JavaScript异常",
+      "actual": "无pageerror；Blazor未显示断连错误栏",
       "status": "passed"
     }
   ],
   "javascriptErrors": [],
   "limitations": [
-    "未在Windows/macOS执行",
-    "未使用真实车辆数据",
-    "未验证Microsoft Word分页"
+    "未验证Visual Studio/Windows/macOS图形启动",
+    "未验证真实车辆数据",
+    "无Microsoft Word实际分页证据"
   ]
 }

@@ -1,119 +1,400 @@
 {
-  "scope": [
-    "acoustic/*.py",
-    "web/*.js",
-    "web/*.css",
-    "web/*.html"
-  ],
-  "baseline": 0,
-  "minimum": 3500,
-  "productionNonblank": 3523,
-  "includes": "手写生产源码非空行（含必要注释及样式，不含测试、工具、文档、示例及生成物）",
+  "scope": "src/**/*.cs, src/**/*.razor, src/**/*.css; excluding obj/bin",
+  "legacyBaselineCommit": "bf7de5ebc0fad67453e01e72db52367c9c92bade",
+  "legacyProductionNonblank": 3523,
+  "minimum": 7046,
+  "productionNonblank": 7140,
+  "byExtension": {
+    ".razor": 1240,
+    ".cs": 5174,
+    ".css": 726
+  },
+  "exclusions": "测试、工具、文档、截图、示例、依赖、生成文件、配置与解决方案",
   "files": [
     {
-      "path": "acoustic/__init__.py",
-      "purpose": "软件身份与格式版本",
-      "lines": 5,
+      "path": "src/AcousticSeal.App/Components/App.razor",
+      "purpose": "实际编译的页面/控件视图",
+      "physical": 14,
+      "nonblank": 14,
+      "sha256": "5aa6922ce9dea7032a09640aa111710e1c610dd24660aafa01bb3a7832724320"
+    },
+    {
+      "path": "src/AcousticSeal.App/Components/Pages/AnalysisPage.razor",
+      "purpose": "实际编译的页面/控件视图",
+      "physical": 114,
+      "nonblank": 114,
+      "sha256": "c8d1f21ad6d6619c4cde20ac779d71137ddab42ba5beeca75b8d0e15f1d4cb19"
+    },
+    {
+      "path": "src/AcousticSeal.App/Components/Pages/ConditionsPage.razor",
+      "purpose": "实际编译的页面/控件视图",
+      "physical": 43,
+      "nonblank": 43,
+      "sha256": "42b5bcc754823d5ccfb71e5cc15c0657de9110abe8139ab8b97d0ba9fedc92a8"
+    },
+    {
+      "path": "src/AcousticSeal.App/Components/Pages/DeliveryPage.razor",
+      "purpose": "实际编译的页面/控件视图",
+      "physical": 63,
+      "nonblank": 63,
+      "sha256": "db91ab8b58aa64d8c06ea5751fc13ed09a995a32bf15273a5cde56432e84a29e"
+    },
+    {
+      "path": "src/AcousticSeal.App/Components/Pages/Error.razor",
+      "purpose": "实际编译的页面/控件视图",
+      "physical": 4,
       "nonblank": 4,
-      "sha256": "b5a973cef14e168715e06373824d41ba51a387bf8af4c333634bf1694ed87127"
+      "sha256": "28499d8da00121b4d5eee658b3f51ee62918e18e587994c74107dc634e4f67dd"
     },
     {
-      "path": "acoustic/analysis.py",
-      "purpose": "声级差、重复统计和筛查",
-      "lines": 377,
-      "nonblank": 347,
-      "sha256": "b2514b25b9fea76b2cc8e46dafd3111e7292bb378d680d229706b8ddfaa2dd1a"
+      "path": "src/AcousticSeal.App/Components/Pages/HistoryPage.razor",
+      "purpose": "实际编译的页面/控件视图",
+      "physical": 49,
+      "nonblank": 49,
+      "sha256": "4641c3774e07161c6de751b551cb95556e4f20122020eccb75a54311ff3b68a1"
     },
     {
-      "path": "acoustic/commands.py",
-      "purpose": "项目事务、引用保护、归档和审计",
-      "lines": 168,
-      "nonblank": 147,
-      "sha256": "dc99de41ae193498a32135221f2c001037b46218a611cb4b7fecff8c89822fda"
+      "path": "src/AcousticSeal.App/Components/Pages/ImportPage.razor",
+      "purpose": "实际编译的页面/控件视图",
+      "physical": 115,
+      "nonblank": 114,
+      "sha256": "87e474debc713b84870fe96b6585cf84afae47a4783a0438d5a1e0743e0c3e45"
     },
     {
-      "path": "acoustic/demo.py",
-      "purpose": "用户主动载入的固定模拟样例",
-      "lines": 91,
-      "nonblank": 88,
-      "sha256": "1909ad2f3b617515e65068097c47b4c85895a3bfd03ff2bebb900b79fc0178db"
+      "path": "src/AcousticSeal.App/Components/Pages/LocationsPage.razor",
+      "purpose": "实际编译的页面/控件视图",
+      "physical": 36,
+      "nonblank": 36,
+      "sha256": "0cdc5c81e4462d012c56c379cd62c5c53f2ebf789c76b755799abcb232b05c62"
     },
     {
-      "path": "acoustic/imports.py",
-      "purpose": "CSV预检、整体导入与明细输出",
-      "lines": 145,
-      "nonblank": 131,
-      "sha256": "0b5e43b986e358dddd64ef4394e42c3e48011b46ae94d99e2e179f1b60a1ed05"
+      "path": "src/AcousticSeal.App/Components/Pages/PairsPage.razor",
+      "purpose": "实际编译的页面/控件视图",
+      "physical": 111,
+      "nonblank": 110,
+      "sha256": "785c320419ea3d4161760d3cbe72137a12311978bd6d3f4fd180cf193b232130"
     },
     {
-      "path": "acoustic/models.py",
-      "purpose": "领域对象、输入边界与项目验证",
-      "lines": 398,
-      "nonblank": 350,
-      "sha256": "2dd9a7ac361c68d3edb9e843c00fdda0d569838817600b942c141aed7152c4cb"
+      "path": "src/AcousticSeal.App/Components/Pages/ProjectPage.razor",
+      "purpose": "实际编译的页面/控件视图",
+      "physical": 90,
+      "nonblank": 89,
+      "sha256": "7e2bce7521b6ab7d03a97894b79e27feaa4847d941ce13497b6a4edd23e33bde"
     },
     {
-      "path": "acoustic/report.py",
-      "purpose": "自包含报告、图表和溯源附录",
-      "lines": 288,
-      "nonblank": 274,
-      "sha256": "398086167a243870618705011022121d3350077d0c6856a00e8c3f7405ac84ea"
+      "path": "src/AcousticSeal.App/Components/Pages/QualityPage.razor",
+      "purpose": "实际编译的页面/控件视图",
+      "physical": 137,
+      "nonblank": 135,
+      "sha256": "29f2551c0b8b55b2e7eda812ee698bf29966155c16148d826be31016acf435c0"
     },
     {
-      "path": "acoustic/review.py",
-      "purpose": "覆盖、时间线与测得差值矩阵",
-      "lines": 126,
-      "nonblank": 118,
-      "sha256": "f857ebf210b8690ad56615b2021d0f34c80eb3efc0ed1b72ef1274da4ca3cd8d"
+      "path": "src/AcousticSeal.App/Components/Pages/RevisionPage.razor",
+      "purpose": "实际编译的页面/控件视图",
+      "physical": 88,
+      "nonblank": 86,
+      "sha256": "b796a1632c1d978c8818caa4ed60514895c6c9dff477f6ecec8476f74818f9cb"
     },
     {
-      "path": "acoustic/server.py",
-      "purpose": "本机HTTP接口、静态界面与请求边界",
-      "lines": 181,
-      "nonblank": 158,
-      "sha256": "e75a9ddc3b5593a0a64a0cf67b733788ec1bf3f1b177559772704aa80c086d1c"
+      "path": "src/AcousticSeal.App/Components/Pages/TrialsPage.razor",
+      "purpose": "实际编译的页面/控件视图",
+      "physical": 86,
+      "nonblank": 86,
+      "sha256": "670b9bf2ab0f51a9a11fafe8fd1fc940cdb8519a982bd16bfe1bbbaeb96ae69c"
     },
     {
-      "path": "web/app.js",
-      "purpose": "事件适配、表单解析与ViewModel绑定",
-      "lines": 367,
-      "nonblank": 339,
-      "sha256": "9e43525c2a2c309e2ed4f1331b990246b9abf2402141695bffcff41c08f6e758"
+      "path": "src/AcousticSeal.App/Components/Pages/Workspace.razor",
+      "purpose": "实际编译的页面/控件视图",
+      "physical": 106,
+      "nonblank": 103,
+      "sha256": "6913601d48c894623c658c253be4950ab678ad1998acdf7d2b885a6d311b3f10"
     },
     {
-      "path": "web/index.html",
-      "purpose": "本地应用入口与无脚本提示",
-      "lines": 19,
-      "nonblank": 19,
-      "sha256": "ee2788ca4cb46b178b90618f4f2932fce99d1b15ae78e49cb2ff78e2c74e233a"
+      "path": "src/AcousticSeal.App/Components/Routes.razor",
+      "purpose": "实际编译的页面/控件视图",
+      "physical": 6,
+      "nonblank": 6,
+      "sha256": "14137f630bd5660ee855f5b19cfe6edfd4e145a17208b1f1195d3a35e0821627"
     },
     {
-      "path": "web/service.js",
-      "purpose": "浏览器服务调用和文件下载边界",
-      "lines": 74,
+      "path": "src/AcousticSeal.App/Components/Shared/EditorActions.razor",
+      "purpose": "实际编译的页面/控件视图",
+      "physical": 15,
+      "nonblank": 14,
+      "sha256": "9124c8b4ffc895a53905b75f2abb161183b3bf48f956c1e570fab1caa9caa44b"
+    },
+    {
+      "path": "src/AcousticSeal.App/Components/Shared/EditorField.razor",
+      "purpose": "实际编译的页面/控件视图",
+      "physical": 41,
+      "nonblank": 39,
+      "sha256": "2a09ab25f9f19f58672c815c21b2f764856f456ef877b03b90aa84209b5c918d"
+    },
+    {
+      "path": "src/AcousticSeal.App/Components/Shared/InputWorkbookPanel.razor",
+      "purpose": "实际编译的页面/控件视图",
+      "physical": 50,
+      "nonblank": 50,
+      "sha256": "6b81397c560639e69a742c8d23fc9905f83e2260dc9eb9df26855820dec885cf"
+    },
+    {
+      "path": "src/AcousticSeal.App/Components/Shared/PairChart.razor",
+      "purpose": "实际编译的页面/控件视图",
+      "physical": 13,
+      "nonblank": 12,
+      "sha256": "e68e7933c702dfbcdf422514d460dd271fe36e400c4267fc06cc2f8889d945ac"
+    },
+    {
+      "path": "src/AcousticSeal.App/Components/Shared/ScenarioPanel.razor",
+      "purpose": "实际编译的页面/控件视图",
+      "physical": 57,
+      "nonblank": 57,
+      "sha256": "5f6cc9aef8e4929ea5972677b5c3116779e38ccde2ed1a720575a6821d7aa725"
+    },
+    {
+      "path": "src/AcousticSeal.App/Components/Shared/StatusBadge.razor",
+      "purpose": "实际编译的页面/控件视图",
+      "physical": 5,
+      "nonblank": 4,
+      "sha256": "67f746a57fb435ba8550cc6b3b94b92bc1a33267a1b0c5f0ceb747d720b41311"
+    },
+    {
+      "path": "src/AcousticSeal.App/Components/Shared/UploadBoundary.cs",
+      "purpose": "应用入口/文件边界/视图绑定",
+      "physical": 25,
+      "nonblank": 21,
+      "sha256": "312e9adddaf1480d6c19ab4cec48b6d139c7ff658eb6b17bfb61c7988bf60d66"
+    },
+    {
+      "path": "src/AcousticSeal.App/Components/Shared/VmComponent.cs",
+      "purpose": "应用入口/文件边界/视图绑定",
+      "physical": 26,
+      "nonblank": 21,
+      "sha256": "a250c49c083827c50034759abba8819841c601be30cc65ea13b25685387b5398"
+    },
+    {
+      "path": "src/AcousticSeal.App/Components/_Imports.razor",
+      "purpose": "实际编译的页面/控件视图",
+      "physical": 12,
+      "nonblank": 12,
+      "sha256": "11f7c190b210c7a5ed3c42014214be6a02a4b564930086e190e006ce1e611070"
+    },
+    {
+      "path": "src/AcousticSeal.App/DownloadVault.cs",
+      "purpose": "应用入口/文件边界/视图绑定",
+      "physical": 48,
+      "nonblank": 40,
+      "sha256": "51da88a3cec36b25bdd9de04b7b917dc729b022820de87c4b8bd007be836b331"
+    },
+    {
+      "path": "src/AcousticSeal.App/Program.cs",
+      "purpose": "应用入口/文件边界/视图绑定",
+      "physical": 78,
+      "nonblank": 72,
+      "sha256": "59e6cfc9e1b0498b8c349f8f7c6171fa99b4258ab0b4f7a63125d54227b9d9a4"
+    },
+    {
+      "path": "src/AcousticSeal.App/ViewModels/AnalysisEditors.cs",
+      "purpose": "MVVM状态、编辑器和业务命令",
+      "physical": 260,
+      "nonblank": 230,
+      "sha256": "2b9a9fad0410170a6880977e276256baf036ce88efbc65ca44c16b27a6dd1724"
+    },
+    {
+      "path": "src/AcousticSeal.App/ViewModels/ObservableObject.cs",
+      "purpose": "MVVM状态、编辑器和业务命令",
+      "physical": 68,
+      "nonblank": 58,
+      "sha256": "49705c9250be080bb777b00bc6cc731d3fc5b70ba50ef571a4755c5ba5c320f8"
+    },
+    {
+      "path": "src/AcousticSeal.App/ViewModels/ProjectEditors.cs",
+      "purpose": "MVVM状态、编辑器和业务命令",
+      "physical": 364,
+      "nonblank": 329,
+      "sha256": "d79c4f188417f38793235314dedc7cd3e9bbf0f7e7ceb9233bea807a40c4d65d"
+    },
+    {
+      "path": "src/AcousticSeal.App/ViewModels/RevisionViewModel.cs",
+      "purpose": "MVVM状态、编辑器和业务命令",
+      "physical": 143,
+      "nonblank": 126,
+      "sha256": "c21b7e8936a73d44b654e32856cb50a2452a69ed4c0dda9d5a2fc8e606b6c1bd"
+    },
+    {
+      "path": "src/AcousticSeal.App/ViewModels/ScenarioViewModel.cs",
+      "purpose": "MVVM状态、编辑器和业务命令",
+      "physical": 51,
+      "nonblank": 44,
+      "sha256": "38d33c24b794acaa432902395d2b7a01ada62a93fe33f5e758efc883a65ad413"
+    },
+    {
+      "path": "src/AcousticSeal.App/ViewModels/WorkbookViewModel.cs",
+      "purpose": "MVVM状态、编辑器和业务命令",
+      "physical": 78,
       "nonblank": 68,
-      "sha256": "da858ae70c5f8822c0298fd879e2e062d43167dcf18a236c85dc5b619373617f"
+      "sha256": "92220b62d417bdd7999eea8c4c67ac9ff7c768d0f3517becfba7924cb0a2676f"
     },
     {
-      "path": "web/styles.css",
-      "purpose": "响应式布局、交互状态与图表样式",
-      "lines": 764,
-      "nonblank": 764,
-      "sha256": "cdefed5583bf92aa8060f974ed734ed85d4c876ed53d8d881e64f6b939b4a82a"
+      "path": "src/AcousticSeal.App/ViewModels/WorkspaceViewModel.cs",
+      "purpose": "MVVM状态、编辑器和业务命令",
+      "physical": 775,
+      "nonblank": 695,
+      "sha256": "acfc412c1b8ec6eac35a153e1f595c00252226fac9b1580f79c930542190bf40"
     },
     {
-      "path": "web/viewmodel.js",
-      "purpose": "MVVM可观察状态及命令",
-      "lines": 289,
-      "nonblank": 257,
-      "sha256": "5a296507421b108242351a5df215f289e457ecdc82dd89eec3d66773700b9653"
+      "path": "src/AcousticSeal.App/wwwroot/app.css",
+      "purpose": "界面布局和视觉状态",
+      "physical": 726,
+      "nonblank": 726,
+      "sha256": "df8111e51e3524c1926162bf696cc0b901a45a630ae2f734d9f18f78cdcd2231"
     },
     {
-      "path": "web/views.js",
-      "purpose": "工作页、表格、图表与表单视图",
-      "lines": 491,
-      "nonblank": 459,
-      "sha256": "8b8142ec6de0224ba9f66ed98c8e333481a6c4a2b7aba5c1a05baa1e326598f1"
+      "path": "src/AcousticSeal.Core/Analysis/AcousticMath.cs",
+      "purpose": "数值/比较/质量复核",
+      "physical": 149,
+      "nonblank": 132,
+      "sha256": "ff0a48e301995d2bca13339edbab63158c8997e9f2679d2fd9cc5755003b7583"
+    },
+    {
+      "path": "src/AcousticSeal.Core/Analysis/AnalysisEngine.cs",
+      "purpose": "数值/比较/质量复核",
+      "physical": 309,
+      "nonblank": 284,
+      "sha256": "5dc67bedd334d6b198cfc7d92c0aa7cd04771f92ecaa97cb0af75bf5f0948e03"
+    },
+    {
+      "path": "src/AcousticSeal.Core/Analysis/Comparability.cs",
+      "purpose": "数值/比较/质量复核",
+      "physical": 70,
+      "nonblank": 60,
+      "sha256": "aead7711053fca11742aa647e1e29f7e95dcdca67c6cebab99c3196f3ac6098c"
+    },
+    {
+      "path": "src/AcousticSeal.Core/Analysis/InputWorkbook.cs",
+      "purpose": "数值/比较/质量复核",
+      "physical": 130,
+      "nonblank": 112,
+      "sha256": "27ae8f7d72c888d63573a304773aaddcd790edfd60e1923d64139e795bc57a15"
+    },
+    {
+      "path": "src/AcousticSeal.Core/Analysis/QualityInspector.cs",
+      "purpose": "数值/比较/质量复核",
+      "physical": 81,
+      "nonblank": 70,
+      "sha256": "08876b42bc5ba594f6e5c250259264126dae1cce5802878ba97dea6197c29ca9"
+    },
+    {
+      "path": "src/AcousticSeal.Core/Analysis/Results.cs",
+      "purpose": "数值/比较/质量复核",
+      "physical": 145,
+      "nonblank": 131,
+      "sha256": "26c8db0f76b7be50bb8c97c915724f3ef7a40f91ffe340ad048cf5dc7612764c"
+    },
+    {
+      "path": "src/AcousticSeal.Core/Analysis/RevisionComparison.cs",
+      "purpose": "数值/比较/质量复核",
+      "physical": 206,
+      "nonblank": 186,
+      "sha256": "c462bce3578e7164f8d3b3751a1ed751a8735ce3aa43e3b7e2b305a822539595"
+    },
+    {
+      "path": "src/AcousticSeal.Core/Analysis/SettingsScenarios.cs",
+      "purpose": "数值/比较/质量复核",
+      "physical": 89,
+      "nonblank": 81,
+      "sha256": "00b058f003262340f783e31de152c968fe94c4afcc48ca3bc4a3cbcf829a76c6"
+    },
+    {
+      "path": "src/AcousticSeal.Core/Analysis/SpectrumChart.cs",
+      "purpose": "数值/比较/质量复核",
+      "physical": 107,
+      "nonblank": 92,
+      "sha256": "3da6dfde24ea0252661d2f855e6961142d8c869fa7ab6bd48f445209fd21e7bb"
+    },
+    {
+      "path": "src/AcousticSeal.Core/Domain/Demonstration.cs",
+      "purpose": "领域对象/输入验证",
+      "physical": 125,
+      "nonblank": 121,
+      "sha256": "4033a0db31675771bb5b67b7540f219a38dcae182b5c910bd5c996a8e71a30f5"
+    },
+    {
+      "path": "src/AcousticSeal.Core/Domain/Identity.cs",
+      "purpose": "领域对象/输入验证",
+      "physical": 157,
+      "nonblank": 140,
+      "sha256": "3b4f6f33446e40576ce9ada208c012cef7dca72417d35ed3ff0b2891da216b62"
+    },
+    {
+      "path": "src/AcousticSeal.Core/Domain/Project.cs",
+      "purpose": "领域对象/输入验证",
+      "physical": 217,
+      "nonblank": 196,
+      "sha256": "c3d57fa30046e50dc1697be9316c3d667c81cb6c34195d0d7f676059e6785f3e"
+    },
+    {
+      "path": "src/AcousticSeal.Core/Domain/Validation.cs",
+      "purpose": "领域对象/输入验证",
+      "physical": 402,
+      "nonblank": 352,
+      "sha256": "680913a2ef26e0d7844884c914eef32ed756c8ceae077cdfa0730fb7c768e479"
+    },
+    {
+      "path": "src/AcousticSeal.Core/IO/CsvImport.cs",
+      "purpose": "项目/导入/持久化/输出",
+      "physical": 272,
+      "nonblank": 240,
+      "sha256": "691feb2cee4a1379019a903c95ca5d68477721c2ec648f01ddcd6cda0e6374c4"
+    },
+    {
+      "path": "src/AcousticSeal.Core/IO/LegacyMigration.cs",
+      "purpose": "项目/导入/持久化/输出",
+      "physical": 211,
+      "nonblank": 194,
+      "sha256": "7fcf0d9ca5810f9e9d2b308e20ed54072dc47c8ad4b22172d2e5f504820d6ff2"
+    },
+    {
+      "path": "src/AcousticSeal.Core/IO/ProjectCodec.cs",
+      "purpose": "项目/导入/持久化/输出",
+      "physical": 211,
+      "nonblank": 187,
+      "sha256": "5da065ac46744cfb10c810a145e03d23a0898e9d190c99ab1fec7df95f746589"
+    },
+    {
+      "path": "src/AcousticSeal.Core/IO/ProjectStore.cs",
+      "purpose": "项目/导入/持久化/输出",
+      "physical": 183,
+      "nonblank": 159,
+      "sha256": "96b8da3e71d755e0664d42fb71c849b1571d1bbcec906f6d40d3ed07ceee982b"
+    },
+    {
+      "path": "src/AcousticSeal.Core/IO/ResultExport.cs",
+      "purpose": "项目/导入/持久化/输出",
+      "physical": 439,
+      "nonblank": 395,
+      "sha256": "2f24d60f63226b0226176b3c62b5e7ea880a84ef43642e42badef27a09d27107"
+    },
+    {
+      "path": "src/AcousticSeal.Core/Operations/BatchPairing.cs",
+      "purpose": "事务/历史/引用保护",
+      "physical": 71,
+      "nonblank": 62,
+      "sha256": "9e111bba4a07aead57ed1468ed5b54ab94b84b6ea5d23cd459dfd79c1b705028"
+    },
+    {
+      "path": "src/AcousticSeal.Core/Operations/ProjectCommands.cs",
+      "purpose": "事务/历史/引用保护",
+      "physical": 123,
+      "nonblank": 108,
+      "sha256": "4f04799a55800e85e05805d851823d3e012de5a0fcc26f81544262c20ad7fe12"
+    },
+    {
+      "path": "src/AcousticSeal.Core/Operations/ProjectSession.cs",
+      "purpose": "事务/历史/引用保护",
+      "physical": 188,
+      "nonblank": 168,
+      "sha256": "469b35f7d85744de98bdbcc3c8b71cb1e00528e53c58f5baf9681ea000e64570"
     }
   ]
 }

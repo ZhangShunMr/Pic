@@ -1,0 +1,88 @@
+@inherits VmComponent
+<section class="panel">
+    <h2>两份项目内容的版本核对</h2>
+    <p>用于检查修改了哪些工况、试验、频带、配对或参数。只按对象GUID和频率键对应，不按名称猜测。这不是两次封堵效果比较，也不修改当前工作项目。</p>
+    <div class="columns">
+        <div>
+            <label class="upload">左侧：较早项目<InputFile id="revision-left" OnChange="args => LoadAsync(args, true)" accept=".sealproj,.json" /></label>
+            <p><strong>@Vm.Revision.LeftFilename</strong><small class="block">@Vm.Revision.LeftIdentity</small></p>
+            <button @onclick="() => Vm.Edit(() => Vm.Revision.UseCurrent(true, Vm.Project))">左侧使用当前已应用快照</button>
+        </div>
+        <div>
+            <label class="upload">右侧：较新项目<InputFile id="revision-right" OnChange="args => LoadAsync(args, false)" accept=".sealproj,.json" /></label>
+            <p><strong>@Vm.Revision.RightFilename</strong><small class="block">@Vm.Revision.RightIdentity</small></p>
+            <button @onclick="() => Vm.Edit(() => Vm.Revision.UseCurrent(false, Vm.Project))">右侧使用当前已应用快照</button>
+        </div>
+    </div>
+    <div class="editor-actions">
+        <button class="primary" data-testid="compare-revisions" @onclick="() => Vm.Edit(Vm.Revision.Compare)" disabled="@(!Vm.Revision.CanCompare)">核对两份项目内容</button>
+        <button @onclick="Vm.Revision.Clear">清空核对副本</button>
+        <small>未应用的编辑表单不在快照中；不会将核对副本覆盖当前项目。</small>
+    </div>
+    @foreach (var note in Vm.Revision.MigrationNotes)
+    {
+        <p class="muted">@note</p>
+    }
+</section>
+@if (Vm.Revision.Result is { } result)
+{
+    <section class="panel">
+        <div class="metric-grid compact">
+            <article><span>新增项</span><strong>@result.AddedCount</strong></article>
+            <article><span>移除项</span><strong>@result.RemovedCount</strong></article>
+            <article><span>修改项</span><strong>@result.ModifiedCount</strong></article>
+            <article><span>全部内容变化</span><strong>@result.Changes.Count</strong></article>
+        </div>
+        <ul class="muted">@foreach (var note in result.Notes) { <li>@note</li> }</ul>
+        <dl class="details">
+            <dt>左侧输入哈希</dt><dd><code>@result.LeftHash</code></dd>
+            <dt>右侧输入哈希</dt><dd><code>@result.RightHash</code></dd>
+        </dl>
+        <div class="toolbar filters">
+            <label>路径或内容<input name="revision-search" @bind="Vm.Revision.Search" /></label>
+            <label>变化类型<select @bind="Vm.Revision.Kind"><option value="">全部</option>@foreach (var kind in Enum.GetValues<ChangeKind>()) { <option value="@kind">@RevisionViewModel.KindText(kind)</option> }</select></label>
+            <button @onclick="Vm.Revision.Filter">筛选变化</button>
+            <button @onclick="() => Vm.Edit(Vm.ExportRevision)">准备核对结果JSON</button>
+        </div>
+        @if (Vm.Revision.DownloadUrl.Length > 0)
+        {
+            <a class="button primary" href="@Vm.Revision.DownloadUrl" download="@Vm.Revision.DownloadFilename">下载版本核对JSON</a>
+        }
+        <div class="table-wrap">
+            <table data-testid="revision-table">
+                <thead><tr><th>类型</th><th>对象路径</th><th>左侧内容</th><th>右侧内容</th></tr></thead>
+                <tbody>
+                    @if (Vm.Revision.Filtered().Count == 0)
+                    {
+                        <tr><td colspan="4" class="empty-cell">没有符合筛选的内容变化。身份、时间、审计数量仍按上方说明分别核对。</td></tr>
+                    }
+                    @foreach (var change in Vm.Revision.Visible())
+                    {
+                        <tr><td>@RevisionViewModel.KindText(change.Kind)</td><td><code>@change.Path</code></td><td><details><summary>@Preview(change.Before)</summary><pre>@change.Before</pre></details></td><td><details><summary>@Preview(change.After)</summary><pre>@change.After</pre></details></td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="pagination"><button @onclick="() => Vm.Revision.MovePage(-1)" disabled="@(Vm.Revision.Page == 0)">上一页</button><span>第 @(Vm.Revision.Page + 1) 页 · 每页50项</span><button @onclick="() => Vm.Revision.MovePage(1)" disabled="@((Vm.Revision.Page + 1) * Vm.Revision.PageSize >= Vm.Revision.Filtered().Count)">下一页</button></div>
+    </section>
+}
+
+@code {
+    private async Task LoadAsync(InputFileChangeEventArgs args, bool isLeft)
+    {
+        try
+        {
+            var bytes = await UploadBoundary.ReadAsync(args.File, Software.MaximumFileBytes);
+            Vm.Edit(() => Vm.Revision.Load(isLeft, bytes, args.File.Name));
+        }
+        catch (Exception error) when (error is IOException or DomainValidationException or InvalidOperationException)
+        {
+            Vm.Edit(() => throw new DomainValidationException("revision.file", error.Message));
+        }
+    }
+
+    private static string Preview(string text)
+    {
+        return text.Length > 100 ? text[..100] + "…展开完整内容" : text.Length == 0 ? "空文本" : text;
+    }
+}

@@ -30,7 +30,8 @@ with sync_playwright() as playwright:
 server.shutdown()
 server.server_close()
 reader = PdfReader(DOCS / '操作说明书-浏览器预览.pdf')
-assert len(reader.pages) == 16, len(reader.pages)
+expected = len(json.loads((ROOT / 'tools' / 'manual-content.json').read_text()))
+assert len(reader.pages) == expected, len(reader.pages)
 page_evidence = []
 for index, pdf_page in enumerate(reader.pages):
     text = pdf_page.extract_text()

@@ -1,0 +1,15 @@
+<div class="editor-actions">
+    <button type="submit" class="primary" data-testid="apply-editor">应用@(Existing ? "修改" : "新增")</button>
+    <button type="button" @onclick="New" data-testid="new-editor">清空 / 新增</button>
+    @if (Existing)
+    {
+        <button type="button" class="danger" @onclick="Delete" data-testid="delete-editor">删除</button>
+    }
+    <small>应用更新工作副本；点击“保存项目”才写入磁盘。</small>
+</div>
+
+@code {
+    [Parameter] public bool Existing { get; set; }
+    [Parameter] public EventCallback New { get; set; }
+    [Parameter] public EventCallback Delete { get; set; }
+}

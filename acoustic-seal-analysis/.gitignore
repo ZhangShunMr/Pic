@@ -1,4 +1,7 @@
-__pycache__/
-*.py[cod]
-.venv/
+**/bin/
+**/obj/
+.vs/
 .runtime/
+Data/
+*.user
+__pycache__/

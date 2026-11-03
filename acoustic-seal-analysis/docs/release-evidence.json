@@ -1,0 +1,48 @@
+{
+  "baseline": "dbd4c8429a4ff2e76ffc41fef429be5366c7e90a",
+  "branch": "codex/cloud-dev-20261102",
+  "protected": [
+    {
+      "path": "5ee3d2c48bf38ce358402ca5954d6748.jpg",
+      "sha256": "5bac15a3c669681d415ea6b2fd382239c826e3b430423c8e1875b6c2f5a730f6",
+      "unchanged": true
+    },
+    {
+      "path": "83f99195bebafe1f7be1abe0d7167bda.jpg",
+      "sha256": "fc8e72b64ec3927bd6f4830d5151ee92d97a28937a399ccc52e521817d39667c",
+      "unchanged": true
+    },
+    {
+      "path": "Record (online-voice-recorder.com).mp3",
+      "sha256": "c8bb17dd1b91350b602a2f3b4094f923e2f3399ea7e9f16d9103bde8b9d9584b",
+      "unchanged": true
+    },
+    {
+      "path": "c56ee052566c8f99ae94a6fe63fa4204.jpg",
+      "sha256": "7b6aa9390e920d607097acae4f7d57dfb9007434a5cb62936b84bf9aa2299af8",
+      "unchanged": true
+    },
+    {
+      "path": "download.png",
+      "sha256": "44b9615521cef47e97f9b55b229199d140deb53621f64ad79680c88360f9f1a6",
+      "unchanged": true
+    },
+    {
+      "path": "软件设计准则.md",
+      "sha256": "b2d4eb3e0922c46effdc049d41665c3e53b6dfe635e18b2d6cd0fdb9285ac1a5",
+      "unchanged": true
+    },
+    {
+      "path": "软著编写要求.md",
+      "sha256": "4fdf5f834030b942be52e329499a36bfb0af60e1f7aca8d6065915fc9c70543f",
+      "unchanged": true
+    }
+  ],
+  "productionNonblank": 7140,
+  "sourceIntegrity": "all hashes matched",
+  "manualPdfPreviewPages": 20,
+  "manualEmbeddedImages": 17,
+  "unitVerification": "65 passed, 0 failed",
+  "writeScope": "acoustic-seal-analysis only",
+  "wordActualPagination": "未执行，不以浏览器PDF替代"
+}

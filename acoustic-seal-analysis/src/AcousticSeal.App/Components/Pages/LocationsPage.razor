@@ -1,0 +1,36 @@
+@inherits VmComponent
+<div class="editor-layout">
+    <aside class="object-list">
+        <div class="section-heading"><h2>封堵位置</h2><span>@Vm.Project.Locations.Count</span></div>
+        <button class="add-object" @onclick="() => Vm.SelectLocation(null)">+ 新增位置</button>
+        @if (Vm.Project.Locations.Count == 0)
+        {
+            <p class="muted">先定义位置和覆盖范围，再建立封堵试验。</p>
+        }
+        @foreach (var item in Vm.Project.Locations)
+        {
+            <button class="object @(Vm.Location.Id == item.Id ? "active" : "")"
+                    data-location="@item.Id" @onclick="() => Vm.SelectLocation(item.Id)">
+                <strong>@item.Name</strong><small>@item.Zone</small>
+            </button>
+        }
+    </aside>
+    <section class="panel">
+        <div class="section-heading"><h2>@(Vm.Location.IsExisting ? "编辑" : "新增")封堵位置</h2><code>@Vm.Location.IdentityLabel</code></div>
+        <p class="muted">位置是试验对象，不自动等同于已确认泄漏路径。被试验引用的位置不能直接删除。</p>
+        <form @onsubmit="Vm.SaveLocation" @onsubmit:preventDefault novalidate>
+            <fieldset class="form-grid" disabled="@Vm.Archived">
+                <EditorField Label="位置名称 *" Name="location-name" @bind-Value="Vm.Location.Name" MaximumLength="120" />
+                <EditorField Label="车身区域" Name="location-zone" @bind-Value="Vm.Location.Zone" MaximumLength="120" />
+                <EditorField Label="材料与规格" Name="location-material" @bind-Value="Vm.Location.Material" MaximumLength="1000" />
+                <EditorField Label="覆盖范围与边界" Name="location-extent" @bind-Value="Vm.Location.Extent" MaximumLength="1000" />
+                <EditorField Label="封堵步骤" Name="location-procedure" @bind-Value="Vm.Location.Procedure" Area Wide Rows="4" />
+                <EditorField Label="解除封堵与恢复步骤" Name="location-recovery" @bind-Value="Vm.Location.RecoveryProcedure" Area Wide Rows="4" />
+                <EditorField Label="照片 / 作业记录编号（文字引用）" Name="location-reference" @bind-Value="Vm.Location.Reference" Wide MaximumLength="1000"
+                             Help="不自动携带图片或附件；需要保管的原始文件另行按项目规则留存。" />
+                <EditorField Label="备注" Name="location-notes" @bind-Value="Vm.Location.Notes" Area Wide />
+                <EditorActions Existing="Vm.Location.IsExisting" New="() => Vm.SelectLocation(null)" Delete='() => Vm.DeleteSelected("location", Vm.Location.Id)' />
+            </fieldset>
+        </form>
+    </section>
+</div>

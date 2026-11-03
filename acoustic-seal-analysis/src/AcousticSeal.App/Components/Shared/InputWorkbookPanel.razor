@@ -1,0 +1,50 @@
+@inherits VmComponent
+<section class="panel">
+    <h2>原始频带人工核对工作表</h2>
+    <p class="muted">显式选择最多20条试验横向核对原始声级、缺失和未声明频带。不会建立配对或推断封堵效果。</p>
+    <div class="toolbar filters">
+        <label>查找候选试验<input @bind="Vm.Workbook.Search" /></label>
+        <label>下限 Hz<input name="workbook-min" @bind="Vm.Workbook.Minimum" /></label>
+        <label>上限 Hz<input name="workbook-max" @bind="Vm.Workbook.Maximum" /></label>
+    </div>
+    <div class="target-checks">
+        @foreach (var trial in Vm.Workbook.Candidates(Vm.Project))
+        {
+            <label class="check"><input type="checkbox" name="workbook-trial" value="@trial.Id" checked="@Vm.Workbook.Selected.Contains(trial.Id)" @onchange="args => Vm.Workbook.Toggle(trial.Id, (bool)args.Value!)" />@trial.Name · @trial.Source.Text()</label>
+        }
+    </div>
+    <p class="muted">候选列表最多显示搜索结果前100条；已选 @Vm.Workbook.Selected.Count 条。用查找定位更多试验。</p>
+    <div class="toolbar">
+        <button data-testid="build-workbook" @onclick="() => Vm.Edit(() => Vm.Workbook.Build(Vm.Project))">生成原始核对表</button>
+        <button @onclick="Vm.Workbook.Clear">清空核对选择</button>
+        <button disabled="@(Vm.Workbook.Result is null)" @onclick="() => Vm.Edit(Vm.ExportWorkbook)">准备核对表CSV</button>
+    </div>
+    @if (Vm.Workbook.Result is { } workbook)
+    {
+        <p class="muted">@workbook.Purpose 输入修订 @Vm.Workbook.Revision；全部列有效的频带 @workbook.CompleteRows / @workbook.Rows.Count。</p>
+        @if (Vm.Workbook.IsStale(Vm.Project))
+        {
+            <div class="notice">项目已改变，下表为旧输入快照。请重新生成后再下载。</div>
+        }
+        @foreach (var warning in workbook.Warnings)
+        {
+            <p class="error-text">@warning</p>
+        }
+        <div class="table-wrap">
+            <table data-testid="input-workbook">
+                <thead><tr><th>Hz</th>@foreach (var column in workbook.Columns) { <th>@column.Name<small class="block">@column.Condition · @column.Source.Text()</small></th> }</tr></thead>
+                <tbody>
+                    @foreach (var row in workbook.Rows)
+                    {
+                        <tr><td>@row.Frequency</td>@foreach (var cell in row.Cells) { <td><strong>@Software.Format(cell.Level)</strong><small class="block">@cell.Status @cell.Note</small></td> }</tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <details><summary>核对表各列来源</summary><ul>@foreach (var column in workbook.Columns) { <li><strong>@column.Name</strong>：@column.SourceNote</li> }</ul><code>@Vm.Workbook.InputHash</code></details>
+        @if (Vm.Workbook.DownloadUrl.Length > 0)
+        {
+            <a class="button" href="@Vm.Workbook.DownloadUrl" download="原始输入核对表.csv">下载原始核对表CSV</a>
+        }
+    }
+</section>
