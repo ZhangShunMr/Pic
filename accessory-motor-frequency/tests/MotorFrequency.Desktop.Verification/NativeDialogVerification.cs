@@ -131,10 +131,13 @@ internal static class NativeDialogVerification
                     || edit.Current.Name.Contains("文件名"))
                     && edit.TryGetCurrentPattern(ValuePattern.Pattern, out _));
                 Require(fileName is not null && fileName.TryGetCurrentPattern(ValuePattern.Pattern, out _), "Native filename edit not found");
-                fileName!.SetFocus();
-                var filenameValue = (ValuePattern)fileName.GetCurrentPattern(ValuePattern.Pattern);
                 SetForegroundWindow(handle);
                 Require(GetForegroundWindow() == handle, "Cannot focus own native dialog for keyboard input");
+                fileName!.SetFocus();
+                for (var attempt = 0; attempt < 40 && !fileName.Current.HasKeyboardFocus; attempt++)
+                    Thread.Sleep(50);
+                Require(fileName.Current.HasKeyboardFocus, "Native filename edit did not receive keyboard focus");
+                var filenameValue = (ValuePattern)fileName.GetCurrentPattern(ValuePattern.Pattern);
                 PressKey(0x11, false);
                 PressKey(0x41);
                 PressKey(0x11, true);
@@ -143,10 +146,24 @@ internal static class NativeDialogVerification
                     SendKeys(new KeyboardInput { Scan = character, Flags = 4 },
                         new KeyboardInput { Scan = character, Flags = 6 });
                 }
-                Thread.Sleep(150);
-                Require(filenameValue.Current.Value == path, "Native filename edit did not retain entered path");
-                Thread.Sleep(150);
+                var entered = "";
+                var complete = false;
+                for (var attempt = 0; attempt < 60; attempt++)
+                {
+                    entered = filenameValue.Current.Value;
+                    if (string.Equals(entered.Trim('"'), path, StringComparison.OrdinalIgnoreCase))
+                    {
+                        complete = true;
+                        break;
+                    }
+                    Thread.Sleep(100);
+                }
+                File.WriteAllText(screenshot + ".input.json", System.Text.Json.JsonSerializer.Serialize(new
+                {
+                    expected = path, actual = entered, complete, keyboardFocus = fileName.Current.HasKeyboardFocus
+                }, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
                 CaptureDialog(handle, screenshot);
+                Require(complete, "Native filename edit did not retain complete entered path; see input.json");
                 Console.WriteLine("Native dialog: filename entered by real keyboard input");
                 var accept = dialog.FindFirst(TreeScope.Descendants, new AndCondition(
                     new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Button),

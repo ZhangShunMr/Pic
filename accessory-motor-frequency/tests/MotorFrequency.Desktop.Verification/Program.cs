@@ -32,7 +32,7 @@ internal static class Program
         }
         foreach (var image in new[] { "dialog-01-save.png", "dialog-02-open.png", "dialog-03-export.png" })
         {
-            foreach (var suffix in new[] { "", ".controls.json", ".selection.json", ".failure.txt" })
+            foreach (var suffix in new[] { "", ".controls.json", ".input.json", ".selection.json", ".failure.txt" })
             {
                 var previous = Path.Combine(output, image + suffix);
                 if (File.Exists(previous)) File.Delete(previous);
