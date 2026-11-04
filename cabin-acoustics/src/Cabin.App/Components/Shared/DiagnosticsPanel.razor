@@ -1,0 +1,62 @@
+@inherits VmComponent
+@if (Vm.Current is not null && Vm.Result is not null)
+{
+    <section class="paper-panel">
+        <details>
+            <summary>数值检查：模态密度、节点耦合与截断敏感性</summary>
+            @foreach (var advice in Diagnostics.Advice(Vm.Current, Vm.Result))
+            {
+                <p class="warning">@advice</p>
+            }
+            <div class="analysis-columns">
+                <div>
+                    <h3>25Hz频段模态数</h3>
+                    <p class="muted">左闭右开，退化模态分别计数；不是声品质评分。</p>
+                    <div class="table-scroll mode-table">
+                        <table><thead><tr><th>频段 / Hz</th><th>总数</th><th>轴向</th><th>切向</th><th>斜向</th></tr></thead>
+                            <tbody>
+                                @foreach (var row in Diagnostics.Density(Vm.Result))
+                                {
+                                    <tr><td>@N(row.Lower, "F0")–@N(row.Upper, "F0")</td><td>@row.Count</td><td>@row.Axial</td><td>@row.Tangential</td><td>@row.Oblique</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div>
+                    <h3>当前耳点节点耦合检查</h3>
+                    <p class="muted">耳点|φ|小于0.01；源耦合小于总启用幅值的1%时提示弱耦合。此阈值仅用于检查。</p>
+                    @if (Vm.SelectedSeat is not null)
+                    {
+                        <div class="table-scroll mode-table">
+                            <table><thead><tr><th>模态</th><th>频率 / Hz</th><th>观察</th></tr></thead>
+                                <tbody>
+                                    @foreach (var row in Diagnostics.Coupling(Vm.Current, Vm.Result, Vm.SelectedSeat))
+                                    {
+                                        <tr><td>@row.ModeKey</td><td>@N(row.Frequency)</td><td>@row.Observation</td></tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+            <button disabled="@Vm.Busy" @onclick="Vm.CheckTruncation">截断增加100Hz复核</button>
+            <p class="muted">只比较有限模型的数值敏感性，保持原项目和原结果；不能把一次变化较小解释为精度认证。</p>
+            @if (Vm.Truncation is not null)
+            {
+                <p>@Vm.Truncation.OriginalCutoff → @Vm.Truncation.ExtendedCutoff Hz；模态 @Vm.Truncation.OriginalModes → @Vm.Truncation.ExtendedModes 阶</p>
+                <div class="table-scroll">
+                    <table><thead><tr><th>耳点</th><th>原RMS</th><th>增加截断RMS</th><th>比值 / dB</th></tr></thead>
+                        <tbody>
+                            @foreach (var row in Vm.Truncation.Rows)
+                            {
+                                <tr><td>@row.Seat</td><td>@N(row.OriginalRms, "G5")</td><td>@N(row.ExtendedRms, "G5")</td><td>@(double.IsFinite(row.RatioDb) ? N(row.RatioDb) : "原值近零")</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </details>
+    </section>
+}

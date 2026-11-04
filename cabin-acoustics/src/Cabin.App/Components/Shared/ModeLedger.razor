@@ -1,0 +1,29 @@
+@inherits VmComponent
+<div class="panel-heading">
+    <div><p class="eyebrow">MODE LEDGER</p><h3>模态谱</h3></div>
+    <select aria-label="模态类型筛选" @bind="Vm.ModeFilter">
+        <option>全部</option><option>轴向</option><option>切向</option><option>斜向</option>
+    </select>
+</div>
+@if (Vm.Result is not null)
+{
+    <p class="muted">纳入 @Vm.Result.Modes.Count 阶；表格显示筛选后前100阶。点击一行联动振型。退化模态各自保留。</p>
+    <div class="table-scroll mode-table">
+        <table>
+            <thead><tr><th>阶次</th><th>频率 / Hz</th><th>类型</th><th>同频重数</th></tr></thead>
+            <tbody>
+                @foreach (var mode in Vm.VisibleModes)
+                {
+                    <tr class="@(Vm.SelectedMode?.Key == mode.Key ? "active-row" : "")">
+                        <td><button class="text-button" @onclick="() => Vm.SelectMode(mode)">(@mode.Key)</button></td>
+                        <td>@N(mode.Frequency, "F3")</td><td>@mode.Kind</td><td>@mode.Degeneracy</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <p class="empty-result">计算后显示低阶模态。</p>
+}

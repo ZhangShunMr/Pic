@@ -1,0 +1,22 @@
+@inherits VmComponent
+<div class="panel-heading"><div><p class="eyebrow">COUPLING / 相位叠加</p><h3>当前耳点模态贡献</h3></div></div>
+@if (Vm.Result is not null && Vm.SelectedSeat is not null)
+{
+    <p>@Vm.SelectedSeat.Name · @N(Vm.CursorFrequency) Hz · 幅值前12项</p>
+    <p class="muted">源耦合与耳点振型共同决定响应；幅值不能直接相加，复数项可能抵消。</p>
+    <div class="table-scroll mode-table">
+        <table>
+            <thead><tr><th>模态</th><th>项幅值</th><th>相位 / °</th><th>源耦合</th><th>耳点振型</th></tr></thead>
+            <tbody>
+                @foreach (var item in Vm.Contributions)
+                {
+                    <tr><td>@item.Key</td><td>@N(item.Magnitude, "G4")</td><td>@N(item.Phase, "F1")</td><td>@N(item.SourceMagnitude, "F3")</td><td>@N(item.SeatShape, "F3")</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <p class="empty-result">计算并选择耳点后查看。</p>
+}

@@ -1,0 +1,85 @@
+@inherits VmComponent
+<div class="drawer-shade" @onclick="Close"></div>
+<aside class="file-drawer" role="dialog" aria-modal="true" aria-label="项目与成果">
+    <div class="panel-heading"><h2>项目与成果</h2><button @onclick="Close">关闭</button></div>
+    <p class="muted">本机运行，文件由本机进程保存。刷新页面会丢失未保存工作。</p>
+    <div class="file-actions">
+        <button @onclick="Vm.NewProject">新建空白项目</button>
+        <button @onclick="Vm.LoadDemo">载入独立模拟示例</button>
+        <button @onclick="Vm.Duplicate" disabled="@(Vm.Current is null)">复制当前项目</button>
+        <button class="primary" @onclick="Vm.Save" disabled="@(Vm.Current is null)">保存到本机</button>
+    </div>
+    <label class="upload-label">从文件导入项目（.cabin.json，最多2MiB）
+        <InputFile @key="inputVersion" OnChange="Upload" accept=".json" />
+    </label>
+    <details open>
+        <summary>本机项目库（@Vm.Library.Count）</summary>
+        <p class="path-hint">保存目录：@Vm.SaveDirectory</p>
+        @if (Vm.Library.Count == 0)
+        {
+            <p>尚无保存项目。</p>
+        }
+        @foreach (var item in Vm.Library)
+        {
+            <article class="library-row">
+                <div><strong>@item.Name</strong><p>@item.Revision / @(item.IsDemo ? "模拟" : "人工模型") / @item.Modified.ToString("u")</p></div>
+                @if (item.Error.Length == 0)
+                {
+                    <button @onclick="() => Vm.Open(item.Id)">打开</button>
+                }
+                else
+                {
+                    <p class="error-text">@item.Error</p>
+                }
+                <button class="text-button danger" @onclick="() => Vm.DeleteStored(item.Id)">删除</button>
+            </article>
+        }
+    </details>
+    @if (Vm.Current is not null)
+    {
+        <h3>成果导出</h3>
+        <p>先生成，再点击下载。项目JSON包含全部输入、基准和复核记录，可搬迁到其他安装位置重新导入。分析结果由输入重算。</p>
+        <div class="export-grid">
+            <button @onclick='() => Vm.Export("project")'>项目JSON</button>
+            <button @onclick='() => Vm.Export("points")'>点位CSV</button>
+            <button @onclick='() => Vm.Export("modes")' disabled="@(Vm.Result is null)">模态CSV</button>
+            <button @onclick='() => Vm.Export("responses")' disabled="@(Vm.Result is null)">频响CSV</button>
+            <button @onclick='() => Vm.Export("contributions")' disabled="@(Vm.Result is null)">贡献CSV</button>
+            <button @onclick='() => Vm.Export("comparison")' disabled="@(Vm.Difference is null)">比较CSV</button>
+            <button @onclick='() => Vm.Export("scan")' disabled="@(Vm.Scan is null)">扫描CSV</button>
+            <button @onclick='() => Vm.Export("reviews")'>复核CSV</button>
+            <button class="primary" @onclick='() => Vm.Export("report")' disabled="@(Vm.Result is null)">研究报告HTML</button>
+        </div>
+    }
+    @if (Vm.DownloadUrl.Length > 0)
+    {
+        <a class="download-link" href="@Vm.DownloadUrl" download="@Vm.DownloadName">下载 @Vm.DownloadName ↓</a>
+        <p>浏览器决定目标文件夹。HTML报告内嵌图表，无需联网，可用浏览器打印成PDF。</p>
+    }
+    <p class="model-limit">@Software.Scope</p>
+</aside>
+@code {
+    private int inputVersion;
+    private void Close()
+    {
+        Vm.FileOpen = false;
+        Vm.Notify();
+    }
+    private async Task Upload(InputFileChangeEventArgs args)
+    {
+        try
+        {
+            using var memory = new MemoryStream();
+            await args.File.OpenReadStream(Software.MaximumBytes).CopyToAsync(memory);
+            Vm.Import(memory.ToArray());
+        }
+        catch (Exception error) when (error is IOException or InvalidOperationException)
+        {
+            Vm.Error("导入失败：" + error.Message);
+        }
+        finally
+        {
+            inputVersion++;
+        }
+    }
+}

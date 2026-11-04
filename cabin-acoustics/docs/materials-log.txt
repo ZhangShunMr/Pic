@@ -1,0 +1,10 @@
+{
+  "manualPages": 18,
+  "renderer": "LibreOfficeDev 26.8.0.0.alpha0；不是Microsoft Word",
+  "browserPreviewPages": 18,
+  "mainFunctionHan": 870,
+  "productionNonempty": 3608,
+  "screenshots": 16,
+  "wordPagination": "未验证，仍须Microsoft Word打开或导出PDF实际核验",
+  "review": "逐页图像和文本检查；无空白页，图注连续，截图来源与当前软件一致；采集表跨页无裁切重叠。"
+}

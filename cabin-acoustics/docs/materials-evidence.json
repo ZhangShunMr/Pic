@@ -1,0 +1,132 @@
+{
+  "manualPages": 18,
+  "renderer": "LibreOfficeDev 26.8.0.0.alpha0；不是Microsoft Word",
+  "browserPreviewPages": 18,
+  "mainFunctionHan": 870,
+  "productionNonempty": 3608,
+  "screenshots": 16,
+  "pages": [
+    {
+      "file": "操作说明书-LibreOffice核对.pdf",
+      "page": 1,
+      "characters": 624,
+      "images": 14
+    },
+    {
+      "file": "操作说明书-LibreOffice核对.pdf",
+      "page": 2,
+      "characters": 544,
+      "images": 14
+    },
+    {
+      "file": "操作说明书-LibreOffice核对.pdf",
+      "page": 3,
+      "characters": 426,
+      "images": 14
+    },
+    {
+      "file": "操作说明书-LibreOffice核对.pdf",
+      "page": 4,
+      "characters": 600,
+      "images": 14
+    },
+    {
+      "file": "操作说明书-LibreOffice核对.pdf",
+      "page": 5,
+      "characters": 618,
+      "images": 14
+    },
+    {
+      "file": "操作说明书-LibreOffice核对.pdf",
+      "page": 6,
+      "characters": 394,
+      "images": 14
+    },
+    {
+      "file": "操作说明书-LibreOffice核对.pdf",
+      "page": 7,
+      "characters": 413,
+      "images": 14
+    },
+    {
+      "file": "操作说明书-LibreOffice核对.pdf",
+      "page": 8,
+      "characters": 395,
+      "images": 14
+    },
+    {
+      "file": "操作说明书-LibreOffice核对.pdf",
+      "page": 9,
+      "characters": 454,
+      "images": 14
+    },
+    {
+      "file": "操作说明书-LibreOffice核对.pdf",
+      "page": 10,
+      "characters": 375,
+      "images": 14
+    },
+    {
+      "file": "操作说明书-LibreOffice核对.pdf",
+      "page": 11,
+      "characters": 411,
+      "images": 14
+    },
+    {
+      "file": "操作说明书-LibreOffice核对.pdf",
+      "page": 12,
+      "characters": 442,
+      "images": 14
+    },
+    {
+      "file": "操作说明书-LibreOffice核对.pdf",
+      "page": 13,
+      "characters": 434,
+      "images": 14
+    },
+    {
+      "file": "操作说明书-LibreOffice核对.pdf",
+      "page": 14,
+      "characters": 506,
+      "images": 14
+    },
+    {
+      "file": "操作说明书-LibreOffice核对.pdf",
+      "page": 15,
+      "characters": 492,
+      "images": 14
+    },
+    {
+      "file": "操作说明书-LibreOffice核对.pdf",
+      "page": 16,
+      "characters": 447,
+      "images": 14
+    },
+    {
+      "file": "操作说明书-LibreOffice核对.pdf",
+      "page": 17,
+      "characters": 442,
+      "images": 14
+    },
+    {
+      "file": "操作说明书-LibreOffice核对.pdf",
+      "page": 18,
+      "characters": 703,
+      "images": 14
+    },
+    {
+      "file": "软著信息采集表-LibreOffice核对.pdf",
+      "page": 1,
+      "characters": 981,
+      "images": 0
+    },
+    {
+      "file": "软著信息采集表-LibreOffice核对.pdf",
+      "page": 2,
+      "characters": 677,
+      "images": 0
+    }
+  ],
+  "wordPagination": "未验证，仍须Microsoft Word打开或导出PDF实际核验",
+  "review": "逐页图像和文本检查；无空白页，图注连续，截图来源与当前软件一致；采集表跨页无裁切重叠。"
+}

@@ -1,0 +1,3944 @@
+======================================================================
+src/Cabin.App/Components/App.razor
+非空行 15 / SHA256 cb5c55017c9d11e55ddaf0c1193c5118cabc1adac91cdc747ab3917ccca11d2c
+======================================================================
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <base href="/" />
+    <link rel="stylesheet" href="app.css" />
+    <HeadOutlet @rendermode="InteractiveServer" />
+</head>
+<body>
+    <Routes @rendermode="InteractiveServer" />
+    <script src="scene.js"></script>
+    <script src="_framework/blazor.web.js"></script>
+</body>
+</html>
+
+
+======================================================================
+src/Cabin.App/Components/Routes.razor
+非空行 9 / SHA256 f067114c791a493c0e2e52b8346af3fbc841a0cd718aa2bd1a55098173cc4242
+======================================================================
+<Router AppAssembly="typeof(Program).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="routeData" />
+        <FocusOnNavigate RouteData="routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <main><h1>页面不存在</h1><a href="/">返回座舱研究</a></main>
+    </NotFound>
+</Router>
+
+
+======================================================================
+src/Cabin.App/Components/Shared/ContributionPanel.razor
+非空行 22 / SHA256 82cb9727ddadef151e744eea72f9f66f33f28ef2bd19bff218af28f85167f3ac
+======================================================================
+@inherits VmComponent
+<div class="panel-heading"><div><p class="eyebrow">COUPLING / 相位叠加</p><h3>当前耳点模态贡献</h3></div></div>
+@if (Vm.Result is not null && Vm.SelectedSeat is not null)
+{
+    <p>@Vm.SelectedSeat.Name · @N(Vm.CursorFrequency) Hz · 幅值前12项</p>
+    <p class="muted">源耦合与耳点振型共同决定响应；幅值不能直接相加，复数项可能抵消。</p>
+    <div class="table-scroll mode-table">
+        <table>
+            <thead><tr><th>模态</th><th>项幅值</th><th>相位 / °</th><th>源耦合</th><th>耳点振型</th></tr></thead>
+            <tbody>
+                @foreach (var item in Vm.Contributions)
+                {
+                    <tr><td>@item.Key</td><td>@N(item.Magnitude, "G4")</td><td>@N(item.Phase, "F1")</td><td>@N(item.SourceMagnitude, "F3")</td><td>@N(item.SeatShape, "F3")</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <p class="empty-result">计算并选择耳点后查看。</p>
+}
+
+
+======================================================================
+src/Cabin.App/Components/Shared/DiagnosticsPanel.razor
+非空行 62 / SHA256 ad6efcfe901ddb86f0aadd48c7147e5f86e14e82ce630a6990769a2e41905b9a
+======================================================================
+@inherits VmComponent
+@if (Vm.Current is not null && Vm.Result is not null)
+{
+    <section class="paper-panel">
+        <details>
+            <summary>数值检查：模态密度、节点耦合与截断敏感性</summary>
+            @foreach (var advice in Diagnostics.Advice(Vm.Current, Vm.Result))
+            {
+                <p class="warning">@advice</p>
+            }
+            <div class="analysis-columns">
+                <div>
+                    <h3>25Hz频段模态数</h3>
+                    <p class="muted">左闭右开，退化模态分别计数；不是声品质评分。</p>
+                    <div class="table-scroll mode-table">
+                        <table><thead><tr><th>频段 / Hz</th><th>总数</th><th>轴向</th><th>切向</th><th>斜向</th></tr></thead>
+                            <tbody>
+                                @foreach (var row in Diagnostics.Density(Vm.Result))
+                                {
+                                    <tr><td>@N(row.Lower, "F0")–@N(row.Upper, "F0")</td><td>@row.Count</td><td>@row.Axial</td><td>@row.Tangential</td><td>@row.Oblique</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div>
+                    <h3>当前耳点节点耦合检查</h3>
+                    <p class="muted">耳点|φ|小于0.01；源耦合小于总启用幅值的1%时提示弱耦合。此阈值仅用于检查。</p>
+                    @if (Vm.SelectedSeat is not null)
+                    {
+                        <div class="table-scroll mode-table">
+                            <table><thead><tr><th>模态</th><th>频率 / Hz</th><th>观察</th></tr></thead>
+                                <tbody>
+                                    @foreach (var row in Diagnostics.Coupling(Vm.Current, Vm.Result, Vm.SelectedSeat))
+                                    {
+                                        <tr><td>@row.ModeKey</td><td>@N(row.Frequency)</td><td>@row.Observation</td></tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+            <button disabled="@Vm.Busy" @onclick="Vm.CheckTruncation">截断增加100Hz复核</button>
+            <p class="muted">只比较有限模型的数值敏感性，保持原项目和原结果；不能把一次变化较小解释为精度认证。</p>
+            @if (Vm.Truncation is not null)
+            {
+                <p>@Vm.Truncation.OriginalCutoff → @Vm.Truncation.ExtendedCutoff Hz；模态 @Vm.Truncation.OriginalModes → @Vm.Truncation.ExtendedModes 阶</p>
+                <div class="table-scroll">
+                    <table><thead><tr><th>耳点</th><th>原RMS</th><th>增加截断RMS</th><th>比值 / dB</th></tr></thead>
+                        <tbody>
+                            @foreach (var row in Vm.Truncation.Rows)
+                            {
+                                <tr><td>@row.Seat</td><td>@N(row.OriginalRms, "G5")</td><td>@N(row.ExtendedRms, "G5")</td><td>@(double.IsFinite(row.RatioDb) ? N(row.RatioDb) : "原值近零")</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </details>
+    </section>
+}
+
+
+======================================================================
+src/Cabin.App/Components/Shared/FileDrawer.razor
+非空行 85 / SHA256 f57e54e28e7b9221d17cf6de0534e244d7a101239f5da9f1dab2f1f3fdd98c01
+======================================================================
+@inherits VmComponent
+<div class="drawer-shade" @onclick="Close"></div>
+<aside class="file-drawer" role="dialog" aria-modal="true" aria-label="项目与成果">
+    <div class="panel-heading"><h2>项目与成果</h2><button @onclick="Close">关闭</button></div>
+    <p class="muted">本机运行，文件由本机进程保存。刷新页面会丢失未保存工作。</p>
+    <div class="file-actions">
+        <button @onclick="Vm.NewProject">新建空白项目</button>
+        <button @onclick="Vm.LoadDemo">载入独立模拟示例</button>
+        <button @onclick="Vm.Duplicate" disabled="@(Vm.Current is null)">复制当前项目</button>
+        <button class="primary" @onclick="Vm.Save" disabled="@(Vm.Current is null)">保存到本机</button>
+    </div>
+    <label class="upload-label">从文件导入项目（.cabin.json，最多2MiB）
+        <InputFile @key="inputVersion" OnChange="Upload" accept=".json" />
+    </label>
+    <details open>
+        <summary>本机项目库（@Vm.Library.Count）</summary>
+        <p class="path-hint">保存目录：@Vm.SaveDirectory</p>
+        @if (Vm.Library.Count == 0)
+        {
+            <p>尚无保存项目。</p>
+        }
+        @foreach (var item in Vm.Library)
+        {
+            <article class="library-row">
+                <div><strong>@item.Name</strong><p>@item.Revision / @(item.IsDemo ? "模拟" : "人工模型") / @item.Modified.ToString("u")</p></div>
+                @if (item.Error.Length == 0)
+                {
+                    <button @onclick="() => Vm.Open(item.Id)">打开</button>
+                }
+                else
+                {
+                    <p class="error-text">@item.Error</p>
+                }
+                <button class="text-button danger" @onclick="() => Vm.DeleteStored(item.Id)">删除</button>
+            </article>
+        }
+    </details>
+    @if (Vm.Current is not null)
+    {
+        <h3>成果导出</h3>
+        <p>先生成，再点击下载。项目JSON包含全部输入、基准和复核记录，可搬迁到其他安装位置重新导入。分析结果由输入重算。</p>
+        <div class="export-grid">
+            <button @onclick='() => Vm.Export("project")'>项目JSON</button>
+            <button @onclick='() => Vm.Export("points")'>点位CSV</button>
+            <button @onclick='() => Vm.Export("modes")' disabled="@(Vm.Result is null)">模态CSV</button>
+            <button @onclick='() => Vm.Export("responses")' disabled="@(Vm.Result is null)">频响CSV</button>
+            <button @onclick='() => Vm.Export("contributions")' disabled="@(Vm.Result is null)">贡献CSV</button>
+            <button @onclick='() => Vm.Export("comparison")' disabled="@(Vm.Difference is null)">比较CSV</button>
+            <button @onclick='() => Vm.Export("scan")' disabled="@(Vm.Scan is null)">扫描CSV</button>
+            <button @onclick='() => Vm.Export("reviews")'>复核CSV</button>
+            <button class="primary" @onclick='() => Vm.Export("report")' disabled="@(Vm.Result is null)">研究报告HTML</button>
+        </div>
+    }
+    @if (Vm.DownloadUrl.Length > 0)
+    {
+        <a class="download-link" href="@Vm.DownloadUrl" download="@Vm.DownloadName">下载 @Vm.DownloadName ↓</a>
+        <p>浏览器决定目标文件夹。HTML报告内嵌图表，无需联网，可用浏览器打印成PDF。</p>
+    }
+    <p class="model-limit">@Software.Scope</p>
+</aside>
+@code {
+    private int inputVersion;
+    private void Close()
+    {
+        Vm.FileOpen = false;
+        Vm.Notify();
+    }
+    private async Task Upload(InputFileChangeEventArgs args)
+    {
+        try
+        {
+            using var memory = new MemoryStream();
+            await args.File.OpenReadStream(Software.MaximumBytes).CopyToAsync(memory);
+            Vm.Import(memory.ToArray());
+        }
+        catch (Exception error) when (error is IOException or InvalidOperationException)
+        {
+            Vm.Error("导入失败：" + error.Message);
+        }
+        finally
+        {
+            inputVersion++;
+        }
+    }
+}
+
+
+======================================================================
+src/Cabin.App/Components/Shared/FrequencyPlot.razor
+非空行 69 / SHA256 67238de54f08eb7cb7251fe3db74a3eaa521ac383c03030b6b8830270ae4d21f
+======================================================================
+@inherits VmComponent
+@inject IJSRuntime Js
+@if (Vm.Result is not null && Vm.Current is not null)
+{
+    var result = Vm.Result;
+    var model = Vm.Current.Model;
+    var reference = Vm.Difference?.Reference ?? result.Reference;
+    <svg @ref="plot" class="frequency-svg" viewBox="0 0 1100 290" role="img" aria-label="耳点相对频率响应曲线" @onclick="Select">
+        <rect width="1100" height="290" fill="#fbfaf4" />
+        @for (var db = 0; db >= -80; db -= 20)
+        {
+            var y = 30 - db * 2.3;
+            <g>
+                <path d="@($"M65 {N(y)}H1070")" stroke="#d5ded5" />
+                <text x="18" y="@N(y+5)" class="svg-small">@db</text>
+            </g>
+        }
+        @for (var tick = 0; tick <= 4; tick++)
+        {
+            var x = 65 + tick * 1005 / 4.0;
+            var f = model.MinimumFrequency + tick * (model.MaximumFrequency - model.MinimumFrequency) / 4;
+            <g>
+                <text x="@N(x-10)" y="240" class="svg-small">@N(f, "F0")</text>
+            </g>
+        }
+        @for (var i = 0; i < result.Curves.Count; i++)
+        {
+            var curve = result.Curves[i];
+            var index = i;
+            <polyline points="@Points(curve, model, reference)" fill="none" stroke="@Colors[index % Colors.Length]" stroke-width="@(Vm.SelectedSeatId == curve.Id ? 3 : 1.6)" />
+            @if (Vm.Difference is not null)
+            {
+                var old = Vm.Difference.BaselineResult.Curves.FirstOrDefault(x => x.Id == curve.Id);
+                if (old is not null)
+                {
+                    <polyline points="@Points(old, model, reference)" fill="none" stroke="@Colors[index % Colors.Length]" stroke-width="1.3" stroke-dasharray="5 5" opacity="0.7" />
+                }
+            }
+            <g><text x="@(65 + index % 6 * 160)" y="@(268 + index / 6 * 18)" fill="@Colors[index % Colors.Length]" class="svg-small">@curve.Name</text></g>
+        }
+        <path d="@($"M{N(65+(Vm.CursorFrequency-model.MinimumFrequency)/(model.MaximumFrequency-model.MinimumFrequency)*1005)} 25V218")" stroke="#b25c38" stroke-width="1.5" stroke-dasharray="4 4" />
+        <text x="18" y="17" class="svg-small">相对dB</text>
+        <text x="1045" y="260" class="svg-small">Hz</text>
+    </svg>
+    <p class="chart-note">参考幅值 @N(reference, "G5")；@(Vm.Difference is null ? "本项目所有耳点全频带最大值" : "当前与基准共用最大值；虚线为基准")。图形裁切于−80 dB，导出保留至−120 dB。频点等权，非实测声级。</p>
+}
+else
+{
+    <div class="empty-result">尚无频响曲线。请填写声源和耳点，然后计算声场。</div>
+}
+@code {
+    private ElementReference plot;
+    private static readonly string[] Colors = ["#236b72", "#c3663b", "#7974a6", "#788643", "#ab5776", "#456aa0"];
+    private static string Points(SeatCurve curve, Cavity model, double reference)
+    {
+        return string.Join(" ", curve.Points.Select(p =>
+            N(65 + (p.Frequency - model.MinimumFrequency) / (model.MaximumFrequency - model.MinimumFrequency) * 1005) + "," +
+            N(30 - Math.Max(-80, p.RelativeDb(reference)) * 2.3)));
+    }
+    private async Task Select(MouseEventArgs args)
+    {
+        if (Vm.Current is null)
+            return;
+        var point = await Js.InvokeAsync<double[]>("cabinSvgPoint", plot, args.ClientX, args.ClientY);
+        var f = Vm.Current.Model.MinimumFrequency + (point[0] - 65) / 1005 *
+            (Vm.Current.Model.MaximumFrequency - Vm.Current.Model.MinimumFrequency);
+        Vm.SelectFrequency(f);
+    }
+}
+
+
+======================================================================
+src/Cabin.App/Components/Shared/HelpPanel.razor
+非空行 13 / SHA256 fafd550406cba59dfe8c3aa1efc29e402854304758bf40ad152e37baad40b972
+======================================================================
+<div class="help-copy">
+    <h3>模型、单位和读取方法</h3>
+    <p>模型是均匀介质、刚性矩形边界的理想声腔。长度、宽度、高度及坐标均用米；声速用m/s；频率用Hz。模态阻尼比为无量纲等效参数，默认0.03仅为研究假设。</p>
+    <p>模态频率 f=c/2·√[(nx/Lx)²+(ny/Ly)²+(nz/Lz)²]。nx、ny、nz为非负整数，不同时为零。振型φ=cos(nxπx/Lx)cos(nyπy/Ly)cos(nzπz/Lz)。边界法向梯度为零；不同阶次频率相同仍各自保留。</p>
+    <p>激励响应 H=Σ (2^d·1m³/V) φ(r) Σ[A exp(iθ)φ(s)]·100²/[fn²−f²+i2ζfnf]，其中d为非零阶次数量。逆范数2^d/V来自余弦模态体积积分，V为腔体体积；固定1m³参考体积用于跨尺寸统一标度。固定100Hz标度使此筛查指标无量纲，不包括实际源强、介质密度与绝对声压校准。</p>
+    <p>模型不含000均匀压缩模态，不能用于密闭腔准静态压缩预测。低频完整响应和高阶尾项可能改变结果，需对截断频率、频率网格和阻尼做敏感性检查。源位于振型节点时该模态耦合减弱；测点位于节点时该模态接收减弱，多源相位还会产生抵消。</p>
+    <p>振型色标固定为−1至+1。响应场颜色按当前剖面最大值归一化；各耳点曲线按全频带所有耳点最大幅值统一换算20log10(|H|/参考)，不是dB SPL。参考近零时显示下限−120dB并提示零响应。对比曲线使用当前与基准共用参考，表格显示峰值和频点RMS比值。</p>
+    <p>峰值是离散频点最大值；RMS是频点等权的幅值平方均值开方，不是时间域或实测宽带声压。贡献表按各复数项幅值排序，不能把幅值百分比解释为能量贡献。</p>
+    <p>参考：<a href="https://ntrs.nasa.gov/citations/19770021964" target="_blank" rel="noreferrer">NASA CR-145110</a>；<a href="https://arxiv.org/html/2602.09594v2" target="_blank" rel="noreferrer">矩形房间模态展开研究</a>。本程序只使用披露的理想模型，不实现文献中的一般阻抗求解。</p>
+    <h3>首次使用与恢复</h3>
+    <p>新建空白项目后展开“模型与点位”，填写来源，添加至少一个有效声源和一个耳点；点击“计算声场”。若报点位出界，检查对应x、y、z是否介于零和相应尺寸。修改尺寸不会自动缩放点位，原绝对坐标会保留。</p>
+    <p>“保存到本机”写入显示目录；项目JSON用于备份与搬迁。导入先校验结构与范围，损坏或未知版本不会替换当前工作。离开前保存；下载报告不等于保存项目。基准和清单包含在项目文件中，频响、扫描与比较结果需打开后重算。</p>
+</div>
+
+
+======================================================================
+src/Cabin.App/Components/Shared/ModeLedger.razor
+非空行 29 / SHA256 0df444a47194b8af08f64b3a70a8c3b841812f03a13234ccdf1ee04334d62e40
+======================================================================
+@inherits VmComponent
+<div class="panel-heading">
+    <div><p class="eyebrow">MODE LEDGER</p><h3>模态谱</h3></div>
+    <select aria-label="模态类型筛选" @bind="Vm.ModeFilter">
+        <option>全部</option><option>轴向</option><option>切向</option><option>斜向</option>
+    </select>
+</div>
+@if (Vm.Result is not null)
+{
+    <p class="muted">纳入 @Vm.Result.Modes.Count 阶；表格显示筛选后前100阶。点击一行联动振型。退化模态各自保留。</p>
+    <div class="table-scroll mode-table">
+        <table>
+            <thead><tr><th>阶次</th><th>频率 / Hz</th><th>类型</th><th>同频重数</th></tr></thead>
+            <tbody>
+                @foreach (var mode in Vm.VisibleModes)
+                {
+                    <tr class="@(Vm.SelectedMode?.Key == mode.Key ? "active-row" : "")">
+                        <td><button class="text-button" @onclick="() => Vm.SelectMode(mode)">(@mode.Key)</button></td>
+                        <td>@N(mode.Frequency, "F3")</td><td>@mode.Kind</td><td>@mode.Degeneracy</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <p class="empty-result">计算后显示低阶模态。</p>
+}
+
+
+======================================================================
+src/Cabin.App/Components/Shared/ModelEditor.razor
+非空行 132 / SHA256 50512b66de556688b6ac8989bea7af15acd5fd8ed3e03c9677b8ac099b6e7bda
+======================================================================
+@inherits VmComponent
+@if (Vm.Current is not null)
+{
+    var project = Vm.Current;
+    var model = project.Model;
+    <section class="model-editor">
+        <div class="editor-title"><h3>模型与点位</h3><span>所有几何量均为 m；坐标必须在腔体内</span></div>
+        <div class="editor-grid">
+            <fieldset>
+                <legend>项目身份与来源</legend>
+                <label>项目名称<input aria-label="项目名称" maxlength="80" @bind="project.Name" @bind:after="Vm.Edited" /></label>
+                <div class="form-pair">
+                    <label>修订号<input aria-label="修订号" maxlength="30" @bind="project.Revision" @bind:after="Vm.Edited" /></label>
+                    <label>负责人<input aria-label="负责人" maxlength="80" @bind="project.Owner" @bind:after="Vm.Edited" /></label>
+                </div>
+                <label>数据来源<input aria-label="数据来源" maxlength="300" @bind="project.DataSource" @bind:after="Vm.Edited" /></label>
+                <label class="check"><input type="checkbox" @bind="project.IsDemo" @bind:after="Vm.Edited" /> 模拟示例标记</label>
+                <label>研究备注<textarea rows="3" maxlength="3000" @bind="project.Notes" @bind:after="Vm.Edited"></textarea></label>
+            </fieldset>
+            <fieldset>
+                <legend>矩形几何与介质</legend>
+                <div class="form-triple">
+                    <label>长度 Lx / m<input aria-label="长度Lx" type="number" min="0.5" max="10" step="0.01" @bind="model.Length" @bind:after="Vm.Edited" /></label>
+                    <label>宽度 Ly / m<input aria-label="宽度Ly" type="number" min="0.5" max="10" step="0.01" @bind="model.Width" @bind:after="Vm.Edited" /></label>
+                    <label>高度 Lz / m<input aria-label="高度Lz" type="number" min="0.5" max="10" step="0.01" @bind="model.Height" @bind:after="Vm.Edited" /></label>
+                </div>
+                <label>声速 / m/s<input aria-label="声速" type="number" min="300" max="380" step="0.1" @bind="model.SoundSpeed" @bind:after="Vm.Edited" /></label>
+                <label>模态阻尼比 ζ<input aria-label="模态阻尼比" type="number" min="0.002" max="0.2" step="0.001" @bind="model.Damping" @bind:after="Vm.Edited" /></label>
+                <p class="muted">默认343 m/s和0.03为研究假设，需根据介质与实测校准；刚性振型配合统一等效阻尼。</p>
+            </fieldset>
+            <fieldset>
+                <legend>分析频带与截断</legend>
+                <div class="form-pair">
+                    <label>起点 / Hz<input aria-label="频带起点" type="number" min="5" max="499" @bind="model.MinimumFrequency" @bind:after="Vm.Edited" /></label>
+                    <label>终点 / Hz<input aria-label="频带终点" type="number" min="6" max="500" @bind="model.MaximumFrequency" @bind:after="Vm.Edited" /></label>
+                </div>
+                <label>频率步长 / Hz<input aria-label="频率步长" type="number" min="0.25" max="10" step="0.25" @bind="model.FrequencyStep" @bind:after="Vm.Edited" /></label>
+                <label>模态截断 / Hz<input aria-label="模态截断" type="number" min="100" max="1000" @bind="model.Cutoff" @bind:after="Vm.Edited" /></label>
+                <p class="muted">截断不得低于终点。增加截断和减小步长可做敏感性检查，不能保证真实车舱精度。</p>
+                <button class="text-button" @onclick="Vm.Undo" disabled="@(!Vm.CanUndo)">撤销上一次结构操作</button>
+            </fieldset>
+        </div>
+        <div class="point-editors">
+            <fieldset>
+                <legend>声源（最多8个）</legend>
+                <div class="inline-selection">
+                    <select aria-label="选中声源" @bind="Vm.SelectedSourceId" @bind:after="() => Vm.Notify()">
+                        <option value="@Guid.Empty">选择声源</option>
+                        @foreach (var source in project.Sources)
+                        {
+                            <option value="@source.Id">@source.Name</option>
+                        }
+                    </select>
+                    <button @onclick="Vm.AddSource" disabled="@(project.Sources.Count >= 8)">添加声源</button>
+                </div>
+                @if (Vm.SelectedSource is not null)
+                {
+                    var source = Vm.SelectedSource;
+                    <label>声源名称<input aria-label="声源名称" maxlength="50" @bind="source.Name" @bind:after="Vm.Edited" /></label>
+                    <div class="form-triple">
+                        <label>x / m<input aria-label="声源x" type="number" step="0.01" @bind="source.Point.X" @bind:after="Vm.Edited" /></label>
+                        <label>y / m<input aria-label="声源y" type="number" step="0.01" @bind="source.Point.Y" @bind:after="Vm.Edited" /></label>
+                        <label>z / m<input aria-label="声源z" type="number" step="0.01" @bind="source.Point.Z" @bind:after="Vm.Edited" /></label>
+                    </div>
+                    <div class="form-pair">
+                        <label>相对幅值 A<input aria-label="声源幅值" type="number" min="0" max="10" step="0.1" @bind="source.Amplitude" @bind:after="Vm.Edited" /></label>
+                        <label>相位 / °<input aria-label="声源相位" type="number" min="-180" max="180" @bind="source.PhaseDegrees" @bind:after="Vm.Edited" /></label>
+                    </div>
+                    <div class="actions">
+                        <label class="check"><input type="checkbox" @bind="source.Enabled" @bind:after="Vm.Edited" />启用此声源</label>
+                        <button class="danger" @onclick="() => Vm.RemoveSource(source.Id)">移除此声源</button>
+                    </div>
+                }
+                <p class="muted">幅值为无量纲相对输入，多源相位共用参考；不等于声功率或体积速度。</p>
+            </fieldset>
+            <fieldset>
+                <legend>座位耳点（最多12个）</legend>
+                <div class="inline-selection">
+                    <select aria-label="选中耳点" @bind="Vm.SelectedSeatId" @bind:after="() => Vm.Notify()">
+                        <option value="@Guid.Empty">选择耳点</option>
+                        @foreach (var seat in project.Seats)
+                        {
+                            <option value="@seat.Id">@seat.Name</option>
+                        }
+                    </select>
+                    <button @onclick="Vm.AddSeat" disabled="@(project.Seats.Count >= 12)">添加耳点</button>
+                </div>
+                @if (Vm.SelectedSeat is not null)
+                {
+                    var seat = Vm.SelectedSeat;
+                    <label>耳点名称<input aria-label="耳点名称" maxlength="50" @bind="seat.Name" @bind:after="Vm.Edited" /></label>
+                    <div class="form-triple">
+                        <label>x / m<input aria-label="耳点x" type="number" step="0.01" @bind="seat.Point.X" @bind:after="Vm.Edited" /></label>
+                        <label>y / m<input aria-label="耳点y" type="number" step="0.01" @bind="seat.Point.Y" @bind:after="Vm.Edited" /></label>
+                        <label>z / m<input aria-label="耳点z" type="number" step="0.01" @bind="seat.Point.Z" @bind:after="Vm.Edited" /></label>
+                    </div>
+                    <label>耳点备注<input maxlength="300" @bind="seat.Note" @bind:after="Vm.Edited" /></label>
+                    <button class="danger" @onclick="() => Vm.RemoveSeat(seat.Id)">移除此耳点</button>
+                }
+                <p class="muted">耳点不模拟人体散射或左右耳差异；各点为理想位置采样。</p>
+            </fieldset>
+        </div>
+        <details class="csv-panel">
+            <summary>点位CSV批量导入 / 替换预检</summary>
+            <p>UTF-8、逗号分隔、小数点；kind为source或seat。单元格不支持换行。seat行的幅值和相位留空。应用前显示错误行号，不部分导入。</p>
+            <textarea aria-label="点位CSV内容" rows="6" spellcheck="false" @bind="Vm.CsvText" @bind:after="CsvChanged"></textarea>
+            <div class="actions">
+                <button @onclick="Vm.PreviewCsv">预检点位CSV</button>
+                <button @onclick="Vm.ApplyCsv" disabled="@(Vm.Csv?.CanApply != true)">应用CSV替换</button>
+                <button @onclick='() => Vm.Export("points")'>导出当前点位CSV</button>
+            </div>
+            @if (Vm.Csv is not null)
+            {
+                <p>有效点位 @Vm.Csv.Rows.Count 个；错误 @Vm.Csv.Issues.Count 个。</p>
+                @foreach (var issue in Vm.Csv.Issues)
+                {
+                    <p class="error-text">@issue.Path：@issue.Message</p>
+                }
+                @foreach (var row in Vm.Csv.Rows.Take(20))
+                {
+                    <p class="preview-row">@row.Kind / @row.Name / (@N(row.Point.X), @N(row.Point.Y), @N(row.Point.Z)) m</p>
+                }
+            }
+        </details>
+    </section>
+}
+@code {
+    private void CsvChanged()
+    {
+        Vm.PreviewCsv();
+    }
+}
+
+
+======================================================================
+src/Cabin.App/Components/Shared/ReviewPanel.razor
+非空行 30 / SHA256 3010452434d13a5c53468def8c6e94ac53fd51c6157827836e182f666db56a3e
+======================================================================
+@inherits VmComponent
+@if (Vm.Current is not null)
+{
+    <section class="review-section">
+        <div class="section-caption"><span>04 / 实测复核与追溯</span><span>人工记录 · 与项目一起保存</span></div>
+        <div class="review-inputs">
+            <label>复核对象<input aria-label="复核对象" maxlength="200" placeholder="例如：首阶纵向模态" @bind="Vm.ReviewTarget" /></label>
+            <label>具体步骤<textarea aria-label="复核步骤" rows="2" maxlength="1000" placeholder="写明测点、频率、工况和检查内容" @bind="Vm.ReviewAction"></textarea></label>
+            <label>负责人<input aria-label="复核负责人" maxlength="80" @bind="Vm.ReviewOwner" /></label>
+            <button @onclick="Vm.AddReview">加入复核清单</button>
+        </div>
+        @foreach (var item in Vm.Current.Reviews)
+        {
+            <article class="review-item">
+                <div><strong>@item.Target</strong><p>@item.Action</p><small>负责人：@item.Owner</small></div>
+                <label>人工复核结果<textarea aria-label="@("复核结果" + item.Target)" rows="2" maxlength="1000" @bind="item.Result" @bind:after="Vm.ReviewEdited"></textarea></label>
+                <button class="text-button danger" @onclick="() => Vm.RemoveReview(item.Id)">删除记录</button>
+            </article>
+        }
+        <details>
+            <summary>操作历史（最近30条）</summary>
+            <div class="journal">
+                @foreach (var entry in Vm.Current.Journal.TakeLast(30).Reverse())
+                {
+                    <p><time>@entry.Time.ToString("u")</time> <strong>@entry.Action</strong> @entry.Detail</p>
+                }
+            </div>
+        </details>
+    </section>
+}
+
+
+======================================================================
+src/Cabin.App/Components/Shared/Scene.razor
+非空行 86 / SHA256 8f9ed536e3753c4dac8ebdac695fbf97161155420881b8e0d440abc5bbf97ec0
+======================================================================
+@inherits VmComponent
+@inject IJSRuntime Js
+@if (Vm.Current is not null && Vm.GeometryValid)
+{
+    var model = Vm.Current.Model;
+    var field = Vm.Field();
+    <svg @ref="canvas" class="scene-svg" viewBox="0 0 960 440" role="img" aria-label="交互式座舱剖面场景" @onclick="Place">
+        <defs>
+            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#dce2d9" stroke-width="0.8" /></pattern>
+        </defs>
+        <rect width="960" height="440" fill="#f3f2e9" />
+        <rect x="80" y="48" width="780" height="312" fill="url(#grid)" />
+        @if (field is not null)
+        {
+            @foreach (var cell in field.Cells)
+            {
+                <rect x="@N(80 + (cell.U - 0.5 / 48) * 780)" y="@N(48 + (1 - cell.V - 0.5 / 24) * 312)" width="16.5" height="13.3" fill="@Engine.FieldColor(cell.Value, field.Maximum, Vm.IsShape)" />
+            }
+        }
+        <path d="M80 48H860V360H80Z" fill="none" stroke="#345b5e" stroke-width="2" />
+        <path d="M80 48L112 26H892V338L860 360 M860 48L892 26" fill="none" stroke="#8caba5" stroke-width="1.2" />
+        <path d="M80 380H860 M80 376V384 M860 376V384" stroke="#688782" />
+        <text x="390" y="404">@(Vm.Plane == "yz" ? "y 向右" : "x 向后") / @(N(Vm.Plane == "yz" ? model.Width : model.Length)) m</text>
+        <text x="90" y="430" class="svg-small">所有声源和耳点均为投影；图中颜色对应当前剖面。</text>
+        <text x="12" y="205" class="svg-small">@(Vm.Plane == "xy" ? "y 向右" : "z 向上")</text>
+        <text x="80" y="30" class="svg-small">原点侧</text>
+        @foreach (var source in Vm.Current.Sources)
+        {
+            var projected = Engine.Project(source.Point, model, Vm.Plane);
+            var x = 80 + projected.U * 780;
+            var y = 48 + (1 - projected.V) * 312;
+            <g role="button" tabindex="0" aria-label="@("选中声源" + source.Name)" @onclick:stopPropagation="true" @onclick="() => SelectSource(source.Id)" @onkeydown="e => SourceKey(e, source.Id)">
+                <circle cx="@N(x)" cy="@N(y)" r="18" fill="white" opacity="0.85" />
+                <path d="@($"M{N(x)} {N(y-11)}L{N(x+10)} {N(y+8)}H{N(x-10)}Z")" fill="@(source.Enabled ? "#be5e35" : "#89928d")" stroke="@(Vm.SelectedSourceId == source.Id ? "#263f41" : "white")" stroke-width="2" />
+                <text x="@N(x+18)" y="@N(y+5)" class="point-label">@source.Name</text>
+            </g>
+        }
+        @foreach (var seat in Vm.Current.Seats)
+        {
+            var projected = Engine.Project(seat.Point, model, Vm.Plane);
+            var x = 80 + projected.U * 780;
+            var y = 48 + (1 - projected.V) * 312;
+            <g role="button" tabindex="0" aria-label="@("选中耳点" + seat.Name)" @onclick:stopPropagation="true" @onclick="() => SelectSeat(seat.Id)" @onkeydown="e => SeatKey(e, seat.Id)">
+                <circle cx="@N(x)" cy="@N(y)" r="@(Vm.SelectedSeatId == seat.Id ? 15 : 11)" fill="#f7f6ed" stroke="#286d73" stroke-width="3" />
+                <circle cx="@N(x)" cy="@N(y)" r="4" fill="#286d73" />
+                <text x="@N(x+18)" y="@N(y+5)" class="point-label">@seat.Name</text>
+            </g>
+        }
+    </svg>
+}
+else
+{
+    <div class="empty-result">请将长度、宽度和高度修正到0.5至10m，恢复空间场景。</div>
+}
+@code {
+    private ElementReference canvas;
+    private async Task Place(MouseEventArgs args)
+    {
+        if (Vm.PointAction == "select")
+            return;
+        var point = await Js.InvokeAsync<double[]>("cabinSvgPoint", canvas, args.ClientX, args.ClientY);
+        if (point[0] < 80 || point[0] > 860 || point[1] < 48 || point[1] > 360)
+            return;
+        Vm.PlacePoint((point[0] - 80) / 780, 1 - (point[1] - 48) / 312);
+    }
+    private void SelectSeat(Guid id)
+    {
+        Vm.SelectedSeatId = id;
+        Vm.Notify();
+    }
+    private void SelectSource(Guid id)
+    {
+        Vm.SelectedSourceId = id;
+        Vm.Notify();
+    }
+    private void SeatKey(KeyboardEventArgs args, Guid id)
+    {
+        if (args.Key is "Enter" or " ")
+            SelectSeat(id);
+    }
+    private void SourceKey(KeyboardEventArgs args, Guid id)
+    {
+        if (args.Key is "Enter" or " ")
+            SelectSource(id);
+    }
+}
+
+
+======================================================================
+src/Cabin.App/Components/Shared/SeatResults.razor
+非空行 25 / SHA256 0c1baf44864d5f0c5a69eaa927fe3881736203a6d9a2f7efe6f42199139bbb34
+======================================================================
+@inherits VmComponent
+@if (Vm.Result is not null && Vm.Current is not null)
+{
+    <div class="seat-cards">
+        @foreach (var curve in Vm.Result.Curves)
+        {
+            var seat = Vm.Current.Seats.First(x => x.Id == curve.Id);
+            var response = Engine.At(Vm.Current, Vm.Result, seat.Point, Vm.CursorFrequency);
+            <button class="seat-card @(Vm.SelectedSeatId == seat.Id ? "selected" : "")" @onclick="() => Pick(seat.Id)">
+                <span>@seat.Name</span>
+                <strong>@N(Engine.Decibels(response.Magnitude, Vm.Difference?.Reference ?? Vm.Result.Reference), "F1") <small>相对dB</small></strong>
+                <span>@N(Vm.CursorFrequency) Hz / 幅值 @N(response.Magnitude, "G4")</span>
+                <span>离散峰值 @N(curve.Peak.Frequency) Hz</span>
+                <span>相位 @N(response.Phase * 180 / Math.PI, "F1")°</span>
+            </button>
+        }
+    </div>
+}
+@code {
+    private void Pick(Guid id)
+    {
+        Vm.SelectedSeatId = id;
+        Vm.Notify();
+    }
+}
+
+
+======================================================================
+src/Cabin.App/Components/Shared/StudyPanel.razor
+非空行 101 / SHA256 c12a6ace9c2f2f19f9174d4e19ae9b17834dc7ed4abf8f9ae6e51e9bff720425
+======================================================================
+@inherits VmComponent
+@if (Vm.Current is not null)
+{
+    <section class="study-section">
+        <div class="section-caption"><span>03 / 方案研究</span><span>基准冻结 · 同条件核对 · 单参数扫描</span></div>
+        <div class="analysis-columns">
+            <div class="paper-panel">
+                <h3>冻结基准与比较</h3>
+                <label>基准名称<input aria-label="新基准名称" maxlength="80" @bind="Vm.BaselineName" /></label>
+                <button @onclick="Vm.Capture" disabled="@(Vm.Result is null)">保存当前为基准</button>
+                <label>比较基准
+                    <select aria-label="比较基准" @bind="Vm.BaselineId" @bind:after="BaselineChanged">
+                        <option value="@Guid.Empty">请选择</option>
+                        @foreach (var baseline in Vm.Current.Baselines)
+                        {
+                            <option value="@baseline.Id">@baseline.Name</option>
+                        }
+                    </select>
+                </label>
+                <div class="actions">
+                    <button class="primary" @onclick="Vm.Compare" disabled="@(Vm.Result is null || Vm.Baseline is null)">比较当前与基准</button>
+                    <button @onclick="Vm.RestoreBaseline" disabled="@(Vm.Baseline is null)">恢复基准模型</button>
+                    <button class="danger" @onclick="Vm.DeleteBaseline" disabled="@(Vm.Baseline is null)">删除基准</button>
+                </div>
+                @if (Vm.Baseline is not null)
+                {
+                    <p class="muted">基准：@Vm.Baseline.Name；@Vm.Baseline.Created.ToString("u")；尺寸 @N(Vm.Baseline.Model.Length) × @N(Vm.Baseline.Model.Width) × @N(Vm.Baseline.Model.Height) m。</p>
+                }
+                <p class="muted">频带、步长、截断、来源不同时拒绝比较；尺寸、声速、阻尼或耳点变化会提示。峰值比是各自离散峰值之比，峰值频率可能不同。</p>
+                @if (Vm.Difference is not null)
+                {
+                    @foreach (var warning in Vm.Difference.Warnings)
+                    {
+                        <p class="warning">@warning</p>
+                    }
+                    <div class="table-scroll">
+                        <table><thead><tr><th>耳点</th><th>峰值比 / dB</th><th>RMS比 / dB</th><th>峰频变化 / Hz</th></tr></thead>
+                            <tbody>
+                                @foreach (var row in Vm.Difference.Seats)
+                                {
+                                    <tr><td>@row.Name</td><td>@N(row.PeakRatioDb)</td><td>@N(row.RmsRatioDb)</td><td>@N(row.BaselineFrequency) → @N(row.CurrentFrequency)</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <details>
+                        <summary>同阶次模态频移（前12项）</summary>
+                        @foreach (var row in Vm.Difference.Modes.Take(12))
+                        {
+                            <p>(@row.Key) / @N(row.BaselineFrequency) → @N(row.CurrentFrequency) Hz / @N(row.Percent)%</p>
+                        }
+                    </details>
+                }
+            </div>
+            <div class="paper-panel">
+                <h3>单参数扫描</h3>
+                <label>扫描参数
+                    <select aria-label="扫描参数" @bind="Vm.ScanParameter">
+                        <option value="length">长度Lx / m</option><option value="width">宽度Ly / m</option><option value="height">高度Lz / m</option>
+                        <option value="sourceX">首个声源x / m</option><option value="sourceY">首个声源y / m</option><option value="sourceZ">首个声源z / m</option>
+                        <option value="damping">模态阻尼比</option>
+                    </select>
+                </label>
+                <div class="form-triple">
+                    <label>初值<input aria-label="扫描初值" type="number" step="0.01" @bind="Vm.ScanStart" /></label>
+                    <label>终值<input aria-label="扫描终值" type="number" step="0.01" @bind="Vm.ScanEnd" /></label>
+                    <label>点数<input aria-label="扫描点数" type="number" min="2" max="21" @bind="Vm.ScanCount" /></label>
+                </div>
+                <label>扫描耳点
+                    <select aria-label="扫描耳点" @bind="Vm.SelectedSeatId" @bind:after="() => Vm.Notify()">
+                        @foreach (var seat in Vm.Current.Seats)
+                        {
+                            <option value="@seat.Id">@seat.Name</option>
+                        }
+                    </select>
+                </label>
+                <button class="primary" @onclick="Vm.RunScan" disabled="@(Vm.Busy || Vm.Result is null)">@(Vm.Busy ? "扫描中…" : "运行参数扫描")</button>
+                <p class="muted">当前项目保持原参数；耳点保持绝对坐标。缩小尺寸导致点位出界时，该行保留失败原因。扫描结果不是优化保证。</p>
+                @if (Vm.Scan is not null)
+                {
+                    <div class="table-scroll scan-table">
+                        <table><thead><tr><th>参数 / @Vm.Scan.Unit</th><th>峰幅值</th><th>峰频 / Hz</th><th>首阶 / Hz</th><th>状态</th></tr></thead>
+                            <tbody>
+                                @foreach (var row in Vm.Scan.Rows)
+                                {
+                                    <tr><td>@N(row.Parameter, "F3")</td><td>@(row.Error.Length == 0 ? N(row.PeakMagnitude, "G4") : "—")</td><td>@(row.Error.Length == 0 ? N(row.PeakFrequency) : "—")</td><td>@(row.Error.Length == 0 ? N(row.FirstMode) : "—")</td><td>@(row.Error.Length == 0 ? "已计算" : row.Error)</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+@code {
+    private void BaselineChanged()
+    {
+        Vm.ClearComparison();
+    }
+}
+
+
+======================================================================
+src/Cabin.App/Components/Shared/VmComponent.cs
+非空行 23 / SHA256 931aeb04669e777d85ff01daf74190e1bc7420399c3791ad9330c45f045cc43f
+======================================================================
+using System.ComponentModel;
+using System.Globalization;
+using Microsoft.AspNetCore.Components;
+using Cabin.App.ViewModels;
+
+namespace Cabin.App.Components.Shared;
+
+public abstract class VmComponent : ComponentBase, IDisposable
+{
+    [Inject] public WorkspaceViewModel Vm { get; set; } = null!;
+
+    protected override void OnInitialized()
+    {
+        Vm.PropertyChanged += Changed;
+    }
+
+    private void Changed(object? sender, PropertyChangedEventArgs args)
+    {
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        Vm.PropertyChanged -= Changed;
+        GC.SuppressFinalize(this);
+    }
+
+    protected static string N(double value, string format = "F2") => value.ToString(format, CultureInfo.InvariantCulture);
+}
+
+
+======================================================================
+src/Cabin.App/Components/Workspace.razor
+非空行 196 / SHA256 6b95ece82046c55fa9f7e2abc844fd27ba59f27dc4cf013e74f64008d45386b7
+======================================================================
+@page "/"
+@inherits VmComponent
+@inject IJSRuntime Js
+<PageTitle>座舱声场研究 · V1.0</PageTitle>
+<header class="masthead">
+    <div class="brand-mark">腔</div>
+    <div>
+        <p class="eyebrow">CABIN ACOUSTICS / 空间研究</p>
+        <h1>车内低频声学模态与座位声压分布设计软件 <small>V1.0</small></h1>
+    </div>
+    <button class="file-trigger" @onclick="OpenFiles">项目与成果 ↗</button>
+</header>
+<div class="status-strip" role="status" aria-live="polite">
+    <span class="status-dot"></span>
+    <span>@Vm.Status</span>
+    @if (Vm.Dirty)
+    {
+        <strong class="unsaved">有未保存更改</strong>
+    }
+</div>
+@if (Vm.Current is null)
+{
+    <main class="welcome">
+        <div class="welcome-copy">
+            <p class="eyebrow">从几何出发，理解低频空间差异</p>
+            <h2>同一声源，<br />不同座位的响应为何不同？</h2>
+            <p>建立理想矩形座舱，在空间中放置声源和耳点，沿着模态谱观察振型，再用指定频率的激励响应比较座位。</p>
+            <div class="actions">
+                <button class="primary" @onclick="Vm.NewProject">新建空白项目</button>
+                <button @onclick="Vm.LoadDemo">载入独立模拟示例</button>
+            </div>
+            <p class="muted">示例将载入3.4 × 1.6 × 1.2 m矩形腔、1个模拟声源和4个耳点。</p>
+        </div>
+        <div class="welcome-art" aria-label="矩形腔空间示意，非计算结果">
+            <svg viewBox="0 0 500 350" role="img">
+                <path d="M70 100L330 55L450 150L190 200Z M70 100V240L190 305V200 M190 305L450 250V150 M330 55V195L450 250 M70 240L330 195" fill="none" stroke="#3b7075" stroke-width="2" />
+                <path d="M100 170Q140 60 180 160T260 150T340 140T420 130" fill="none" stroke="#c5683e" stroke-width="4" />
+                <circle cx="145" cy="210" r="9" fill="#cc683e" />
+                <circle cx="320" cy="210" r="9" fill="#2e7175" />
+                <text x="90" y="335">空间示意 · 不代表实测声场</text>
+            </svg>
+        </div>
+        <p class="model-limit">@Software.Scope</p>
+    </main>
+}
+else
+{
+    <main class="research" aria-busy="@Vm.Busy">
+        <section class="project-heading">
+            <div>
+                <p class="eyebrow">@Vm.SourceLabel</p>
+                <h2>@Vm.Current.Name <small>修订 @Vm.Current.Revision</small></h2>
+            </div>
+            <div class="actions">
+                <button @onclick="() => Vm.SettingsOpen = !Vm.SettingsOpen">模型与点位 @(Vm.SettingsOpen ? "收起" : "展开")</button>
+                <button class="primary" disabled="@Vm.Busy" @onclick="Vm.Calculate">计算声场</button>
+            </div>
+        </section>
+        @if (Vm.Issues.Count > 0)
+        {
+            <section class="errors" role="alert">
+                <strong>请修正以下输入</strong>
+                @foreach (var issue in Vm.Issues)
+                {
+                    <p>@issue.Path：@issue.Message</p>
+                }
+            </section>
+        }
+        <section class="scene-section">
+            <div class="section-caption"><span>01 / 空间场景</span><span>前左下为原点 · x向后 · y向右 · z向上</span></div>
+            <div class="scene-toolbar">
+                <label>显示量
+                    <select aria-label="场景显示量" @bind="Vm.Quantity">
+                        <option value="shape">模态振型（正负号）</option>
+                        <option value="response">激励响应（幅值）</option>
+                    </select>
+                </label>
+                <label>剖面
+                    <select aria-label="剖面方向" @bind="Vm.Plane">
+                        <option value="xy">俯视 x-y</option>
+                        <option value="xz">纵剖 x-z</option>
+                        <option value="yz">横剖 y-z</option>
+                    </select>
+                </label>
+                <label class="slice-control">剖面位置 @N(Vm.Slice * 100, "F0")%
+                    <input aria-label="剖面位置" type="range" min="0" max="1" step="0.01" @bind="Vm.Slice" />
+                </label>
+                <label>画布操作
+                    <select aria-label="画布操作" @bind="Vm.PointAction">
+                        <option value="select">选择点位</option>
+                        <option value="seat">放置选中耳点</option>
+                        <option value="source">放置选中声源</option>
+                    </select>
+                </label>
+            </div>
+            <div class="scene-layout">
+                <div class="spatial-stage">
+                    <Scene />
+                </div>
+                <aside class="scene-note">
+                    <p class="eyebrow">@(Vm.IsShape ? "EIGENMODE / 特征模态" : "FORCED RESPONSE / 激励响应")</p>
+                    @if (Vm.IsShape && Vm.SelectedMode is not null)
+                    {
+                        <h3>@N(Vm.SelectedMode.Frequency) <small>Hz</small></h3>
+                        <p>阶次 (@Vm.SelectedMode.Key) · @Vm.SelectedMode.Kind</p>
+                        <p>暖色为正、冷色为负，浅色接近节点。振型归一化至±1；正负号表示空间相位关系。</p>
+                        <p>此图由几何决定，声源移动不会改变此模态形状。</p>
+                    }
+                    else if (!Vm.IsShape && Vm.Result is not null)
+                    {
+                        <h3>@N(Vm.CursorFrequency) <small>Hz</small></h3>
+                        <p>所有纳入模态按相位叠加。</p>
+                        <p>场景颜色除以当前剖面最大幅值，仅用于观察空间分布，不能跨方案比较颜色深浅。</p>
+                        <p>下方曲线和座位数值采用全部耳点全频带共同参考。</p>
+                    }
+                    else
+                    {
+                        <h3>等待计算</h3>
+                        <p>填写模型和点位后计算。空间中点位为投影，可能不处于当前剖面。</p>
+                    }
+                    <div class="point-legend"><i class="source-symbol"></i>声源 <i class="seat-symbol"></i>耳点</div>
+                    <p class="muted">画布放置会使用当前剖面高度或位置。具体三维坐标见“模型与点位”。</p>
+                </aside>
+            </div>
+            @if (Vm.SettingsOpen)
+            {
+                <ModelEditor />
+            }
+        </section>
+        <section class="frequency-section">
+            <div class="section-caption"><span>02 / 频率与座位</span><span>离散频点峰值 · 统一参考 · 非 dB SPL</span></div>
+            <div class="frequency-control">
+                <label>激励频率 / Hz
+                    <input aria-label="激励频率" type="number" min="@N(Vm.Current.Model.MinimumFrequency)" max="@N(Vm.Current.Model.MaximumFrequency)" step="0.25" value="@N(Vm.CursorFrequency)" @onchange="FrequencyChanged" />
+                </label>
+                <input aria-label="激励频率滑杆" type="range" min="@N(Vm.Current.Model.MinimumFrequency)" max="@N(Vm.Current.Model.MaximumFrequency)" step="0.25" value="@N(Vm.CursorFrequency)" @onchange="FrequencyChanged" />
+                <span>点击曲线或输入频率查看激励响应</span>
+            </div>
+            <FrequencyPlot />
+            <SeatResults />
+        </section>
+        <div class="analysis-columns">
+            <section class="paper-panel">
+                <ModeLedger />
+            </section>
+            <section class="paper-panel">
+                <ContributionPanel />
+            </section>
+        </div>
+        <DiagnosticsPanel />
+        <StudyPanel />
+        <ReviewPanel />
+        <footer class="model-limit">
+            <p>@Software.Scope</p>
+            <button class="text-button" @onclick="() => Vm.HelpOpen = !Vm.HelpOpen">计算方法与使用边界</button>
+            @if (Vm.HelpOpen)
+            {
+                <HelpPanel />
+            }
+        </footer>
+    </main>
+}
+@if (Vm.FileOpen)
+{
+    <FileDrawer />
+}
+@if (Vm.Confirmation.Length > 0)
+{
+    <div class="modal-shade">
+        <section role="dialog" aria-modal="true" aria-label="确认操作" class="confirmation">
+            <h2>确认操作</h2>
+            <p>@Vm.Confirmation</p>
+            <div class="actions">
+                <button @onclick="Vm.Cancel">取消</button>
+                <button class="primary" @onclick="Vm.Confirm">确认继续</button>
+            </div>
+        </section>
+    </div>
+}
+<div id="blazor-error-ui">连接或运行发生错误，请刷新后重新打开已保存项目。<a href="/">重新连接</a></div>
+@code {
+    private void OpenFiles()
+    {
+        Vm.FileOpen = true;
+        Vm.RefreshLibrary();
+    }
+    private void FrequencyChanged(ChangeEventArgs args)
+    {
+        if (double.TryParse(args.Value?.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out var value) && double.IsFinite(value))
+            Vm.SelectFrequency(value);
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await Js.InvokeVoidAsync("cabinGuard", Vm.Dirty);
+    }
+}
+
+
+======================================================================
+src/Cabin.App/Components/_Imports.razor
+非空行 12 / SHA256 efe5fcde4eb4d00e051392776eb8dfa223fd66aaa58d7c19ffc34d4150fdee01
+======================================================================
+@using Microsoft.AspNetCore.Components.Routing
+@using System.Globalization
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.JSInterop
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@using Cabin.App.ViewModels
+@using Cabin.Core.Domain
+@using Cabin.Core.Analysis
+@using Cabin.Core.IO
+@using Cabin.App.Components.Shared
+
+
+======================================================================
+src/Cabin.App/Program.cs
+非空行 50 / SHA256 b33f7606cdfba98e9bf191169a8148705e551dcaeb84b58faa42dc81d5ae3d51
+======================================================================
+using System.Net;
+using Cabin.App.Components;
+using Cabin.App.ViewModels;
+using Cabin.Core.Domain;
+using Cabin.Core.IO;
+
+var builder = WebApplication.CreateBuilder(args);
+var port = builder.Configuration.GetValue<int?>("port") ?? 8786;
+if (port is < 1024 or > 65535)
+    throw new ArgumentException("端口允许1024至65535");
+builder.WebHost.UseStaticWebAssets();
+builder.WebHost.UseUrls("http://127.0.0.1:" + port);
+var directory = builder.Configuration["data-directory"] ?? Path.Combine(builder.Environment.ContentRootPath, "Data");
+builder.Services.AddSingleton(new ProjectStore(directory));
+builder.Services.AddScoped<WorkspaceViewModel>();
+builder.Services.AddSingleton<DownloadVault>();
+builder.Services.AddRazorComponents().AddInteractiveServerComponents()
+    .AddHubOptions(options => options.MaximumReceiveMessageSize = 256 * 1024);
+var app = builder.Build();
+app.Use(async (context, next) =>
+{
+    var host = context.Request.Host.Host;
+    var remote = context.Connection.RemoteIpAddress;
+    if (host is not ("127.0.0.1" or "localhost") || remote is null || !IPAddress.IsLoopback(remote))
+    {
+        context.Response.StatusCode = 403;
+        return;
+    }
+    var originText = context.Request.Headers.Origin.ToString();
+    if (originText.Length > 0 && (!Uri.TryCreate(originText, UriKind.Absolute, out var origin) ||
+        origin.Host != host || origin.Port != port || origin.Scheme != "http"))
+    {
+        context.Response.StatusCode = 403;
+        return;
+    }
+    context.Response.Headers.XContentTypeOptions = "nosniff";
+    context.Response.Headers["Referrer-Policy"] = "no-referrer";
+    context.Response.Headers.CacheControl = "no-store";
+    await next();
+});
+app.UseStaticFiles();
+app.UseAntiforgery();
+app.MapStaticAssets();
+app.MapGet("/health", () => Results.Json(new { name = Software.Name, version = Software.Version, status = "ready" }));
+app.MapGet("/download/{id:guid}", (Guid id, DownloadVault vault) =>
+{
+    var item = vault.Get(id);
+    return item is null ? Results.NotFound("下载已过期，请重新生成") : Results.File(item.Bytes, item.Mime, item.Name);
+});
+app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
+app.Run();
+
+
+======================================================================
+src/Cabin.App/ViewModels/DownloadVault.cs
+非空行 27 / SHA256 e16b7a107f54c62b6828b6b2d257dfa264bf3c14527831bf3c43975acbae707d
+======================================================================
+namespace Cabin.App.ViewModels;
+
+public sealed record DownloadItem(string Name, string Mime, byte[] Bytes, DateTimeOffset Created);
+
+public sealed class DownloadVault
+{
+    private readonly Dictionary<Guid, DownloadItem> items = [];
+    private readonly object gate = new();
+
+    public string Add(string name, string mime, byte[] bytes)
+    {
+        lock (gate)
+        {
+            foreach (var old in items.Where(x => x.Value.Created < DateTimeOffset.UtcNow.AddMinutes(-20)).Select(x => x.Key).ToList())
+                items.Remove(old);
+            while (items.Count >= 30)
+                items.Remove(items.OrderBy(x => x.Value.Created).First().Key);
+            var id = Guid.NewGuid();
+            items[id] = new(name, mime, bytes, DateTimeOffset.UtcNow);
+            return "/download/" + id;
+        }
+    }
+
+    public DownloadItem? Get(Guid id)
+    {
+        lock (gate)
+        {
+            return items.TryGetValue(id, out var value) && value.Created > DateTimeOffset.UtcNow.AddMinutes(-20) ? value : null;
+        }
+    }
+}
+
+
+======================================================================
+src/Cabin.App/ViewModels/WorkspaceViewModel.cs
+非空行 593 / SHA256 de6dbb57f546f9422d73fa4238fabe2557ab0815892385f0f122c81e02447c51
+======================================================================
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Text;
+using Cabin.Core.Analysis;
+using Cabin.Core.Domain;
+using Cabin.Core.IO;
+
+namespace Cabin.App.ViewModels;
+
+public sealed class WorkspaceViewModel(ProjectStore store, DownloadVault vault) : INotifyPropertyChanged
+{
+    public event PropertyChangedEventHandler? PropertyChanged;
+    public Project? Current { get; private set; }
+    public AnalysisResult? Result { get; private set; }
+    public ComparisonResult? Difference { get; private set; }
+    public ScanResult? Scan { get; private set; }
+    public TruncationStudy? Truncation { get; private set; }
+    public CsvPreview? Csv { get; private set; }
+    public List<StoredProject> Library { get; private set; } = [];
+    public List<Issue> Issues { get; private set; } = [];
+    public string Status { get; private set; } = "从空白项目开始，或载入独立模拟示例。";
+    public string DownloadUrl { get; private set; } = "";
+    public string DownloadName { get; private set; } = "";
+    public string Confirmation { get; private set; } = "";
+    public bool Dirty { get; private set; }
+    public bool FileOpen { get; set; }
+    public bool SettingsOpen { get; set; }
+    public bool HelpOpen { get; set; }
+    public bool Busy { get; private set; }
+    public string Plane { get; set; } = "xy";
+    public double Slice { get; set; } = 0.7;
+    public string Quantity { get; set; } = "shape";
+    public double CursorFrequency { get; set; } = 50;
+    public string SelectedModeKey { get; set; } = "";
+    public Guid SelectedSeatId { get; set; }
+    public Guid SelectedSourceId { get; set; }
+    public Guid BaselineId { get; set; }
+    public string BaselineName { get; set; } = "新基准";
+    public string ModeFilter { get; set; } = "全部";
+    public string PointAction { get; set; } = "select";
+    public string CsvText { get; set; } = PointCsv.Header;
+    public string ScanParameter { get; set; } = "length";
+    public double ScanStart { get; set; } = 3;
+    public double ScanEnd { get; set; } = 4;
+    public int ScanCount { get; set; } = 5;
+    public string ReviewTarget { get; set; } = "";
+    public string ReviewAction { get; set; } = "";
+    public string ReviewOwner { get; set; } = "";
+    private Action? pending;
+    private Project? undo;
+
+    public Mode? SelectedMode => Result?.Modes.FirstOrDefault(x => x.Key == SelectedModeKey) ?? Result?.Modes.FirstOrDefault();
+    public EarPoint? SelectedSeat => Current?.Seats.FirstOrDefault(x => x.Id == SelectedSeatId);
+    public Emitter? SelectedSource => Current?.Sources.FirstOrDefault(x => x.Id == SelectedSourceId);
+    public Snapshot? Baseline => Current?.Baselines.FirstOrDefault(x => x.Id == BaselineId);
+    public bool IsShape => Quantity == "shape";
+    public string SaveDirectory => store.DirectoryPath;
+    public string SourceLabel => Current is null ? "尚无项目" : Current.IsDemo ? "模拟示例 · 非实测" : "人工模型 · 待验证";
+    public bool GeometryValid => Current is not null &&
+        new[] { Current.Model.Length, Current.Model.Width, Current.Model.Height }
+            .All(value => double.IsFinite(value) && value >= 0.5 && value <= 10);
+    public bool CanUndo => undo is not null;
+    public IEnumerable<Mode> VisibleModes => Result?.Modes.Where(x => ModeFilter == "全部" || x.Kind == ModeFilter).Take(100) ?? [];
+    public List<Contribution> Contributions => Current is not null && Result is not null && SelectedSeat is not null ?
+        Engine.Contributions(Current, Result, SelectedSeat, CursorFrequency).Take(12).ToList() : [];
+
+    public FieldResult? Field()
+    {
+        if (Current is null || Result is null)
+            return null;
+        return Engine.Field(Current, Result, Plane, Slice, IsShape, SelectedMode, CursorFrequency);
+    }
+
+    public void Notify([CallerMemberName] string? name = null)
+    {
+        PropertyChanged?.Invoke(this, new(name));
+    }
+
+    public void Edited()
+    {
+        if (Current is null)
+            return;
+        Dirty = true;
+        Current.Modified = DateTimeOffset.UtcNow;
+        Invalidate();
+        Status = "参数已改变，旧结果已清除。请点击“计算声场”。";
+        Notify();
+    }
+
+    private void Invalidate()
+    {
+        Result = null;
+        Difference = null;
+        Scan = null;
+        Csv = null;
+        Truncation = null;
+        DownloadUrl = "";
+        Issues = [];
+    }
+
+    private void Journal(string action, string detail)
+    {
+        if (Current is null)
+            return;
+        Current.Journal.Add(new() { Action = action, Detail = detail });
+        if (Current.Journal.Count > 500)
+            Current.Journal.RemoveRange(0, Current.Journal.Count - 500);
+        Current.Modified = DateTimeOffset.UtcNow;
+        Dirty = true;
+    }
+
+    private void Remember()
+    {
+        if (Current is not null)
+            undo = ProjectCodec.Clone(Current);
+    }
+
+    public void Undo()
+    {
+        if (undo is null)
+            return;
+        var previous = undo;
+        undo = Current is null ? null : ProjectCodec.Clone(Current);
+        Install(previous);
+        Dirty = true;
+        Status = "已恢复上一次结构操作前的项目；数值字段修改不在撤销范围。";
+        Notify();
+    }
+
+    public void Request(string message, Action action)
+    {
+        Confirmation = message;
+        pending = action;
+        Notify();
+    }
+
+    public void Confirm()
+    {
+        var action = pending;
+        pending = null;
+        Confirmation = "";
+        action?.Invoke();
+        Notify();
+    }
+
+    public void Cancel()
+    {
+        pending = null;
+        Confirmation = "";
+        Notify();
+    }
+
+    private void Replace(Action action)
+    {
+        if (Dirty)
+            Request("当前有未保存更改。继续将替换当前工作区，请先保存或确认放弃。", action);
+        else
+            action();
+    }
+
+    public void NewProject()
+    {
+        Replace(() =>
+        {
+            Install(new());
+            Dirty = true;
+            FileOpen = false;
+            SettingsOpen = true;
+            Status = "已建立空白项目。填写来源与模型，再添加声源和耳点。";
+        });
+    }
+
+    public void LoadDemo()
+    {
+        Replace(() =>
+        {
+            Install(Demo.Create());
+            Dirty = true;
+            FileOpen = false;
+            SettingsOpen = false;
+            Calculate();
+            Status = "已载入独立模拟示例；所有结果均非实测。";
+        });
+    }
+
+    private void Install(Project project)
+    {
+        Current = project;
+        Invalidate();
+        SelectedSeatId = project.Seats.FirstOrDefault()?.Id ?? Guid.Empty;
+        SelectedSourceId = project.Sources.FirstOrDefault()?.Id ?? Guid.Empty;
+        BaselineId = project.Baselines.FirstOrDefault()?.Id ?? Guid.Empty;
+        SelectedModeKey = "";
+        CursorFrequency = project.Model.MinimumFrequency;
+        CsvText = PointCsv.Header;
+        Dirty = false;
+        Notify();
+    }
+
+    public void Duplicate()
+    {
+        if (Current is null)
+            return;
+        var copy = ProjectCodec.Clone(Current);
+        copy.Id = Guid.NewGuid();
+        copy.Name = copy.Name.Length > 70 ? copy.Name[..70] + " 副本" : copy.Name + " 副本";
+        copy.Created = DateTimeOffset.UtcNow;
+        Install(copy);
+        Journal("复制项目", "生成新项目标识；保留模型与点位标识以支持比较");
+        Status = "副本已建立，保存后生成独立本机项目。";
+        Notify();
+    }
+
+    public void RefreshLibrary()
+    {
+        Safe(() => Library = store.List());
+    }
+
+    public void Save()
+    {
+        if (Current is null)
+            return;
+        Safe(() =>
+        {
+            var problems = Validation.Check(Current, false);
+            if (problems.Count > 0)
+            {
+                Issues = problems;
+                Status = "保存失败，请修正列出的字段。";
+                return;
+            }
+            Journal("保存项目", "写入本机项目目录，包含模型、点位、基准与复核清单");
+            store.Save(Current);
+            Dirty = false;
+            Library = store.List();
+            Status = "保存成功：" + Path.Combine(store.DirectoryPath, Current.Id + Software.Extension);
+        });
+    }
+
+    public void Open(Guid id)
+    {
+        Replace(() => Safe(() =>
+        {
+            var project = store.Open(id);
+            Install(project);
+            FileOpen = false;
+            Status = "已打开本机项目；请计算声场以重建结果。";
+        }));
+    }
+
+    public void DeleteStored(Guid id)
+    {
+        Request("确认删除此本机保存文件？当前工作区仍可另行保存，删除文件无法自动恢复。", () => Safe(() =>
+        {
+            store.Delete(id);
+            Library = store.List();
+            Status = "本机项目文件已删除。";
+        }));
+    }
+
+    public void Import(byte[] bytes)
+    {
+        Safe(() =>
+        {
+            var project = ProjectCodec.Decode(bytes);
+            Replace(() =>
+            {
+                Install(project);
+                Dirty = true;
+                FileOpen = false;
+                Status = "项目文件预检通过并载入；尚未写入本机目录。";
+            });
+        });
+    }
+
+    public void Calculate()
+    {
+        if (Current is null)
+            return;
+        Safe(() =>
+        {
+            Issues = Validation.Check(Current);
+            if (Issues.Count > 0)
+            {
+                Result = null;
+                Status = "计算被阻止，请按字段提示修正输入。";
+                return;
+            }
+            Result = Engine.Calculate(Current);
+            Difference = null;
+            Scan = null;
+            SelectedModeKey = Result.Modes.FirstOrDefault()?.Key ?? "";
+            CursorFrequency = Math.Clamp(SelectedMode?.Frequency ?? Current.Model.MinimumFrequency,
+                Current.Model.MinimumFrequency, Current.Model.MaximumFrequency);
+            Journal("计算声场", $"{Result.Modes.Count}个非零模态；{Result.Frequencies.Count}个频点；{Current.Seats.Count}个耳点");
+            Status = Result.Reference < 1e-12 ? "已计算；总响应近零，请检查源幅值、相位抵消及节点耦合。" :
+                "计算完成。点击模态行查看振型，点击曲线区域选择激励频率。";
+        });
+    }
+
+    public void SelectMode(Mode mode)
+    {
+        SelectedModeKey = mode.Key;
+        Quantity = "shape";
+        if (Current is not null)
+            CursorFrequency = Math.Clamp(mode.Frequency, Current.Model.MinimumFrequency, Current.Model.MaximumFrequency);
+        Notify();
+    }
+
+    public void SelectFrequency(double frequency)
+    {
+        if (Current is null)
+            return;
+        CursorFrequency = Math.Clamp(frequency, Current.Model.MinimumFrequency, Current.Model.MaximumFrequency);
+        Quantity = "response";
+        Notify();
+    }
+
+    public void AddSource()
+    {
+        if (Current is null || Current.Sources.Count >= 8)
+            return;
+        Remember();
+        var source = new Emitter { Name = "声源" + (Current.Sources.Count + 1), Point = new(Current.Model.Length * 0.1, Current.Model.Width / 2, Current.Model.Height / 3) };
+        Current.Sources.Add(source);
+        SelectedSourceId = source.Id;
+        Edited();
+        Journal("添加声源", source.Name);
+    }
+
+    public void AddSeat()
+    {
+        if (Current is null || Current.Seats.Count >= 12)
+            return;
+        Remember();
+        var seat = new EarPoint { Name = "耳点" + (Current.Seats.Count + 1), Point = new(Current.Model.Length / 2, Current.Model.Width / 2, Current.Model.Height * 0.7) };
+        Current.Seats.Add(seat);
+        SelectedSeatId = seat.Id;
+        Edited();
+        Journal("添加耳点", seat.Name);
+    }
+
+    public void RemoveSource(Guid id)
+    {
+        Request("确认移除此声源？相关计算结果将清除。", () =>
+        {
+            if (Current is null)
+                return;
+            Remember();
+            Current.Sources.RemoveAll(x => x.Id == id);
+            SelectedSourceId = Current.Sources.FirstOrDefault()?.Id ?? Guid.Empty;
+            Edited();
+            Journal("移除声源", id.ToString());
+        });
+    }
+
+    public void RemoveSeat(Guid id)
+    {
+        Request("确认移除此耳点？相关计算结果将清除，基准快照保留原始点位。", () =>
+        {
+            if (Current is null)
+                return;
+            Remember();
+            Current.Seats.RemoveAll(x => x.Id == id);
+            SelectedSeatId = Current.Seats.FirstOrDefault()?.Id ?? Guid.Empty;
+            Edited();
+            Journal("移除耳点", id.ToString());
+        });
+    }
+
+    public void PlacePoint(double u, double v)
+    {
+        if (Current is null || PointAction == "select")
+            return;
+        u = Math.Clamp(u, 0, 1);
+        v = Math.Clamp(v, 0, 1);
+        var point = Engine.PlanePoint(Current.Model, Plane, u, v, Slice);
+        Remember();
+        if (PointAction == "source" && SelectedSource is not null)
+            SelectedSource.Point = point;
+        else if (PointAction == "seat" && SelectedSeat is not null)
+            SelectedSeat.Point = point;
+        else
+        {
+            Status = "请先添加并选中对应点位。";
+            Notify();
+            return;
+        }
+        Edited();
+        Journal("画布放置点位", $"{Plane}剖面；x={point.X:F3},y={point.Y:F3},z={point.Z:F3}m");
+    }
+
+    public void Capture()
+    {
+        if (Current is null)
+            return;
+        Safe(() =>
+        {
+            if (Result is null)
+                throw new ArgumentException("先计算当前模型，再保存基准");
+            if (Current.Baselines.Count >= 12 || string.IsNullOrWhiteSpace(BaselineName) || BaselineName.Length > 80)
+                throw new ArgumentException("基准名为1至80字符，最多12个基准");
+            var snapshot = Demo.Capture(Current, BaselineName);
+            Current.Baselines.Add(snapshot);
+            BaselineId = snapshot.Id;
+            Journal("保存基准", snapshot.Name);
+            Status = "基准已冻结，修改当前模型不会改变基准。请保存项目持久化基准。";
+        });
+    }
+
+    public void RestoreBaseline()
+    {
+        if (Current is null || Baseline is null)
+            return;
+        Request("用所选基准覆盖当前模型、声源与耳点？项目身份与其他基准保留。", () =>
+        {
+            Remember();
+            Current.Model = ProjectCodec.Clone(Baseline.Model);
+            Current.Sources = ProjectCodec.Clone(Baseline.Sources);
+            Current.Seats = ProjectCodec.Clone(Baseline.Seats);
+            Current.IsDemo = Baseline.IsDemo;
+            Current.DataSource = Baseline.DataSource;
+            Edited();
+            SelectedSeatId = Current.Seats.FirstOrDefault()?.Id ?? Guid.Empty;
+            SelectedSourceId = Current.Sources.FirstOrDefault()?.Id ?? Guid.Empty;
+            Journal("恢复基准", Baseline.Name);
+        });
+    }
+
+    public void DeleteBaseline()
+    {
+        if (Current is null || Baseline is null)
+            return;
+        Request("确认删除所选基准？", () =>
+        {
+            Remember();
+            var name = Baseline.Name;
+            Current.Baselines.RemoveAll(x => x.Id == BaselineId);
+            BaselineId = Current.Baselines.FirstOrDefault()?.Id ?? Guid.Empty;
+            Difference = null;
+            Journal("删除基准", name);
+        });
+    }
+
+    public async Task CheckTruncation()
+    {
+        if (Current is null || Result is null || Busy)
+            return;
+        Busy = true;
+        Status = "正在增加截断复核…";
+        Notify();
+        var project = ProjectCodec.Clone(Current);
+        var original = Result;
+        var modified = Current.Modified;
+        try
+        {
+            var study = await Task.Run(() => Diagnostics.Extend(project, original));
+            if (Current?.Id != project.Id || Current.Modified != modified)
+            {
+                Status = "工作对象已变化，丢弃旧条件的截断复核。";
+                return;
+            }
+            Truncation = study;
+            Status = "截断敏感性复核完成，原项目参数保持。";
+        }
+        catch (ArgumentException error)
+        {
+            Status = error.Message;
+            Truncation = null;
+        }
+        finally
+        {
+            Busy = false;
+            Notify();
+        }
+    }
+
+    public void ClearComparison()
+    {
+        Difference = null;
+        Notify();
+    }
+
+    public void Compare()
+    {
+        Safe(() =>
+        {
+            Difference = null;
+            if (Current is null || Result is null || Baseline is null)
+                throw new ArgumentException("请先计算并选择一个基准");
+            Difference = Comparison.Compare(Current, Result, Baseline);
+            Status = "比较完成；表格比值使用同量纲原始幅值，曲线使用共同参考。";
+        });
+    }
+
+    public async Task RunScan()
+    {
+        if (Current is null || Busy)
+            return;
+        Busy = true;
+        Status = "正在扫描，请稍候。";
+        Notify();
+        await Task.Delay(30);
+        var copy = ProjectCodec.Clone(Current);
+        var modified = Current.Modified;
+        var settings = new ScanSettings(ScanParameter, ScanStart, ScanEnd, ScanCount, SelectedSeatId);
+        try
+        {
+            var scan = await Task.Run(() => ParameterScan.Run(copy, settings));
+            if (Current?.Id != copy.Id || Current.Modified != modified)
+            {
+                Status = "工作对象已变化，丢弃旧条件的扫描结果。";
+                return;
+            }
+            Scan = scan;
+            Status = "扫描完成；" + Scan.Rows.Count(x => x.Error.Length == 0) + "项有效。错误行已保留原因。";
+        }
+        catch (ArgumentException error)
+        {
+            Scan = null;
+            Status = error.Message;
+        }
+        finally
+        {
+            Busy = false;
+            Notify();
+        }
+    }
+
+    public void PreviewCsv()
+    {
+        if (Current is null)
+            return;
+        Csv = PointCsv.Preview(CsvText, Current.Model);
+        Status = Csv.CanApply ? "预检通过。确认应用会替换所有当前声源和耳点，并重新生成点位标识。" : "CSV预检失败，项目未改变。";
+        Notify();
+    }
+
+    public void ApplyCsv()
+    {
+        if (Current is null || Csv is null || !Csv.CanApply)
+            return;
+        Request("CSV将替换所有声源与耳点，重新生成标识，旧基准耳点将无法按标识匹配。继续？", () =>
+        {
+            Remember();
+            PointCsv.Apply(Current, Csv);
+            SelectedSeatId = Current.Seats.FirstOrDefault()?.Id ?? Guid.Empty;
+            SelectedSourceId = Current.Sources.FirstOrDefault()?.Id ?? Guid.Empty;
+            Edited();
+            Journal("点位CSV替换", "已通过预检；新点位标识");
+        });
+    }
+
+    public void AddReview()
+    {
+        if (Current is null)
+            return;
+        Safe(() =>
+        {
+            if (string.IsNullOrWhiteSpace(ReviewTarget) || string.IsNullOrWhiteSpace(ReviewAction))
+                throw new ArgumentException("填写复核对象和具体步骤");
+            if (ReviewTarget.Length > 200 || ReviewAction.Length > 1000 || ReviewOwner.Length > 80 || Current.Reviews.Count >= 100)
+                throw new ArgumentException("复核对象最多200字、步骤1000字、负责人80字、总计100项");
+            Current.Reviews.Add(new() { Target = ReviewTarget, Action = ReviewAction, Owner = ReviewOwner });
+            Journal("添加复核项", ReviewTarget);
+            ReviewTarget = "";
+            ReviewAction = "";
+            Status = "复核项已加入项目。";
+        });
+    }
+
+    public void ReviewEdited()
+    {
+        Journal("更新复核记录", "人工填写结果；未自动判定");
+        Notify();
+    }
+
+    public void RemoveReview(Guid id)
+    {
+        Request("确认删除此复核记录？", () =>
+        {
+            Remember();
+            Current?.Reviews.RemoveAll(x => x.Id == id);
+            Journal("删除复核项", id.ToString());
+        });
+    }
+
+    public void Export(string kind)
+    {
+        if (Current is null)
+            return;
+        Safe(() =>
+        {
+            if (kind == "project")
+            {
+                DownloadName = "座舱项目" + Software.Extension;
+                DownloadUrl = vault.Add(DownloadName, "application/json", ProjectCodec.Encode(Current));
+            }
+            else
+            {
+                var text = kind switch
+                {
+                    "points" => PointCsv.Export(Current),
+                    "reviews" => Exports.ReviewsCsv(Current),
+                    "modes" when Result is not null => Exports.ModesCsv(Current, Result),
+                    "responses" when Result is not null => Exports.ResponsesCsv(Current, Result),
+                    "contributions" when Result is not null && SelectedSeat is not null => Exports.ContributionsCsv(Current, Result, SelectedSeat, CursorFrequency),
+                    "comparison" when Difference is not null && Baseline is not null => Exports.ComparisonCsv(Current, Baseline, Difference),
+                    "scan" when Scan is not null => Exports.ScanCsv(Current, Scan),
+                    "report" when Result is not null => Exports.Html(Current, Result, Difference, Scan),
+                    _ => throw new ArgumentException("此成果尚无有效结果，请先计算对应内容")
+                };
+                DownloadName = "座舱研究-" + kind + (kind == "report" ? ".html" : ".csv");
+                var bytes = Encoding.UTF8.GetPreamble().Concat(Encoding.UTF8.GetBytes(text)).ToArray();
+                DownloadUrl = vault.Add(DownloadName, kind == "report" ? "text/html; charset=utf-8" : "text/csv; charset=utf-8", bytes);
+            }
+            Status = "导出已准备：" + DownloadName + "。点击下载，保存位置由浏览器下载设置决定；链接20分钟有效。";
+        });
+    }
+
+    public void Error(string message)
+    {
+        Status = message;
+        Notify();
+    }
+
+    private void Safe(Action action)
+    {
+        try
+        {
+            action();
+        }
+        catch (Exception error) when (error is ArgumentException or IOException or UnauthorizedAccessException)
+        {
+            Status = "操作失败：" + error.Message;
+        }
+        Notify();
+    }
+}
+
+
+======================================================================
+src/Cabin.App/wwwroot/app.css
+非空行 729 / SHA256 a2ed8eaab2e903152d1847040ab06db61ea8c767ee32745c774a140e02b3c6f4
+======================================================================
+:root {
+    font-family: "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+    color: #294347;
+    background: #eeeee5;
+    font-synthesis: none;
+    --ink: #294347;
+    --teal: #2b6c72;
+    --line: #cdd7ce;
+    --paper: #faf9f2;
+    --warm: #b35b35;
+}
+* {
+    box-sizing: border-box;
+}
+body {
+    margin: 0;
+}
+button, input, select, textarea {
+    font: inherit;
+}
+button, .download-link {
+    border: 1px solid #b6c6be;
+    background: #fcfbf5;
+    color: var(--ink);
+    border-radius: 4px;
+    padding: 9px 15px;
+    cursor: pointer;
+    transition: background .15s;
+}
+button:hover {
+    background: #e6ece3;
+}
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible {
+    outline: 3px solid #b9673e;
+    outline-offset: 3px;
+}
+button:disabled {
+    opacity: .45;
+    cursor: default;
+}
+.primary, .download-link {
+    color: #fff;
+    background: var(--teal);
+    border-color: var(--teal);
+}
+.primary:hover {
+    background: #20585e;
+}
+.danger {
+    color: #a54b30;
+}
+.text-button {
+    background: transparent;
+    border: 0;
+    padding: 4px 0;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+input, select, textarea {
+    width: 100%;
+    border: 1px solid #bdcbc1;
+    border-radius: 3px;
+    padding: 8px 10px;
+    background: #fffef9;
+    color: #233f44;
+    min-width: 0;
+}
+textarea {
+    resize: vertical;
+}
+input[type="range"] {
+    accent-color: var(--teal);
+    padding: 4px 0;
+}
+input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--teal);
+}
+label {
+    display: grid;
+    gap: 6px;
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+.check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0;
+}
+h1, h2, h3, p {
+    margin: 0;
+}
+p {
+    line-height: 1.75;
+    margin: 9px 0;
+}
+h1 {
+    font-size: 21px;
+    font-weight: 600;
+    letter-spacing: .03em;
+}
+h2 {
+    font-size: 25px;
+    font-weight: 500;
+}
+h3 {
+    font-size: 19px;
+    font-weight: 600;
+    margin-bottom: 14px;
+}
+small {
+    font-size: 12px;
+    font-weight: 400;
+}
+.eyebrow {
+    font-size: 11px;
+    letter-spacing: .15em;
+    color: #657c76;
+    margin: 0 0 7px;
+}
+.masthead {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 25px 3.5vw;
+    border-bottom: 1px solid #c5d0c7;
+    background: #f7f6ee;
+}
+.brand-mark {
+    width: 50px;
+    height: 50px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--teal);
+    color: var(--teal);
+    font-size: 25px;
+    transform: rotate(-5deg);
+}
+.file-trigger {
+    margin-left: auto;
+    white-space: nowrap;
+}
+.status-strip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 3.5vw;
+    background: #e1e8df;
+    font-size: 12px;
+    overflow-wrap: anywhere;
+}
+.status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--teal);
+    flex-shrink: 0;
+}
+.unsaved {
+    color: #9d4e2c;
+    margin-left: auto;
+    white-space: nowrap;
+}
+.research {
+    max-width: 1600px;
+    padding: 30px 3.5vw 50px;
+    margin: auto;
+}
+.project-heading, .section-caption, .panel-heading, .editor-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+.project-heading {
+    margin: 4px 0 26px;
+}
+.project-heading small {
+    color: #6b7e77;
+    margin-left: 15px;
+}
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+.section-caption {
+    padding: 13px 0;
+    border-top: 2px solid #486c69;
+    font-size: 12px;
+    letter-spacing: .04em;
+}
+.section-caption span:last-child {
+    color: #6e8177;
+    font-size: 11px;
+}
+.scene-section, .frequency-section, .study-section, .review-section {
+    margin-bottom: 28px;
+}
+.scene-toolbar {
+    display: flex;
+    align-items: end;
+    gap: 20px;
+    padding: 16px 22px 4px;
+    background: var(--paper);
+}
+.scene-toolbar label {
+    min-width: 155px;
+}
+.slice-control {
+    flex: 1;
+}
+.scene-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 255px;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+}
+.spatial-stage {
+    display: grid;
+    place-items: center;
+    min-height: 330px;
+    padding: 10px 12px 0;
+}
+.scene-svg {
+    width: 100%;
+    height: auto;
+    max-height: 550px;
+    cursor: crosshair;
+}
+.scene-note {
+    border-left: 1px solid var(--line);
+    margin: 20px 0;
+    padding: 5px 22px;
+    font-size: 12px;
+}
+.scene-note h3 {
+    font-size: 32px;
+    font-weight: 400;
+    margin: 18px 0 10px;
+}
+.point-label {
+    font-size: 13px;
+    fill: #203b40;
+    paint-order: stroke;
+    stroke: #fffef5;
+    stroke-width: 4px;
+    stroke-linejoin: round;
+}
+.svg-small {
+    font-size: 12px;
+    fill: #4e6b69;
+}
+.point-legend {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 18px 0;
+}
+.source-symbol {
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 11px solid #be5e35;
+}
+.seat-symbol {
+    width: 12px;
+    height: 12px;
+    border: 3px solid var(--teal);
+    border-radius: 50%;
+    margin-left: 16px;
+}
+.model-editor {
+    background: #e6ebe2;
+    padding: 24px;
+    border: 1px solid #becbc0;
+}
+.editor-title {
+    margin-bottom: 16px;
+    font-size: 12px;
+}
+.editor-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+}
+fieldset {
+    border: 1px solid #becbc0;
+    padding: 16px;
+    margin: 0;
+    min-width: 0;
+}
+legend {
+    font-size: 14px;
+    padding: 0 8px;
+    color: #355d5e;
+}
+.form-pair, .form-triple {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.form-triple {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.point-editors {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+    margin-top: 22px;
+}
+.inline-selection {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+.inline-selection button {
+    flex-shrink: 0;
+}
+.muted, .chart-note {
+    font-size: 12px;
+    color: #617970;
+    line-height: 1.8;
+}
+.csv-panel {
+    margin-top: 20px;
+}
+summary {
+    cursor: pointer;
+    padding: 12px 0;
+    font-weight: 500;
+    font-size: 14px;
+}
+.csv-panel textarea {
+    font-family: Consolas, monospace;
+    font-size: 12px;
+}
+.preview-row {
+    font-size: 12px;
+    margin: 4px 0;
+}
+.frequency-control {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    font-size: 12px;
+    padding: 15px 0 5px;
+}
+.frequency-control label {
+    width: 160px;
+    flex-shrink: 0;
+}
+.frequency-control > input {
+    flex: 1;
+}
+.frequency-control > span {
+    max-width: 250px;
+    color: #6a7d73;
+}
+.frequency-svg {
+    width: 100%;
+    display: block;
+    cursor: crosshair;
+}
+.seat-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 13px;
+    margin-top: 20px;
+}
+.seat-card {
+    text-align: left;
+    display: grid;
+    gap: 8px;
+    padding: 18px;
+}
+.seat-card > span {
+    font-size: 12px;
+}
+.seat-card > span:first-child {
+    font-size: 15px;
+}
+.seat-card strong {
+    font-size: 27px;
+    font-weight: 400;
+}
+.seat-card.selected {
+    border-color: #2c7479;
+    background: #e4ece2;
+    box-shadow: inset 0 3px var(--teal);
+}
+.analysis-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin: 25px 0;
+}
+.paper-panel {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    padding: 22px;
+    min-width: 0;
+}
+.panel-heading {
+    margin-bottom: 12px;
+}
+.panel-heading h3 {
+    margin: 0;
+}
+.panel-heading select {
+    width: 100px;
+}
+.table-scroll {
+    overflow: auto;
+}
+.mode-table {
+    max-height: 330px;
+}
+.scan-table {
+    max-height: 350px;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 12px;
+}
+th, td {
+    text-align: left;
+    padding: 10px;
+    border-bottom: 1px solid #d6dfd4;
+    vertical-align: top;
+}
+th {
+    color: #5b746c;
+    font-weight: 500;
+    background: #edf0e7;
+    position: sticky;
+    top: 0;
+    white-space: nowrap;
+}
+.active-row {
+    background: #e1eae0;
+}
+.errors, .warning {
+    background: #fbecdb;
+    border-left: 4px solid #b3693e;
+    padding: 15px 20px;
+    margin: 14px 0;
+    font-size: 13px;
+}
+.error-text {
+    color: #a74b32;
+    font-size: 13px;
+}
+.review-inputs {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr auto;
+    gap: 18px;
+    align-items: center;
+    margin: 15px 0;
+}
+.review-item {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr auto;
+    gap: 22px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--line);
+    align-items: center;
+    font-size: 13px;
+}
+.journal {
+    font-size: 12px;
+    max-height: 300px;
+    overflow: auto;
+}
+.journal time {
+    color: #647c71;
+    margin-right: 16px;
+}
+.model-limit {
+    color: #67786a;
+    font-size: 12px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+    line-height: 1.8;
+}
+.help-copy {
+    max-width: 1000px;
+    font-size: 13px;
+    padding: 22px 0;
+}
+.help-copy h3 {
+    margin-top: 20px;
+}
+.empty-result {
+    padding: 45px 20px;
+    text-align: center;
+    color: #738578;
+    font-size: 13px;
+    background: #f6f6ed;
+}
+.welcome {
+    max-width: 1400px;
+    margin: 80px auto;
+    padding: 0 5vw;
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 55px;
+    align-items: center;
+}
+.welcome h2 {
+    font-size: 44px;
+    line-height: 1.5;
+    margin: 20px 0;
+}
+.welcome-copy > p:not(.eyebrow) {
+    max-width: 560px;
+    margin-bottom: 25px;
+}
+.welcome-art {
+    background: #e1e9df;
+    padding: 30px;
+    transform: rotate(-2deg);
+}
+.welcome-art svg {
+    width: 100%;
+    font-size: 12px;
+    fill: #58766f;
+}
+.welcome > .model-limit {
+    grid-column: 1 / -1;
+}
+.drawer-shade, .modal-shade {
+    position: fixed;
+    inset: 0;
+    background: #1e3a3c55;
+    z-index: 20;
+}
+.file-drawer {
+    position: fixed;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: min(600px, 95vw);
+    background: #faf9f1;
+    padding: 30px;
+    overflow: auto;
+    z-index: 21;
+    box-shadow: -15px 0 55px #173c3e33;
+    font-size: 13px;
+}
+.file-actions, .export-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 20px 0;
+}
+.upload-label {
+    padding: 15px;
+    background: #e8eee3;
+}
+.path-hint {
+    overflow-wrap: anywhere;
+    font-size: 11px;
+}
+.library-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid var(--line);
+    padding: 15px 0;
+}
+.library-row > div {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+.library-row p {
+    font-size: 11px;
+}
+.download-link {
+    display: block;
+    text-decoration: none;
+    margin-top: 20px;
+    overflow-wrap: anywhere;
+}
+.modal-shade {
+    z-index: 30;
+    display: grid;
+    place-items: center;
+}
+.confirmation {
+    width: min(520px, 90vw);
+    padding: 35px;
+    background: #fffdf4;
+    box-shadow: 0 15px 80px #183f3f55;
+}
+.confirmation p {
+    margin: 25px 0;
+}
+#blazor-error-ui {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    padding: 15px;
+    background: #ffe5c1;
+    width: 100%;
+    z-index: 100;
+}
+@media (max-width: 1100px) {
+    .masthead {
+        padding: 20px;
+    }
+    h1 {
+        font-size: 17px;
+    }
+    .scene-layout {
+        grid-template-columns: 1fr 210px;
+    }
+    .scene-toolbar {
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    .editor-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    .editor-grid fieldset:last-child {
+        grid-column: 1 / -1;
+    }
+    .review-inputs {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+@media (max-width: 760px) {
+    .masthead {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .masthead > div:nth-child(2) {
+        flex: 1;
+    }
+    .brand-mark {
+        width: 35px;
+        height: 35px;
+        font-size: 20px;
+    }
+    h1 {
+        font-size: 15px;
+    }
+    .file-trigger {
+        margin-left: 47px;
+    }
+    .research {
+        padding: 22px 16px;
+    }
+    .project-heading {
+        align-items: start;
+        flex-direction: column;
+    }
+    .project-heading h2 {
+        font-size: 21px;
+    }
+    .scene-layout, .analysis-columns, .point-editors, .editor-grid, .review-inputs, .review-item {
+        grid-template-columns: 1fr;
+    }
+    .scene-note {
+        border-left: 0;
+        border-top: 1px solid var(--line);
+        margin: 0 20px 20px;
+        padding: 20px 0 0;
+    }
+    .scene-note h3 {
+        font-size: 26px;
+    }
+    .scene-toolbar {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        padding: 15px;
+    }
+    .scene-toolbar label {
+        min-width: 0;
+    }
+    .spatial-stage {
+        min-height: 200px;
+        padding: 10px 0;
+    }
+    .frequency-control {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .frequency-control > input {
+        min-width: 120px;
+    }
+    .frequency-control > span {
+        max-width: none;
+    }
+    .section-caption span:last-child {
+        max-width: 160px;
+        text-align: right;
+    }
+    .model-editor {
+        padding: 15px;
+    }
+    .editor-title {
+        display: block;
+    }
+    .paper-panel {
+        padding: 16px;
+    }
+    .welcome {
+        margin: 40px auto;
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+    .welcome h2 {
+        font-size: 31px;
+    }
+    .welcome-art {
+        max-width: 420px;
+    }
+    .unsaved {
+        white-space: normal;
+    }
+}
+
+
+======================================================================
+src/Cabin.App/wwwroot/scene.js
+非空行 15 / SHA256 e3f2b6665e495c615cf101c3680859e0eab508d1f16ddd1b1792aa69a80f2802
+======================================================================
+window.cabinSvgPoint = (svg, clientX, clientY) => {
+    const point = new DOMPoint(clientX, clientY);
+    const matrix = svg.getScreenCTM();
+    if (!matrix) return [-1, -1];
+    const local = point.matrixTransform(matrix.inverse());
+    return [local.x, local.y];
+};
+window.cabinDirty = false;
+window.cabinGuard = value => { window.cabinDirty = value; };
+window.addEventListener('beforeunload', event => {
+    if (window.cabinDirty) {
+        event.preventDefault();
+        event.returnValue = '';
+    }
+});
+
+
+======================================================================
+src/Cabin.Core/Analysis/Comparison.cs
+非空行 138 / SHA256 09c718cf6cd61342e3112d26806b987ce798b6c967f10037cc0234faffba77c3
+======================================================================
+using Cabin.Core.Domain;
+using Cabin.Core.IO;
+
+namespace Cabin.Core.Analysis;
+
+public sealed record SeatDifference(string Name, double BaselinePeak, double CurrentPeak,
+    double PeakRatioDb, double BaselineFrequency, double CurrentFrequency, double RmsRatioDb);
+public sealed record ModeDifference(string Key, double BaselineFrequency, double CurrentFrequency, double Percent);
+public sealed class ComparisonResult
+{
+    public List<string> Warnings { get; init; } = [];
+    public List<SeatDifference> Seats { get; init; } = [];
+    public List<ModeDifference> Modes { get; init; } = [];
+    public double Reference { get; init; }
+    public AnalysisResult BaselineResult { get; init; } = new();
+}
+
+public static class Comparison
+{
+    public static ComparisonResult Compare(Project current, AnalysisResult currentResult, Snapshot baseline)
+    {
+        var oldProject = Demo.FromSnapshot(baseline);
+        var oldResult = Engine.Calculate(oldProject);
+        var warnings = new List<string>();
+        if (current.Model.MinimumFrequency != baseline.Model.MinimumFrequency ||
+            current.Model.MaximumFrequency != baseline.Model.MaximumFrequency ||
+            current.Model.FrequencyStep != baseline.Model.FrequencyStep)
+            throw new ArgumentException("分析频带或步长不同，不能比较。请恢复基准频带与步长后重算。");
+        if (current.Model.Cutoff != baseline.Model.Cutoff)
+            throw new ArgumentException("模态截断不同，不能比较。请使用相同截断频率。");
+        if (current.DataSource != baseline.DataSource || current.IsDemo != baseline.IsDemo)
+            throw new ArgumentException("来源或模拟标记不同，不能比较。");
+        if (current.Model.Damping != baseline.Model.Damping)
+            warnings.Add("阻尼已变化；差值同时包含阻尼影响。");
+        if (current.Model.SoundSpeed != baseline.Model.SoundSpeed)
+            warnings.Add("声速已变化；差值同时包含介质条件影响。");
+        if (current.Model.Length != baseline.Model.Length || current.Model.Width != baseline.Model.Width || current.Model.Height != baseline.Model.Height)
+            warnings.Add("尺寸变化；模态按阶次匹配，耳点使用绝对米制坐标。");
+        var differences = new List<SeatDifference>();
+        foreach (var curve in currentResult.Curves)
+        {
+            var old = oldResult.Curves.FirstOrDefault(x => x.Id == curve.Id);
+            if (old is null)
+            {
+                warnings.Add(curve.Name + "没有相同标识的基准耳点，跳过此耳点。");
+                continue;
+            }
+            var oldSeat = baseline.Seats.First(x => x.Id == curve.Id);
+            var seat = current.Seats.First(x => x.Id == curve.Id);
+            if (oldSeat.Point.X != seat.Point.X || oldSeat.Point.Y != seat.Point.Y || oldSeat.Point.Z != seat.Point.Z)
+                warnings.Add(curve.Name + "位置变化；差值包含测点变化。");
+            if (old.Peak.Magnitude < 1e-12 || old.Rms < 1e-12)
+            {
+                warnings.Add(curve.Name + "基准近零，不能计算稳定比值。");
+                continue;
+            }
+            differences.Add(new(curve.Name, old.Peak.Magnitude, curve.Peak.Magnitude,
+                Engine.Decibels(curve.Peak.Magnitude, old.Peak.Magnitude), old.Peak.Frequency,
+                curve.Peak.Frequency, Engine.Decibels(curve.Rms, old.Rms)));
+        }
+        if (differences.Count == 0)
+            throw new ArgumentException("没有可匹配的非零基准耳点");
+        var modes = new List<ModeDifference>();
+        foreach (var mode in currentResult.Modes)
+        {
+            var old = oldResult.Modes.FirstOrDefault(x => x.Key == mode.Key);
+            if (old is not null)
+                modes.Add(new(mode.Key, old.Frequency, mode.Frequency, (mode.Frequency / old.Frequency - 1) * 100));
+        }
+        return new()
+        {
+            Warnings = warnings,
+            Seats = differences,
+            Modes = modes,
+            Reference = Math.Max(oldResult.Reference, currentResult.Reference),
+            BaselineResult = oldResult
+        };
+    }
+}
+
+public sealed record ScanSettings(string Parameter, double Start, double End, int Count, Guid SeatId);
+public sealed record ScanRow(double Parameter, double PeakMagnitude, double PeakFrequency, double Rms, double FirstMode, string Error);
+public sealed class ScanResult
+{
+    public ScanSettings Settings { get; init; } = new("length", 3, 4, 5, Guid.Empty);
+    public List<ScanRow> Rows { get; init; } = [];
+    public string Unit => Settings.Parameter is "damping" ? "无量纲" : "m";
+}
+
+public static class ParameterScan
+{
+    public static ScanResult Run(Project project, ScanSettings settings)
+    {
+        if (settings.Count is < 2 or > 21)
+            throw new ArgumentException("扫描点数应为2至21");
+        if (!double.IsFinite(settings.Start) || !double.IsFinite(settings.End) || settings.Start >= settings.End)
+            throw new ArgumentException("扫描终值应大于初值，且均为有限数值");
+        if (!project.Seats.Any(x => x.Id == settings.SeatId))
+            throw new ArgumentException("请选择扫描耳点");
+        if (settings.Parameter is not ("length" or "width" or "height" or "sourceX" or "sourceY" or "sourceZ" or "damping"))
+            throw new ArgumentException("不支持的扫描参数");
+        var rows = new List<ScanRow>();
+        for (var i = 0; i < settings.Count; i++)
+        {
+            var value = settings.Start + (settings.End - settings.Start) * i / (settings.Count - 1);
+            var candidate = ProjectCodec.Clone(project);
+            candidate.Baselines.Clear();
+            Apply(candidate, settings.Parameter, value);
+            try
+            {
+                var result = Engine.Calculate(candidate);
+                var curve = result.Curves.First(x => x.Id == settings.SeatId);
+                rows.Add(new(value, curve.Peak.Magnitude, curve.Peak.Frequency, curve.Rms,
+                    result.Modes.FirstOrDefault()?.Frequency ?? 0, ""));
+            }
+            catch (ArgumentException error)
+            {
+                rows.Add(new(value, 0, 0, 0, 0, error.Message));
+            }
+        }
+        return new() { Settings = settings, Rows = rows };
+    }
+
+    public static void Apply(Project project, string parameter, double value)
+    {
+        switch (parameter)
+        {
+            case "length": project.Model.Length = value; break;
+            case "width": project.Model.Width = value; break;
+            case "height": project.Model.Height = value; break;
+            case "damping": project.Model.Damping = value; break;
+            default:
+                var source = project.Sources.FirstOrDefault() ?? throw new ArgumentException("没有首个声源可扫描");
+                switch (parameter)
+                {
+                    case "sourceX": source.Point.X = value; break;
+                    case "sourceY": source.Point.Y = value; break;
+                    case "sourceZ": source.Point.Z = value; break;
+                    default: throw new ArgumentException("未知参数");
+                }
+                break;
+        }
+    }
+}
+
+
+======================================================================
+src/Cabin.Core/Analysis/Diagnostics.cs
+非空行 95 / SHA256 cb2a3f18edb685682abf33f27054f518c4672cf9df9175540f28dd69d50bf6f3
+======================================================================
+using Cabin.Core.Domain;
+using Cabin.Core.IO;
+
+namespace Cabin.Core.Analysis;
+
+public sealed record DensityBand(double Lower, double Upper, int Count, int Axial, int Tangential, int Oblique);
+public sealed record CouplingDiagnostic(string ModeKey, double Frequency, double SourceMagnitude,
+    double SeatShape, string Observation);
+public sealed record SensitivityRow(string Seat, double OriginalRms, double ExtendedRms, double RatioDb,
+    double OriginalPeak, double ExtendedPeak);
+public sealed class TruncationStudy
+{
+    public double OriginalCutoff { get; init; }
+    public double ExtendedCutoff { get; init; }
+    public int OriginalModes { get; init; }
+    public int ExtendedModes { get; init; }
+    public List<SensitivityRow> Rows { get; init; } = [];
+}
+
+public static class Diagnostics
+{
+    public static List<DensityBand> Density(AnalysisResult result, double width = 25)
+    {
+        if (!double.IsFinite(width) || width <= 0)
+            throw new ArgumentException("频段宽度应大于零");
+        var maximum = result.Modes.Select(x => x.Frequency).DefaultIfEmpty(0).Max();
+        var rows = new List<DensityBand>();
+        for (var lower = 0.0; lower <= maximum; lower += width)
+        {
+            var upper = lower + width;
+            var modes = result.Modes.Where(x => x.Frequency >= lower && x.Frequency < upper).ToList();
+            rows.Add(new(lower, upper, modes.Count, modes.Count(x => x.Dimension == 1),
+                modes.Count(x => x.Dimension == 2), modes.Count(x => x.Dimension == 3)));
+        }
+        return rows;
+    }
+
+    public static List<CouplingDiagnostic> Coupling(Project project, AnalysisResult result, EarPoint seat)
+    {
+        var rows = new List<CouplingDiagnostic>();
+        foreach (var mode in result.Modes.Where(x => x.Frequency <= project.Model.MaximumFrequency))
+        {
+            var source = Modes.SourceCoupling(mode, project.Model, project.Sources).Magnitude;
+            var shape = Modes.Shape(mode, project.Model, seat.Point);
+            var maximumAmplitude = project.Sources.Where(x => x.Enabled).Sum(x => x.Amplitude);
+            var weakSource = source < Math.Max(1e-12, maximumAmplitude * 0.01);
+            var weakSeat = Math.Abs(shape) < 0.01;
+            var observation = weakSource && weakSeat ? "源与耳点均弱耦合" :
+                weakSource ? "源弱耦合或多源抵消" : weakSeat ? "耳点接近此模态节点" : "存在耦合";
+            rows.Add(new(mode.Key, mode.Frequency, source, shape, observation));
+        }
+        return rows;
+    }
+
+    public static TruncationStudy Extend(Project project, AnalysisResult original)
+    {
+        var extended = ProjectCodec.Clone(project);
+        extended.Baselines.Clear();
+        var cutoff = Math.Min(1000, project.Model.Cutoff + 100);
+        if (cutoff <= project.Model.Cutoff)
+            throw new ArgumentException("当前截断已达1000Hz上限，不能继续增加");
+        extended.Model.Cutoff = cutoff;
+        var result = Engine.Calculate(extended);
+        var rows = new List<SensitivityRow>();
+        foreach (var curve in original.Curves)
+        {
+            var other = result.Curves.First(x => x.Id == curve.Id);
+            var ratio = curve.Rms > 1e-12 ? Engine.Decibels(other.Rms, curve.Rms) : double.NaN;
+            rows.Add(new(curve.Name, curve.Rms, other.Rms, ratio, curve.Peak.Magnitude, other.Peak.Magnitude));
+        }
+        return new()
+        {
+            OriginalCutoff = project.Model.Cutoff,
+            ExtendedCutoff = cutoff,
+            OriginalModes = original.Modes.Count,
+            ExtendedModes = result.Modes.Count,
+            Rows = rows
+        };
+    }
+
+    public static List<string> Advice(Project project, AnalysisResult result)
+    {
+        var advice = new List<string>();
+        if (result.Modes.Count == 0)
+            advice.Add("截断内没有非零模态，考虑提高截断频率。");
+        if (result.Reference < 1e-12)
+            advice.Add("总响应近零，检查源相位抵消、零幅值与模态节点。");
+        var modes = result.Modes.Where(x => x.Frequency >= project.Model.MinimumFrequency &&
+            x.Frequency <= project.Model.MaximumFrequency).ToList();
+        if (modes.Any(x => project.Model.FrequencyStep > project.Model.Damping * x.Frequency))
+            advice.Add("部分模态的频率步长大于ζfn，可能漏掉窄峰。请细化步长，使用滑杆观察连续频率响应。");
+        if (project.Model.Cutoff < project.Model.MaximumFrequency * 1.5)
+            advice.Add("截断频率距分析终点较近，建议增加截断并检查RMS变化。");
+        if (modes.Any(x => x.Degeneracy > 1))
+            advice.Add("频带内存在退化模态。单个退化振型的基底不唯一，应关注其叠加响应。");
+        if (project.Sources.Count(x => x.Enabled) > 1)
+            advice.Add("多源使用同一相位参考，幅值叠加必须保留复数相位。");
+        advice.Add("以上均为数值检查提示；没有提示不代表实车模型已校准。");
+        return advice;
+    }
+}
+
+
+======================================================================
+src/Cabin.Core/Analysis/Engine.cs
+非空行 153 / SHA256 a3fc2736c3464a368777318c2474e3c628b83bb5661d82c868e727abc6eec279
+======================================================================
+using System.Numerics;
+using Cabin.Core.Domain;
+
+namespace Cabin.Core.Analysis;
+
+public sealed record ResponsePoint(double Frequency, double Real, double Imaginary)
+{
+    public double Magnitude => Math.Sqrt(Real * Real + Imaginary * Imaginary);
+    public double Phase => Math.Atan2(Imaginary, Real) * 180 / Math.PI;
+    public double RelativeDb(double reference) => Engine.Decibels(Magnitude, reference);
+}
+
+public sealed record SeatCurve(Guid Id, string Name, List<ResponsePoint> Points)
+{
+    public ResponsePoint Peak => Points.OrderByDescending(x => x.Magnitude).First();
+    public double Rms => Math.Sqrt(Points.Average(x => x.Magnitude * x.Magnitude));
+}
+
+public sealed class AnalysisResult
+{
+    public List<Mode> Modes { get; init; } = [];
+    public List<SeatCurve> Curves { get; init; } = [];
+    public List<double> Frequencies { get; init; } = [];
+    public double Reference { get; init; }
+    public DateTimeOffset Computed { get; init; } = DateTimeOffset.UtcNow;
+    public int InBandModes(double minimum, double maximum) => Modes.Count(x => x.Frequency >= minimum && x.Frequency <= maximum);
+}
+
+public sealed record Contribution(string Key, double Frequency, double Magnitude, double Phase, double SourceMagnitude, double SeatShape);
+public sealed record FieldCell(double U, double V, double Value);
+public sealed record FieldResult(List<FieldCell> Cells, double Maximum, string Plane, double Slice, string Quantity);
+
+public static class Engine
+{
+    public static List<double> FrequencyGrid(Cavity model)
+    {
+        var frequencies = new List<double>();
+        var count = (int)Math.Floor((model.MaximumFrequency - model.MinimumFrequency) / model.FrequencyStep + 1e-8);
+        for (var i = 0; i <= count; i++)
+            frequencies.Add(model.MinimumFrequency + i * model.FrequencyStep);
+        if (frequencies.Count == 0 || model.MaximumFrequency - frequencies[^1] > 1e-8)
+            frequencies.Add(model.MaximumFrequency);
+        return frequencies;
+    }
+
+    public static AnalysisResult Calculate(Project project)
+    {
+        var issues = Validation.Check(project);
+        if (issues.Count > 0)
+            throw new ArgumentException(string.Join("；", issues.Select(x => x.Path + "：" + x.Message)));
+        var modes = Modes.Enumerate(project.Model);
+        var frequencies = FrequencyGrid(project.Model);
+        var couplings = modes.Select(x => Modes.SourceCoupling(x, project.Model, project.Sources)).ToList();
+        var curves = new List<SeatCurve>();
+        foreach (var seat in project.Seats)
+        {
+            var points = new List<ResponsePoint>();
+            foreach (var frequency in frequencies)
+            {
+                var response = At(project.Model, modes, couplings, seat.Point, frequency);
+                points.Add(new(frequency, response.Real, response.Imaginary));
+            }
+            curves.Add(new(seat.Id, seat.Name, points));
+        }
+        var reference = curves.SelectMany(x => x.Points).Select(x => x.Magnitude).DefaultIfEmpty(0).Max();
+        return new()
+        {
+            Modes = modes,
+            Frequencies = frequencies,
+            Curves = curves,
+            Reference = reference
+        };
+    }
+
+    public static Complex At(Cavity model, IReadOnlyList<Mode> modes, IReadOnlyList<Complex> couplings, Position point, double frequency)
+    {
+        var sum = Complex.Zero;
+        for (var i = 0; i < modes.Count; i++)
+            sum += Modes.Term(modes[i], model, couplings[i], point, frequency);
+        return sum;
+    }
+
+    public static Complex At(Project project, AnalysisResult result, Position point, double frequency)
+    {
+        var couplings = result.Modes.Select(x => Modes.SourceCoupling(x, project.Model, project.Sources)).ToList();
+        return At(project.Model, result.Modes, couplings, point, frequency);
+    }
+
+    public static List<Contribution> Contributions(Project project, AnalysisResult result, EarPoint seat, double frequency)
+    {
+        return result.Modes.Select(mode =>
+        {
+            var source = Modes.SourceCoupling(mode, project.Model, project.Sources);
+            var value = Modes.Term(mode, project.Model, source, seat.Point, frequency);
+            return new Contribution(mode.Key, mode.Frequency, value.Magnitude,
+                value.Phase * 180 / Math.PI, source.Magnitude, Modes.Shape(mode, project.Model, seat.Point));
+        }).OrderByDescending(x => x.Magnitude).ToList();
+    }
+
+    public static FieldResult Field(Project project, AnalysisResult result, string plane, double fraction,
+        bool shape, Mode? mode, double frequency, int columns = 48, int rows = 24)
+    {
+        if (plane is not ("xy" or "xz" or "yz"))
+            throw new ArgumentException("剖面只能为xy、xz、yz");
+        if (fraction < 0 || fraction > 1 || !double.IsFinite(fraction))
+            throw new ArgumentException("剖面位置必须在0至1之间");
+        var cells = new List<FieldCell>();
+        var couplings = result.Modes.Select(x => Modes.SourceCoupling(x, project.Model, project.Sources)).ToList();
+        for (var row = 0; row < rows; row++)
+        {
+            for (var column = 0; column < columns; column++)
+            {
+                var u = (column + 0.5) / columns;
+                var v = (row + 0.5) / rows;
+                var point = PlanePoint(project.Model, plane, u, v, fraction);
+                var value = shape && mode is not null ? Modes.Shape(mode, project.Model, point) :
+                    At(project.Model, result.Modes, couplings, point, frequency).Magnitude;
+                cells.Add(new(u, v, value));
+            }
+        }
+        var maximum = shape ? 1 : cells.Select(x => x.Value).DefaultIfEmpty(0).Max();
+        return new(cells, maximum, plane, fraction, shape ? "有符号归一化振型" : "剖面局部归一化响应幅值");
+    }
+
+    public static Position PlanePoint(Cavity model, string plane, double u, double v, double fraction)
+    {
+        return plane switch
+        {
+            "xy" => new(u * model.Length, v * model.Width, fraction * model.Height),
+            "xz" => new(u * model.Length, fraction * model.Width, v * model.Height),
+            "yz" => new(fraction * model.Length, u * model.Width, v * model.Height),
+            _ => throw new ArgumentException("未知剖面")
+        };
+    }
+
+    public static (double U, double V) Project(Position point, Cavity model, string plane)
+    {
+        return plane switch
+        {
+            "xy" => (point.X / model.Length, point.Y / model.Width),
+            "xz" => (point.X / model.Length, point.Z / model.Height),
+            "yz" => (point.Y / model.Width, point.Z / model.Height),
+            _ => throw new ArgumentException("未知剖面")
+        };
+    }
+
+    public static double Decibels(double value, double reference)
+    {
+        if (reference <= 1e-15)
+            return -120;
+        return Math.Max(-120, 20 * Math.Log10(Math.Max(value, reference * 1e-6) / reference));
+    }
+
+    public static string FieldColor(double value, double maximum, bool shape)
+    {
+        var t = maximum > 1e-15 ? Math.Clamp(value / maximum, shape ? -1 : 0, 1) : 0;
+        if (shape)
+        {
+            var strength = Math.Abs(t);
+            var target = t >= 0 ? (R: 204, G: 104, B: 56) : (R: 35, G: 117, B: 133);
+            var r = (int)(245 + (target.R - 245) * strength);
+            var g = (int)(241 + (target.G - 241) * strength);
+            var b = (int)(225 + (target.B - 225) * strength);
+            return $"rgb({r},{g},{b})";
+        }
+        return $"hsl({195 - 170 * t:F0},48%,{90 - 45 * t:F0}%)";
+    }
+}
+
+
+======================================================================
+src/Cabin.Core/Analysis/Modes.cs
+非空行 83 / SHA256 48b69cb00fa035624db344a18a3e948753a280eec94f2303b66df01a40ac9ccb
+======================================================================
+using System.Numerics;
+using Cabin.Core.Domain;
+
+namespace Cabin.Core.Analysis;
+
+public sealed record Mode(int Nx, int Ny, int Nz, double Frequency, int Degeneracy = 1)
+{
+    public string Key => $"{Nx},{Ny},{Nz}";
+    public int Dimension => (Nx > 0 ? 1 : 0) + (Ny > 0 ? 1 : 0) + (Nz > 0 ? 1 : 0);
+    public string Kind => Dimension switch { 1 => "轴向", 2 => "切向", _ => "斜向" };
+    public double NormFactor => Math.Pow(2, Dimension);
+}
+
+public static class Modes
+{
+    public static List<Mode> Enumerate(Cavity model)
+    {
+        var issues = new List<Issue>();
+        Validation.Model(model, issues);
+        if (issues.Count > 0)
+            throw new ArgumentException(string.Join("；", issues.Select(x => x.Path + "：" + x.Message)));
+        var result = new List<Mode>();
+        var maxX = (int)Math.Floor(2 * model.Cutoff * model.Length / model.SoundSpeed);
+        var maxY = (int)Math.Floor(2 * model.Cutoff * model.Width / model.SoundSpeed);
+        var maxZ = (int)Math.Floor(2 * model.Cutoff * model.Height / model.SoundSpeed);
+        for (var nx = 0; nx <= maxX; nx++)
+        {
+            for (var ny = 0; ny <= maxY; ny++)
+            {
+                for (var nz = 0; nz <= maxZ; nz++)
+                {
+                    if (nx + ny + nz == 0)
+                        continue;
+                    var f = Frequency(model, nx, ny, nz);
+                    if (f <= model.Cutoff + 1e-9)
+                        result.Add(new(nx, ny, nz, f));
+                    if (result.Count > 10000)
+                        throw new ArgumentException("模态数量超过10000，请降低截断频率");
+                }
+            }
+        }
+        result = result.OrderBy(x => x.Frequency).ThenBy(x => x.Nx).ThenBy(x => x.Ny).ThenBy(x => x.Nz).ToList();
+        var start = 0;
+        while (start < result.Count)
+        {
+            var end = start + 1;
+            var tolerance = Math.Max(1e-8, result[start].Frequency * 1e-8);
+            while (end < result.Count && result[end].Frequency - result[start].Frequency <= tolerance)
+                end++;
+            for (var i = start; i < end; i++)
+                result[i] = result[i] with { Degeneracy = end - start };
+            start = end;
+        }
+        return result;
+    }
+
+    public static double Frequency(Cavity model, int nx, int ny, int nz)
+    {
+        return model.SoundSpeed / 2 * Math.Sqrt(
+            Math.Pow(nx / model.Length, 2) +
+            Math.Pow(ny / model.Width, 2) +
+            Math.Pow(nz / model.Height, 2));
+    }
+
+    public static double Shape(Mode mode, Cavity model, Position point)
+    {
+        return Math.Cos(mode.Nx * Math.PI * point.X / model.Length) *
+            Math.Cos(mode.Ny * Math.PI * point.Y / model.Width) *
+            Math.Cos(mode.Nz * Math.PI * point.Z / model.Height);
+    }
+
+    public static Complex SourceCoupling(Mode mode, Cavity model, IEnumerable<Emitter> sources)
+    {
+        var sum = Complex.Zero;
+        foreach (var source in sources.Where(x => x.Enabled))
+        {
+            var phase = source.PhaseDegrees * Math.PI / 180;
+            sum += Complex.FromPolarCoordinates(source.Amplitude, phase) * Shape(mode, model, source.Point);
+        }
+        return sum;
+    }
+
+    public static Complex Term(Mode mode, Cavity model, Complex coupling, Position point, double frequency)
+    {
+        var fn = mode.Frequency;
+        var denominator = new Complex(fn * fn - frequency * frequency, 2 * model.Damping * fn * frequency);
+        return mode.NormFactor * Software.ReferenceVolume / model.Volume * Shape(mode, model, point) * coupling *
+            (Software.ReferenceFrequency * Software.ReferenceFrequency) / denominator;
+    }
+}
+
+
+======================================================================
+src/Cabin.Core/Domain/Demo.cs
+非空行 60 / SHA256 452502b17dcf7ddd21d578a4add15950e60aa65dae927d0d7519328d6074b722
+======================================================================
+using Cabin.Core.IO;
+
+namespace Cabin.Core.Domain;
+
+public static class Demo
+{
+    public static Project Create()
+    {
+        var project = new Project
+        {
+            Name = "四座矩形座舱 · 模拟研究",
+            Owner = "示例工程师",
+            IsDemo = true,
+            DataSource = "可重复模拟；矩形理想几何；非实测",
+            Notes = "比较前后排耳点响应；将声源移至x=Lx/2可观察奇数纵向模态耦合减弱。",
+            Sources =
+            [
+                new() { Name = "前舱等效声源", Point = new(0.2, 0.8, 0.35) }
+            ],
+            Seats =
+            [
+                new() { Name = "驾驶员", Point = new(1.05, 0.4, 0.85), Note = "模拟耳点" },
+                new() { Name = "前排乘员", Point = new(1.05, 1.2, 0.85), Note = "模拟耳点" },
+                new() { Name = "后排左", Point = new(2.55, 0.4, 0.85), Note = "模拟耳点" },
+                new() { Name = "后排右", Point = new(2.55, 1.2, 0.85), Note = "模拟耳点" }
+            ]
+        };
+        project.Reviews.Add(new()
+        {
+            Target = "首阶纵向模态约50.441Hz",
+            Action = "沿x方向布置前、中、后测点，保持y和z一致；实测检查相位和幅值分布。",
+            Result = "待实测"
+        });
+        project.Journal.Add(new() { Action = "载入独立示例", Detail = "所有尺寸及点位均为模拟" });
+        project.Baselines.Add(Capture(project, "原始模拟布置"));
+        return project;
+    }
+
+    public static Snapshot Capture(Project project, string name)
+    {
+        return new()
+        {
+            Name = name,
+            Model = ProjectCodec.Clone(project.Model),
+            Sources = ProjectCodec.Clone(project.Sources),
+            Seats = ProjectCodec.Clone(project.Seats),
+            IsDemo = project.IsDemo,
+            DataSource = project.DataSource
+        };
+    }
+
+    public static Project FromSnapshot(Snapshot snapshot)
+    {
+        return new()
+        {
+            Name = snapshot.Name,
+            Model = ProjectCodec.Clone(snapshot.Model),
+            Sources = ProjectCodec.Clone(snapshot.Sources),
+            Seats = ProjectCodec.Clone(snapshot.Seats),
+            IsDemo = snapshot.IsDemo,
+            DataSource = snapshot.DataSource
+        };
+    }
+}
+
+
+======================================================================
+src/Cabin.Core/Domain/Project.cs
+非空行 98 / SHA256 eeeb08054cacb2b1b654c68bf3a7968b063801142d3f5ccf36ae3173b9701166
+======================================================================
+namespace Cabin.Core.Domain;
+
+public static class Software
+{
+    public const string Name = "车内低频声学模态与座位声压分布设计软件";
+    public const string Version = "1.0";
+    public const int Schema = 1;
+    public const int MaximumBytes = 2 * 1024 * 1024;
+    public const string Extension = ".cabin.json";
+    public const string Scope = "理想刚性矩形腔；截断非零阶模态叠加；不含000均匀压缩模态；相对响应不等于实车绝对声压。";
+    public const double ReferenceFrequency = 100;
+    public const double ReferenceVolume = 1;
+}
+
+public sealed class Project
+{
+    public int Schema { get; set; } = Software.Schema;
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public string Name { get; set; } = "未命名座舱";
+    public string Revision { get; set; } = "A";
+    public string Owner { get; set; } = "";
+    public string DataSource { get; set; } = "人工输入 / 理想化几何";
+    public bool IsDemo { get; set; }
+    public string Notes { get; set; } = "";
+    public DateTimeOffset Created { get; set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset Modified { get; set; } = DateTimeOffset.UtcNow;
+    public Cavity Model { get; set; } = new();
+    public List<Emitter> Sources { get; set; } = [];
+    public List<EarPoint> Seats { get; set; } = [];
+    public List<Snapshot> Baselines { get; set; } = [];
+    public List<ReviewItem> Reviews { get; set; } = [];
+    public List<JournalEntry> Journal { get; set; } = [];
+}
+
+public sealed class Cavity
+{
+    public double Length { get; set; } = 3.4;
+    public double Width { get; set; } = 1.6;
+    public double Height { get; set; } = 1.2;
+    public double SoundSpeed { get; set; } = 343;
+    public double Damping { get; set; } = 0.03;
+    public double MinimumFrequency { get; set; } = 20;
+    public double MaximumFrequency { get; set; } = 200;
+    public double FrequencyStep { get; set; } = 1;
+    public double Cutoff { get; set; } = 400;
+    public double Volume => Length * Width * Height;
+}
+
+public sealed class Position
+{
+    public double X { get; set; }
+    public double Y { get; set; }
+    public double Z { get; set; }
+    public Position() { }
+    public Position(double x, double y, double z)
+    {
+        X = x;
+        Y = y;
+        Z = z;
+    }
+}
+
+public sealed class Emitter
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public string Name { get; set; } = "声源";
+    public Position Point { get; set; } = new();
+    public double Amplitude { get; set; } = 1;
+    public double PhaseDegrees { get; set; }
+    public bool Enabled { get; set; } = true;
+}
+
+public sealed class EarPoint
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public string Name { get; set; } = "耳点";
+    public Position Point { get; set; } = new();
+    public string Note { get; set; } = "";
+}
+
+public sealed class Snapshot
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public string Name { get; set; } = "基准";
+    public DateTimeOffset Created { get; set; } = DateTimeOffset.UtcNow;
+    public Cavity Model { get; set; } = new();
+    public List<Emitter> Sources { get; set; } = [];
+    public List<EarPoint> Seats { get; set; } = [];
+    public bool IsDemo { get; set; }
+    public string DataSource { get; set; } = "";
+}
+
+public sealed class ReviewItem
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public string Target { get; set; } = "";
+    public string Action { get; set; } = "";
+    public string Owner { get; set; } = "";
+    public string Result { get; set; } = "待验证";
+}
+
+public sealed class JournalEntry
+{
+    public DateTimeOffset Time { get; set; } = DateTimeOffset.UtcNow;
+    public string Action { get; set; } = "";
+    public string Detail { get; set; } = "";
+}
+
+
+======================================================================
+src/Cabin.Core/Domain/Validation.cs
+非空行 167 / SHA256 c0580c8f55b1869b492d4d1457806ba25eb19966cad5cdf51e638c4d1e72f1ef
+======================================================================
+namespace Cabin.Core.Domain;
+
+public sealed record Issue(string Path, string Message);
+
+public static class Validation
+{
+    public static List<Issue> Check(Project project, bool forCalculation = true)
+    {
+        var issues = new List<Issue>();
+        if (project.Schema != Software.Schema)
+            issues.Add(new("schema", "只支持项目格式版本1"));
+        if (project.Id == Guid.Empty)
+            issues.Add(new("id", "项目标识不能为空"));
+        Text(project.Name, "项目名称", 80, true, issues);
+        Text(project.Revision, "修订号", 30, true, issues);
+        Text(project.Owner, "负责人", 80, false, issues);
+        Text(project.DataSource, "数据来源", 300, true, issues);
+        Text(project.Notes, "备注", 3000, false, issues);
+        if (project.Model is null || project.Sources is null || project.Seats is null ||
+            project.Baselines is null || project.Reviews is null || project.Journal is null)
+        {
+            issues.Add(new("项目结构", "模型和集合不能为空"));
+            return issues;
+        }
+        Model(project.Model, issues);
+        Points(project.Model, project.Sources, project.Seats, issues);
+        if (forCalculation)
+        {
+            if (project.Sources.All(x => !x.Enabled || x.Amplitude == 0))
+                issues.Add(new("声源", "至少需要一个启用且幅值大于零的声源"));
+            if (project.Seats.Count == 0)
+                issues.Add(new("耳点", "至少添加一个座位耳点"));
+        }
+        if (project.Baselines.Count > 12)
+            issues.Add(new("基准", "最多保留12个基准"));
+        var baselineIds = new HashSet<Guid>();
+        foreach (var baseline in project.Baselines)
+        {
+            if (baseline is null)
+            {
+                issues.Add(new("基准", "基准内容不能为null"));
+                continue;
+            }
+            if (baseline.Id == Guid.Empty || !baselineIds.Add(baseline.Id))
+                issues.Add(new("基准标识", "基准标识为空或重复"));
+            Text(baseline.Name, "基准名称", 80, true, issues);
+            Text(baseline.DataSource, "基准来源", 300, true, issues);
+            if (baseline.Model is null || baseline.Sources is null || baseline.Seats is null)
+            {
+                issues.Add(new("基准", "基准模型与集合不能为空"));
+                continue;
+            }
+            Model(baseline.Model, issues);
+            Points(baseline.Model, baseline.Sources, baseline.Seats, issues);
+        }
+        if (project.Reviews.Count > 100)
+            issues.Add(new("复核清单", "最多100项"));
+        foreach (var item in project.Reviews)
+        {
+            if (item is null)
+            {
+                issues.Add(new("复核清单", "清单项不能为null"));
+                continue;
+            }
+            Text(item.Target, "复核对象", 200, true, issues);
+            Text(item.Action, "复核步骤", 1000, true, issues);
+            Text(item.Owner, "复核负责人", 80, false, issues);
+            Text(item.Result, "复核结果", 1000, true, issues);
+        }
+        if (project.Journal.Count > 500)
+            issues.Add(new("历史", "最多500条历史记录"));
+        foreach (var entry in project.Journal)
+        {
+            if (entry is null)
+            {
+                issues.Add(new("历史", "历史项不能为null"));
+                continue;
+            }
+            Text(entry.Action, "历史操作", 100, true, issues);
+            Text(entry.Detail, "历史详情", 1000, false, issues);
+        }
+        return issues;
+    }
+
+    public static void Model(Cavity model, List<Issue> issues)
+    {
+        Range(model.Length, 0.5, 10, "长度 Lx / m", issues);
+        Range(model.Width, 0.5, 10, "宽度 Ly / m", issues);
+        Range(model.Height, 0.5, 10, "高度 Lz / m", issues);
+        Range(model.SoundSpeed, 300, 380, "声速 / m/s", issues);
+        Range(model.Damping, 0.002, 0.2, "模态阻尼比", issues);
+        Range(model.MinimumFrequency, 5, 499, "频带起点 / Hz", issues);
+        Range(model.MaximumFrequency, 6, 500, "频带终点 / Hz", issues);
+        Range(model.FrequencyStep, 0.25, 10, "频率步长 / Hz", issues);
+        Range(model.Cutoff, 100, 1000, "模态截断 / Hz", issues);
+        if (model.MinimumFrequency >= model.MaximumFrequency)
+            issues.Add(new("频带", "终点必须大于起点"));
+        if (model.Cutoff < model.MaximumFrequency)
+            issues.Add(new("模态截断", "截断频率不能低于分析终点"));
+        if ((model.MaximumFrequency - model.MinimumFrequency) / model.FrequencyStep > 2000)
+            issues.Add(new("频率步长", "频率采样最多2001点"));
+        if (double.IsFinite(model.Cutoff) && double.IsFinite(model.SoundSpeed) && model.SoundSpeed > 0)
+        {
+            var estimate = 4 * Math.PI / 3 * model.Volume * Math.Pow(model.Cutoff / model.SoundSpeed, 3);
+            if (estimate > 6000)
+                issues.Add(new("模态截断", "模型模态数量过大，请降低截断频率或缩小尺寸"));
+        }
+    }
+
+    public static void Points(Cavity model, List<Emitter> sources, List<EarPoint> seats, List<Issue> issues)
+    {
+        if (sources.Count > 8)
+            issues.Add(new("声源", "最多8个声源"));
+        if (seats.Count > 12)
+            issues.Add(new("耳点", "最多12个座位耳点"));
+        var ids = new HashSet<Guid>();
+        foreach (var source in sources)
+        {
+            if (source is null)
+            {
+                issues.Add(new("声源", "声源不能为null"));
+                continue;
+            }
+            Identity(source.Id, ids, "声源", issues);
+            Text(source.Name, "声源名称", 50, true, issues);
+            Point(source.Point, model, source.Name, issues);
+            Range(source.Amplitude, 0, 10, source.Name + "相对幅值", issues);
+            Range(source.PhaseDegrees, -180, 180, source.Name + "相位 / °", issues);
+        }
+        foreach (var seat in seats)
+        {
+            if (seat is null)
+            {
+                issues.Add(new("耳点", "耳点不能为null"));
+                continue;
+            }
+            Identity(seat.Id, ids, "耳点", issues);
+            Text(seat.Name, "耳点名称", 50, true, issues);
+            Text(seat.Note, "耳点备注", 300, false, issues);
+            Point(seat.Point, model, seat.Name, issues);
+        }
+    }
+
+    private static void Identity(Guid id, HashSet<Guid> ids, string path, List<Issue> issues)
+    {
+        if (id == Guid.Empty || !ids.Add(id))
+            issues.Add(new(path, "标识为空或重复"));
+    }
+
+    private static void Point(Position? point, Cavity model, string path, List<Issue> issues)
+    {
+        if (point is null)
+        {
+            issues.Add(new(path, "坐标不能为空"));
+            return;
+        }
+        Range(point.X, 0, model.Length, path + " x / m", issues);
+        Range(point.Y, 0, model.Width, path + " y / m", issues);
+        Range(point.Z, 0, model.Height, path + " z / m", issues);
+    }
+
+    private static void Text(string? value, string path, int maximum, bool required, List<Issue> issues)
+    {
+        if (value is null || (required && string.IsNullOrWhiteSpace(value)))
+            issues.Add(new(path, "此字段不能为空"));
+        else if (value.Length > maximum || value.Any(c => char.IsControl(c) && c != '\n' && c != '\r' && c != '\t'))
+            issues.Add(new(path, $"最多{maximum}字符，不允许控制字符"));
+    }
+
+    private static void Range(double value, double minimum, double maximum, string path, List<Issue> issues)
+    {
+        if (!double.IsFinite(value) || value < minimum || value > maximum)
+            issues.Add(new(path, $"必须为{minimum}至{maximum}之间的有限数值"));
+    }
+}
+
+
+======================================================================
+src/Cabin.Core/IO/Exports.cs
+非空行 177 / SHA256 beb6f9c0bf338826b26a37f77ebcdeed00d1da2d2098778971ee613bab971aec
+======================================================================
+using System.Net;
+using System.Text;
+using Cabin.Core.Analysis;
+using Cabin.Core.Domain;
+
+namespace Cabin.Core.IO;
+
+public static class Exports
+{
+    public static string ModesCsv(Project project, AnalysisResult result)
+    {
+        var builder = Metadata(project, "模态频率；无000模态；退化模态逐项保留");
+        builder.AppendLine("nx,ny,nz,frequency_Hz,kind,degeneracy,norm_factor");
+        foreach (var mode in result.Modes)
+            builder.AppendLine(PointCsv.Join(mode.Nx.ToString(), mode.Ny.ToString(), mode.Nz.ToString(),
+                PointCsv.N(mode.Frequency), mode.Kind, mode.Degeneracy.ToString(), PointCsv.N(mode.NormFactor)));
+        return builder.ToString();
+    }
+
+    public static string ResponsesCsv(Project project, AnalysisResult result)
+    {
+        var builder = Metadata(project, "无量纲截断响应；所有耳点共用全频带最大幅值参考；非dB SPL");
+        builder.AppendLine("seat_id,seat_name,frequency_Hz,real,imaginary,magnitude,phase_deg,relative_dB,reference_magnitude");
+        foreach (var curve in result.Curves)
+        {
+            foreach (var point in curve.Points)
+                builder.AppendLine(PointCsv.Join(curve.Id.ToString(), curve.Name, PointCsv.N(point.Frequency),
+                    PointCsv.N(point.Real), PointCsv.N(point.Imaginary), PointCsv.N(point.Magnitude),
+                    PointCsv.N(point.Phase), PointCsv.N(point.RelativeDb(result.Reference)), PointCsv.N(result.Reference)));
+        }
+        return builder.ToString();
+    }
+
+    public static string ContributionsCsv(Project project, AnalysisResult result, EarPoint seat, double frequency)
+    {
+        var builder = Metadata(project, $"耳点{seat.Name}；频率{PointCsv.N(frequency)}Hz；各项复数相加，幅值不能直接相加");
+        builder.AppendLine("mode,frequency_Hz,term_magnitude,term_phase_deg,source_coupling_magnitude,seat_shape");
+        foreach (var item in Engine.Contributions(project, result, seat, frequency))
+            builder.AppendLine(PointCsv.Join(item.Key, PointCsv.N(item.Frequency), PointCsv.N(item.Magnitude),
+                PointCsv.N(item.Phase), PointCsv.N(item.SourceMagnitude), PointCsv.N(item.SeatShape)));
+        return builder.ToString();
+    }
+
+    public static string ScanCsv(Project project, ScanResult result)
+    {
+        var builder = Metadata(project, "单参数扫描；其他参数固定；失败行保留原因；耳点=" + result.Settings.SeatId);
+        builder.AppendLine(PointCsv.Join("parameter=" + result.Settings.Parameter, "unit=" + result.Unit));
+        builder.AppendLine("value,peak_magnitude,peak_frequency_Hz,rms_magnitude,first_mode_Hz,error");
+        foreach (var row in result.Rows)
+            builder.AppendLine(PointCsv.Join(PointCsv.N(row.Parameter), PointCsv.N(row.PeakMagnitude),
+                PointCsv.N(row.PeakFrequency), PointCsv.N(row.Rms), PointCsv.N(row.FirstMode), row.Error));
+        return builder.ToString();
+    }
+
+    public static string ComparisonCsv(Project project, Snapshot baseline, ComparisonResult result)
+    {
+        var builder = Metadata(project, "比较基准=" + baseline.Name + "；同频带同截断；差值为当前/基准幅值比");
+        foreach (var warning in result.Warnings)
+            builder.AppendLine(PointCsv.Join("#警示", warning));
+        builder.AppendLine("seat,baseline_peak,current_peak,peak_ratio_dB,baseline_peak_Hz,current_peak_Hz,rms_ratio_dB");
+        foreach (var row in result.Seats)
+            builder.AppendLine(PointCsv.Join(row.Name, PointCsv.N(row.BaselinePeak), PointCsv.N(row.CurrentPeak),
+                PointCsv.N(row.PeakRatioDb), PointCsv.N(row.BaselineFrequency), PointCsv.N(row.CurrentFrequency), PointCsv.N(row.RmsRatioDb)));
+        return builder.ToString();
+    }
+
+    public static string ReviewsCsv(Project project)
+    {
+        var builder = Metadata(project, "实测复核清单；清单内容为人工记录，不自动判定合格");
+        builder.AppendLine("target,action,owner,result");
+        foreach (var row in project.Reviews)
+            builder.AppendLine(PointCsv.Join(row.Target, row.Action, row.Owner, row.Result));
+        return builder.ToString();
+    }
+
+    public static string Html(Project project, AnalysisResult result, ComparisonResult? comparison = null, ScanResult? scan = null)
+    {
+        var builder = new StringBuilder("<!doctype html><html lang='zh-CN'><meta charset='utf-8'>");
+        builder.Append("<title>座舱声学研究报告</title><style>body{font:15px/1.7 sans-serif;color:#243d40;max-width:1100px;margin:40px auto;padding:24px}h1{font-size:27px}h2{margin-top:30px}table{border-collapse:collapse;width:100%;margin:12px 0}td,th{padding:8px;border:1px solid #bccbc9;text-align:left}th{background:#e9eeea}.limit{padding:16px;background:#f7edda}svg{width:100%;height:auto}small{color:#536c70}@media print{body{margin:0}tr{break-inside:avoid}}</style>");
+        builder.Append("<h1>" + H(Software.Name) + " V" + Software.Version + "</h1>");
+        builder.Append("<p>项目：" + H(project.Name) + " / 修订 " + H(project.Revision) + " / 负责人：" + H(project.Owner) + "</p>");
+        builder.Append("<p>来源：" + H(project.DataSource) + " / " + (project.IsDemo ? "模拟示例" : "人工模型") + " / 生成UTC：" + DateTimeOffset.UtcNow.ToString("u") + "</p>");
+        builder.Append("<p class='limit'>" + H(Software.Scope) + " 图形和幅值仅用于简化模型对比。结果未校准到Pa或dB SPL。</p>");
+        builder.Append("<h2>1. 模型与计算口径</h2>");
+        Table(builder, ["参数", "数值与单位"],
+        [
+            ["长度Lx / 宽度Ly / 高度Lz", $"{N(project.Model.Length)} / {N(project.Model.Width)} / {N(project.Model.Height)} m"],
+            ["声速", N(project.Model.SoundSpeed) + " m/s"],
+            ["模态阻尼比", N(project.Model.Damping)],
+            ["频带及步长", $"{N(project.Model.MinimumFrequency)}–{N(project.Model.MaximumFrequency)} Hz；{N(project.Model.FrequencyStep)} Hz"],
+            ["模态截断", N(project.Model.Cutoff) + " Hz"],
+            ["幅值参考", N(result.Reference) + "；本项目所有耳点全频带最大值"],
+            ["计算时间UTC", result.Computed.ToString("u")]
+        ]);
+        builder.Append("<p>f(n)=c/2·√[(nx/Lx)²+(ny/Ly)²+(nz/Lz)²]；φ=cos(nxπx/Lx)cos(nyπy/Ly)cos(nzπz/Lz)。坐标原点前左下，x向后，y向右，z向上。非零模态按频率截断，退化模态不合并。</p>");
+        builder.Append("<p>H=Σ (2^d·1m³/V)·φ(r)·Σ[A·exp(iθ)·φ(s)]·100²/[fn²−f²+i·2ζfnf]。d为非零阶次数量。采用固定100Hz与1m³标度，V为腔体体积，保持同一源系数跨尺寸比较的范数一致；无量纲；不含源强校准和000压缩模态。相对dB=20log10(|H|/共同参考)，显示下限−120dB；近零参考显示−120dB并需按零响应理解。</p>");
+        builder.Append("<h2>2. 声源与耳点</h2>");
+        Table(builder, ["类型", "名称", "x / m", "y / m", "z / m", "条件"],
+            project.Sources.Select(x => new[] { "声源", x.Name, N(x.Point.X), N(x.Point.Y), N(x.Point.Z), $"A={N(x.Amplitude)}；θ={N(x.PhaseDegrees)}°；{(x.Enabled ? "启用" : "停用")}" })
+            .Concat(project.Seats.Select(x => new[] { "耳点", x.Name, N(x.Point.X), N(x.Point.Y), N(x.Point.Z), x.Note })));
+        builder.Append("<h2>3. 模态频率（前40阶）</h2>");
+        Table(builder, ["阶次nx,ny,nz", "频率 / Hz", "类型", "退化重数"],
+            result.Modes.Take(40).Select(x => new[] { x.Key, N(x.Frequency), x.Kind, x.Degeneracy.ToString() }));
+        builder.Append("<h2>4. 座位相对响应</h2>");
+        builder.Append(ResponseSvg(project, result));
+        Table(builder, ["耳点", "峰值频率 / Hz", "峰值幅值", "峰值相对dB", "频点等权RMS"],
+            result.Curves.Select(x => new[] { x.Name, N(x.Peak.Frequency), N(x.Peak.Magnitude), N(x.Peak.RelativeDb(result.Reference)), N(x.Rms) }));
+        builder.Append("<p>峰值为离散频率网格最大值，未进行峰值插值；RMS为采样频点幅值平方均值开方，不等同于宽带实测声压。步长可能漏掉窄峰，应细化频率网格并检查截断敏感性。</p>");
+        if (comparison is not null)
+        {
+            builder.Append("<h2>5. 当前比较结果</h2>");
+            foreach (var warning in comparison.Warnings)
+                builder.Append("<p class='limit'>" + H(warning) + "</p>");
+            Table(builder, ["耳点", "基准峰值", "当前峰值", "峰值比 / dB", "RMS比 / dB"],
+                comparison.Seats.Select(x => new[] { x.Name, N(x.BaselinePeak), N(x.CurrentPeak), N(x.PeakRatioDb), N(x.RmsRatioDb) }));
+        }
+        if (scan is not null)
+        {
+            builder.Append("<h2>6. 参数扫描：" + H(scan.Settings.Parameter) + "</h2>");
+            Table(builder, ["参数 / " + scan.Unit, "峰值幅值", "峰值频率 / Hz", "首阶模态 / Hz", "状态"],
+                scan.Rows.Select(x => new[] { N(x.Parameter), N(x.PeakMagnitude), N(x.PeakFrequency), N(x.FirstMode), x.Error.Length == 0 ? "已计算" : x.Error }));
+        }
+        builder.Append("<h2>7. 复核清单</h2>");
+        Table(builder, ["对象", "步骤", "负责人", "结果"], project.Reviews.Select(x => new[] { x.Target, x.Action, x.Owner, x.Result }));
+        builder.Append("<h2>8. 备注与追溯</h2><p>" + H(project.Notes).Replace("\n", "<br>") + "</p>");
+        Table(builder, ["UTC", "操作", "详情"], project.Journal.TakeLast(30).Select(x => new[] { x.Time.ToString("u"), x.Action, x.Detail }));
+        builder.Append("<p class='limit'>真实座舱存在不规则几何、柔性结构和吸声边界。等效阻尼为用户假设；本结果需使用实际声源、几何和边界条件进行实测或更高保真仿真确认。不能由本报告给出实车声级或整改保证。</p></html>");
+        return builder.ToString();
+    }
+
+    public static string ResponseSvg(Project project, AnalysisResult result)
+    {
+        var builder = new StringBuilder("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 900 280' role='img' aria-label='所有耳点共用参考的频率响应'>");
+        builder.Append("<rect width='900' height='280' fill='#f4f3eb'/>");
+        for (var db = 0; db >= -80; db -= 20)
+        {
+            var y = 30 - db * 2.25;
+            builder.Append($"<path d='M60 {N(y)}H870' stroke='#c6d0c9'/><text x='12' y='{N(y + 5)}' font-size='13'>{db}</text>");
+        }
+        string[] colors = ["#216b72", "#c2673d", "#7174a1", "#708343", "#a15377", "#466595"];
+        for (var i = 0; i < result.Curves.Count; i++)
+        {
+            var curve = result.Curves[i];
+            var points = curve.Points.Select(point =>
+            {
+                var x = 60 + (point.Frequency - project.Model.MinimumFrequency) /
+                    (project.Model.MaximumFrequency - project.Model.MinimumFrequency) * 810;
+                var y = 30 - Math.Max(-80, point.RelativeDb(result.Reference)) * 2.25;
+                return PointCsv.N(x) + "," + PointCsv.N(y);
+            });
+            builder.Append("<polyline fill='none' stroke='" + colors[i % colors.Length] + "' stroke-width='2' points='" + string.Join(" ", points) + "'/>");
+            builder.Append($"<text x='{60 + (i % 6) * 135}' y='{245 + i / 6 * 20}' fill='{colors[i % colors.Length]}' font-size='12'>{H(curve.Name)}</text>");
+        }
+        builder.Append($"<text x='60' y='230' font-size='12'>{N(project.Model.MinimumFrequency)} Hz</text><text x='800' y='230' font-size='12'>{N(project.Model.MaximumFrequency)} Hz</text><text x='10' y='18' font-size='12'>相对dB</text></svg>");
+        return builder.ToString();
+    }
+
+    private static StringBuilder Metadata(Project project, string metric)
+    {
+        var builder = new StringBuilder();
+        builder.AppendLine(PointCsv.Join("#软件", Software.Name, Software.Version, "schema=" + project.Schema));
+        builder.AppendLine(PointCsv.Join("#项目", project.Name, project.Id.ToString(), project.Revision));
+        builder.AppendLine(PointCsv.Join("#来源", project.DataSource, project.IsDemo ? "模拟示例" : "人工模型"));
+        builder.AppendLine(PointCsv.Join("#口径", metric, Software.Scope));
+        builder.AppendLine(PointCsv.Join("#模型", "Lx_m=" + PointCsv.N(project.Model.Length), "Ly_m=" + PointCsv.N(project.Model.Width),
+            "Lz_m=" + PointCsv.N(project.Model.Height), "c_m_s=" + PointCsv.N(project.Model.SoundSpeed), "zeta=" + PointCsv.N(project.Model.Damping),
+            "cutoff_Hz=" + PointCsv.N(project.Model.Cutoff)));
+        return builder;
+    }
+
+    private static void Table(StringBuilder builder, string[] headers, IEnumerable<string[]> rows)
+    {
+        builder.Append("<table><thead><tr>");
+        foreach (var header in headers)
+            builder.Append("<th>" + H(header) + "</th>");
+        builder.Append("</tr></thead><tbody>");
+        foreach (var row in rows)
+        {
+            builder.Append("<tr>");
+            foreach (var cell in row)
+                builder.Append("<td>" + H(cell) + "</td>");
+            builder.Append("</tr>");
+        }
+        builder.Append("</tbody></table>");
+    }
+
+    private static string H(string value) => WebUtility.HtmlEncode(value);
+    private static string N(double value) => value.ToString("F3", System.Globalization.CultureInfo.InvariantCulture);
+}
+
+
+======================================================================
+src/Cabin.Core/IO/PointCsv.cs
+非空行 148 / SHA256 71745b4c0da5f4b9131464eafe7fa76db0f4cee4c9370643a750baf6b10d76c9
+======================================================================
+using System.Globalization;
+using System.Text;
+using Cabin.Core.Domain;
+
+namespace Cabin.Core.IO;
+
+public sealed record PointRow(string Kind, string Name, Position Point, double Amplitude, double Phase, string Note);
+public sealed class CsvPreview
+{
+    public List<PointRow> Rows { get; } = [];
+    public List<Issue> Issues { get; } = [];
+    public bool CanApply => Rows.Count > 0 && Issues.Count == 0;
+}
+
+public static class PointCsv
+{
+    public const string Header = "kind,name,x_m,y_m,z_m,amplitude,phase_deg,note";
+
+    public static CsvPreview Preview(string text, Cavity model)
+    {
+        var preview = new CsvPreview();
+        if (text.Length > 100000)
+        {
+            preview.Issues.Add(new("CSV", "点位CSV最多100000字符"));
+            return preview;
+        }
+        var lines = text.TrimStart('\uFEFF').Replace("\r\n", "\n").Split('\n');
+        if (lines.Length == 0 || lines[0].Trim() != Header)
+        {
+            preview.Issues.Add(new("第1行", "表头必须为：" + Header));
+            return preview;
+        }
+        for (var i = 1; i < lines.Length; i++)
+        {
+            if (string.IsNullOrWhiteSpace(lines[i]))
+                continue;
+            var path = "第" + (i + 1) + "行";
+            try
+            {
+                var cells = ParseLine(lines[i]);
+                if (cells.Count != 8)
+                    throw new ArgumentException("需要8列");
+                if (cells[0] is not ("source" or "seat"))
+                    throw new ArgumentException("kind必须为source或seat");
+                var point = new Position(Number(cells[2]), Number(cells[3]), Number(cells[4]));
+                var amplitude = cells[0] == "source" ? Number(cells[5]) : 0;
+                var phase = cells[0] == "source" ? Number(cells[6]) : 0;
+                var row = new PointRow(cells[0], cells[1], point, amplitude, phase, cells[7]);
+                var issues = new List<Issue>();
+                var sources = row.Kind == "source" ? new List<Emitter> { new() { Name = row.Name, Point = row.Point, Amplitude = amplitude, PhaseDegrees = phase } } : [];
+                var seats = row.Kind == "seat" ? new List<EarPoint> { new() { Name = row.Name, Point = row.Point, Note = row.Note } } : [];
+                Validation.Points(model, sources, seats, issues);
+                if (issues.Count > 0)
+                    throw new ArgumentException(string.Join("；", issues.Select(x => x.Path + "：" + x.Message)));
+                preview.Rows.Add(row);
+            }
+            catch (ArgumentException error)
+            {
+                preview.Issues.Add(new(path, error.Message));
+            }
+        }
+        if (preview.Rows.Count(x => x.Kind == "source") > 8 || preview.Rows.Count(x => x.Kind == "seat") > 12)
+            preview.Issues.Add(new("CSV", "最多8个声源、12个耳点"));
+        if (preview.Rows.Count == 0)
+            preview.Issues.Add(new("CSV", "没有有效点位"));
+        return preview;
+    }
+
+    public static void Apply(Project project, CsvPreview preview)
+    {
+        if (!preview.CanApply)
+            throw new ArgumentException("CSV预检未通过；项目未改变");
+        var sources = new List<Emitter>();
+        var seats = new List<EarPoint>();
+        foreach (var row in preview.Rows)
+        {
+            if (row.Kind == "source")
+                sources.Add(new() { Name = row.Name, Point = ProjectCodec.Clone(row.Point), Amplitude = row.Amplitude, PhaseDegrees = row.Phase });
+            else
+                seats.Add(new() { Name = row.Name, Point = ProjectCodec.Clone(row.Point), Note = row.Note });
+        }
+        project.Sources = sources;
+        project.Seats = seats;
+    }
+
+    public static string Export(Project project)
+    {
+        var builder = new StringBuilder(Header + Environment.NewLine);
+        foreach (var source in project.Sources)
+            builder.AppendLine(Join("source", source.Name, N(source.Point.X), N(source.Point.Y), N(source.Point.Z), N(source.Amplitude), N(source.PhaseDegrees), source.Enabled ? "启用" : "停用；导入时需手动停用"));
+        foreach (var seat in project.Seats)
+            builder.AppendLine(Join("seat", seat.Name, N(seat.Point.X), N(seat.Point.Y), N(seat.Point.Z), "", "", seat.Note));
+        return builder.ToString();
+    }
+
+    public static string Join(params string[] fields) => string.Join(",", fields.Select(Quote));
+    public static string N(double value) => value.ToString("G12", CultureInfo.InvariantCulture);
+    public static string Quote(string value)
+    {
+        if (value.Contains(',') || value.Contains('"') || value.Contains('\n') || value.Contains('\r'))
+            return "\"" + value.Replace("\"", "\"\"") + "\"";
+        return value;
+    }
+
+    public static List<string> ParseLine(string line)
+    {
+        var cells = new List<string>();
+        var value = new StringBuilder();
+        var quoted = false;
+        var closed = false;
+        for (var i = 0; i < line.Length; i++)
+        {
+            var c = line[i];
+            if (quoted)
+            {
+                if (c == '"')
+                {
+                    if (i + 1 < line.Length && line[i + 1] == '"')
+                    {
+                        value.Append('"');
+                        i++;
+                    }
+                    else
+                    {
+                        quoted = false;
+                        closed = true;
+                    }
+                }
+                else
+                    value.Append(c);
+            }
+            else if (c == ',')
+            {
+                cells.Add(value.ToString());
+                value.Clear();
+                closed = false;
+            }
+            else if (c == '"' && value.Length == 0 && !closed)
+                quoted = true;
+            else if (closed || c == '"')
+                throw new ArgumentException("引号格式错误；不支持单元格内换行");
+            else
+                value.Append(c);
+        }
+        if (quoted)
+            throw new ArgumentException("引号未闭合；不支持单元格内换行");
+        cells.Add(value.ToString());
+        return cells;
+    }
+
+    private static double Number(string value)
+    {
+        if (!double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var number) || !double.IsFinite(number))
+            throw new ArgumentException("数值使用小数点，不能为空或非有限值");
+        return number;
+    }
+}
+
+
+======================================================================
+src/Cabin.Core/IO/ProjectCodec.cs
+非空行 90 / SHA256 34e6bdfdab731b5b0215cd51a6168422b323d8f299270ba6e84b1c923cca5627
+======================================================================
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Cabin.Core.Domain;
+
+namespace Cabin.Core.IO;
+
+public static class ProjectCodec
+{
+    public static readonly JsonSerializerOptions Options = new()
+    {
+        WriteIndented = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
+        MaxDepth = 24
+    };
+
+    public static byte[] Encode(Project project)
+    {
+        var issues = Validation.Check(project, false);
+        if (issues.Count > 0)
+            throw new ArgumentException(string.Join("；", issues.Select(x => x.Path + "：" + x.Message)));
+        return JsonSerializer.SerializeToUtf8Bytes(project, Options);
+    }
+
+    public static Project Decode(byte[] bytes)
+    {
+        if (bytes.Length == 0 || bytes.Length > Software.MaximumBytes)
+            throw new ArgumentException("项目应为非空JSON，且不超过2MiB");
+        try
+        {
+            using var document = JsonDocument.Parse(bytes, new() { MaxDepth = 24 });
+            var root = document.RootElement;
+            Require(root, "schema", "id", "name", "revision", "dataSource", "isDemo", "created", "modified", "model", "sources", "seats", "baselines", "reviews", "journal");
+            if (root.GetProperty("schema").GetInt32() != Software.Schema)
+                throw new ArgumentException("只支持项目格式版本1；未执行迁移");
+            Require(root.GetProperty("model"), "length", "width", "height", "soundSpeed", "damping", "minimumFrequency", "maximumFrequency", "frequencyStep", "cutoff");
+            foreach (var source in root.GetProperty("sources").EnumerateArray())
+            {
+                Require(source, "id", "name", "point", "amplitude", "phaseDegrees", "enabled");
+                Require(source.GetProperty("point"), "x", "y", "z");
+            }
+            foreach (var seat in root.GetProperty("seats").EnumerateArray())
+            {
+                Require(seat, "id", "name", "point");
+                Require(seat.GetProperty("point"), "x", "y", "z");
+            }
+            foreach (var baseline in root.GetProperty("baselines").EnumerateArray())
+            {
+                Require(baseline, "id", "name", "model", "sources", "seats", "isDemo", "dataSource");
+                Require(baseline.GetProperty("model"), "length", "width", "height", "soundSpeed", "damping", "minimumFrequency", "maximumFrequency", "frequencyStep", "cutoff");
+                foreach (var source in baseline.GetProperty("sources").EnumerateArray())
+                {
+                    Require(source, "id", "name", "point", "amplitude", "phaseDegrees", "enabled");
+                    Require(source.GetProperty("point"), "x", "y", "z");
+                }
+                foreach (var seat in baseline.GetProperty("seats").EnumerateArray())
+                {
+                    Require(seat, "id", "name", "point");
+                    Require(seat.GetProperty("point"), "x", "y", "z");
+                }
+            }
+            foreach (var item in root.GetProperty("reviews").EnumerateArray())
+                Require(item, "id", "target", "action", "owner", "result");
+            foreach (var entry in root.GetProperty("journal").EnumerateArray())
+                Require(entry, "time", "action", "detail");
+            var project = JsonSerializer.Deserialize<Project>(bytes, Options) ?? throw new ArgumentException("项目内容为null");
+            var issues = Validation.Check(project, false);
+            if (issues.Count > 0)
+                throw new ArgumentException(string.Join("；", issues.Select(x => x.Path + "：" + x.Message)));
+            return project;
+        }
+        catch (Exception error) when (error is JsonException or InvalidOperationException or FormatException or OverflowException)
+        {
+            throw new ArgumentException("JSON项目结构或数值格式错误：" + error.Message);
+        }
+    }
+
+    public static T Clone<T>(T value)
+    {
+        return JsonSerializer.Deserialize<T>(JsonSerializer.SerializeToUtf8Bytes(value, Options), Options)!;
+    }
+
+    private static void Require(JsonElement element, params string[] fields)
+    {
+        if (element.ValueKind != JsonValueKind.Object)
+            throw new ArgumentException("预期JSON对象");
+        var names = element.EnumerateObject().Select(x => x.Name).ToList();
+        if (names.Distinct(StringComparer.Ordinal).Count() != names.Count)
+            throw new ArgumentException("JSON包含重复字段");
+        foreach (var field in fields)
+        {
+            if (!element.TryGetProperty(field, out var value) || value.ValueKind == JsonValueKind.Null)
+                throw new ArgumentException("缺少字段：" + field);
+        }
+    }
+}
+
+
+======================================================================
+src/Cabin.Core/IO/ProjectStore.cs
+非空行 76 / SHA256 f87b47fe640c0e106dcf25bf7a961843e1b6f0e6a0362ae057911c78283df6a2
+======================================================================
+using Cabin.Core.Domain;
+
+namespace Cabin.Core.IO;
+
+public sealed record StoredProject(Guid Id, string Name, string Revision, DateTimeOffset Modified, bool IsDemo, string Error);
+
+public sealed class ProjectStore(string directory)
+{
+    private readonly object gate = new();
+    public string DirectoryPath { get; } = Path.GetFullPath(directory);
+
+    public void Save(Project project)
+    {
+        var bytes = ProjectCodec.Encode(project);
+        lock (gate)
+        {
+            Directory.CreateDirectory(DirectoryPath);
+            var target = Path.Combine(DirectoryPath, project.Id + Software.Extension);
+            var temporary = target + "." + Guid.NewGuid().ToString("N") + ".tmp";
+            try
+            {
+                File.WriteAllBytes(temporary, bytes);
+                File.Move(temporary, target, true);
+            }
+            finally
+            {
+                if (File.Exists(temporary))
+                    File.Delete(temporary);
+            }
+        }
+    }
+
+    public Project Open(Guid id)
+    {
+        lock (gate)
+        {
+            var path = Path.Combine(DirectoryPath, id + Software.Extension);
+            if (!File.Exists(path))
+                throw new ArgumentException("本机项目已不存在，请从项目文件导入");
+            var info = new FileInfo(path);
+            if (info.Length > Software.MaximumBytes)
+                throw new ArgumentException("项目超过2MiB，拒绝读取");
+            return ProjectCodec.Decode(File.ReadAllBytes(path));
+        }
+    }
+
+    public List<StoredProject> List()
+    {
+        var result = new List<StoredProject>();
+        lock (gate)
+        {
+            if (!Directory.Exists(DirectoryPath))
+                return result;
+            foreach (var path in Directory.EnumerateFiles(DirectoryPath, "*" + Software.Extension))
+            {
+                var name = Path.GetFileName(path);
+                if (!Guid.TryParse(name[..^Software.Extension.Length], out var id))
+                    continue;
+                try
+                {
+                    var project = Open(id);
+                    result.Add(new(project.Id, project.Name, project.Revision, project.Modified, project.IsDemo, ""));
+                }
+                catch (Exception error) when (error is IOException or ArgumentException or UnauthorizedAccessException)
+                {
+                    result.Add(new(id, name, "?", File.GetLastWriteTimeUtc(path), false, error.Message));
+                }
+            }
+        }
+        return result.OrderByDescending(x => x.Modified).ToList();
+    }
+
+    public void Delete(Guid id)
+    {
+        lock (gate)
+        {
+            var path = Path.Combine(DirectoryPath, id + Software.Extension);
+            if (!File.Exists(path))
+                throw new ArgumentException("目标项目不存在");
+            File.Delete(path);
+        }
+    }
+}

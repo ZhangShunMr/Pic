@@ -1,0 +1,109 @@
+{
+  "date": "2026-11-04T05:18:24Z",
+  "browser": "154.0.8037.57",
+  "viewport": "1500x1050 / 540x960",
+  "checks": [
+    {
+      "name": "普通启动为空白状态",
+      "passed": true
+    },
+    {
+      "name": "空白项目没有模拟声源和耳点",
+      "passed": true
+    },
+    {
+      "name": "空项目计算阻止并提示字段",
+      "passed": true
+    },
+    {
+      "name": "从空白建立模型计算真实曲线",
+      "passed": true
+    },
+    {
+      "name": "空白建模保存并下载项目核对",
+      "passed": true
+    },
+    {
+      "name": "独立模拟示例载入并标注来源",
+      "passed": true
+    },
+    {
+      "name": "模态谱点选联动空间振型",
+      "passed": true
+    },
+    {
+      "name": "三种剖面方向切换",
+      "passed": true
+    },
+    {
+      "name": "指定频率响应与振型区分",
+      "passed": true
+    },
+    {
+      "name": "耳点选择联动相位贡献表",
+      "passed": true
+    },
+    {
+      "name": "截断增加计算并保持原模型",
+      "passed": true
+    },
+    {
+      "name": "输入改变后旧结果清除",
+      "passed": true
+    },
+    {
+      "name": "双倍幅值比较约6.02dB",
+      "passed": true
+    },
+    {
+      "name": "声源位置五点扫描",
+      "passed": true
+    },
+    {
+      "name": "复核记录加入项目",
+      "passed": true
+    },
+    {
+      "name": "报告项目频响扫描比较真实下载与内容核对",
+      "passed": true
+    },
+    {
+      "name": "浏览器刷新后本机保存重开并重算",
+      "passed": true
+    },
+    {
+      "name": "项目JSON文件导入与未保存保护",
+      "passed": true
+    },
+    {
+      "name": "出界坐标阻止并恢复",
+      "passed": true
+    },
+    {
+      "name": "CSV错误行号与应用阻止",
+      "passed": true
+    },
+    {
+      "name": "真实画布点击三维点位放置",
+      "passed": true
+    },
+    {
+      "name": "不同频率网格比较实际阻止",
+      "passed": true
+    },
+    {
+      "name": "模型边界帮助可展开",
+      "passed": true
+    },
+    {
+      "name": "540像素窄屏无页面横向溢出",
+      "passed": true
+    },
+    {
+      "name": "浏览器无脚本错误或断线错误",
+      "passed": true
+    }
+  ],
+  "total": 25,
+  "errors": []
+}

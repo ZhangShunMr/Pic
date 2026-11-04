@@ -1,0 +1,200 @@
+{
+  "scope": "src/**/*.cs,razor,css,js 手写生产源码非空行；排除bin,obj,测试,依赖,文档,脚本生成产物",
+  "baseline": 0,
+  "minimum": 3500,
+  "nonempty": 3608,
+  "files": [
+    {
+      "path": "src/Cabin.App/Components/App.razor",
+      "nonempty": 15,
+      "total": 15,
+      "sha256": "cb5c55017c9d11e55ddaf0c1193c5118cabc1adac91cdc747ab3917ccca11d2c"
+    },
+    {
+      "path": "src/Cabin.App/Components/Routes.razor",
+      "nonempty": 9,
+      "total": 9,
+      "sha256": "f067114c791a493c0e2e52b8346af3fbc841a0cd718aa2bd1a55098173cc4242"
+    },
+    {
+      "path": "src/Cabin.App/Components/Shared/ContributionPanel.razor",
+      "nonempty": 22,
+      "total": 22,
+      "sha256": "82cb9727ddadef151e744eea72f9f66f33f28ef2bd19bff218af28f85167f3ac"
+    },
+    {
+      "path": "src/Cabin.App/Components/Shared/DiagnosticsPanel.razor",
+      "nonempty": 62,
+      "total": 62,
+      "sha256": "ad6efcfe901ddb86f0aadd48c7147e5f86e14e82ce630a6990769a2e41905b9a"
+    },
+    {
+      "path": "src/Cabin.App/Components/Shared/FileDrawer.razor",
+      "nonempty": 85,
+      "total": 85,
+      "sha256": "f57e54e28e7b9221d17cf6de0534e244d7a101239f5da9f1dab2f1f3fdd98c01"
+    },
+    {
+      "path": "src/Cabin.App/Components/Shared/FrequencyPlot.razor",
+      "nonempty": 69,
+      "total": 69,
+      "sha256": "67238de54f08eb7cb7251fe3db74a3eaa521ac383c03030b6b8830270ae4d21f"
+    },
+    {
+      "path": "src/Cabin.App/Components/Shared/HelpPanel.razor",
+      "nonempty": 13,
+      "total": 13,
+      "sha256": "fafd550406cba59dfe8c3aa1efc29e402854304758bf40ad152e37baad40b972"
+    },
+    {
+      "path": "src/Cabin.App/Components/Shared/ModeLedger.razor",
+      "nonempty": 29,
+      "total": 29,
+      "sha256": "0df444a47194b8af08f64b3a70a8c3b841812f03a13234ccdf1ee04334d62e40"
+    },
+    {
+      "path": "src/Cabin.App/Components/Shared/ModelEditor.razor",
+      "nonempty": 132,
+      "total": 132,
+      "sha256": "50512b66de556688b6ac8989bea7af15acd5fd8ed3e03c9677b8ac099b6e7bda"
+    },
+    {
+      "path": "src/Cabin.App/Components/Shared/ReviewPanel.razor",
+      "nonempty": 30,
+      "total": 30,
+      "sha256": "3010452434d13a5c53468def8c6e94ac53fd51c6157827836e182f666db56a3e"
+    },
+    {
+      "path": "src/Cabin.App/Components/Shared/Scene.razor",
+      "nonempty": 86,
+      "total": 86,
+      "sha256": "8f9ed536e3753c4dac8ebdac695fbf97161155420881b8e0d440abc5bbf97ec0"
+    },
+    {
+      "path": "src/Cabin.App/Components/Shared/SeatResults.razor",
+      "nonempty": 25,
+      "total": 25,
+      "sha256": "0c1baf44864d5f0c5a69eaa927fe3881736203a6d9a2f7efe6f42199139bbb34"
+    },
+    {
+      "path": "src/Cabin.App/Components/Shared/StudyPanel.razor",
+      "nonempty": 101,
+      "total": 101,
+      "sha256": "c12a6ace9c2f2f19f9174d4e19ae9b17834dc7ed4abf8f9ae6e51e9bff720425"
+    },
+    {
+      "path": "src/Cabin.App/Components/Shared/VmComponent.cs",
+      "nonempty": 23,
+      "total": 29,
+      "sha256": "931aeb04669e777d85ff01daf74190e1bc7420399c3791ad9330c45f045cc43f"
+    },
+    {
+      "path": "src/Cabin.App/Components/Workspace.razor",
+      "nonempty": 196,
+      "total": 196,
+      "sha256": "6b95ece82046c55fa9f7e2abc844fd27ba59f27dc4cf013e74f64008d45386b7"
+    },
+    {
+      "path": "src/Cabin.App/Components/_Imports.razor",
+      "nonempty": 12,
+      "total": 12,
+      "sha256": "efe5fcde4eb4d00e051392776eb8dfa223fd66aaa58d7c19ffc34d4150fdee01"
+    },
+    {
+      "path": "src/Cabin.App/Program.cs",
+      "nonempty": 50,
+      "total": 51,
+      "sha256": "b33f7606cdfba98e9bf191169a8148705e551dcaeb84b58faa42dc81d5ae3d51"
+    },
+    {
+      "path": "src/Cabin.App/ViewModels/DownloadVault.cs",
+      "nonempty": 27,
+      "total": 31,
+      "sha256": "e16b7a107f54c62b6828b6b2d257dfa264bf3c14527831bf3c43975acbae707d"
+    },
+    {
+      "path": "src/Cabin.App/ViewModels/WorkspaceViewModel.cs",
+      "nonempty": 593,
+      "total": 639,
+      "sha256": "de6dbb57f546f9422d73fa4238fabe2557ab0815892385f0f122c81e02447c51"
+    },
+    {
+      "path": "src/Cabin.App/wwwroot/app.css",
+      "nonempty": 729,
+      "total": 729,
+      "sha256": "a2ed8eaab2e903152d1847040ab06db61ea8c767ee32745c774a140e02b3c6f4"
+    },
+    {
+      "path": "src/Cabin.App/wwwroot/scene.js",
+      "nonempty": 15,
+      "total": 15,
+      "sha256": "e3f2b6665e495c615cf101c3680859e0eab508d1f16ddd1b1792aa69a80f2802"
+    },
+    {
+      "path": "src/Cabin.Core/Analysis/Comparison.cs",
+      "nonempty": 138,
+      "total": 144,
+      "sha256": "09c718cf6cd61342e3112d26806b987ce798b6c967f10037cc0234faffba77c3"
+    },
+    {
+      "path": "src/Cabin.Core/Analysis/Diagnostics.cs",
+      "nonempty": 95,
+      "total": 101,
+      "sha256": "cb2a3f18edb685682abf33f27054f518c4672cf9df9175540f28dd69d50bf6f3"
+    },
+    {
+      "path": "src/Cabin.Core/Analysis/Engine.cs",
+      "nonempty": 153,
+      "total": 168,
+      "sha256": "a3fc2736c3464a368777318c2474e3c628b83bb5661d82c868e727abc6eec279"
+    },
+    {
+      "path": "src/Cabin.Core/Analysis/Modes.cs",
+      "nonempty": 83,
+      "total": 90,
+      "sha256": "48b69cb00fa035624db344a18a3e948753a280eec94f2303b66df01a40ac9ccb"
+    },
+    {
+      "path": "src/Cabin.Core/Domain/Demo.cs",
+      "nonempty": 60,
+      "total": 64,
+      "sha256": "452502b17dcf7ddd21d578a4add15950e60aa65dae927d0d7519328d6074b722"
+    },
+    {
+      "path": "src/Cabin.Core/Domain/Project.cs",
+      "nonempty": 98,
+      "total": 107,
+      "sha256": "eeeb08054cacb2b1b654c68bf3a7968b063801142d3f5ccf36ae3173b9701166"
+    },
+    {
+      "path": "src/Cabin.Core/Domain/Validation.cs",
+      "nonempty": 167,
+      "total": 175,
+      "sha256": "c0580c8f55b1869b492d4d1457806ba25eb19966cad5cdf51e638c4d1e72f1ef"
+    },
+    {
+      "path": "src/Cabin.Core/IO/Exports.cs",
+      "nonempty": 177,
+      "total": 189,
+      "sha256": "beb6f9c0bf338826b26a37f77ebcdeed00d1da2d2098778971ee613bab971aec"
+    },
+    {
+      "path": "src/Cabin.Core/IO/PointCsv.cs",
+      "nonempty": 148,
+      "total": 157,
+      "sha256": "71745b4c0da5f4b9131464eafe7fa76db0f4cee4c9370643a750baf6b10d76c9"
+    },
+    {
+      "path": "src/Cabin.Core/IO/ProjectCodec.cs",
+      "nonempty": 90,
+      "total": 96,
+      "sha256": "34e6bdfdab731b5b0215cd51a6168422b323d8f299270ba6e84b1c923cca5627"
+    },
+    {
+      "path": "src/Cabin.Core/IO/ProjectStore.cs",
+      "nonempty": 76,
+      "total": 83,
+      "sha256": "f87b47fe640c0e106dcf25bf7a961843e1b6f0e6a0362ae057911c78283df6a2"
+    }
+  ]
+}

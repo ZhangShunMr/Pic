@@ -1,0 +1,101 @@
+@inherits VmComponent
+@if (Vm.Current is not null)
+{
+    <section class="study-section">
+        <div class="section-caption"><span>03 / 方案研究</span><span>基准冻结 · 同条件核对 · 单参数扫描</span></div>
+        <div class="analysis-columns">
+            <div class="paper-panel">
+                <h3>冻结基准与比较</h3>
+                <label>基准名称<input aria-label="新基准名称" maxlength="80" @bind="Vm.BaselineName" /></label>
+                <button @onclick="Vm.Capture" disabled="@(Vm.Result is null)">保存当前为基准</button>
+                <label>比较基准
+                    <select aria-label="比较基准" @bind="Vm.BaselineId" @bind:after="BaselineChanged">
+                        <option value="@Guid.Empty">请选择</option>
+                        @foreach (var baseline in Vm.Current.Baselines)
+                        {
+                            <option value="@baseline.Id">@baseline.Name</option>
+                        }
+                    </select>
+                </label>
+                <div class="actions">
+                    <button class="primary" @onclick="Vm.Compare" disabled="@(Vm.Result is null || Vm.Baseline is null)">比较当前与基准</button>
+                    <button @onclick="Vm.RestoreBaseline" disabled="@(Vm.Baseline is null)">恢复基准模型</button>
+                    <button class="danger" @onclick="Vm.DeleteBaseline" disabled="@(Vm.Baseline is null)">删除基准</button>
+                </div>
+                @if (Vm.Baseline is not null)
+                {
+                    <p class="muted">基准：@Vm.Baseline.Name；@Vm.Baseline.Created.ToString("u")；尺寸 @N(Vm.Baseline.Model.Length) × @N(Vm.Baseline.Model.Width) × @N(Vm.Baseline.Model.Height) m。</p>
+                }
+                <p class="muted">频带、步长、截断、来源不同时拒绝比较；尺寸、声速、阻尼或耳点变化会提示。峰值比是各自离散峰值之比，峰值频率可能不同。</p>
+                @if (Vm.Difference is not null)
+                {
+                    @foreach (var warning in Vm.Difference.Warnings)
+                    {
+                        <p class="warning">@warning</p>
+                    }
+                    <div class="table-scroll">
+                        <table><thead><tr><th>耳点</th><th>峰值比 / dB</th><th>RMS比 / dB</th><th>峰频变化 / Hz</th></tr></thead>
+                            <tbody>
+                                @foreach (var row in Vm.Difference.Seats)
+                                {
+                                    <tr><td>@row.Name</td><td>@N(row.PeakRatioDb)</td><td>@N(row.RmsRatioDb)</td><td>@N(row.BaselineFrequency) → @N(row.CurrentFrequency)</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <details>
+                        <summary>同阶次模态频移（前12项）</summary>
+                        @foreach (var row in Vm.Difference.Modes.Take(12))
+                        {
+                            <p>(@row.Key) / @N(row.BaselineFrequency) → @N(row.CurrentFrequency) Hz / @N(row.Percent)%</p>
+                        }
+                    </details>
+                }
+            </div>
+            <div class="paper-panel">
+                <h3>单参数扫描</h3>
+                <label>扫描参数
+                    <select aria-label="扫描参数" @bind="Vm.ScanParameter">
+                        <option value="length">长度Lx / m</option><option value="width">宽度Ly / m</option><option value="height">高度Lz / m</option>
+                        <option value="sourceX">首个声源x / m</option><option value="sourceY">首个声源y / m</option><option value="sourceZ">首个声源z / m</option>
+                        <option value="damping">模态阻尼比</option>
+                    </select>
+                </label>
+                <div class="form-triple">
+                    <label>初值<input aria-label="扫描初值" type="number" step="0.01" @bind="Vm.ScanStart" /></label>
+                    <label>终值<input aria-label="扫描终值" type="number" step="0.01" @bind="Vm.ScanEnd" /></label>
+                    <label>点数<input aria-label="扫描点数" type="number" min="2" max="21" @bind="Vm.ScanCount" /></label>
+                </div>
+                <label>扫描耳点
+                    <select aria-label="扫描耳点" @bind="Vm.SelectedSeatId" @bind:after="() => Vm.Notify()">
+                        @foreach (var seat in Vm.Current.Seats)
+                        {
+                            <option value="@seat.Id">@seat.Name</option>
+                        }
+                    </select>
+                </label>
+                <button class="primary" @onclick="Vm.RunScan" disabled="@(Vm.Busy || Vm.Result is null)">@(Vm.Busy ? "扫描中…" : "运行参数扫描")</button>
+                <p class="muted">当前项目保持原参数；耳点保持绝对坐标。缩小尺寸导致点位出界时，该行保留失败原因。扫描结果不是优化保证。</p>
+                @if (Vm.Scan is not null)
+                {
+                    <div class="table-scroll scan-table">
+                        <table><thead><tr><th>参数 / @Vm.Scan.Unit</th><th>峰幅值</th><th>峰频 / Hz</th><th>首阶 / Hz</th><th>状态</th></tr></thead>
+                            <tbody>
+                                @foreach (var row in Vm.Scan.Rows)
+                                {
+                                    <tr><td>@N(row.Parameter, "F3")</td><td>@(row.Error.Length == 0 ? N(row.PeakMagnitude, "G4") : "—")</td><td>@(row.Error.Length == 0 ? N(row.PeakFrequency) : "—")</td><td>@(row.Error.Length == 0 ? N(row.FirstMode) : "—")</td><td>@(row.Error.Length == 0 ? "已计算" : row.Error)</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+@code {
+    private void BaselineChanged()
+    {
+        Vm.ClearComparison();
+    }
+}

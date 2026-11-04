@@ -1,0 +1,25 @@
+@inherits VmComponent
+@if (Vm.Result is not null && Vm.Current is not null)
+{
+    <div class="seat-cards">
+        @foreach (var curve in Vm.Result.Curves)
+        {
+            var seat = Vm.Current.Seats.First(x => x.Id == curve.Id);
+            var response = Engine.At(Vm.Current, Vm.Result, seat.Point, Vm.CursorFrequency);
+            <button class="seat-card @(Vm.SelectedSeatId == seat.Id ? "selected" : "")" @onclick="() => Pick(seat.Id)">
+                <span>@seat.Name</span>
+                <strong>@N(Engine.Decibels(response.Magnitude, Vm.Difference?.Reference ?? Vm.Result.Reference), "F1") <small>相对dB</small></strong>
+                <span>@N(Vm.CursorFrequency) Hz / 幅值 @N(response.Magnitude, "G4")</span>
+                <span>离散峰值 @N(curve.Peak.Frequency) Hz</span>
+                <span>相位 @N(response.Phase * 180 / Math.PI, "F1")°</span>
+            </button>
+        }
+    </div>
+}
+@code {
+    private void Pick(Guid id)
+    {
+        Vm.SelectedSeatId = id;
+        Vm.Notify();
+    }
+}

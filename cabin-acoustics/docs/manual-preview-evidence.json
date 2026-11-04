@@ -1,0 +1,96 @@
+{
+  "renderer": "Chromium PDF；不是Word分页",
+  "pages": 18,
+  "pageEvidence": [
+    {
+      "page": 1,
+      "textCharacters": 620,
+      "images": 0
+    },
+    {
+      "page": 2,
+      "textCharacters": 542,
+      "images": 1
+    },
+    {
+      "page": 3,
+      "textCharacters": 415,
+      "images": 1
+    },
+    {
+      "page": 4,
+      "textCharacters": 581,
+      "images": 0
+    },
+    {
+      "page": 5,
+      "textCharacters": 567,
+      "images": 0
+    },
+    {
+      "page": 6,
+      "textCharacters": 392,
+      "images": 1
+    },
+    {
+      "page": 7,
+      "textCharacters": 410,
+      "images": 1
+    },
+    {
+      "page": 8,
+      "textCharacters": 388,
+      "images": 1
+    },
+    {
+      "page": 9,
+      "textCharacters": 447,
+      "images": 1
+    },
+    {
+      "page": 10,
+      "textCharacters": 373,
+      "images": 1
+    },
+    {
+      "page": 11,
+      "textCharacters": 404,
+      "images": 1
+    },
+    {
+      "page": 12,
+      "textCharacters": 435,
+      "images": 1
+    },
+    {
+      "page": 13,
+      "textCharacters": 429,
+      "images": 1
+    },
+    {
+      "page": 14,
+      "textCharacters": 498,
+      "images": 1
+    },
+    {
+      "page": 15,
+      "textCharacters": 478,
+      "images": 1
+    },
+    {
+      "page": 16,
+      "textCharacters": 441,
+      "images": 1
+    },
+    {
+      "page": 17,
+      "textCharacters": 437,
+      "images": 1
+    },
+    {
+      "page": 18,
+      "textCharacters": 684,
+      "images": 0
+    }
+  ]
+}

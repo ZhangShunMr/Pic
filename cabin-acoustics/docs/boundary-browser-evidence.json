@@ -1,0 +1,30 @@
+{
+  "date": "2026-11-04T05:18:27Z",
+  "total": 6,
+  "checks": [
+    {
+      "name": "零几何停止投影并恢复有效场景",
+      "passed": true
+    },
+    {
+      "name": "损坏导入不替换当前已计算项目",
+      "passed": true
+    },
+    {
+      "name": "有效CSV确认替换后重算",
+      "passed": true
+    },
+    {
+      "name": "CSV新标识与旧基准无法匹配明确阻止",
+      "passed": true
+    },
+    {
+      "name": "结构撤销恢复CSV替换前点位",
+      "passed": true
+    },
+    {
+      "name": "复制独立项目保存并确认删除文件",
+      "passed": true
+    }
+  ]
+}

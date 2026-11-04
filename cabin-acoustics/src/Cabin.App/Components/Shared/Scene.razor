@@ -1,0 +1,86 @@
+@inherits VmComponent
+@inject IJSRuntime Js
+@if (Vm.Current is not null && Vm.GeometryValid)
+{
+    var model = Vm.Current.Model;
+    var field = Vm.Field();
+    <svg @ref="canvas" class="scene-svg" viewBox="0 0 960 440" role="img" aria-label="交互式座舱剖面场景" @onclick="Place">
+        <defs>
+            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#dce2d9" stroke-width="0.8" /></pattern>
+        </defs>
+        <rect width="960" height="440" fill="#f3f2e9" />
+        <rect x="80" y="48" width="780" height="312" fill="url(#grid)" />
+        @if (field is not null)
+        {
+            @foreach (var cell in field.Cells)
+            {
+                <rect x="@N(80 + (cell.U - 0.5 / 48) * 780)" y="@N(48 + (1 - cell.V - 0.5 / 24) * 312)" width="16.5" height="13.3" fill="@Engine.FieldColor(cell.Value, field.Maximum, Vm.IsShape)" />
+            }
+        }
+        <path d="M80 48H860V360H80Z" fill="none" stroke="#345b5e" stroke-width="2" />
+        <path d="M80 48L112 26H892V338L860 360 M860 48L892 26" fill="none" stroke="#8caba5" stroke-width="1.2" />
+        <path d="M80 380H860 M80 376V384 M860 376V384" stroke="#688782" />
+        <text x="390" y="404">@(Vm.Plane == "yz" ? "y 向右" : "x 向后") / @(N(Vm.Plane == "yz" ? model.Width : model.Length)) m</text>
+        <text x="90" y="430" class="svg-small">所有声源和耳点均为投影；图中颜色对应当前剖面。</text>
+        <text x="12" y="205" class="svg-small">@(Vm.Plane == "xy" ? "y 向右" : "z 向上")</text>
+        <text x="80" y="30" class="svg-small">原点侧</text>
+        @foreach (var source in Vm.Current.Sources)
+        {
+            var projected = Engine.Project(source.Point, model, Vm.Plane);
+            var x = 80 + projected.U * 780;
+            var y = 48 + (1 - projected.V) * 312;
+            <g role="button" tabindex="0" aria-label="@("选中声源" + source.Name)" @onclick:stopPropagation="true" @onclick="() => SelectSource(source.Id)" @onkeydown="e => SourceKey(e, source.Id)">
+                <circle cx="@N(x)" cy="@N(y)" r="18" fill="white" opacity="0.85" />
+                <path d="@($"M{N(x)} {N(y-11)}L{N(x+10)} {N(y+8)}H{N(x-10)}Z")" fill="@(source.Enabled ? "#be5e35" : "#89928d")" stroke="@(Vm.SelectedSourceId == source.Id ? "#263f41" : "white")" stroke-width="2" />
+                <text x="@N(x+18)" y="@N(y+5)" class="point-label">@source.Name</text>
+            </g>
+        }
+        @foreach (var seat in Vm.Current.Seats)
+        {
+            var projected = Engine.Project(seat.Point, model, Vm.Plane);
+            var x = 80 + projected.U * 780;
+            var y = 48 + (1 - projected.V) * 312;
+            <g role="button" tabindex="0" aria-label="@("选中耳点" + seat.Name)" @onclick:stopPropagation="true" @onclick="() => SelectSeat(seat.Id)" @onkeydown="e => SeatKey(e, seat.Id)">
+                <circle cx="@N(x)" cy="@N(y)" r="@(Vm.SelectedSeatId == seat.Id ? 15 : 11)" fill="#f7f6ed" stroke="#286d73" stroke-width="3" />
+                <circle cx="@N(x)" cy="@N(y)" r="4" fill="#286d73" />
+                <text x="@N(x+18)" y="@N(y+5)" class="point-label">@seat.Name</text>
+            </g>
+        }
+    </svg>
+}
+else
+{
+    <div class="empty-result">请将长度、宽度和高度修正到0.5至10m，恢复空间场景。</div>
+}
+@code {
+    private ElementReference canvas;
+    private async Task Place(MouseEventArgs args)
+    {
+        if (Vm.PointAction == "select")
+            return;
+        var point = await Js.InvokeAsync<double[]>("cabinSvgPoint", canvas, args.ClientX, args.ClientY);
+        if (point[0] < 80 || point[0] > 860 || point[1] < 48 || point[1] > 360)
+            return;
+        Vm.PlacePoint((point[0] - 80) / 780, 1 - (point[1] - 48) / 312);
+    }
+    private void SelectSeat(Guid id)
+    {
+        Vm.SelectedSeatId = id;
+        Vm.Notify();
+    }
+    private void SelectSource(Guid id)
+    {
+        Vm.SelectedSourceId = id;
+        Vm.Notify();
+    }
+    private void SeatKey(KeyboardEventArgs args, Guid id)
+    {
+        if (args.Key is "Enter" or " ")
+            SelectSeat(id);
+    }
+    private void SourceKey(KeyboardEventArgs args, Guid id)
+    {
+        if (args.Key is "Enter" or " ")
+            SelectSource(id);
+    }
+}

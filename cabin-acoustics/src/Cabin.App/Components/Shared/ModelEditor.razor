@@ -1,0 +1,132 @@
+@inherits VmComponent
+@if (Vm.Current is not null)
+{
+    var project = Vm.Current;
+    var model = project.Model;
+    <section class="model-editor">
+        <div class="editor-title"><h3>模型与点位</h3><span>所有几何量均为 m；坐标必须在腔体内</span></div>
+        <div class="editor-grid">
+            <fieldset>
+                <legend>项目身份与来源</legend>
+                <label>项目名称<input aria-label="项目名称" maxlength="80" @bind="project.Name" @bind:after="Vm.Edited" /></label>
+                <div class="form-pair">
+                    <label>修订号<input aria-label="修订号" maxlength="30" @bind="project.Revision" @bind:after="Vm.Edited" /></label>
+                    <label>负责人<input aria-label="负责人" maxlength="80" @bind="project.Owner" @bind:after="Vm.Edited" /></label>
+                </div>
+                <label>数据来源<input aria-label="数据来源" maxlength="300" @bind="project.DataSource" @bind:after="Vm.Edited" /></label>
+                <label class="check"><input type="checkbox" @bind="project.IsDemo" @bind:after="Vm.Edited" /> 模拟示例标记</label>
+                <label>研究备注<textarea rows="3" maxlength="3000" @bind="project.Notes" @bind:after="Vm.Edited"></textarea></label>
+            </fieldset>
+            <fieldset>
+                <legend>矩形几何与介质</legend>
+                <div class="form-triple">
+                    <label>长度 Lx / m<input aria-label="长度Lx" type="number" min="0.5" max="10" step="0.01" @bind="model.Length" @bind:after="Vm.Edited" /></label>
+                    <label>宽度 Ly / m<input aria-label="宽度Ly" type="number" min="0.5" max="10" step="0.01" @bind="model.Width" @bind:after="Vm.Edited" /></label>
+                    <label>高度 Lz / m<input aria-label="高度Lz" type="number" min="0.5" max="10" step="0.01" @bind="model.Height" @bind:after="Vm.Edited" /></label>
+                </div>
+                <label>声速 / m/s<input aria-label="声速" type="number" min="300" max="380" step="0.1" @bind="model.SoundSpeed" @bind:after="Vm.Edited" /></label>
+                <label>模态阻尼比 ζ<input aria-label="模态阻尼比" type="number" min="0.002" max="0.2" step="0.001" @bind="model.Damping" @bind:after="Vm.Edited" /></label>
+                <p class="muted">默认343 m/s和0.03为研究假设，需根据介质与实测校准；刚性振型配合统一等效阻尼。</p>
+            </fieldset>
+            <fieldset>
+                <legend>分析频带与截断</legend>
+                <div class="form-pair">
+                    <label>起点 / Hz<input aria-label="频带起点" type="number" min="5" max="499" @bind="model.MinimumFrequency" @bind:after="Vm.Edited" /></label>
+                    <label>终点 / Hz<input aria-label="频带终点" type="number" min="6" max="500" @bind="model.MaximumFrequency" @bind:after="Vm.Edited" /></label>
+                </div>
+                <label>频率步长 / Hz<input aria-label="频率步长" type="number" min="0.25" max="10" step="0.25" @bind="model.FrequencyStep" @bind:after="Vm.Edited" /></label>
+                <label>模态截断 / Hz<input aria-label="模态截断" type="number" min="100" max="1000" @bind="model.Cutoff" @bind:after="Vm.Edited" /></label>
+                <p class="muted">截断不得低于终点。增加截断和减小步长可做敏感性检查，不能保证真实车舱精度。</p>
+                <button class="text-button" @onclick="Vm.Undo" disabled="@(!Vm.CanUndo)">撤销上一次结构操作</button>
+            </fieldset>
+        </div>
+        <div class="point-editors">
+            <fieldset>
+                <legend>声源（最多8个）</legend>
+                <div class="inline-selection">
+                    <select aria-label="选中声源" @bind="Vm.SelectedSourceId" @bind:after="() => Vm.Notify()">
+                        <option value="@Guid.Empty">选择声源</option>
+                        @foreach (var source in project.Sources)
+                        {
+                            <option value="@source.Id">@source.Name</option>
+                        }
+                    </select>
+                    <button @onclick="Vm.AddSource" disabled="@(project.Sources.Count >= 8)">添加声源</button>
+                </div>
+                @if (Vm.SelectedSource is not null)
+                {
+                    var source = Vm.SelectedSource;
+                    <label>声源名称<input aria-label="声源名称" maxlength="50" @bind="source.Name" @bind:after="Vm.Edited" /></label>
+                    <div class="form-triple">
+                        <label>x / m<input aria-label="声源x" type="number" step="0.01" @bind="source.Point.X" @bind:after="Vm.Edited" /></label>
+                        <label>y / m<input aria-label="声源y" type="number" step="0.01" @bind="source.Point.Y" @bind:after="Vm.Edited" /></label>
+                        <label>z / m<input aria-label="声源z" type="number" step="0.01" @bind="source.Point.Z" @bind:after="Vm.Edited" /></label>
+                    </div>
+                    <div class="form-pair">
+                        <label>相对幅值 A<input aria-label="声源幅值" type="number" min="0" max="10" step="0.1" @bind="source.Amplitude" @bind:after="Vm.Edited" /></label>
+                        <label>相位 / °<input aria-label="声源相位" type="number" min="-180" max="180" @bind="source.PhaseDegrees" @bind:after="Vm.Edited" /></label>
+                    </div>
+                    <div class="actions">
+                        <label class="check"><input type="checkbox" @bind="source.Enabled" @bind:after="Vm.Edited" />启用此声源</label>
+                        <button class="danger" @onclick="() => Vm.RemoveSource(source.Id)">移除此声源</button>
+                    </div>
+                }
+                <p class="muted">幅值为无量纲相对输入，多源相位共用参考；不等于声功率或体积速度。</p>
+            </fieldset>
+            <fieldset>
+                <legend>座位耳点（最多12个）</legend>
+                <div class="inline-selection">
+                    <select aria-label="选中耳点" @bind="Vm.SelectedSeatId" @bind:after="() => Vm.Notify()">
+                        <option value="@Guid.Empty">选择耳点</option>
+                        @foreach (var seat in project.Seats)
+                        {
+                            <option value="@seat.Id">@seat.Name</option>
+                        }
+                    </select>
+                    <button @onclick="Vm.AddSeat" disabled="@(project.Seats.Count >= 12)">添加耳点</button>
+                </div>
+                @if (Vm.SelectedSeat is not null)
+                {
+                    var seat = Vm.SelectedSeat;
+                    <label>耳点名称<input aria-label="耳点名称" maxlength="50" @bind="seat.Name" @bind:after="Vm.Edited" /></label>
+                    <div class="form-triple">
+                        <label>x / m<input aria-label="耳点x" type="number" step="0.01" @bind="seat.Point.X" @bind:after="Vm.Edited" /></label>
+                        <label>y / m<input aria-label="耳点y" type="number" step="0.01" @bind="seat.Point.Y" @bind:after="Vm.Edited" /></label>
+                        <label>z / m<input aria-label="耳点z" type="number" step="0.01" @bind="seat.Point.Z" @bind:after="Vm.Edited" /></label>
+                    </div>
+                    <label>耳点备注<input maxlength="300" @bind="seat.Note" @bind:after="Vm.Edited" /></label>
+                    <button class="danger" @onclick="() => Vm.RemoveSeat(seat.Id)">移除此耳点</button>
+                }
+                <p class="muted">耳点不模拟人体散射或左右耳差异；各点为理想位置采样。</p>
+            </fieldset>
+        </div>
+        <details class="csv-panel">
+            <summary>点位CSV批量导入 / 替换预检</summary>
+            <p>UTF-8、逗号分隔、小数点；kind为source或seat。单元格不支持换行。seat行的幅值和相位留空。应用前显示错误行号，不部分导入。</p>
+            <textarea aria-label="点位CSV内容" rows="6" spellcheck="false" @bind="Vm.CsvText" @bind:after="CsvChanged"></textarea>
+            <div class="actions">
+                <button @onclick="Vm.PreviewCsv">预检点位CSV</button>
+                <button @onclick="Vm.ApplyCsv" disabled="@(Vm.Csv?.CanApply != true)">应用CSV替换</button>
+                <button @onclick='() => Vm.Export("points")'>导出当前点位CSV</button>
+            </div>
+            @if (Vm.Csv is not null)
+            {
+                <p>有效点位 @Vm.Csv.Rows.Count 个；错误 @Vm.Csv.Issues.Count 个。</p>
+                @foreach (var issue in Vm.Csv.Issues)
+                {
+                    <p class="error-text">@issue.Path：@issue.Message</p>
+                }
+                @foreach (var row in Vm.Csv.Rows.Take(20))
+                {
+                    <p class="preview-row">@row.Kind / @row.Name / (@N(row.Point.X), @N(row.Point.Y), @N(row.Point.Z)) m</p>
+                }
+            }
+        </details>
+    </section>
+}
+@code {
+    private void CsvChanged()
+    {
+        Vm.PreviewCsv();
+    }
+}

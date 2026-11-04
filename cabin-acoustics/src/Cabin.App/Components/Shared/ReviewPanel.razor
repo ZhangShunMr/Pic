@@ -1,0 +1,30 @@
+@inherits VmComponent
+@if (Vm.Current is not null)
+{
+    <section class="review-section">
+        <div class="section-caption"><span>04 / 实测复核与追溯</span><span>人工记录 · 与项目一起保存</span></div>
+        <div class="review-inputs">
+            <label>复核对象<input aria-label="复核对象" maxlength="200" placeholder="例如：首阶纵向模态" @bind="Vm.ReviewTarget" /></label>
+            <label>具体步骤<textarea aria-label="复核步骤" rows="2" maxlength="1000" placeholder="写明测点、频率、工况和检查内容" @bind="Vm.ReviewAction"></textarea></label>
+            <label>负责人<input aria-label="复核负责人" maxlength="80" @bind="Vm.ReviewOwner" /></label>
+            <button @onclick="Vm.AddReview">加入复核清单</button>
+        </div>
+        @foreach (var item in Vm.Current.Reviews)
+        {
+            <article class="review-item">
+                <div><strong>@item.Target</strong><p>@item.Action</p><small>负责人：@item.Owner</small></div>
+                <label>人工复核结果<textarea aria-label="@("复核结果" + item.Target)" rows="2" maxlength="1000" @bind="item.Result" @bind:after="Vm.ReviewEdited"></textarea></label>
+                <button class="text-button danger" @onclick="() => Vm.RemoveReview(item.Id)">删除记录</button>
+            </article>
+        }
+        <details>
+            <summary>操作历史（最近30条）</summary>
+            <div class="journal">
+                @foreach (var entry in Vm.Current.Journal.TakeLast(30).Reverse())
+                {
+                    <p><time>@entry.Time.ToString("u")</time> <strong>@entry.Action</strong> @entry.Detail</p>
+                }
+            </div>
+        </details>
+    </section>
+}

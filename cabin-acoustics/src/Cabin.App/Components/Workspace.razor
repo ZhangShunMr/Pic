@@ -1,0 +1,196 @@
+@page "/"
+@inherits VmComponent
+@inject IJSRuntime Js
+<PageTitle>座舱声场研究 · V1.0</PageTitle>
+<header class="masthead">
+    <div class="brand-mark">腔</div>
+    <div>
+        <p class="eyebrow">CABIN ACOUSTICS / 空间研究</p>
+        <h1>车内低频声学模态与座位声压分布设计软件 <small>V1.0</small></h1>
+    </div>
+    <button class="file-trigger" @onclick="OpenFiles">项目与成果 ↗</button>
+</header>
+<div class="status-strip" role="status" aria-live="polite">
+    <span class="status-dot"></span>
+    <span>@Vm.Status</span>
+    @if (Vm.Dirty)
+    {
+        <strong class="unsaved">有未保存更改</strong>
+    }
+</div>
+@if (Vm.Current is null)
+{
+    <main class="welcome">
+        <div class="welcome-copy">
+            <p class="eyebrow">从几何出发，理解低频空间差异</p>
+            <h2>同一声源，<br />不同座位的响应为何不同？</h2>
+            <p>建立理想矩形座舱，在空间中放置声源和耳点，沿着模态谱观察振型，再用指定频率的激励响应比较座位。</p>
+            <div class="actions">
+                <button class="primary" @onclick="Vm.NewProject">新建空白项目</button>
+                <button @onclick="Vm.LoadDemo">载入独立模拟示例</button>
+            </div>
+            <p class="muted">示例将载入3.4 × 1.6 × 1.2 m矩形腔、1个模拟声源和4个耳点。</p>
+        </div>
+        <div class="welcome-art" aria-label="矩形腔空间示意，非计算结果">
+            <svg viewBox="0 0 500 350" role="img">
+                <path d="M70 100L330 55L450 150L190 200Z M70 100V240L190 305V200 M190 305L450 250V150 M330 55V195L450 250 M70 240L330 195" fill="none" stroke="#3b7075" stroke-width="2" />
+                <path d="M100 170Q140 60 180 160T260 150T340 140T420 130" fill="none" stroke="#c5683e" stroke-width="4" />
+                <circle cx="145" cy="210" r="9" fill="#cc683e" />
+                <circle cx="320" cy="210" r="9" fill="#2e7175" />
+                <text x="90" y="335">空间示意 · 不代表实测声场</text>
+            </svg>
+        </div>
+        <p class="model-limit">@Software.Scope</p>
+    </main>
+}
+else
+{
+    <main class="research" aria-busy="@Vm.Busy">
+        <section class="project-heading">
+            <div>
+                <p class="eyebrow">@Vm.SourceLabel</p>
+                <h2>@Vm.Current.Name <small>修订 @Vm.Current.Revision</small></h2>
+            </div>
+            <div class="actions">
+                <button @onclick="() => Vm.SettingsOpen = !Vm.SettingsOpen">模型与点位 @(Vm.SettingsOpen ? "收起" : "展开")</button>
+                <button class="primary" disabled="@Vm.Busy" @onclick="Vm.Calculate">计算声场</button>
+            </div>
+        </section>
+        @if (Vm.Issues.Count > 0)
+        {
+            <section class="errors" role="alert">
+                <strong>请修正以下输入</strong>
+                @foreach (var issue in Vm.Issues)
+                {
+                    <p>@issue.Path：@issue.Message</p>
+                }
+            </section>
+        }
+        <section class="scene-section">
+            <div class="section-caption"><span>01 / 空间场景</span><span>前左下为原点 · x向后 · y向右 · z向上</span></div>
+            <div class="scene-toolbar">
+                <label>显示量
+                    <select aria-label="场景显示量" @bind="Vm.Quantity">
+                        <option value="shape">模态振型（正负号）</option>
+                        <option value="response">激励响应（幅值）</option>
+                    </select>
+                </label>
+                <label>剖面
+                    <select aria-label="剖面方向" @bind="Vm.Plane">
+                        <option value="xy">俯视 x-y</option>
+                        <option value="xz">纵剖 x-z</option>
+                        <option value="yz">横剖 y-z</option>
+                    </select>
+                </label>
+                <label class="slice-control">剖面位置 @N(Vm.Slice * 100, "F0")%
+                    <input aria-label="剖面位置" type="range" min="0" max="1" step="0.01" @bind="Vm.Slice" />
+                </label>
+                <label>画布操作
+                    <select aria-label="画布操作" @bind="Vm.PointAction">
+                        <option value="select">选择点位</option>
+                        <option value="seat">放置选中耳点</option>
+                        <option value="source">放置选中声源</option>
+                    </select>
+                </label>
+            </div>
+            <div class="scene-layout">
+                <div class="spatial-stage">
+                    <Scene />
+                </div>
+                <aside class="scene-note">
+                    <p class="eyebrow">@(Vm.IsShape ? "EIGENMODE / 特征模态" : "FORCED RESPONSE / 激励响应")</p>
+                    @if (Vm.IsShape && Vm.SelectedMode is not null)
+                    {
+                        <h3>@N(Vm.SelectedMode.Frequency) <small>Hz</small></h3>
+                        <p>阶次 (@Vm.SelectedMode.Key) · @Vm.SelectedMode.Kind</p>
+                        <p>暖色为正、冷色为负，浅色接近节点。振型归一化至±1；正负号表示空间相位关系。</p>
+                        <p>此图由几何决定，声源移动不会改变此模态形状。</p>
+                    }
+                    else if (!Vm.IsShape && Vm.Result is not null)
+                    {
+                        <h3>@N(Vm.CursorFrequency) <small>Hz</small></h3>
+                        <p>所有纳入模态按相位叠加。</p>
+                        <p>场景颜色除以当前剖面最大幅值，仅用于观察空间分布，不能跨方案比较颜色深浅。</p>
+                        <p>下方曲线和座位数值采用全部耳点全频带共同参考。</p>
+                    }
+                    else
+                    {
+                        <h3>等待计算</h3>
+                        <p>填写模型和点位后计算。空间中点位为投影，可能不处于当前剖面。</p>
+                    }
+                    <div class="point-legend"><i class="source-symbol"></i>声源 <i class="seat-symbol"></i>耳点</div>
+                    <p class="muted">画布放置会使用当前剖面高度或位置。具体三维坐标见“模型与点位”。</p>
+                </aside>
+            </div>
+            @if (Vm.SettingsOpen)
+            {
+                <ModelEditor />
+            }
+        </section>
+        <section class="frequency-section">
+            <div class="section-caption"><span>02 / 频率与座位</span><span>离散频点峰值 · 统一参考 · 非 dB SPL</span></div>
+            <div class="frequency-control">
+                <label>激励频率 / Hz
+                    <input aria-label="激励频率" type="number" min="@N(Vm.Current.Model.MinimumFrequency)" max="@N(Vm.Current.Model.MaximumFrequency)" step="0.25" value="@N(Vm.CursorFrequency)" @onchange="FrequencyChanged" />
+                </label>
+                <input aria-label="激励频率滑杆" type="range" min="@N(Vm.Current.Model.MinimumFrequency)" max="@N(Vm.Current.Model.MaximumFrequency)" step="0.25" value="@N(Vm.CursorFrequency)" @onchange="FrequencyChanged" />
+                <span>点击曲线或输入频率查看激励响应</span>
+            </div>
+            <FrequencyPlot />
+            <SeatResults />
+        </section>
+        <div class="analysis-columns">
+            <section class="paper-panel">
+                <ModeLedger />
+            </section>
+            <section class="paper-panel">
+                <ContributionPanel />
+            </section>
+        </div>
+        <DiagnosticsPanel />
+        <StudyPanel />
+        <ReviewPanel />
+        <footer class="model-limit">
+            <p>@Software.Scope</p>
+            <button class="text-button" @onclick="() => Vm.HelpOpen = !Vm.HelpOpen">计算方法与使用边界</button>
+            @if (Vm.HelpOpen)
+            {
+                <HelpPanel />
+            }
+        </footer>
+    </main>
+}
+@if (Vm.FileOpen)
+{
+    <FileDrawer />
+}
+@if (Vm.Confirmation.Length > 0)
+{
+    <div class="modal-shade">
+        <section role="dialog" aria-modal="true" aria-label="确认操作" class="confirmation">
+            <h2>确认操作</h2>
+            <p>@Vm.Confirmation</p>
+            <div class="actions">
+                <button @onclick="Vm.Cancel">取消</button>
+                <button class="primary" @onclick="Vm.Confirm">确认继续</button>
+            </div>
+        </section>
+    </div>
+}
+<div id="blazor-error-ui">连接或运行发生错误，请刷新后重新打开已保存项目。<a href="/">重新连接</a></div>
+@code {
+    private void OpenFiles()
+    {
+        Vm.FileOpen = true;
+        Vm.RefreshLibrary();
+    }
+    private void FrequencyChanged(ChangeEventArgs args)
+    {
+        if (double.TryParse(args.Value?.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out var value) && double.IsFinite(value))
+            Vm.SelectFrequency(value);
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await Js.InvokeVoidAsync("cabinGuard", Vm.Dirty);
+    }
+}

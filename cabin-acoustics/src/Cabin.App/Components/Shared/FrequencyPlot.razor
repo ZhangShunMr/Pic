@@ -1,0 +1,69 @@
+@inherits VmComponent
+@inject IJSRuntime Js
+@if (Vm.Result is not null && Vm.Current is not null)
+{
+    var result = Vm.Result;
+    var model = Vm.Current.Model;
+    var reference = Vm.Difference?.Reference ?? result.Reference;
+    <svg @ref="plot" class="frequency-svg" viewBox="0 0 1100 290" role="img" aria-label="耳点相对频率响应曲线" @onclick="Select">
+        <rect width="1100" height="290" fill="#fbfaf4" />
+        @for (var db = 0; db >= -80; db -= 20)
+        {
+            var y = 30 - db * 2.3;
+            <g>
+                <path d="@($"M65 {N(y)}H1070")" stroke="#d5ded5" />
+                <text x="18" y="@N(y+5)" class="svg-small">@db</text>
+            </g>
+        }
+        @for (var tick = 0; tick <= 4; tick++)
+        {
+            var x = 65 + tick * 1005 / 4.0;
+            var f = model.MinimumFrequency + tick * (model.MaximumFrequency - model.MinimumFrequency) / 4;
+            <g>
+                <text x="@N(x-10)" y="240" class="svg-small">@N(f, "F0")</text>
+            </g>
+        }
+        @for (var i = 0; i < result.Curves.Count; i++)
+        {
+            var curve = result.Curves[i];
+            var index = i;
+            <polyline points="@Points(curve, model, reference)" fill="none" stroke="@Colors[index % Colors.Length]" stroke-width="@(Vm.SelectedSeatId == curve.Id ? 3 : 1.6)" />
+            @if (Vm.Difference is not null)
+            {
+                var old = Vm.Difference.BaselineResult.Curves.FirstOrDefault(x => x.Id == curve.Id);
+                if (old is not null)
+                {
+                    <polyline points="@Points(old, model, reference)" fill="none" stroke="@Colors[index % Colors.Length]" stroke-width="1.3" stroke-dasharray="5 5" opacity="0.7" />
+                }
+            }
+            <g><text x="@(65 + index % 6 * 160)" y="@(268 + index / 6 * 18)" fill="@Colors[index % Colors.Length]" class="svg-small">@curve.Name</text></g>
+        }
+        <path d="@($"M{N(65+(Vm.CursorFrequency-model.MinimumFrequency)/(model.MaximumFrequency-model.MinimumFrequency)*1005)} 25V218")" stroke="#b25c38" stroke-width="1.5" stroke-dasharray="4 4" />
+        <text x="18" y="17" class="svg-small">相对dB</text>
+        <text x="1045" y="260" class="svg-small">Hz</text>
+    </svg>
+    <p class="chart-note">参考幅值 @N(reference, "G5")；@(Vm.Difference is null ? "本项目所有耳点全频带最大值" : "当前与基准共用最大值；虚线为基准")。图形裁切于−80 dB，导出保留至−120 dB。频点等权，非实测声级。</p>
+}
+else
+{
+    <div class="empty-result">尚无频响曲线。请填写声源和耳点，然后计算声场。</div>
+}
+@code {
+    private ElementReference plot;
+    private static readonly string[] Colors = ["#236b72", "#c3663b", "#7974a6", "#788643", "#ab5776", "#456aa0"];
+    private static string Points(SeatCurve curve, Cavity model, double reference)
+    {
+        return string.Join(" ", curve.Points.Select(p =>
+            N(65 + (p.Frequency - model.MinimumFrequency) / (model.MaximumFrequency - model.MinimumFrequency) * 1005) + "," +
+            N(30 - Math.Max(-80, p.RelativeDb(reference)) * 2.3)));
+    }
+    private async Task Select(MouseEventArgs args)
+    {
+        if (Vm.Current is null)
+            return;
+        var point = await Js.InvokeAsync<double[]>("cabinSvgPoint", plot, args.ClientX, args.ClientY);
+        var f = Vm.Current.Model.MinimumFrequency + (point[0] - 65) / 1005 *
+            (Vm.Current.Model.MaximumFrequency - Vm.Current.Model.MinimumFrequency);
+        Vm.SelectFrequency(f);
+    }
+}

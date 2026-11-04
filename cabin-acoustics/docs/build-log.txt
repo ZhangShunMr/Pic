@@ -1,0 +1,11 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  Cabin.Core -> /workspace/Pic/cabin-acoustics/src/Cabin.Core/bin/Debug/net10.0/Cabin.Core.dll
+  Cabin.App -> /workspace/Pic/cabin-acoustics/src/Cabin.App/bin/Debug/net10.0/Cabin.App.dll
+  Cabin.Verification -> /workspace/Pic/cabin-acoustics/tests/Cabin.Verification/bin/Debug/net10.0/Cabin.Verification.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:02.78

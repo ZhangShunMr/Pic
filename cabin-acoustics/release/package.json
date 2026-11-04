@@ -1,0 +1,7 @@
+{
+  "file": "CabinAcoustics-V1.0-portable.zip",
+  "bytes": 5163872,
+  "sha256": "65df82063607cbe69068671de939018bfd75dd67fcf37e681cc8fc118065b5d6",
+  "runtime": "需要.NET 10 ASP.NET Core Runtime或SDK；不内嵌运行时",
+  "build": "framework-dependent Release net10.0"
+}

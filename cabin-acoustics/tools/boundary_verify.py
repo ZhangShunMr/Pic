@@ -1,0 +1,41 @@
+from playwright.sync_api import sync_playwright,expect
+from pathlib import Path
+import json,time
+root=Path(__file__).resolve().parents[1]
+checks=[]
+def record(name):checks.append({'name':name,'passed':True});print('PASS',name,flush=True)
+def button(page,name):return page.get_by_role('button',name=name,exact=True)
+with sync_playwright() as p:
+ b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox']);page=b.new_page(viewport={'width':1500,'height':1050})
+ page.goto('http://127.0.0.1:8786');page.wait_for_timeout(1300)
+ button(page,'载入独立模拟示例').click();button(page,'模型与点位 展开').click()
+ page.get_by_label('宽度Ly',exact=True).fill('0');page.get_by_label('宽度Ly',exact=True).press('Tab')
+ expect(page.locator('.spatial-stage')).to_contain_text('0.5至10m')
+ button(page,'计算声场').click();expect(page.get_by_role('alert')).to_contain_text('宽度 Ly / m')
+ page.get_by_label('宽度Ly',exact=True).fill('1.6');page.get_by_label('宽度Ly',exact=True).press('Tab');button(page,'计算声场').click()
+ expect(page.locator('.scene-svg')).to_be_visible();record('零几何停止投影并恢复有效场景')
+ button(page,'项目与成果 ↗').click()
+ bad=root/'docs/browser-downloads/损坏.cabin.json';bad.write_text('{"schema":2}')
+ page.locator('input[type=file]').set_input_files(str(bad))
+ expect(page.get_by_role('status')).to_contain_text('缺少字段')
+ button(page,'关闭').click();expect(page.locator('.seat-card')).to_have_count(4)
+ record('损坏导入不替换当前已计算项目')
+ page.get_by_text('点位CSV批量导入 / 替换预检',exact=True).click()
+ page.get_by_label('点位CSV内容').fill('kind,name,x_m,y_m,z_m,amplitude,phase_deg,note\nsource,批量源,0.2,0.8,0.35,1,0,模拟\nseat,批量耳点,1.05,0.4,0.85,,,模拟')
+ button(page,'预检点位CSV').click();expect(button(page,'应用CSV替换')).to_be_enabled()
+ button(page,'应用CSV替换').click();expect(page.get_by_role('dialog',name='确认操作')).to_be_visible();button(page,'确认继续').click()
+ button(page,'计算声场').click();expect(page.locator('.seat-card')).to_have_count(1);expect(page.locator('.seat-card')).to_contain_text('批量耳点')
+ record('有效CSV确认替换后重算')
+ button(page,'比较当前与基准').click();expect(page.get_by_role('status')).to_contain_text('没有可匹配')
+ record('CSV新标识与旧基准无法匹配明确阻止')
+ button(page,'撤销上一次结构操作').click();button(page,'计算声场').click();expect(page.locator('.seat-card')).to_have_count(4)
+ record('结构撤销恢复CSV替换前点位')
+ button(page,'项目与成果 ↗').click();button(page,'复制当前项目').click()
+ expect(page.get_by_role('heading',name='四座矩形座舱 · 模拟研究 副本 修订 A')).to_be_visible()
+ button(page,'保存到本机').click();expect(page.get_by_role('status')).to_contain_text('保存成功')
+ row=page.locator('.library-row').filter(has_text='副本').first
+ row.get_by_role('button',name='删除',exact=True).click();button(page,'确认继续').click()
+ expect(page.get_by_role('status')).to_contain_text('本机项目文件已删除')
+ record('复制独立项目保存并确认删除文件')
+ b.close()
+(root/'docs/boundary-browser-evidence.json').write_text(json.dumps({'date':time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime()),'total':len(checks),'checks':checks},ensure_ascii=False,indent=2))

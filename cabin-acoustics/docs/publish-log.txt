@@ -1,0 +1,5 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  Cabin.Core -> /workspace/Pic/cabin-acoustics/src/Cabin.Core/bin/Release/net10.0/Cabin.Core.dll
+  Cabin.App -> /workspace/Pic/cabin-acoustics/src/Cabin.App/bin/Release/net10.0/Cabin.App.dll
+  Cabin.App -> /workspace/Pic/cabin-acoustics/publish/
