@@ -1,9 +1,9 @@
 {
-  "executedUtc": "2026-11-04T15:46:00.7228238+00:00",
-  "sourceCommit": "e1e691f070d35b7e353584615228cdbadb6585e9",
+  "executedUtc": "2026-11-04T15:50:54.6051632+00:00",
+  "sourceCommit": "4d05a94c55c0a6fc9ac994bde6f0a18e1a421844",
   "platform": "Microsoft Windows NT 10.0.26100.0",
   "executable": "artifacts/win-x64/AcousticSeal.Desktop.exe",
-  "sha256": "8E428E7F50B9C3BBF01038AE552C8B0750E9B7B9CE9B1BC48FDB0E3E2E08C40D",
+  "sha256": "D988659E22B281C3EDC083F9B3841F053AA56D453A2585E120D122CF15575014",
   "actualProcessStarted": true,
   "nativeWindowTitle": "车身声学泄漏路径与封堵试验分析软件 V3.0 · 未命名声学试验项目",
   "selfContained": true,

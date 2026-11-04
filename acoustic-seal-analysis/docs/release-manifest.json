@@ -1,11 +1,14 @@
 {
-  "file": "releases/AcousticSeal-V3.0-win-x64.zip",
-  "sha256": "16d62b3fed2430f4de76a47b3f71053442865baf631a9b45d10f8b58e3734262",
-  "bytes": 63327025,
   "rid": "win-x64",
+  "bytes": 65364601,
+  "native_exit_code": 0,
+  "built_on": "Microsoft Windows NT 10.0.26100.0",
+  "workflowRun": "https://github.com/ZhangShunMr/Pic/actions/runs/41861712287",
+  "sourceCommit": "4d05a94c55c0a6fc9ac994bde6f0a18e1a421844",
+  "sha256": "15267bfabbafed71161a687daff7867a2e215813f4904a7a418c628c72786498",
   "self_contained": true,
-  "built_on": "Linux x64 .NET SDK 10.0.403",
-  "windows_runtime_executed": false,
-  "zip_integrity_test": "passed",
-  "contains_exe": true
+  "file": "releases/AcousticSeal-V3.0-win-x64.zip",
+  "tested_exe_sha256": "d988659e22b281c3edc083f9b3841f053aa56d453a2585e120d122cf15575014",
+  "archived_exe_hash_verified": true,
+  "windows_runtime_executed": true
 }

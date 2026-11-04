@@ -1,5 +1,5 @@
 ﻿"project_id","project","revision","software_version","schema_version","pair_id","purpose","baseline_id","target_id","baseline","target","source_kind","baseline_source","target_source","baseline_condition_id","target_condition_id","frequency_hz","baseline_db","target_db","measured_baseline_minus_target_db","status","blocking_reasons","warnings","level_reference","settings_json","input_hash"
-"9f2236cb-88b5-410d-a49c-e783ff064d0a","手工模拟封堵案例","6","3.0.0","2","beba987f-5276-44f0-89f5-0edb20f39687","Effect","9ef73140-da84-42dc-b2f3-ecb617b3982b","0804e99f-1307-476b-81fd-f738e171ec95","基线","单项封堵","Manual","人工填写的独立Windows验证数值","人工填写的独立Windows验证数值","8d4b60de-5d03-469a-abd5-2b5b4df5ba1d","8d4b60de-5d03-469a-abd5-2b5b4df5ba1d","125","70","67","3","Valid","","包含人工填写数据，不能证明真实应用效果","dB re 20 µPa","{
+"e14ee5e8-d565-4ff0-a6ac-422151661606","手工模拟封堵案例","6","3.0.0","2","d161d6fe-210a-44c2-9fc0-57068e34efe5","Effect","ebccd118-1d00-40c6-bba3-cb01ce9e8526","df09922b-5646-404b-8bb3-f9256d95d8b6","基线","单项封堵","Manual","人工填写的独立Windows验证数值","人工填写的独立Windows验证数值","35394bfb-1e88-4bff-8f6f-4de375572e9f","35394bfb-1e88-4bff-8f6f-4de375572e9f","125","70","67","3","Valid","","包含人工填写数据，不能证明真实应用效果","dB re 20 µPa","{
   ""speedTolerance"": 0.5,
   ""rpmTolerance"": 20,
   ""temperatureTolerance"": 2,
@@ -10,4 +10,4 @@
   ""minimumEffectDisplay"": 0,
   ""requireSampleRateMatch"": false,
   ""requireSynchronizationMatch"": false
-}","bf161661e991da93b738e9613f933ea2f20b584add81f9b7b21ae49893440904"
+}","9295f937b36c0223c7ff0c880d5e109414ab058f54bf0f84b167abb0e2d74422"

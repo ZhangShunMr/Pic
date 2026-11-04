@@ -1,19 +1,19 @@
 {
   "schemaVersion": 2,
   "softwareVersion": "3.0.0",
-  "id": "9f2236cb-88b5-410d-a49c-e783ff064d0a",
+  "id": "e14ee5e8-d565-4ff0-a6ac-422151661606",
   "name": "手工模拟封堵案例",
   "owner": "Windows验证人员",
   "vehicleProgramme": "",
   "objective": "",
   "description": "",
-  "createdAt": "2026-11-04T15:45:28.6129876+00:00",
-  "updatedAt": "2026-11-04T15:45:36.9018487+00:00",
+  "createdAt": "2026-11-04T15:50:16.3829628+00:00",
+  "updatedAt": "2026-11-04T15:50:25.6533894+00:00",
   "revision": 6,
   "status": "active",
   "locations": [
     {
-      "id": "e1ba2703-1917-463d-9fa7-60ec6b42d6a8",
+      "id": "df7c7eee-3857-4f38-9dfa-ba12a0c7e0c0",
       "name": "车门密封条",
       "zone": "",
       "material": "模拟胶带",
@@ -26,7 +26,7 @@
   ],
   "conditions": [
     {
-      "id": "8d4b60de-5d03-469a-abd5-2b5b4df5ba1d",
+      "id": "35394bfb-1e88-4bff-8f6f-4de375572e9f",
       "name": "模拟工况",
       "vehicle": "SIM-01",
       "microphone": "驾驶员耳旁",
@@ -51,12 +51,12 @@
   ],
   "trials": [
     {
-      "id": "9ef73140-da84-42dc-b2f3-ecb617b3982b",
+      "id": "ebccd118-1d00-40c6-bba3-cb01ce9e8526",
       "name": "基线",
       "kind": "baseline",
-      "conditionId": "8d4b60de-5d03-469a-abd5-2b5b4df5ba1d",
+      "conditionId": "35394bfb-1e88-4bff-8f6f-4de375572e9f",
       "locationIds": [],
-      "timestamp": "2026-11-04T15:45:33.5039386+00:00",
+      "timestamp": "2026-11-04T15:50:21.9979655+00:00",
       "repeatGroup": "",
       "source": "manual",
       "sourceNote": "人工填写的独立Windows验证数值",
@@ -73,14 +73,14 @@
       ]
     },
     {
-      "id": "0804e99f-1307-476b-81fd-f738e171ec95",
+      "id": "df09922b-5646-404b-8bb3-f9256d95d8b6",
       "name": "单项封堵",
       "kind": "single",
-      "conditionId": "8d4b60de-5d03-469a-abd5-2b5b4df5ba1d",
+      "conditionId": "35394bfb-1e88-4bff-8f6f-4de375572e9f",
       "locationIds": [
-        "e1ba2703-1917-463d-9fa7-60ec6b42d6a8"
+        "df7c7eee-3857-4f38-9dfa-ba12a0c7e0c0"
       ],
-      "timestamp": "2026-11-04T15:45:35.0752149+00:00",
+      "timestamp": "2026-11-04T15:50:23.6867045+00:00",
       "repeatGroup": "",
       "source": "manual",
       "sourceNote": "人工填写的独立Windows验证数值",
@@ -99,9 +99,9 @@
   ],
   "pairs": [
     {
-      "id": "beba987f-5276-44f0-89f5-0edb20f39687",
-      "baselineId": "9ef73140-da84-42dc-b2f3-ecb617b3982b",
-      "targetId": "0804e99f-1307-476b-81fd-f738e171ec95",
+      "id": "d161d6fe-210a-44c2-9fc0-57068e34efe5",
+      "baselineId": "ebccd118-1d00-40c6-bba3-cb01ce9e8526",
+      "targetId": "df09922b-5646-404b-8bb3-f9256d95d8b6",
       "purpose": "effect",
       "notes": ""
     }
@@ -120,58 +120,58 @@
   },
   "audit": [
     {
-      "id": "74d2b95b-25bc-4c52-83bf-40aefcab38c7",
-      "time": "2026-11-04T15:45:30.7256528+00:00",
+      "id": "fa7bf05c-c59c-4340-89b7-69c08b1f1e6a",
+      "time": "2026-11-04T15:50:18.7447876+00:00",
       "revision": 1,
       "action": "应用项目档案",
-      "entity": "9f2236cb-88b5-410d-a49c-e783ff064d0a",
+      "entity": "e14ee5e8-d565-4ff0-a6ac-422151661606",
       "detail": "修改字段/集合：name、owner",
-      "inputHash": "829a17ff22d8ba24ef836db0c292b04b1ec4577220c65f5d59fdbd29e5cf6788"
+      "inputHash": "e141139832010578afa887ddcc9016a8a6ebe754ce22a6fd8a3917cd1461ebde"
     },
     {
-      "id": "de35c7a7-5363-4b0b-a5c3-c991ad930f97",
-      "time": "2026-11-04T15:45:31.3675824+00:00",
+      "id": "e0391977-4503-4efc-9228-dc30a87327f9",
+      "time": "2026-11-04T15:50:19.4649627+00:00",
       "revision": 2,
       "action": "应用封堵位置",
-      "entity": "e1ba2703-1917-463d-9fa7-60ec6b42d6a8",
+      "entity": "df7c7eee-3857-4f38-9dfa-ba12a0c7e0c0",
       "detail": "修改字段/集合：locations",
-      "inputHash": "8be974824c786bab6af1747530761ecb33d22063173fe569fa8c13099b1ba5c8"
+      "inputHash": "39ed7771a9287acba32d346823bb878cd028dc63c7ad70709c59fdf4a8004176"
     },
     {
-      "id": "f46e166c-695a-4f26-987f-226312f591c7",
-      "time": "2026-11-04T15:45:32.5013971+00:00",
+      "id": "cda8d5a7-459c-4672-a171-44941bfda6d5",
+      "time": "2026-11-04T15:50:20.7685799+00:00",
       "revision": 3,
       "action": "应用工况",
-      "entity": "8d4b60de-5d03-469a-abd5-2b5b4df5ba1d",
+      "entity": "35394bfb-1e88-4bff-8f6f-4de375572e9f",
       "detail": "修改字段/集合：conditions",
-      "inputHash": "7aa743e1c8af4d2463a0d2f8a8ca47d8f459289bedd78bffd2cc7a5a6800af8f"
+      "inputHash": "99d7fa00af4fb17e4d30cc09d01f0143b66fe6746cd11dca7a81b81770947100"
     },
     {
-      "id": "3b9e008b-d245-413e-8e7a-d50c946b432a",
-      "time": "2026-11-04T15:45:34.1805950+00:00",
+      "id": "d79d9b21-1d1b-4acb-83d7-0fe7f2b01bfe",
+      "time": "2026-11-04T15:50:22.7349172+00:00",
       "revision": 4,
       "action": "应用试验",
-      "entity": "9ef73140-da84-42dc-b2f3-ecb617b3982b",
+      "entity": "ebccd118-1d00-40c6-bba3-cb01ce9e8526",
       "detail": "修改字段/集合：trials",
-      "inputHash": "f87d1f1bf8d380d3048f1ded1d68b980b1f254edea6fbf43c50974a578d691e8"
+      "inputHash": "da7d5a258ca22b4cbdf444c564a0f2b92b3da6b21dbd4acc3184cf35f5761256"
     },
     {
-      "id": "e9e180f7-f7f5-433e-a9bf-aa6fab5af8ea",
-      "time": "2026-11-04T15:45:35.7707561+00:00",
+      "id": "22eb3cd5-2ca2-409b-bcfd-6bc0e3204d91",
+      "time": "2026-11-04T15:50:24.3658718+00:00",
       "revision": 5,
       "action": "应用试验",
-      "entity": "0804e99f-1307-476b-81fd-f738e171ec95",
+      "entity": "df09922b-5646-404b-8bb3-f9256d95d8b6",
       "detail": "修改字段/集合：trials",
-      "inputHash": "96e6271550a37d8c9ef753c919ce538fc631002f51ac069796e34c5f67496f91"
+      "inputHash": "daf8589ada244c9c5e9593916f2332e41f41712e33e9a3be09fad1cffd7892c3"
     },
     {
-      "id": "73eee043-a90c-49e9-86f6-7a69b4ed85a4",
-      "time": "2026-11-04T15:45:36.9018498+00:00",
+      "id": "bc292abc-f9d3-4a90-90b1-f67ac7b06cc4",
+      "time": "2026-11-04T15:50:25.6533904+00:00",
       "revision": 6,
       "action": "应用显式配对",
-      "entity": "beba987f-5276-44f0-89f5-0edb20f39687",
+      "entity": "d161d6fe-210a-44c2-9fc0-57068e34efe5",
       "detail": "修改字段/集合：pairs",
-      "inputHash": "bf161661e991da93b738e9613f933ea2f20b584add81f9b7b21ae49893440904"
+      "inputHash": "9295f937b36c0223c7ff0c880d5e109414ab058f54bf0f84b167abb0e2d74422"
     }
   ],
   "reviews": []
