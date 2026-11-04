@@ -1,0 +1,29 @@
+@inherits VmView
+<section class="page-heading"><div><span class="eyebrow">PANEL GEOMETRY</span><h2>饰板简化轮廓</h2><p>按边界顺序填写顶点；最后一点自动与第一点闭合，勿重复首点。</p></div></section>
+<div class="two-column">
+<section class="card">
+<fieldset disabled="@Vm.Project.Archived">
+    <label>饰板名称<input maxlength="100" @bind="Vm.Draft.Panel.Name" @bind:after="Vm.Notify" /></label>
+    <div class="form-grid">
+        <label>质量 kg<input type="number" step="any" min="0.001" max="100" @bind="Vm.Draft.Panel.MassKg" @bind:after="Vm.Notify" /></label>
+        <label>质心 X mm<input type="number" step="any" @bind="Vm.Draft.Panel.CenterXmm" @bind:after="Vm.Notify" /></label>
+        <label>质心 Y mm<input type="number" step="any" @bind="Vm.Draft.Panel.CenterYmm" @bind:after="Vm.Notify" /></label>
+    </div>
+    <div class="button-row"><button @onclick="Vm.AddVertex">增加顶点</button><button @onclick="Vm.Rectangle">建立矩形轮廓</button></div>
+    <div class="table-wrap"><table><thead><tr><th>顶点顺序</th><th>X mm</th><th>Y mm</th><th>操作</th></tr></thead><tbody>
+    @for (int i = 0; i < Vm.Draft.Panel.Outline.Count; i++)
+    {
+        var vertex = Vm.Draft.Panel.Outline[i];
+        <tr @key="vertex"><td>@(i + 1)</td><td><input aria-label="顶点X" type="number" step="any" @bind="vertex.Xmm" @bind:after="Vm.Notify" /></td><td><input aria-label="顶点Y" type="number" step="any" @bind="vertex.Ymm" @bind:after="Vm.Notify" /></td><td><button class="text-danger" @onclick="() => Vm.DeleteVertex(vertex)">删除</button></td></tr>
+    }
+    </tbody></table></div>
+    @if (Vm.Draft.Panel.Outline.Count == 0)
+    {
+        <p class="empty">尚无顶点。可用矩形作为起点，再修改坐标。</p>
+    }
+    <button class="primary" @onclick="() => Vm.Execute(Vm.ApplyDraft)">应用编辑</button>
+</fieldset>
+<p class="hint">至少3点、最多24点；拒绝自交、退化轮廓、重复边和轮廓外点位。修改轮廓后请一并调整已有卡扣、接触点和质心。</p>
+</section>
+<section class="card"><h3>几何预览 · mm</h3><LayoutDiagram /><p class="hint">这是简化平面示意；不表达板厚、曲面与柔性模态。</p></section>
+</div>

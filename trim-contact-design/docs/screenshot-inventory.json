@@ -1,0 +1,89 @@
+{
+  "origin": "Real Chromium screenshots from published V1.0, source simulation",
+  "files": [
+    {
+      "file": "docs/screenshots/01-blank-project-view.png",
+      "width": 1600,
+      "height": 1100,
+      "sha256": "77378bfe8281cf09c45936e219ba2f593d6b29fc8aef9a5bbedd4f71c5a57d41"
+    },
+    {
+      "file": "docs/screenshots/02-panel-view.png",
+      "width": 1600,
+      "height": 1100,
+      "sha256": "f3c8fbebb33f21f17f8464774ed54f2ba5f75ecfeffe56e12f2847762fb2a1c5"
+    },
+    {
+      "file": "docs/screenshots/03-csv-preview-view.png",
+      "width": 1600,
+      "height": 1100,
+      "sha256": "5cc37e600066903a6b0a4de9f753de25ac4c78ce8f1aa72c2131862b880c5d9d"
+    },
+    {
+      "file": "docs/screenshots/04-layout-view.png",
+      "width": 1600,
+      "height": 1100,
+      "sha256": "4ad87addc1b61c7454bc96274aed190aa054f1a66b14c7d50f0dbb966b3555e1"
+    },
+    {
+      "file": "docs/screenshots/05-loads-view.png",
+      "width": 1600,
+      "height": 1100,
+      "sha256": "0566897dfacba2fd2552aa234489d77273062530c9cc3655461ceb1263c958cf"
+    },
+    {
+      "file": "docs/screenshots/06-results-view.png",
+      "width": 1600,
+      "height": 1100,
+      "sha256": "40c1c057ecc1f4999b1a7f53f1cb8ea1eeaaa9ee5b037a7f449b94e82180badb"
+    },
+    {
+      "file": "docs/screenshots/07-comparison-scan-view.png",
+      "width": 1600,
+      "height": 1100,
+      "sha256": "f627049f7949f1024db9b91ed0e066d6795b7e72d77512b6d7ac3ee66b4e2ec1"
+    },
+    {
+      "file": "docs/screenshots/08-quality-view.png",
+      "width": 1600,
+      "height": 1100,
+      "sha256": "bcf35d14e8ef121ee6f041f3e81c11796bd7c1bbbd23283ccb274d7a625f6a0f"
+    },
+    {
+      "file": "docs/screenshots/09-balance-view.png",
+      "width": 1600,
+      "height": 1100,
+      "sha256": "2f9ad0aff099daa9555536372822dc3c8df88d888f5210fbeffa4c3013ff22bc"
+    },
+    {
+      "file": "docs/screenshots/10-tasks-view.png",
+      "width": 1600,
+      "height": 1100,
+      "sha256": "c97713c3fb5e40b3d0a73571584f567323c11c8c7a78167827b6a28f69863f67"
+    },
+    {
+      "file": "docs/screenshots/11-batch-preview-view.png",
+      "width": 1600,
+      "height": 1100,
+      "sha256": "7716ae4d7a64ecd5c810365148443fcbfd301a77c011f927c261db89f8619efa"
+    },
+    {
+      "file": "docs/screenshots/12-delivery-view.png",
+      "width": 1600,
+      "height": 1100,
+      "sha256": "20b56530f20b4c69e7385308ca2b06a089f6313bb6f58d4f8c5cf9569fc1312b"
+    },
+    {
+      "file": "docs/screenshots/13-revision-view.png",
+      "width": 1600,
+      "height": 1100,
+      "sha256": "9457dc29528351ab5bc3a550b2d906aff7e2391c118266a1eae24c52878ce585"
+    },
+    {
+      "file": "docs/screenshots/14-help-view.png",
+      "width": 1600,
+      "height": 1100,
+      "sha256": "19bd8783a63141b0f1dcfa49b91f624cd71f040af15cdf4f70bcb2d33f2e8b3c"
+    }
+  ]
+}

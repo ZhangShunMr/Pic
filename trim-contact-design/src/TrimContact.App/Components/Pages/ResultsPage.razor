@@ -1,0 +1,74 @@
+@inherits VmView
+<section class="page-heading"><div><span class="eyebrow">CONTACT ASSESSMENT</span><h2>接触状态与受力结果</h2><p>结果是简化力学筛查；分离、滑移及用户限值分别展示。</p></div></section>
+@if (!Vm.CurrentResults)
+{
+    <section class="card empty"><h3>@(Vm.Report is null ? "尚未计算" : "输入已变化，结果失效")</h3><p>应用当前编辑后，点击顶部“计算全部方案”。结果不随编辑自动更新。</p></section>
+}
+else if (Vm.Result is not null)
+{
+    <div class="filter-bar">
+        <label>查看方案<select @bind="Vm.ResultVariantId" @bind:after="ResetResult">
+        @foreach (var result in Vm.Report!.Variants)
+        {
+            <option value="@result.VariantId">@result.Name</option>
+        }
+        </select></label>
+        <label>名义曲线载荷<select @bind="Vm.ResultLoadId">
+        @foreach (var trace in Vm.Result.NominalTraces)
+        {
+            <option value="@trace.LoadId">@trace.LoadName</option>
+        }
+        </select></label>
+    </div>
+    <div class="metrics">
+        <article><span>存在分离的接触点</span><strong>@Vm.Result.SeparationPoints</strong><small>任一采样压缩≤1e-7mm</small></article>
+        <article><span>存在滑移的接触点</span><strong>@Vm.Result.SlidingPoints</strong><small>任一采样滑移余量&gt;1e-7mm</small></article>
+        <article><span>超过用户限值点</span><strong>@Vm.Result.OverLimitPoints</strong><small>卡扣合力或接触压缩限值</small></article>
+        <article><span>求解状态数</span><strong>@Vm.Result.EvaluatedStates</strong><small>@Vm.Result.ToleranceCases 公差条件 × 载荷 × 相位</small></article>
+    </div>
+    <section class="card">
+    <h3>全部点位包络 · 名义与已启用角点</h3>
+    <div class="table-wrap"><table><thead><tr><th>点位</th><th>状态</th><th>压缩 min/max mm</th><th>法向力 min/max N</th><th>max |切向力| N</th><th>滑移余量 max mm</th><th>限值比 max</th></tr></thead><tbody>
+    @foreach (var point in Vm.Result.Contacts.Concat(Vm.Result.Clips))
+    {
+        <tr class="@(Vm.ResultPoint?.PointId == point.PointId ? "row-selected" : "")" @onclick="() => Vm.ResultPointId = point.PointId">
+            <td><button class="table-link">@point.Name</button><small>@point.Kind</small></td>
+            <td><span class="badge @(point.State.Contains("分离") || point.MaxUtilization > 1 ? "warn" : "")">@point.State</span></td>
+            <td>@F(point.MinCompressionMm) / @F(point.MaxCompressionMm)</td>
+            <td>@F(point.MinNormalN) / @F(point.MaxNormalN)</td>
+            <td>@F(point.MaxAbsShearN)</td><td>@F(point.MaxSlipMm)</td><td>@F(point.MaxUtilization)</td>
+        </tr>
+    }
+    </tbody></table></div>
+    <p class="hint">卡扣压缩栏为0占位，不表示卡扣实际行程；卡扣法向负值表示反方向约束力。接触点限值比=最大压缩/允许压缩量，卡扣限值比=合力/用户合力限值。</p>
+    </section>
+    <div class="two-column">
+    <section class="card"><h3>选中点位 · 名义相位曲线</h3><PhaseChart /></section>
+    <section class="card">
+    @if (Vm.ResultPoint is not null)
+    {
+        <h3>@Vm.ResultPoint.Name · 控制依据</h3>
+        <dl><dt>最小压缩控制工况</dt><dd>@Vm.ResultPoint.CompressionCase</dd><dt>最大滑移控制工况</dt><dd>@(Vm.ResultPoint.SlipCase.Length == 0 ? "未出现超过数值零的滑移余量" : Vm.ResultPoint.SlipCase)</dd><dt>最大限值比控制工况</dt><dd>@Vm.ResultPoint.GoverningCase</dd></dl>
+        <p>分离采样 @Vm.ResultPoint.DetachedSamples / @Vm.ResultPoint.TotalSamples；滑移采样 @Vm.ResultPoint.SlidingSamples / @Vm.ResultPoint.TotalSamples。</p>
+        <div class="callout">采样数及其比值只描述枚举集合，不是概率、失效率或合格率。所有“持续”表述仅限已经求解的采样。</div>
+    }
+    <p>最大平衡残差：@Vm.Result.MaxResidualN.ToString("G5", CultureInfo.InvariantCulture) N</p>
+    <p class="mono">输入SHA256：@Vm.Report!.InputHash</p>
+    <button @onclick="Vm.GenerateTasks" disabled="@Vm.Project.Archived">生成验证清单</button>
+    </section>
+    </div>
+    <section class="card"><h3>名义相位原始核对表</h3><div class="table-wrap trace-table"><table><thead><tr><th>相位 °</th><th>法向惯性 N</th><th>切向惯性 N</th><th>质心法向 mm</th><th>切向位移 mm</th><th>选中点法向 N</th><th>平衡残差 N</th></tr></thead><tbody>
+    @foreach (var state in Vm.Trace?.Samples ?? [])
+    {
+        var point = state.Contacts.Concat(state.Clips).FirstOrDefault(p => p.Id == Vm.ResultPoint?.PointId);
+        <tr><td>@F(state.PhaseDegrees)</td><td>@F(state.NormalForceN)</td><td>@F(state.TangentialForceN)</td><td>@F(state.Displacement.Z)</td><td>@F(state.TangentialMm)</td><td>@F(point?.NormalN ?? 0)</td><td>@state.ResidualN.ToString("G3", CultureInfo.InvariantCulture)</td></tr>
+    }
+    </tbody></table></div></section>
+}
+@code {
+    private void ResetResult()
+    {
+        Vm.ResultPointId = null;
+        Vm.ResultLoadId = null;
+    }
+}

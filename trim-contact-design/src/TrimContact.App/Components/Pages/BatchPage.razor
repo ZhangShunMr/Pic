@@ -1,0 +1,44 @@
+@inherits VmView
+<section class="page-heading"><div><span class="eyebrow">BATCH DESIGN EDIT</span><h2>批量调整布置参数</h2><p>在选中方案内平移点位、缩放刚度或增加接触干涉，预览后整批应用。</p></div></section>
+<div class="two-column">
+<section class="card">
+<fieldset disabled="@Vm.Project.Archived">
+    <label>目标方案<select @bind="Vm.VariantId">
+    @foreach (var variant in Vm.Draft.Variants)
+    {
+        <option value="@variant.Id">@variant.Name</option>
+    }
+    </select></label>
+    <label>点位范围<select @bind="Vm.BatchRequest.Target"><option>接触点</option><option>卡扣</option><option>全部点位</option></select></label>
+    <div class="form-grid">
+        <label>X平移 mm<input type="number" step="any" @bind="Vm.BatchRequest.ShiftXmm" /></label>
+        <label>Y平移 mm<input type="number" step="any" @bind="Vm.BatchRequest.ShiftYmm" /></label>
+        <label>法向刚度倍数<input type="number" step="any" @bind="Vm.BatchRequest.NormalStiffnessFactor" /></label>
+        <label>切向刚度倍数<input type="number" step="any" @bind="Vm.BatchRequest.TangentialStiffnessFactor" /></label>
+        <label>接触间隙增量 mm<input type="number" step="any" @bind="Vm.BatchRequest.GapDeltaMm" /></label>
+        <label>接触预紧增量 mm<input type="number" step="any" @bind="Vm.BatchRequest.PreloadDeltaMm" /></label>
+    </div>
+    <button class="primary" @onclick="Vm.PreviewBatch">预览批量修改</button>
+</fieldset>
+<p class="hint">默认平移与增量为0，刚度倍数为1。新坐标须仍在轮廓内。负间隙或超范围刚度会取消整批操作；卡扣范围不允许接触增量。</p>
+<div class="callout">建议先在布置页“复制方案”，再对副本批量调整。修改不自动推导材料来源，也不自动保证接触改善。</div>
+</section>
+<section class="card">
+@if (Vm.BatchResult is not null)
+{
+    <h3>@Vm.BatchResult.VariantName · @Vm.BatchResult.Changes.Count 项参数变化</h3>
+    <div class="table-wrap"><table><thead><tr><th>点位</th><th>参数</th><th>单位</th><th>当前值</th><th>新值</th></tr></thead><tbody>
+    @foreach (var row in Vm.BatchResult.Changes)
+    {
+        <tr><td>@row.Point</td><td>@row.Field</td><td>@row.Unit</td><td>@F(row.Before)</td><td>@F(row.After)</td></tr>
+    }
+    </tbody></table></div>
+    <button @onclick="Vm.ApplyBatch" disabled="@Vm.Project.Archived">应用批量修改</button>
+}
+else
+{
+    <p class="empty">填写调整量后预览，新旧参数会在这里逐行展示。</p>
+}
+<p class="hint">预览后项目、方案或批量参数改变时，应用会被阻止，需重新预览。应用后可用顶部“撤销”恢复最近已应用版本。</p>
+</section>
+</div>

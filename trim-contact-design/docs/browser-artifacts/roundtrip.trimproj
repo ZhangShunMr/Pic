@@ -1,0 +1,238 @@
+{
+  "schema": 1,
+  "id": "b9b640d0-e52f-4004-abb9-1e22dcf1ad6b",
+  "name": "\u95E8\u677F\u63A5\u89E6\u5E03\u7F6E\u64CD\u4F5C\u6848\u4F8B",
+  "revision": "A",
+  "owner": "",
+  "goal": "",
+  "origin": "Simulation",
+  "source": "\u6A21\u62DF\u64CD\u4F5C\u6848\u4F8B\uFF1B\u975E\u5B9E\u6D4B\uFF0C\u5F85\u6750\u6599\u4E0E\u88C5\u914D\u9A8C\u8BC1",
+  "archived": false,
+  "createdUtc": "2026-11-04T01:56:06.9005972+00:00",
+  "modifiedUtc": "2026-11-04T01:56:12.4741696+00:00",
+  "panel": {
+    "name": "\u5F85\u5B9A\u4E49\u9970\u677F",
+    "massKg": 1,
+    "centerXmm": 200,
+    "centerYmm": 150,
+    "outline": [
+      {
+        "xmm": 0,
+        "ymm": 0
+      },
+      {
+        "xmm": 400,
+        "ymm": 0
+      },
+      {
+        "xmm": 400,
+        "ymm": 300
+      },
+      {
+        "xmm": 0,
+        "ymm": 300
+      }
+    ]
+  },
+  "settings": {
+    "phases": 24,
+    "enumerateTolerance": true
+  },
+  "variants": [
+    {
+      "id": "6d1bf9a0-f974-4880-ace6-4c36acea42b8",
+      "name": "A \u57FA\u51C6\u5E03\u7F6E",
+      "note": "",
+      "clips": [
+        {
+          "id": "d2c24e71-9fdc-4686-be5d-8695d2d9d111",
+          "name": "\u5DE6\u4E0B\u5361\u6263",
+          "xmm": 40,
+          "ymm": 40,
+          "normalStiffness": 100,
+          "tangentialStiffness": 50,
+          "forceLimitN": 80
+        },
+        {
+          "id": "ae50ed2a-3782-4799-9159-b5e071e43603",
+          "name": "\u53F3\u4E0B\u5361\u6263",
+          "xmm": 360,
+          "ymm": 40,
+          "normalStiffness": 100,
+          "tangentialStiffness": 50,
+          "forceLimitN": 80
+        },
+        {
+          "id": "fbe00267-73c9-4e22-b523-9ee03f610c63",
+          "name": "\u53F3\u4E0A\u5361\u6263",
+          "xmm": 360,
+          "ymm": 260,
+          "normalStiffness": 100,
+          "tangentialStiffness": 50,
+          "forceLimitN": 80
+        },
+        {
+          "id": "08e8b49b-8691-4f12-a4a2-2bfb63696732",
+          "name": "\u5DE6\u4E0A\u5361\u6263",
+          "xmm": 40,
+          "ymm": 260,
+          "normalStiffness": 100,
+          "tangentialStiffness": 50,
+          "forceLimitN": 80
+        }
+      ],
+      "contacts": [
+        {
+          "id": "55cd7554-08be-4eee-9a4b-a94b838d1124",
+          "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+          "material": "\u7F13\u51B2\u5757\uFF08\u6A21\u62DF\uFF09",
+          "xmm": 200,
+          "ymm": 150,
+          "gapMm": 0.1,
+          "toleranceMm": 0.15,
+          "preloadMm": 0.2,
+          "normalStiffness": 100,
+          "tangentialStiffness": 40,
+          "friction": 0.3,
+          "compressionLimitMm": 0.8
+        }
+      ]
+    },
+    {
+      "id": "dae32c17-1e28-4b0d-af97-d514e1f2eb0b",
+      "name": "B \u589E\u52A0\u9884\u7D27",
+      "note": "",
+      "clips": [
+        {
+          "id": "5c0cfa2f-60bc-4283-8dd5-f736e2251b1e",
+          "name": "\u5DE6\u4E0B\u5361\u6263",
+          "xmm": 40,
+          "ymm": 40,
+          "normalStiffness": 100,
+          "tangentialStiffness": 50,
+          "forceLimitN": 80
+        },
+        {
+          "id": "f1331307-878a-4caa-84b6-451ef641fa3c",
+          "name": "\u53F3\u4E0B\u5361\u6263",
+          "xmm": 360,
+          "ymm": 40,
+          "normalStiffness": 100,
+          "tangentialStiffness": 50,
+          "forceLimitN": 80
+        },
+        {
+          "id": "f2001500-96b2-4d14-8b29-cb126e966d9c",
+          "name": "\u53F3\u4E0A\u5361\u6263",
+          "xmm": 360,
+          "ymm": 260,
+          "normalStiffness": 100,
+          "tangentialStiffness": 50,
+          "forceLimitN": 80
+        },
+        {
+          "id": "5ee417ff-0176-4ecc-9c84-d97eb3739092",
+          "name": "\u5DE6\u4E0A\u5361\u6263",
+          "xmm": 40,
+          "ymm": 260,
+          "normalStiffness": 100,
+          "tangentialStiffness": 50,
+          "forceLimitN": 80
+        }
+      ],
+      "contacts": [
+        {
+          "id": "28393693-ee77-4208-b95c-7d2f0afcdce3",
+          "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+          "material": "\u7F13\u51B2\u5757\uFF08\u6A21\u62DF\uFF09",
+          "xmm": 200,
+          "ymm": 150,
+          "gapMm": 0.1,
+          "toleranceMm": 0.15,
+          "preloadMm": 0.4,
+          "normalStiffness": 100,
+          "tangentialStiffness": 40,
+          "friction": 0.3,
+          "compressionLimitMm": 0.8
+        }
+      ]
+    }
+  ],
+  "loads": [
+    {
+      "id": "bce39cc1-7cc6-40c3-8819-80acd42dcee7",
+      "name": "\u4E00\u500D\u91CD\u529B\u5468\u671F\u6848\u4F8B",
+      "normalBiasG": 0,
+      "normalAmplitudeG": 1,
+      "tangentialBiasG": 0,
+      "tangentialAmplitudeG": 0.5,
+      "phaseDegrees": 90,
+      "frequencyHz": 10,
+      "source": "\u5DE5\u7A0B\u4F30\u7B97\uFF0C\u5F85\u6D4B\u91CF"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "0c642653-fcf0-487e-961a-d695c7e940e3",
+      "pointId": null,
+      "title": "\u53C2\u6570\u8BC6\u522B\u4E0E\u6A21\u578B\u590D\u6838",
+      "method": "\u6D4B\u91CF\u88C5\u914D\u95F4\u9699\u3001\u516C\u5DEE\u3001\u5361\u6263\u521A\u5EA6\u3001\u63A5\u89E6\u538B\u7F29\u66F2\u7EBF\u548C\u6750\u6599\u6469\u64E6\uFF1B\u8BB0\u5F55\u6E29\u5EA6\u4E0E\u52A0\u8F7D\u6761\u4EF6\u3002",
+      "acceptance": "\u7531\u9879\u76EE\u8D1F\u8D23\u4EBA\u586B\u5199\u7ECF\u8BD5\u9A8C\u8BA4\u53EF\u7684\u53C2\u6570\u8303\u56F4\uFF1B\u672C\u8F6F\u4EF6\u4E0D\u63D0\u4F9B\u884C\u4E1A\u5408\u683C\u9650\u503C\u3002",
+      "owner": "",
+      "completed": false,
+      "evidence": "\u6D4F\u89C8\u5668\u6D41\u7A0B\u6F14\u793A\uFF0C\u5C1A\u975E\u771F\u5B9E\u8BD5\u9A8C"
+    },
+    {
+      "id": "b96ce747-b3aa-4b92-9be9-a5f95f93f2df",
+      "pointId": "55cd7554-08be-4eee-9a4b-a94b838d1124",
+      "title": "\u4E2D\u5FC3\u7F13\u51B2\u5757\u63A5\u89E6\u4FDD\u6301\u6838\u67E5",
+      "method": "\u6309\u63A7\u5236\u5DE5\u51B5\u88C5\u914D\u4E0A\u4E0B\u9650\u6837\u4EF6\uFF0C\u6D4B\u91CF\u95F4\u9699\u548C\u5206\u79BB\uFF1B\u63A7\u5236\u5DE5\u51B5\uFF1A\u4E00\u500D\u91CD\u529B\u5468\u671F\u6848\u4F8B / \u89D2\u70B92[0.15]mm / 0.0\u00B0",
+      "acceptance": "\u8BB0\u5F55\u5141\u8BB8\u5206\u79BB\u6761\u4EF6\u53CA\u5B9E\u6D4B\u8BC1\u636E\uFF0C\u7ED3\u5408\u9053\u8DEF\u6216\u53F0\u67B6\u4EBA\u5DE5\u542C\u8FA8\u786E\u8BA4\u3002",
+      "owner": "",
+      "completed": false,
+      "evidence": ""
+    }
+  ],
+  "audit": [
+    {
+      "utc": "2026-11-04T01:56:07.4902036+00:00",
+      "action": "\u5E94\u7528\u9879\u76EE\u3001\u5E03\u7F6E\u3001\u8F7D\u8377\u53CA\u9A8C\u8BC1\u4EFB\u52A1\u7F16\u8F91"
+    },
+    {
+      "utc": "2026-11-04T01:56:07.7440582+00:00",
+      "action": "\u5E94\u7528\u9879\u76EE\u3001\u5E03\u7F6E\u3001\u8F7D\u8377\u53CA\u9A8C\u8BC1\u4EFB\u52A1\u7F16\u8F91"
+    },
+    {
+      "utc": "2026-11-04T01:56:08.506237+00:00",
+      "action": "\u5E94\u7528\u9879\u76EE\u3001\u5E03\u7F6E\u3001\u8F7D\u8377\u53CA\u9A8C\u8BC1\u4EFB\u52A1\u7F16\u8F91"
+    },
+    {
+      "utc": "2026-11-04T01:56:09.1392456+00:00",
+      "action": "\u5E94\u7528\u9879\u76EE\u3001\u5E03\u7F6E\u3001\u8F7D\u8377\u53CA\u9A8C\u8BC1\u4EFB\u52A1\u7F16\u8F91"
+    },
+    {
+      "utc": "2026-11-04T01:56:09.6392331+00:00",
+      "action": "\u5E94\u7528\u9879\u76EE\u3001\u5E03\u7F6E\u3001\u8F7D\u8377\u53CA\u9A8C\u8BC1\u4EFB\u52A1\u7F16\u8F91"
+    },
+    {
+      "utc": "2026-11-04T01:56:10.8558258+00:00",
+      "action": "\u5E94\u7528\u9879\u76EE\u3001\u5E03\u7F6E\u3001\u8F7D\u8377\u53CA\u9A8C\u8BC1\u4EFB\u52A1\u7F16\u8F91"
+    },
+    {
+      "utc": "2026-11-04T01:56:12.0082111+00:00",
+      "action": "\u4ECE\u5F53\u524D\u63A5\u89E6\u7B5B\u67E5\u751F\u6210\u9A8C\u8BC1\u4EFB\u52A1"
+    },
+    {
+      "utc": "2026-11-04T01:56:12.0741824+00:00",
+      "action": "\u4ECE\u5F53\u524D\u63A5\u89E6\u7B5B\u67E5\u751F\u6210\u9A8C\u8BC1\u4EFB\u52A1"
+    },
+    {
+      "utc": "2026-11-04T01:56:12.3723061+00:00",
+      "action": "\u5E94\u7528\u9879\u76EE\u3001\u5E03\u7F6E\u3001\u8F7D\u8377\u53CA\u9A8C\u8BC1\u4EFB\u52A1\u7F16\u8F91"
+    },
+    {
+      "utc": "2026-11-04T01:56:12.4741698+00:00",
+      "action": "\u5E94\u7528\u9879\u76EE\u3001\u5E03\u7F6E\u3001\u8F7D\u8377\u53CA\u9A8C\u8BC1\u4EFB\u52A1\u7F16\u8F91"
+    }
+  ]
+}

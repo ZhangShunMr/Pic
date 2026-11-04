@@ -1,0 +1,3866 @@
+
+src/TrimContact.App/Components/App.razor
+======================================================================
+0001  <!DOCTYPE html>
+0002  <html lang="zh-CN">
+0003  <head>
+0004      <meta charset="utf-8" />
+0005      <meta name="viewport" content="width=device-width, initial-scale=1" />
+0006      <base href="/" />
+0007      <link rel="stylesheet" href="app.css" />
+0008      <HeadOutlet />
+0009  </head>
+0010  <body>
+0011      <Workspace @rendermode="new InteractiveServerRenderMode(prerender: false)" />
+0012      <script src="_framework/blazor.web.js"></script>
+0013      <script src="guard.js"></script>
+0014  </body>
+0015  </html>
+
+src/TrimContact.App/Components/Pages/BalancePage.razor
+======================================================================
+0001  @inherits VmView
+0002  <section class="page-heading">
+0003      <div><span class="eyebrow">FREE BODY CHECK</span><h2>反力与力矩独立核查</h2>
+0004      <p>用逐点反力重新汇总，核对外力与约束反力，而不是只读取求解器残差。</p></div>
+0005  </section>
+0006  @if (!Vm.CurrentResults)
+0007  {
+0008      <section class="card empty">先计算当前项目，再检查名义公差下的力平衡。</section>
+0009  }
+0010  else
+0011  {
+0012      var rows = BalanceAudit.Evaluate(Vm.Project, Vm.Report!);
+0013      var maxNormal = rows.Select(r => Math.Abs(r.NormalErrorN)).DefaultIfEmpty().Max();
+0014      var maxShear = rows.Select(r => Math.Abs(r.ShearErrorN)).DefaultIfEmpty().Max();
+0015      var maxMoment = rows.Select(r => Math.Max(Math.Abs(r.MomentXErrorNmm), Math.Abs(r.MomentYErrorNmm))).DefaultIfEmpty().Max();
+0016      <section class="card">
+0017          <h3>当前名义采样的最大绝对差</h3>
+0018          <div class="metrics">
+0019              <article><span>法向力差 N</span><strong class="small-value">@maxNormal.ToString("G3", CultureInfo.InvariantCulture)</strong></article>
+0020              <article><span>切向力差 N</span><strong class="small-value">@maxShear.ToString("G3", CultureInfo.InvariantCulture)</strong></article>
+0021              <article><span>法向力矩差 N·mm</span><strong class="small-value">@maxMoment.ToString("G3", CultureInfo.InvariantCulture)</strong></article>
+0022          </div>
+0023          <button @onclick='() => Vm.Export("balance")'>导出平衡核查CSV</button>
+0024          <p>正值差表示约束反力合计大于对应惯性外力。法向力矩以质心为原点计算，X轴为ΣNy，Y轴为−ΣNx。惯性载荷作用在质心，因此外加法向力矩为0。</p>
+0025          <p class="hint">仅列名义公差的逐相位核查；结果页求解器残差另覆盖所有公差角点。切向模型没有扭转和高度偏心，因此不检查切向引起的力矩。</p>
+0026      </section>
+0027      <section class="card">
+0028      <h3>逐相位核对表</h3>
+0029      <div class="table-wrap trace-table"><table>
+0030          <thead><tr><th>方案/载荷</th><th>相位°</th><th>外加法向N</th><th>法向反力N</th><th>法向差N</th><th>切向差N</th><th>X/Y力矩差N·mm</th><th>储存弹性能N·mm</th></tr></thead>
+0031          <tbody>
+0032          @foreach (var row in rows)
+0033          {
+0034              <tr><td>@row.Variant<br />@row.Load</td><td>@F(row.PhaseDegrees)</td><td>@F(row.AppliedNormalN)</td><td>@F(row.ReactionNormalN)</td>
+0035              <td>@row.NormalErrorN.ToString("G3", CultureInfo.InvariantCulture)</td><td>@row.ShearErrorN.ToString("G3", CultureInfo.InvariantCulture)</td>
+0036              <td>@row.MomentXErrorNmm.ToString("G3", CultureInfo.InvariantCulture) / @row.MomentYErrorNmm.ToString("G3", CultureInfo.InvariantCulture)</td><td>@F(row.ElasticEnergyNmm)</td></tr>
+0037          }
+0038          </tbody>
+0039      </table></div>
+0040      <p class="hint">储存弹性能是卡扣及接触弹簧当前可恢复的弹性能合计，含装配预紧；不包含摩擦耗散，不代表异响能量或声压。</p>
+0041      </section>
+0042  }
+
+src/TrimContact.App/Components/Pages/BatchPage.razor
+======================================================================
+0001  @inherits VmView
+0002  <section class="page-heading"><div><span class="eyebrow">BATCH DESIGN EDIT</span><h2>批量调整布置参数</h2><p>在选中方案内平移点位、缩放刚度或增加接触干涉，预览后整批应用。</p></div></section>
+0003  <div class="two-column">
+0004  <section class="card">
+0005  <fieldset disabled="@Vm.Project.Archived">
+0006      <label>目标方案<select @bind="Vm.VariantId">
+0007      @foreach (var variant in Vm.Draft.Variants)
+0008      {
+0009          <option value="@variant.Id">@variant.Name</option>
+0010      }
+0011      </select></label>
+0012      <label>点位范围<select @bind="Vm.BatchRequest.Target"><option>接触点</option><option>卡扣</option><option>全部点位</option></select></label>
+0013      <div class="form-grid">
+0014          <label>X平移 mm<input type="number" step="any" @bind="Vm.BatchRequest.ShiftXmm" /></label>
+0015          <label>Y平移 mm<input type="number" step="any" @bind="Vm.BatchRequest.ShiftYmm" /></label>
+0016          <label>法向刚度倍数<input type="number" step="any" @bind="Vm.BatchRequest.NormalStiffnessFactor" /></label>
+0017          <label>切向刚度倍数<input type="number" step="any" @bind="Vm.BatchRequest.TangentialStiffnessFactor" /></label>
+0018          <label>接触间隙增量 mm<input type="number" step="any" @bind="Vm.BatchRequest.GapDeltaMm" /></label>
+0019          <label>接触预紧增量 mm<input type="number" step="any" @bind="Vm.BatchRequest.PreloadDeltaMm" /></label>
+0020      </div>
+0021      <button class="primary" @onclick="Vm.PreviewBatch">预览批量修改</button>
+0022  </fieldset>
+0023  <p class="hint">默认平移与增量为0，刚度倍数为1。新坐标须仍在轮廓内。负间隙或超范围刚度会取消整批操作；卡扣范围不允许接触增量。</p>
+0024  <div class="callout">建议先在布置页“复制方案”，再对副本批量调整。修改不自动推导材料来源，也不自动保证接触改善。</div>
+0025  </section>
+0026  <section class="card">
+0027  @if (Vm.BatchResult is not null)
+0028  {
+0029      <h3>@Vm.BatchResult.VariantName · @Vm.BatchResult.Changes.Count 项参数变化</h3>
+0030      <div class="table-wrap"><table><thead><tr><th>点位</th><th>参数</th><th>单位</th><th>当前值</th><th>新值</th></tr></thead><tbody>
+0031      @foreach (var row in Vm.BatchResult.Changes)
+0032      {
+0033          <tr><td>@row.Point</td><td>@row.Field</td><td>@row.Unit</td><td>@F(row.Before)</td><td>@F(row.After)</td></tr>
+0034      }
+0035      </tbody></table></div>
+0036      <button @onclick="Vm.ApplyBatch" disabled="@Vm.Project.Archived">应用批量修改</button>
+0037  }
+0038  else
+0039  {
+0040      <p class="empty">填写调整量后预览，新旧参数会在这里逐行展示。</p>
+0041  }
+0042  <p class="hint">预览后项目、方案或批量参数改变时，应用会被阻止，需重新预览。应用后可用顶部“撤销”恢复最近已应用版本。</p>
+0043  </section>
+0044  </div>
+
+src/TrimContact.App/Components/Pages/ComparePage.razor
+======================================================================
+0001  @inherits VmView
+0002  <section class="page-heading"><div><span class="eyebrow">DESIGN EXPLORATION</span><h2>方案比较与参数扫描</h2><p>所有方案使用同一饰板、质量、载荷和采样设置。比较只支持当前项目同次计算。</p></div></section>
+0003  @if (Vm.CurrentResults)
+0004  {
+0005      <section class="card"><h3>当前输入下方案比较</h3><div class="table-wrap"><table><thead><tr><th>方案</th><th>存在分离点数</th><th>滑移点数</th><th>超限点数</th><th>卡扣最大限值比</th><th>最大滑移余量mm</th></tr></thead><tbody>
+0006      @foreach (var row in AnalysisEngine.Compare(Vm.Report!))
+0007      {
+0008          <tr><td>@row.Name</td><td>@row.SeparationPoints</td><td>@row.SlidingPoints</td><td>@row.OverLimitPoints</td><td>@F(row.MaxClipUtilization)</td><td>@F(row.MaxSlipMm)</td></tr>
+0009      }
+0010      </tbody></table></div><p class="hint">点数受各方案接触点数量影响，不能直接作为优劣总评分；请同时查看逐点包络、控制工况和验证任务。</p></section>
+0011  }
+0012  else
+0013  {
+0014      <p class="callout">比较前请先计算当前全部方案。添加或修改方案后旧结果失效。</p>
+0015  }
+0016  <section class="card">
+0017  <h3>单个接触点参数扫描</h3>
+0018  <p>在原设计的副本中逐值求解，不修改当前布置。公差、全部载荷和采样设置保持一致。</p>
+0019  <div class="form-grid four">
+0020      <label>扫描方案<select @bind="Vm.VariantId" @bind:after="ResetContact">
+0021      @foreach (var variant in Vm.Draft.Variants)
+0022      {
+0023          <option value="@variant.Id">@variant.Name</option>
+0024      }
+0025      </select></label>
+0026      <label>扫描接触点<select @bind="Vm.ContactId">
+0027      @foreach (var point in Vm.Variant?.Contacts ?? [])
+0028      {
+0029          <option value="@point.Id">@point.Name</option>
+0030      }
+0031      </select></label>
+0032      <label>参数<select @bind="Vm.SweepParameter"><option>预紧量mm</option><option>间隙mm</option><option>法向刚度N/mm</option><option>摩擦系数</option></select></label>
+0033      <label>起始值<input type="number" step="any" @bind="Vm.SweepFrom" /></label>
+0034      <label>终止值<input type="number" step="any" @bind="Vm.SweepTo" /></label>
+0035      <label>等距采样点数<input type="number" min="2" max="15" @bind="Vm.SweepSteps" /></label>
+0036  </div>
+0037  <button class="primary" @onclick="Vm.ScanAsync">运行参数扫描</button>
+0038  @if (Vm.CurrentSweep)
+0039  {
+0040      <h3>扫描结果</h3><div class="table-wrap"><table><thead><tr><th>参数值</th><th>存在分离点数</th><th>滑移点数</th><th>超限点数</th><th>卡扣最大限值比</th><th>最大压缩mm</th><th>最大滑移余量mm</th></tr></thead><tbody>
+0041      @foreach (var row in Vm.SweepRows)
+0042      {
+0043          <tr><td>@F(row.Value)</td><td>@row.SeparationPoints</td><td>@row.SlidingPoints</td><td>@row.OverLimitPoints</td><td>@F(row.MaxClipUtilization)</td><td>@F(row.MaxCompressionMm)</td><td>@F(row.MaxSlipMm)</td></tr>
+0044      }
+0045      </tbody></table></div>
+0046      <button @onclick='() => Vm.Export("sweep")'>导出扫描CSV</button>
+0047      <p class="hint">增加预紧量可能改善接触保持，同时增加卡扣反力。扫描不自动推荐或替换参数。</p>
+0048  }
+0049  else if (Vm.SweepRows.Count > 0)
+0050  {
+0051      <p class="callout">设计输入已变化，旧扫描结果失效，请重新扫描。</p>
+0052  }
+0053  </section>
+0054  @code {
+0055      private void ResetContact() => Vm.ContactId = Vm.Variant?.Contacts.FirstOrDefault()?.Id;
+0056  }
+
+src/TrimContact.App/Components/Pages/DeliveryPage.razor
+======================================================================
+0001  @inherits VmView
+0002  <section class="page-heading"><div><span class="eyebrow">PROJECT DELIVERY</span><h2>保存、重开与成果交付</h2><p>项目文件内嵌全部几何、点位、载荷、设置和任务；结果需重算，不依赖外部路径。</p></div></section>
+0003  <div class="two-column">
+0004  <section class="card"><h3>当前项目</h3>
+0005  <p class="mono">@Vm.Project.Id</p>
+0006  <p>保存位置：@(Vm.Session.SavedPath ?? "尚未写入项目库")</p>
+0007  <div class="button-row"><button class="primary" @onclick="Vm.Save">保存项目</button><button @onclick='() => Vm.Export("project")'>下载项目文件</button><button @onclick="Vm.Archive" disabled="@Vm.Project.Archived">归档项目</button></div>
+0008  <p class="hint">保存会校验全部编辑；覆盖前保留.bak，检测外部文件变化后阻止覆盖。下载副本与项目库保存为两种独立操作。</p>
+0009  <label>导入 .trimproj（UTF-8，最多2MB）<InputFile OnChange="Import" accept=".trimproj,application/json" /></label>
+0010  <p class="hint">导入同ID不直接覆盖项目库文件。打开磁盘版继续，或“复制项目”获得新ID再保存。损坏、缺字段和未知版本文件会整体拒绝。</p>
+0011  <h3>成果输出</h3>
+0012  <div class="export-grid">
+0013      <button @onclick='() => Vm.Export("html")'>导出HTML报告</button>
+0014      <button @onclick='() => Vm.Export("csv")'>导出包络CSV</button>
+0015      <button @onclick='() => Vm.Export("trace")'>导出逐相位CSV</button>
+0016      <button @onclick='() => Vm.Export("json")'>导出分析JSON</button>
+0017      <button @onclick='() => Vm.Export("tasks")'>导出验证清单CSV</button>
+0018  </div>
+0019  <p>HTML报告包含全部输入、公差控制条件、版本、来源和输入SHA256；CSV采用UTF-8 BOM、逗号分隔、英文小数点、字段双引号。结果导出前须重新计算已变化的输入。</p>
+0020  </section>
+0021  <section class="card"><h3>本机项目库</h3><button @onclick="Vm.RefreshLibrary">刷新项目库</button>
+0022  @if (Vm.Library.Count == 0)
+0023  {
+0024      <p class="empty">项目库为空。保存一次后再从这里重开，核对实际磁盘文件。</p>
+0025  }
+0026  @foreach (var item in Vm.Library)
+0027  {
+0028      <article class="library-item"><strong>@item.Name</strong><p>修订 @item.Revision · @item.Origin · @(item.Archived ? "已归档" : "可编辑")</p><small>@item.Modified.ToString("u")</small>
+0029      @if (item.Error is not null)
+0030      {
+0031          <p class="error">@item.Error</p>
+0032      }
+0033      <div class="button-row"><button @onclick="() => Vm.Open(item.Id)">打开项目</button><button @onclick="() => Vm.Open(item.Id, true)">载入备份</button></div>
+0034      </article>
+0035  }
+0036  </section>
+0037  </div>
+0038  <section class="card"><h3>最近操作记录 · UTC</h3><div class="table-wrap"><table><thead><tr><th>时间</th><th>操作</th></tr></thead><tbody>
+0039  @foreach (var entry in Vm.Project.Audit.TakeLast(30).Reverse())
+0040  {
+0041      <tr><td>@entry.Utc.ToString("u")</td><td>@entry.Action</td></tr>
+0042  }
+0043  </tbody></table></div><p class="hint">记录最多保留500条；撤销重做作用于会话中的最近20个已应用版本。文件下载后可在其他电脑重新导入，当前分析结果不会被缓存到项目中。</p></section>
+0044  @code {
+0045      private async Task Import(InputFileChangeEventArgs args)
+0046      {
+0047          try
+0048          {
+0049              using var stream = args.File.OpenReadStream(TrimContact.Core.IO.ProjectCodec.MaxBytes);
+0050              using var reader = new StreamReader(stream, System.Text.Encoding.UTF8, true);
+0051              var text = await reader.ReadToEndAsync();
+0052              Vm.ImportProject(text);
+0053          }
+0054          catch (Exception error) when (error is IOException or InvalidOperationException)
+0055          {
+0056              Vm.Message("导入失败：" + error.Message, true);
+0057          }
+0058      }
+0059  }
+
+src/TrimContact.App/Components/Pages/DifferencePage.razor
+======================================================================
+0001  @inherits VmView
+0002  <section class="page-heading"><div><span class="eyebrow">INPUT REVISION CHECK</span><h2>项目输入版本核对</h2><p>读取一份参考项目，按对象ID核对几何、载荷及设计参数；工作副本保持不变。</p></div></section>
+0003  <section class="card">
+0004  <label>参考项目 .trimproj（最多2MB）<InputFile OnChange="LoadReference" accept=".trimproj,application/json" /></label>
+0005  <button @onclick="Vm.RefreshDifference">刷新输入差异</button>
+0006  <p class="hint">复制方案会生成新点位ID，因此显示删除与新增；不按名称猜测匹配。该页只比较设计输入，不比较结果、验证证据或操作记录。</p>
+0007  </section>
+0008  @if (Vm.Difference is not null && Vm.DifferenceCurrent)
+0009  {
+0010      <section class="card">
+0011      <h3>参考：@Vm.Difference.ReferenceName</h3>
+0012      <div class="callout">@(Vm.Difference.SameSharedConditions ? "共用计算条件字段相同；仍须核查各方案点位和参数。" : "共用条件存在差异，不能把两个项目的结果差直接归因于布置变更。")</div>
+0013      <p class="mono">当前输入：@Vm.Difference.CurrentHash<br />参考输入：@Vm.Difference.ReferenceHash</p>
+0014      <h3>差异 @Vm.Difference.Rows.Count 项</h3>
+0015      <div class="table-wrap"><table><thead><tr><th>参数路径（对象ID）</th><th>当前输入</th><th>参考输入</th></tr></thead><tbody>
+0016      @foreach (var row in Vm.Difference.Rows)
+0017      {
+0018          <tr><td class="mono">@row.Path</td><td>@row.Current</td><td>@row.Reference</td></tr>
+0019      }
+0020      </tbody></table></div>
+0021      </section>
+0022  }
+0023  else if (Vm.Difference is not null)
+0024  {
+0025      <p class="callout">当前输入已变化，请点击“刷新输入差异”重新核对。</p>
+0026  }
+0027  @code {
+0028      private async Task LoadReference(InputFileChangeEventArgs args)
+0029      {
+0030          try
+0031          {
+0032              using var stream = args.File.OpenReadStream(TrimContact.Core.IO.ProjectCodec.MaxBytes);
+0033              using var reader = new StreamReader(stream, new System.Text.UTF8Encoding(false, true), true);
+0034              Vm.CompareReference(await reader.ReadToEndAsync());
+0035          }
+0036          catch (Exception error) when (error is IOException or System.Text.DecoderFallbackException)
+0037          {
+0038              Vm.Message("读取参考失败：" + error.Message, true);
+0039          }
+0040      }
+0041  }
+
+src/TrimContact.App/Components/Pages/HelpPage.razor
+======================================================================
+0001  @inherits VmView
+0002  <section class="page-heading"><div><span class="eyebrow">MODEL & LIMITS</span><h2>模型、参数与结果解释</h2><p>先核实输入与简化假设，再将筛查结果用于实物验证计划。</p></div></section>
+0003  <div class="two-column">
+0004  <section class="card"><h3>法向接触与预紧</h3>
+0005  <p>饰板作为刚性平面，具有法向平移和两个小转角自由度。卡扣是双向弹簧，可提供正、负法向反力；三个以上非共线卡扣才能稳定约束三个自由度。</p>
+0006  <p class="formula">压缩 c = max(0, 预紧量 − 间隙 − 公差偏移 + 局部位移)<br />接触法向力 N = 法向刚度 × c</p>
+0007  <p>预紧量表示装配后的等效干涉压缩，不是外加预紧力。软件将所有接触预紧与卡扣反力一起求平衡。因此预紧0.2mm不一定产生0.2mm的最终压缩。</p>
+0008  <h3>切向摩擦与滑移</h3>
+0009  <p>法向平衡后求解一个切向平移自由度。卡扣切向力为刚度乘位移，已接触点摩擦力限制为μN。点位的弹性切向需求超过上限时，显示“滑移余量”。</p>
+0010  <p class="formula">接触切向力 = min(切向刚度 × |u|, μN)<br />滑移余量 = max(0, |u| − μN / 切向刚度)</p>
+0011  <p>这是当前相位的库仑限幅筛查，没有摩擦记忆、粘滑振荡或声学辐射。完全脱离点的摩擦与滑移余量均为0，不等于不存在碰撞问题。</p>
+0012  <h3>公差与相位</h3>
+0013  <p>每个非零公差点分别枚举正负间隙偏移，并叠加名义工况；接触列表顺序就是角点向量顺序。相位在0至360°间均匀取点，不重复360°。离散包络可能遗漏采样间峰值。</p>
+0014  </section>
+0015  <section class="card"><h3>可独立核对案例</h3>
+0016  <ol>
+0017      <li>建立400×300mm矩形，质量1kg，质心(200,150)mm。</li>
+0018      <li>在(40,40)、(360,40)、(360,260)、(40,260)mm放四个卡扣，各法向刚度100N/mm、切向刚度50N/mm。</li>
+0019      <li>不放接触点。设置法向偏置1g，法向、切向幅值和切向偏置均为0。</li>
+0020      <li>计算后各卡扣法向力2.4516625N，质心位移0.024516625mm，四卡扣总反力9.80665N。</li>
+0021      <li>再在中心增加法向刚度100N/mm、预紧0.2mm、间隙0、公差0的接触点；载荷全部设0。</li>
+0022      <li>重新计算，中心点压缩0.16mm、法向力16N；质心位移−0.04mm，四卡扣各−4N。</li>
+0023  </ol>
+0024  <h3>参数填写依据</h3>
+0025  <p>质量来自称重或模型；质心来自试验或设计数据；卡扣刚度及限值来自相应装配方向的力位移试验；接触刚度和允许压缩量来自材料压缩曲线；摩擦系数须与材料副、温度和表面状态对应。材料名称本身不会自动填入物性。</p>
+0026  <h3>使用边界</h3>
+0027  <p>不包含饰板柔性、复杂曲面、热老化、装配残余变形、接触面积变化、阻尼、频率响应、冲击或声压预测。大位移、大转角、强非线性材料不适用线性小位移假设。频率仅为标签。</p>
+0028  <p>导出保留数据来源声明；“实测（用户声明）”只记录用户选择，不代表软件认证了标定链。用户合力与压缩限值也不是法规或行业标准。</p>
+0029  </section>
+0030  </div>
+
+src/TrimContact.App/Components/Pages/ImportPage.razor
+======================================================================
+0001  @inherits VmView
+0002  <section class="page-heading"><div><span class="eyebrow">BATCH INPUT</span><h2>布置CSV批量导入</h2><p>预检后整批应用到选中方案。任何行错误均取消整个导入。</p></div></section>
+0003  <div class="two-column">
+0004  <section class="card">
+0005  <h3>目标与格式</h3>
+0006  <button @onclick="Vm.ExportLayoutCsv">导出当前布置CSV</button>
+0007  <label>目标方案<select @bind="Vm.VariantId" @bind:after="Vm.Notify">
+0008  @foreach (var variant in Vm.Draft.Variants)
+0009  {
+0010      <option value="@variant.Id">@variant.Name</option>
+0011  }
+0012  </select></label>
+0013  <label>导入模式<select @bind="Vm.CsvReplace"><option value="False">追加点位</option><option value="True">替换全部点位</option></select></label>
+0014  <p>格式为UTF-8，逗号分隔，英文小数点，无千位符。字段含逗号或换行时用双引号包围，字段内双引号写为两个双引号。</p>
+0015  <p>kind字段只接受Clip或Contact。卡扣仅填写坐标、双向刚度、合力限值，接触点填写坐标、刚度、间隙、公差、预紧、摩擦、允许压缩和材料。该类型不使用的列必须留空。</p>
+0016  <button @onclick="Vm.DownloadCsvTemplate">生成布置CSV模板</button>
+0017  @if (Vm.CsvTemplateUrl.Length > 0)
+0018  {
+0019      <p><a href="@Vm.CsvTemplateUrl" download="布置导入模板-模拟.csv">下载CSV模板（模拟）</a></p>
+0020  }
+0021  <label>读取CSV文件（最多128KB）<InputFile OnChange="LoadFile" accept=".csv,text/csv" /></label>
+0022  <p class="hint">最多100条数据记录；应用后仍受每方案12卡扣与6接触点限制。追加不按名称合并，重复坐标会在复核页提醒。</p>
+0023  </section>
+0024  <section class="card">
+0025  <label>粘贴或编辑CSV<textarea rows="15" class="mono" @bind="Vm.CsvInput"></textarea></label>
+0026  <div class="button-row"><button class="primary" @onclick="Vm.PreviewCsv" disabled="@Vm.Project.Archived">预检CSV</button><button @onclick="Vm.ApplyCsv" disabled="@(Vm.CsvPreview is null || Vm.Project.Archived)">应用预检导入</button></div>
+0027  <pre class="preview-text">@Vm.CsvPreviewText</pre>
+0028  <p class="hint">替换会解除原点位与验证任务的关联，任务本身保留。导入参数没有自动附带试验来源，须在项目页补充依据。</p>
+0029  </section>
+0030  </div>
+0031  @code {
+0032      private async Task LoadFile(InputFileChangeEventArgs args)
+0033      {
+0034          try
+0035          {
+0036              using var stream = args.File.OpenReadStream(128 * 1024);
+0037              using var reader = new StreamReader(stream, new System.Text.UTF8Encoding(false, true), true);
+0038              Vm.LoadCsvText(await reader.ReadToEndAsync());
+0039          }
+0040          catch (Exception error) when (error is IOException or System.Text.DecoderFallbackException)
+0041          {
+0042              Vm.Message("CSV读取失败：" + error.Message, true);
+0043          }
+0044      }
+0045  }
+
+src/TrimContact.App/Components/Pages/LayoutPage.razor
+======================================================================
+0001  @inherits VmView
+0002  <section class="page-heading"><div><span class="eyebrow">CONTACT LAYOUT</span><h2>卡扣与接触布置</h2><p>卡扣双向约束饰板，缓冲点只承受压缩。各方案共用饰板、来源和载荷。</p></div></section>
+0003  <div class="button-row"><button @onclick="Vm.AddVariant" disabled="@Vm.Project.Archived">新增方案</button><button @onclick="Vm.DuplicateVariant" disabled="@(Vm.Variant is null || Vm.Project.Archived)">复制方案</button><button class="text-danger" @onclick="Vm.DeleteVariant" disabled="@(Vm.Variant is null || Vm.Project.Archived)">删除方案</button></div>
+0004  <div class="variant-tabs">
+0005  @foreach (var variant in Vm.Draft.Variants)
+0006  {
+0007      <button class="@(Vm.VariantId == variant.Id ? "selected" : "")" @onclick="() => Vm.SelectVariant(variant.Id)">@variant.Name</button>
+0008  }
+0009  </div>
+0010  @if (Vm.Variant is null)
+0011  {
+0012      <section class="card empty">还没有方案。点击“新增方案”，再增加卡扣与接触点。</section>
+0013  }
+0014  else
+0015  {
+0016      <div class="two-column layout-columns">
+0017      <section class="card">
+0018          <fieldset disabled="@Vm.Project.Archived">
+0019              <label>方案名称<input maxlength="100" @bind="Vm.Variant.Name" @bind:after="Vm.Notify" /></label>
+0020              <label>设计说明<textarea rows="2" maxlength="2000" @bind="Vm.Variant.Note" @bind:after="Vm.Notify"></textarea></label>
+0021          </fieldset>
+0022          <LayoutDiagram />
+0023          <div class="point-lists">
+0024              <div><h3>卡扣 @Vm.Variant.Clips.Count / 12</h3>
+0025              @foreach (var clip in Vm.Variant.Clips)
+0026              {
+0027                  <button class="point-choice @(Vm.ClipId == clip.Id ? "selected" : "")" @onclick="() => { Vm.ClipId = clip.Id; Vm.Notify(); }">■ @clip.Name <small>(@F(clip.Xmm), @F(clip.Ymm)) mm</small></button>
+0028              }
+0029              <button @onclick="Vm.AddClip" disabled="@Vm.Project.Archived">增加卡扣</button></div>
+0030              <div><h3>接触点 @Vm.Variant.Contacts.Count / 6</h3>
+0031              @foreach (var contact in Vm.Variant.Contacts)
+0032              {
+0033                  <button class="point-choice @(Vm.ContactId == contact.Id ? "selected" : "")" @onclick="() => { Vm.ContactId = contact.Id; Vm.Notify(); }">● @contact.Name <small>(@F(contact.Xmm), @F(contact.Ymm)) mm</small></button>
+0034              }
+0035              <button @onclick="Vm.AddContact" disabled="@Vm.Project.Archived">增加接触点</button></div>
+0036          </div>
+0037      </section>
+0038      <section class="card parameter-card">
+0039          <fieldset disabled="@Vm.Project.Archived">
+0040          @if (Vm.Clip is not null)
+0041          {
+0042              <h3>选中卡扣 · 双向弹簧</h3>
+0043              <label>卡扣名称<input maxlength="100" @bind="Vm.Clip.Name" @bind:after="Vm.Notify" /></label>
+0044              <div class="form-grid">
+0045                  <label>X mm<input type="number" step="any" @bind="Vm.Clip.Xmm" @bind:after="Vm.Notify" /></label>
+0046                  <label>Y mm<input type="number" step="any" @bind="Vm.Clip.Ymm" @bind:after="Vm.Notify" /></label>
+0047                  <label>法向刚度 N/mm<input type="number" step="any" min="0.01" @bind="Vm.Clip.NormalStiffness" @bind:after="Vm.Notify" /></label>
+0048                  <label>切向刚度 N/mm<input type="number" step="any" min="0.01" @bind="Vm.Clip.TangentialStiffness" @bind:after="Vm.Notify" /></label>
+0049                  <label>合力限值 N<input type="number" step="any" min="0.01" @bind="Vm.Clip.ForceLimitN" @bind:after="Vm.Notify" /></label>
+0050              </div>
+0051              <button class="text-danger" @onclick="Vm.DeleteClip">删除选中卡扣</button>
+0052          }
+0053          @if (Vm.Contact is not null)
+0054          {
+0055              <h3>选中接触点 · 单边压缩</h3>
+0056              <label>接触点名称<input maxlength="100" @bind="Vm.Contact.Name" @bind:after="Vm.Notify" /></label>
+0057              <label>材料与标定备注<input maxlength="100" @bind="Vm.Contact.Material" @bind:after="Vm.Notify" /></label>
+0058              <div class="form-grid">
+0059                  <label>X mm<input type="number" step="any" @bind="Vm.Contact.Xmm" @bind:after="Vm.Notify" /></label>
+0060                  <label>Y mm<input type="number" step="any" @bind="Vm.Contact.Ymm" @bind:after="Vm.Notify" /></label>
+0061                  <label>名义间隙 mm<input type="number" step="any" min="0" @bind="Vm.Contact.GapMm" @bind:after="Vm.Notify" /></label>
+0062                  <label>间隙公差 ±mm<input type="number" step="any" min="0" @bind="Vm.Contact.ToleranceMm" @bind:after="Vm.Notify" /></label>
+0063                  <label>预紧等效压缩量 mm<input type="number" step="any" min="0" @bind="Vm.Contact.PreloadMm" @bind:after="Vm.Notify" /></label>
+0064                  <label>允许压缩量 mm<input type="number" step="any" min="0.0001" @bind="Vm.Contact.CompressionLimitMm" @bind:after="Vm.Notify" /></label>
+0065                  <label>法向刚度 N/mm<input type="number" step="any" min="0.01" @bind="Vm.Contact.NormalStiffness" @bind:after="Vm.Notify" /></label>
+0066                  <label>切向刚度 N/mm<input type="number" step="any" min="0.01" @bind="Vm.Contact.TangentialStiffness" @bind:after="Vm.Notify" /></label>
+0067                  <label>摩擦系数 μ<input type="number" step="any" min="0" max="2" @bind="Vm.Contact.Friction" @bind:after="Vm.Notify" /></label>
+0068              </div>
+0069              <button class="text-danger" @onclick="Vm.DeleteContact">删除选中接触点</button>
+0070          }
+0071          <p class="hint">默认值是未标定工程初值。预紧量在无载时仍会产生反力，由卡扣平衡；间隙公差只作用于该点的实际间隙。</p>
+0072          <button class="primary" @onclick="() => Vm.Execute(Vm.ApplyDraft)">应用编辑</button>
+0073          </fieldset>
+0074      </section>
+0075      </div>
+0076  }
+
+src/TrimContact.App/Components/Pages/LoadPage.razor
+======================================================================
+0001  @inherits VmView
+0002  <section class="page-heading"><div><span class="eyebrow">LOAD ENVELOPE</span><h2>振动载荷与采样条件</h2><p>正法向惯性力使饰板朝接触支撑方向移动。切向仅表示一个平移方向。</p></div></section>
+0003  <div class="two-column">
+0004  <section class="card"><h3>共用载荷列表</h3>
+0005  @foreach (var load in Vm.Draft.Loads)
+0006  {
+0007      <button class="point-choice @(Vm.LoadId == load.Id ? "selected" : "")" @onclick="() => { Vm.LoadId = load.Id; Vm.Notify(); }">@load.Name <small>@F(load.FrequencyHz) Hz标签</small></button>
+0008  }
+0009  @if (Vm.Draft.Loads.Count == 0)
+0010  {
+0011      <p class="empty">暂无载荷。先增加一个工况。</p>
+0012  }
+0013  <button @onclick="Vm.AddLoad" disabled="@Vm.Project.Archived">增加载荷</button>
+0014  <h3>计算设置</h3>
+0015  <fieldset disabled="@Vm.Project.Archived">
+0016      <label>一周期相位采样数<select @bind="Vm.Draft.Settings.Phases" @bind:after="Vm.Notify"><option value="24">24（每15°）</option><option value="48">48（每7.5°）</option><option value="72">72（每5°）</option></select></label>
+0017      <label class="checkbox"><input type="checkbox" @bind="Vm.Draft.Settings.EnumerateTolerance" @bind:after="Vm.Notify" />枚举全部接触间隙公差角点，另保留名义工况</label>
+0018      <p class="hint">6个非零公差接触点最多64个角点，加名义共65条件。对每个载荷、每个相位重复求解；角点计数不代表发生概率。</p>
+0019      <button class="primary" @onclick="() => Vm.Execute(Vm.ApplyDraft)">应用编辑</button>
+0020  </fieldset>
+0021  <div class="callout"><strong>频率不是动态放大输入。</strong>本版频率仅为工况标签和试验计划参考；无法表示共振、阻尼或相位历程记忆。</div>
+0022  </section>
+0023  <section class="card">
+0024  @if (Vm.Load is not null)
+0025  {
+0026      <fieldset disabled="@Vm.Project.Archived">
+0027      <h3>选中载荷参数</h3>
+0028      <label>工况名称<input maxlength="100" @bind="Vm.Load.Name" @bind:after="Vm.Notify" /></label>
+0029      <div class="form-grid">
+0030          <label>法向偏置 g<input type="number" step="any" min="-20" max="20" @bind="Vm.Load.NormalBiasG" @bind:after="Vm.Notify" /></label>
+0031          <label>法向幅值 g<input type="number" step="any" min="0" max="20" @bind="Vm.Load.NormalAmplitudeG" @bind:after="Vm.Notify" /></label>
+0032          <label>切向偏置 g<input type="number" step="any" min="-20" max="20" @bind="Vm.Load.TangentialBiasG" @bind:after="Vm.Notify" /></label>
+0033          <label>切向幅值 g<input type="number" step="any" min="0" max="20" @bind="Vm.Load.TangentialAmplitudeG" @bind:after="Vm.Notify" /></label>
+0034          <label>切向相对法向相差 °<input type="number" step="any" min="-360" max="360" @bind="Vm.Load.PhaseDegrees" @bind:after="Vm.Notify" /></label>
+0035          <label>频率标签 Hz<input type="number" step="any" min="0" max="1000" @bind="Vm.Load.FrequencyHz" @bind:after="Vm.Notify" /></label>
+0036      </div>
+0037      <label>载荷来源<textarea rows="4" maxlength="2000" @bind="Vm.Load.Source" @bind:after="Vm.Notify"></textarea></label>
+0038      <button class="text-danger" @onclick="Vm.DeleteLoad">删除选中载荷</button>
+0039      </fieldset>
+0040  }
+0041  else
+0042  {
+0043      <p class="empty">选择一个载荷后编辑。</p>
+0044  }
+0045  <h3>计算定义</h3>
+0046  <p class="formula">aₙ = 偏置 + 幅值 × sin(φ)<br />aₜ = 偏置 + 幅值 × sin(φ + 相差)<br />F = 质量 × 9.80665 × a</p>
+0047  <p>加速度输入单位g；1g = 9.80665m/s²。输入幅值非负，偏置可正可负。法向与切向幅值为零时表示静态偏置载荷。</p>
+0048  </section>
+0049  </div>
+
+src/TrimContact.App/Components/Pages/PanelPage.razor
+======================================================================
+0001  @inherits VmView
+0002  <section class="page-heading"><div><span class="eyebrow">PANEL GEOMETRY</span><h2>饰板简化轮廓</h2><p>按边界顺序填写顶点；最后一点自动与第一点闭合，勿重复首点。</p></div></section>
+0003  <div class="two-column">
+0004  <section class="card">
+0005  <fieldset disabled="@Vm.Project.Archived">
+0006      <label>饰板名称<input maxlength="100" @bind="Vm.Draft.Panel.Name" @bind:after="Vm.Notify" /></label>
+0007      <div class="form-grid">
+0008          <label>质量 kg<input type="number" step="any" min="0.001" max="100" @bind="Vm.Draft.Panel.MassKg" @bind:after="Vm.Notify" /></label>
+0009          <label>质心 X mm<input type="number" step="any" @bind="Vm.Draft.Panel.CenterXmm" @bind:after="Vm.Notify" /></label>
+0010          <label>质心 Y mm<input type="number" step="any" @bind="Vm.Draft.Panel.CenterYmm" @bind:after="Vm.Notify" /></label>
+0011      </div>
+0012      <div class="button-row"><button @onclick="Vm.AddVertex">增加顶点</button><button @onclick="Vm.Rectangle">建立矩形轮廓</button></div>
+0013      <div class="table-wrap"><table><thead><tr><th>顶点顺序</th><th>X mm</th><th>Y mm</th><th>操作</th></tr></thead><tbody>
+0014      @for (int i = 0; i < Vm.Draft.Panel.Outline.Count; i++)
+0015      {
+0016          var vertex = Vm.Draft.Panel.Outline[i];
+0017          <tr @key="vertex"><td>@(i + 1)</td><td><input aria-label="顶点X" type="number" step="any" @bind="vertex.Xmm" @bind:after="Vm.Notify" /></td><td><input aria-label="顶点Y" type="number" step="any" @bind="vertex.Ymm" @bind:after="Vm.Notify" /></td><td><button class="text-danger" @onclick="() => Vm.DeleteVertex(vertex)">删除</button></td></tr>
+0018      }
+0019      </tbody></table></div>
+0020      @if (Vm.Draft.Panel.Outline.Count == 0)
+0021      {
+0022          <p class="empty">尚无顶点。可用矩形作为起点，再修改坐标。</p>
+0023      }
+0024      <button class="primary" @onclick="() => Vm.Execute(Vm.ApplyDraft)">应用编辑</button>
+0025  </fieldset>
+0026  <p class="hint">至少3点、最多24点；拒绝自交、退化轮廓、重复边和轮廓外点位。修改轮廓后请一并调整已有卡扣、接触点和质心。</p>
+0027  </section>
+0028  <section class="card"><h3>几何预览 · mm</h3><LayoutDiagram /><p class="hint">这是简化平面示意；不表达板厚、曲面与柔性模态。</p></section>
+0029  </div>
+
+src/TrimContact.App/Components/Pages/ProjectPage.razor
+======================================================================
+0001  @inherits VmView
+0002  <section class="page-heading"><div><span class="eyebrow">PROJECT BRIEF</span><h2>定义设计任务</h2><p>先记录对象、参数来源与工作目标，再建立饰板及接触布置。</p></div><span class="tag">schema 1 · .trimproj</span></section>
+0003  <div class="two-column">
+0004  <section class="card">
+0005      <h3>项目身份</h3>
+0006      <fieldset disabled="@Vm.Project.Archived">
+0007          <label>项目名称<input maxlength="100" @bind="Vm.Draft.Name" @bind:after="Vm.Notify" /></label>
+0008          <div class="form-grid">
+0009              <label>修订<input maxlength="30" @bind="Vm.Draft.Revision" @bind:after="Vm.Notify" /></label>
+0010              <label>负责人（可选）<input maxlength="100" @bind="Vm.Draft.Owner" @bind:after="Vm.Notify" /></label>
+0011          </div>
+0012          <label>设计目标<textarea rows="4" maxlength="2000" @bind="Vm.Draft.Goal" @bind:after="Vm.Notify"></textarea></label>
+0013          <label>参数来源类型<select @bind="Vm.Draft.Origin" @bind:after="Vm.Notify">
+0014              @foreach (var origin in Enum.GetValues<DataOrigin>())
+0015              {
+0016                  <option value="@origin">@origin.Label()</option>
+0017              }
+0018          </select></label>
+0019          <label>参数依据与数据来源<textarea rows="4" maxlength="2000" @bind="Vm.Draft.Source" @bind:after="Vm.Notify"></textarea></label>
+0020          <button class="primary" @onclick="() => Vm.Execute(Vm.ApplyDraft)">应用编辑</button>
+0021      </fieldset>
+0022  </section>
+0023  <section class="card">
+0024      <h3>工作流程</h3>
+0025      <ol class="workflow">
+0026          <li><strong>定义饰板</strong><p>输入闭合多边形顶点、质量和质心，单位mm、kg。</p></li>
+0027          <li><strong>建立布置</strong><p>至少3个非共线卡扣；按需增加最多6个单边接触点。</p></li>
+0028          <li><strong>设置载荷</strong><p>各方案共用惯性载荷和采样条件，保持比较基准一致。</p></li>
+0029          <li><strong>计算与复核</strong><p>查看分离、滑移、受力及公差角点控制条件，生成验证任务。</p></li>
+0030          <li><strong>保存与交付</strong><p>保存项目后实际重开，导出带输入和来源的工程报告。</p></li>
+0031      </ol>
+0032      <div class="callout">普通启动无内置布置。顶部“载入模拟演示”会载入400×300mm饰板、四卡扣、一个缓冲点和一个周期载荷。所有值为模拟。</div>
+0033      <dl><dt>项目ID</dt><dd class="mono">@Vm.Project.Id</dd><dt>创建UTC</dt><dd>@Vm.Project.CreatedUtc.ToString("u")</dd><dt>本地使用</dt><dd>仅监听127.0.0.1；无远程账号与多人协同。</dd></dl>
+0034  </section>
+0035  </div>
+
+src/TrimContact.App/Components/Pages/QualityPage.razor
+======================================================================
+0001  @inherits VmView
+0002  @{
+0003      var findings = QualityInspector.Inspect(Vm.Draft, Vm.CurrentResults ? Vm.Report : null);
+0004      var metrics = QualityInspector.Metrics(Vm.Draft);
+0005  }
+0006  <section class="page-heading"><div><span class="eyebrow">ENGINEERING REVIEW</span><h2>输入与模型适用性复核</h2><p>复核提示逐项列明依据与后续行动，不生成总评分或自动认证。</p></div></section>
+0007  <section class="card"><h3>复核发现 @findings.Count 项</h3><div class="table-wrap"><table><thead><tr><th>性质</th><th>对象</th><th>发现</th><th>建议行动</th></tr></thead><tbody>
+0008  @foreach (var row in findings)
+0009  {
+0010      <tr><td><span class="badge @(row.Severity is "阻断" or "超限" ? "warn" : "")">@row.Severity</span></td><td>@row.Target</td><td>@row.Finding</td><td>@row.Action</td></tr>
+0011  }
+0012  </tbody></table></div>
+0013  <p class="hint">页面使用当前编辑内容检查；未应用编辑或输入变化时，不使用旧分析结果。位移适用性检查仅覆盖名义采样，角点位移需进一步复核。</p>
+0014  </section>
+0015  <section class="card"><h3>布置与未平衡干涉量</h3><div class="table-wrap"><table><thead><tr><th>方案</th><th>点位</th><th>类型</th><th>最近其他卡扣距离mm</th><th>名义干涉mm</th><th>最小干涉mm</th><th>最大干涉mm</th></tr></thead><tbody>
+0016  @foreach (var row in metrics)
+0017  {
+0018      <tr><td>@row.Variant</td><td>@row.Point</td><td>@row.Kind</td><td>@(double.IsNaN(row.NearestClipDistanceMm) ? "无其他卡扣" : F(row.NearestClipDistanceMm))</td><td>@F(row.EffectiveInterferenceMm)</td><td>@F(row.MinimumInterferenceMm)</td><td>@F(row.MaximumInterferenceMm)</td></tr>
+0019  }
+0020  </tbody></table></div>
+0021  <p>干涉量为预紧量减间隙，范围再加减间隙公差。它尚未考虑饰板位移，不能代替结果页的实际平衡压缩。卡扣干涉栏0为占位，不代表实测装配间隙。</p>
+0022  <p class="hint">最近卡扣距离只为布置复核提供几何依据，模型未包含随距离变化的板柔性，距离较远不会自动触发声学风险等级。</p>
+0023  </section>
+
+src/TrimContact.App/Components/Pages/ResultsPage.razor
+======================================================================
+0001  @inherits VmView
+0002  <section class="page-heading"><div><span class="eyebrow">CONTACT ASSESSMENT</span><h2>接触状态与受力结果</h2><p>结果是简化力学筛查；分离、滑移及用户限值分别展示。</p></div></section>
+0003  @if (!Vm.CurrentResults)
+0004  {
+0005      <section class="card empty"><h3>@(Vm.Report is null ? "尚未计算" : "输入已变化，结果失效")</h3><p>应用当前编辑后，点击顶部“计算全部方案”。结果不随编辑自动更新。</p></section>
+0006  }
+0007  else if (Vm.Result is not null)
+0008  {
+0009      <div class="filter-bar">
+0010          <label>查看方案<select @bind="Vm.ResultVariantId" @bind:after="ResetResult">
+0011          @foreach (var result in Vm.Report!.Variants)
+0012          {
+0013              <option value="@result.VariantId">@result.Name</option>
+0014          }
+0015          </select></label>
+0016          <label>名义曲线载荷<select @bind="Vm.ResultLoadId">
+0017          @foreach (var trace in Vm.Result.NominalTraces)
+0018          {
+0019              <option value="@trace.LoadId">@trace.LoadName</option>
+0020          }
+0021          </select></label>
+0022      </div>
+0023      <div class="metrics">
+0024          <article><span>存在分离的接触点</span><strong>@Vm.Result.SeparationPoints</strong><small>任一采样压缩≤1e-7mm</small></article>
+0025          <article><span>存在滑移的接触点</span><strong>@Vm.Result.SlidingPoints</strong><small>任一采样滑移余量&gt;1e-7mm</small></article>
+0026          <article><span>超过用户限值点</span><strong>@Vm.Result.OverLimitPoints</strong><small>卡扣合力或接触压缩限值</small></article>
+0027          <article><span>求解状态数</span><strong>@Vm.Result.EvaluatedStates</strong><small>@Vm.Result.ToleranceCases 公差条件 × 载荷 × 相位</small></article>
+0028      </div>
+0029      <section class="card">
+0030      <h3>全部点位包络 · 名义与已启用角点</h3>
+0031      <div class="table-wrap"><table><thead><tr><th>点位</th><th>状态</th><th>压缩 min/max mm</th><th>法向力 min/max N</th><th>max |切向力| N</th><th>滑移余量 max mm</th><th>限值比 max</th></tr></thead><tbody>
+0032      @foreach (var point in Vm.Result.Contacts.Concat(Vm.Result.Clips))
+0033      {
+0034          <tr class="@(Vm.ResultPoint?.PointId == point.PointId ? "row-selected" : "")" @onclick="() => Vm.ResultPointId = point.PointId">
+0035              <td><button class="table-link">@point.Name</button><small>@point.Kind</small></td>
+0036              <td><span class="badge @(point.State.Contains("分离") || point.MaxUtilization > 1 ? "warn" : "")">@point.State</span></td>
+0037              <td>@F(point.MinCompressionMm) / @F(point.MaxCompressionMm)</td>
+0038              <td>@F(point.MinNormalN) / @F(point.MaxNormalN)</td>
+0039              <td>@F(point.MaxAbsShearN)</td><td>@F(point.MaxSlipMm)</td><td>@F(point.MaxUtilization)</td>
+0040          </tr>
+0041      }
+0042      </tbody></table></div>
+0043      <p class="hint">卡扣压缩栏为0占位，不表示卡扣实际行程；卡扣法向负值表示反方向约束力。接触点限值比=最大压缩/允许压缩量，卡扣限值比=合力/用户合力限值。</p>
+0044      </section>
+0045      <div class="two-column">
+0046      <section class="card"><h3>选中点位 · 名义相位曲线</h3><PhaseChart /></section>
+0047      <section class="card">
+0048      @if (Vm.ResultPoint is not null)
+0049      {
+0050          <h3>@Vm.ResultPoint.Name · 控制依据</h3>
+0051          <dl><dt>最小压缩控制工况</dt><dd>@Vm.ResultPoint.CompressionCase</dd><dt>最大滑移控制工况</dt><dd>@(Vm.ResultPoint.SlipCase.Length == 0 ? "未出现超过数值零的滑移余量" : Vm.ResultPoint.SlipCase)</dd><dt>最大限值比控制工况</dt><dd>@Vm.ResultPoint.GoverningCase</dd></dl>
+0052          <p>分离采样 @Vm.ResultPoint.DetachedSamples / @Vm.ResultPoint.TotalSamples；滑移采样 @Vm.ResultPoint.SlidingSamples / @Vm.ResultPoint.TotalSamples。</p>
+0053          <div class="callout">采样数及其比值只描述枚举集合，不是概率、失效率或合格率。所有“持续”表述仅限已经求解的采样。</div>
+0054      }
+0055      <p>最大平衡残差：@Vm.Result.MaxResidualN.ToString("G5", CultureInfo.InvariantCulture) N</p>
+0056      <p class="mono">输入SHA256：@Vm.Report!.InputHash</p>
+0057      <button @onclick="Vm.GenerateTasks" disabled="@Vm.Project.Archived">生成验证清单</button>
+0058      </section>
+0059      </div>
+0060      <section class="card"><h3>名义相位原始核对表</h3><div class="table-wrap trace-table"><table><thead><tr><th>相位 °</th><th>法向惯性 N</th><th>切向惯性 N</th><th>质心法向 mm</th><th>切向位移 mm</th><th>选中点法向 N</th><th>平衡残差 N</th></tr></thead><tbody>
+0061      @foreach (var state in Vm.Trace?.Samples ?? [])
+0062      {
+0063          var point = state.Contacts.Concat(state.Clips).FirstOrDefault(p => p.Id == Vm.ResultPoint?.PointId);
+0064          <tr><td>@F(state.PhaseDegrees)</td><td>@F(state.NormalForceN)</td><td>@F(state.TangentialForceN)</td><td>@F(state.Displacement.Z)</td><td>@F(state.TangentialMm)</td><td>@F(point?.NormalN ?? 0)</td><td>@state.ResidualN.ToString("G3", CultureInfo.InvariantCulture)</td></tr>
+0065      }
+0066      </tbody></table></div></section>
+0067  }
+0068  @code {
+0069      private void ResetResult()
+0070      {
+0071          Vm.ResultPointId = null;
+0072          Vm.ResultLoadId = null;
+0073      }
+0074  }
+
+src/TrimContact.App/Components/Pages/TasksPage.razor
+======================================================================
+0001  @inherits VmView
+0002  <section class="page-heading"><div><span class="eyebrow">PHYSICAL VERIFICATION</span><h2>样件验证清单</h2><p>将筛查发现转化为装配、公差、材料与台架验证。完成状态是用户记录，不是软件认证。</p></div></section>
+0003  <div class="button-row"><button @onclick="Vm.GenerateTasks" disabled="@Vm.Project.Archived">从当前结果生成任务</button><button @onclick="Vm.AddTask" disabled="@Vm.Project.Archived">新增任务</button><button @onclick='() => Vm.Export("tasks")'>导出验证清单CSV</button></div>
+0004  <div class="two-column">
+0005  <section class="card"><h3>任务 @Vm.Draft.Tasks.Count / 200</h3>
+0006  @foreach (var task in Vm.Draft.Tasks)
+0007  {
+0008      <button class="point-choice @(Vm.TaskId == task.Id ? "selected" : "")" @onclick="() => { Vm.TaskId = task.Id; Vm.Notify(); }"><span>@(task.Completed ? "☑" : "☐") @task.Title</span><small>@(task.PointId?.ToString() ?? "通用任务")</small></button>
+0009  }
+0010  @if (Vm.Draft.Tasks.Count == 0)
+0011  {
+0012      <p class="empty">计算后生成清单，或添加人工验证任务。</p>
+0013  }
+0014  </section>
+0015  <section class="card">
+0016  @if (Vm.Task is not null)
+0017  {
+0018      <fieldset disabled="@Vm.Project.Archived">
+0019          <label>任务标题<input maxlength="200" @bind="Vm.Task.Title" @bind:after="Vm.Notify" /></label>
+0020          <label>验证方法<textarea rows="4" maxlength="2000" @bind="Vm.Task.Method" @bind:after="Vm.Notify"></textarea></label>
+0021          <label>约定判据<textarea rows="3" maxlength="2000" @bind="Vm.Task.Acceptance" @bind:after="Vm.Notify"></textarea></label>
+0022          <label>负责人<input maxlength="100" @bind="Vm.Task.Owner" @bind:after="Vm.Notify" /></label>
+0023          <label>验证证据或记录编号<textarea rows="3" maxlength="2000" @bind="Vm.Task.Evidence" @bind:after="Vm.Notify"></textarea></label>
+0024          <label class="checkbox"><input type="checkbox" @bind="Vm.Task.Completed" @bind:after="Vm.Notify" />已完成（须填写证据）</label>
+0025          <div class="button-row"><button class="primary" @onclick="() => Vm.Execute(Vm.ApplyDraft)">应用编辑</button><button class="text-danger" @onclick="Vm.DeleteTask">删除选中任务</button></div>
+0026      </fieldset>
+0027  }
+0028  else
+0029  {
+0030      <p class="empty">先选择或添加任务。</p>
+0031  }
+0032  <p class="hint">点位删除后，任务保留并标记原点位已删除。重新生成不会重复同标题与点位任务；设计变化后的旧任务须人工复核，不能自动视为继续适用。</p>
+0033  </section>
+0034  </div>
+
+src/TrimContact.App/Components/Pages/Workspace.razor
+======================================================================
+0001  @page "/"
+0002  @inherits VmView
+0003  @inject Microsoft.JSInterop.IJSRuntime JS
+0004  <PageTitle>汽车内饰卡扣与防异响接触设计软件 V1.0</PageTitle>
+0005  <header class="masthead">
+0006      <div><span class="eyebrow">TRIM CONTACT STUDIO · V1.0</span><h1>汽车内饰卡扣与防异响接触设计软件</h1></div>
+0007      <div class="project-chip"><strong>@Vm.Draft.Name</strong><span>@Vm.Draft.Origin.Label() · @(Vm.Project.Archived ? "已归档" : "工作项目")</span></div>
+0008  </header>
+0009  <div class="toolbar">
+0010      <button @onclick="Vm.NewProject" disabled="@Vm.Busy">新建项目</button>
+0011      <button @onclick="Vm.Demo" disabled="@Vm.Busy">载入模拟演示</button>
+0012      <button @onclick="Vm.CopyProject" disabled="@Vm.Busy">复制项目</button>
+0013      <button @onclick="() => Vm.Execute(Vm.ApplyDraft)" disabled="@(Vm.Busy || Vm.Project.Archived)">应用编辑</button>
+0014      <button class="primary" @onclick="Vm.Save" disabled="@Vm.Busy">保存项目</button>
+0015      <button @onclick="Vm.Undo" disabled="@(Vm.Busy || !Vm.Session.CanUndo)">撤销</button>
+0016      <button @onclick="Vm.Redo" disabled="@(Vm.Busy || !Vm.Session.CanRedo)">重做</button>
+0017      <button class="accent" @onclick="Vm.CalculateAsync" disabled="@Vm.Busy">计算全部方案</button>
+0018      @if (Vm.Busy)
+0019      {
+0020          <button @onclick="Vm.CancelCalculation">取消计算</button>
+0021      }
+0022      <span class="save-state">@(Vm.Dirty ? "有未保存内容" : "工作副本已同步")</span>
+0023  </div>
+0024  <div class="app-shell">
+0025      <nav aria-label="工作导航">
+0026          @foreach (var item in Tabs)
+0027          {
+0028              <button class="@(Vm.Tab == item.Name ? "nav-active" : "")" @onclick="() => Vm.Tab = item.Name">
+0029                  <span>@item.Number</span>@item.Name
+0030              </button>
+0031          }
+0032          <div class="nav-note">刚性平面<br />准静态采样<br />工程筛查</div>
+0033      </nav>
+0034      <main>
+0035          <div class="notice">@Product.Boundary</div>
+0036          <div class="status @(Vm.IsError ? "error" : "")" role="status">@Vm.Status</div>
+0037          @if (Vm.Busy)
+0038          {
+0039              <progress max="100" value="@Vm.Progress"></progress>
+0040          }
+0041          @if (Vm.DownloadUrl is not null)
+0042          {
+0043              <p class="download"><a href="@Vm.DownloadUrl" download="@Vm.DownloadName">下载：@Vm.DownloadName</a> · 链接30分钟有效；保存位置由浏览器选择。</p>
+0044          }
+0045          <fieldset class="work-area" disabled="@Vm.Busy">
+0046              @switch (Vm.Tab)
+0047              {
+0048                  case "项目": <ProjectPage /> break;
+0049                  case "饰板": <PanelPage /> break;
+0050                  case "布置": <LayoutPage /> break;
+0051                  case "载荷": <LoadPage /> break;
+0052                  case "批量导入": <ImportPage /> break;
+0053                  case "工程复核": <QualityPage /> break;
+0054                  case "平衡核查": <BalancePage /> break;
+0055                  case "批量调整": <BatchPage /> break;
+0056                  case "版本核对": <DifferencePage /> break;
+0057                  case "结果": <ResultsPage /> break;
+0058                  case "比较与扫描": <ComparePage /> break;
+0059                  case "验证清单": <TasksPage /> break;
+0060                  case "保存与交付": <DeliveryPage /> break;
+0061                  case "模型说明": <HelpPage /> break;
+0062              }
+0063          </fieldset>
+0064      </main>
+0065  </div>
+0066  @if (Vm.PendingTitle.Length > 0)
+0067  {
+0068      <div class="modal-backdrop"><section class="modal" role="dialog" aria-modal="true" aria-label="操作确认">
+0069          <h2>确认操作</h2><p>@Vm.PendingTitle</p>
+0070          <button class="danger" @onclick="Vm.Confirm">确认继续</button><button @onclick="Vm.CancelPending">取消</button>
+0071      </section></div>
+0072  }
+0073  <footer>输入编辑需应用；保存后再关闭窗口。模型 @Product.Method · 来源：@Vm.Draft.Source</footer>
+0074  @code {
+0075      private static readonly (string Number, string Name)[] Tabs =
+0076      [
+0077          ("01", "项目"), ("02", "饰板"), ("03", "布置"), ("04", "载荷"), ("05", "结果"),
+0078          ("06", "比较与扫描"), ("07", "工程复核"), ("08", "批量导入"), ("09", "验证清单"), ("10", "批量调整"), ("11", "版本核对"), ("12", "保存与交付"), ("13", "平衡核查"), ("14", "模型说明")
+0079      ];
+0080      protected override async Task OnAfterRenderAsync(bool firstRender)
+0081      {
+0082          try { await JS.InvokeVoidAsync("trimGuard", Vm.Dirty); }
+0083          catch (Microsoft.JSInterop.JSDisconnectedException) { }
+0084      }
+0085  }
+
+src/TrimContact.App/Components/Shared/LayoutDiagram.razor
+======================================================================
+0001  @inherits VmView
+0002  @{
+0003      var bounds = Geometry.BoundsOf(Vm.Draft.Panel.Outline);
+0004      var scale = Math.Max(1, bounds.Scale);
+0005      double X(double value) => 60 + 530 * (value - bounds.MinX) / scale;
+0006      double Y(double value) => 350 - 280 * (value - bounds.MinY) / Math.Max(1, bounds.Height);
+0007      string S(double v) => v.ToString("0.###", CultureInfo.InvariantCulture);
+0008      var polygon = string.Join(" ", Vm.Draft.Panel.Outline.Select(p => $"{S(X(p.Xmm))},{S(Y(p.Ymm))}"));
+0009  }
+0010  <svg class="layout-diagram" viewBox="0 0 660 420" role="img" aria-label="饰板轮廓、质心、卡扣和接触点布置示意">
+0011      <defs><pattern id="grid" width="25" height="25" patternUnits="userSpaceOnUse"><path d="M 25 0 L 0 0 0 25" fill="none" stroke="#dce6e5" stroke-width="0.7" /></pattern></defs>
+0012      <rect x="40" y="40" width="570" height="330" fill="url(#grid)" />
+0013      <line x1="40" y1="370" x2="615" y2="370" stroke="#6b888c" />
+0014      <line x1="40" y1="370" x2="40" y2="35" stroke="#6b888c" />
+0015      <text x="560" y="400">X / mm</text><text x="4" y="25">Y / mm</text>
+0016      <text x="45" y="395">@F(bounds.MinX)</text><text x="10" y="365">@F(bounds.MinY)</text>
+0017      <text x="550" y="30">上界 @F(bounds.MaxY)</text>
+0018      @if (Vm.Draft.Panel.Outline.Count > 1)
+0019      {
+0020          <polygon points="@polygon" fill="#d8ece7" fill-opacity="0.65" stroke="#457f7b" stroke-width="2" />
+0021      }
+0022      @if (Vm.Draft.Panel.Outline.Count >= 3)
+0023      {
+0024          <circle cx="@S(X(Vm.Draft.Panel.CenterXmm))" cy="@S(Y(Vm.Draft.Panel.CenterYmm))" r="5" fill="#1c3340" />
+0025          <g><text x="@S(X(Vm.Draft.Panel.CenterXmm) + 9)" y="@S(Y(Vm.Draft.Panel.CenterYmm) - 10)">质心</text></g>
+0026      }
+0027      @if (Vm.Variant is not null)
+0028      {
+0029          @foreach (var clip in Vm.Variant.Clips)
+0030          {
+0031              <g class="point" @onclick="() => { Vm.ClipId = clip.Id; Vm.Notify(); }">
+0032                  <rect x="@S(X(clip.Xmm) - 6)" y="@S(Y(clip.Ymm) - 6)" width="12" height="12" fill="@(clip.Id == Vm.ClipId ? "#e49c39" : "#29516e")" />
+0033                  <text x="@S(X(clip.Xmm) + 10)" y="@S(Y(clip.Ymm) + 5)">@clip.Name</text>
+0034              </g>
+0035          }
+0036          @foreach (var contact in Vm.Variant.Contacts)
+0037          {
+0038              <g class="point" @onclick="() => { Vm.ContactId = contact.Id; Vm.Notify(); }">
+0039                  <circle cx="@S(X(contact.Xmm))" cy="@S(Y(contact.Ymm))" r="8" fill="@(contact.Id == Vm.ContactId ? "#e49c39" : "#268a7b")" stroke="#fff" stroke-width="2" />
+0040                  <text x="@S(X(contact.Xmm) + 12)" y="@S(Y(contact.Ymm) + 15)">@contact.Name</text>
+0041              </g>
+0042          }
+0043      }
+0044  </svg>
+0045  <div class="legend"><span>■ 卡扣</span><span>● 接触点</span><span>● 深色点：质心</span><span>橙色：已选择</span></div>
+0046  <p class="hint">X、Y独立缩放以便阅读；坐标和数值才是尺寸依据。点击点位可选中编辑，位置使用数值输入。</p>
+
+src/TrimContact.App/Components/Shared/PhaseChart.razor
+======================================================================
+0001  @inherits VmView
+0002  @{
+0003      var trace = Vm.Trace;
+0004      var point = Vm.ResultPoint;
+0005      var samples = trace?.Samples ?? [];
+0006      PointState? Find(PhaseState s) => s.Contacts.Concat(s.Clips).FirstOrDefault(p => p.Id == point?.PointId);
+0007      double Value(PhaseState s)
+0008      {
+0009          var p = Find(s);
+0010          if (p is null) return 0;
+0011          return Metric switch { "压缩mm" => p.CompressionMm, "切向力N" => p.ShearN, "滑移余量mm" => p.SlipMm, _ => p.NormalN };
+0012      }
+0013      var values = samples.Select(Value).ToArray();
+0014      var min = values.DefaultIfEmpty().Min();
+0015      var max = values.DefaultIfEmpty().Max();
+0016      var span = Math.Max(1e-6, max - min);
+0017      min -= span * 0.1;
+0018      max += span * 0.1;
+0019      double Y(double v) => 250 - 200 * (v - min) / (max - min);
+0020      string S(double v) => v.ToString("0.###", CultureInfo.InvariantCulture);
+0021      var points = string.Join(" ", samples.Select(s => $"{S(70 + 570 * s.PhaseDegrees / 360)},{S(Y(Value(s)))}"));
+0022  }
+0023  <div class="button-row"><label>曲线指标<select @bind="Metric"><option>法向力N</option><option>切向力N</option><option>压缩mm</option><option>滑移余量mm</option></select></label></div>
+0024  <svg viewBox="0 0 700 310" role="img" aria-label="名义公差下逐相位曲线" class="phase-chart">
+0025      <rect x="70" y="40" width="570" height="210" fill="#f5f9f8" />
+0026      @for (int i = 0; i <= 4; i++)
+0027      {
+0028          var v = min + (max - min) * i / 4;
+0029          <g><line x1="70" y1="@S(Y(v))" x2="640" y2="@S(Y(v))" stroke="#cddcd9" /><text x="5" y="@S(Y(v) + 4)">@v.ToString("0.####", CultureInfo.InvariantCulture)</text></g>
+0030      }
+0031      @for (int degrees = 0; degrees <= 360; degrees += 90)
+0032      {
+0033          <g><text x="@S(65 + 570 * degrees / 360.0)" y="276">@degrees</text></g>
+0034      }
+0035      <polyline points="@points" fill="none" stroke="#167d73" stroke-width="2.5" />
+0036      @foreach (var sample in samples)
+0037      {
+0038          <circle cx="@S(70 + 570 * sample.PhaseDegrees / 360)" cy="@S(Y(Value(sample)))" r="2.5" fill="#167d73"><title>@F(sample.PhaseDegrees)° / @F(Value(sample)) @Metric</title></circle>
+0039      }
+0040      <text x="70" y="25">@Metric · 名义公差 · @point?.Name</text>
+0041      <text x="545" y="301">相位 φ / °</text>
+0042  </svg>
+0043  <p class="hint">来源：@Vm.Report?.Origin。仅显示名义间隙曲线；总体包络表另包含所有已启用公差角点。折线连接离散采样，不表示动态历程或未采样极值。</p>
+0044  @code {
+0045      private string Metric { get; set; } = "法向力N";
+0046  }
+
+src/TrimContact.App/Components/Shared/VmView.cs
+======================================================================
+0001  using System.ComponentModel;
+0002  using Microsoft.AspNetCore.Components;
+0003  using TrimContact.App.ViewModels;
+0004
+0005  namespace TrimContact.App.Components.Shared;
+0006
+0007  public abstract class VmView : ComponentBase, IDisposable
+0008  {
+0009      [Inject] public WorkspaceViewModel Vm { get; set; } = null!;
+0010      protected override void OnInitialized() => Vm.PropertyChanged += OnChanged;
+0011      private void OnChanged(object? sender, PropertyChangedEventArgs e) => _ = InvokeAsync(StateHasChanged);
+0012      public void Dispose()
+0013      {
+0014          Vm.PropertyChanged -= OnChanged;
+0015          GC.SuppressFinalize(this);
+0016      }
+0017      protected static string F(double v) => v.ToString("0.#####", System.Globalization.CultureInfo.InvariantCulture);
+0018  }
+
+src/TrimContact.App/Components/_Imports.razor
+======================================================================
+0001  @using System.Globalization
+0002  @using Microsoft.AspNetCore.Components
+0003  @using Microsoft.AspNetCore.Components.Web
+0004  @using Microsoft.AspNetCore.Components.Forms
+0005  @using static Microsoft.AspNetCore.Components.Web.RenderMode
+0006  @using TrimContact.Core.Domain
+0007  @using TrimContact.Core.Analysis
+0008  @using TrimContact.App.ViewModels
+0009  @using TrimContact.App.Components.Shared
+0010  @using TrimContact.App.Components.Pages
+0011
+0012  @using Microsoft.JSInterop
+
+src/TrimContact.App/DownloadVault.cs
+======================================================================
+0001  using System.Collections.Concurrent;
+0002  using System.Text;
+0003
+0004  namespace TrimContact.App;
+0005
+0006  public sealed record DownloadFile(byte[] Bytes, string ContentType, string Name, DateTimeOffset Expiry);
+0007
+0008  public sealed class DownloadVault
+0009  {
+0010      private readonly ConcurrentDictionary<string, DownloadFile> files = new();
+0011
+0012      public string Add(string text, string contentType, string name)
+0013      {
+0014          foreach (var stale in files.Where(p => p.Value.Expiry < DateTimeOffset.UtcNow))
+0015              files.TryRemove(stale.Key, out _);
+0016          if (files.Count >= 100)
+0017              foreach (var old in files.OrderBy(p => p.Value.Expiry).Take(20))
+0018                  files.TryRemove(old.Key, out _);
+0019          var id = Guid.NewGuid().ToString("N");
+0020          var bytes = Encoding.UTF8.GetBytes(text);
+0021          if (contentType.StartsWith("text/csv", StringComparison.Ordinal))
+0022              bytes = Encoding.UTF8.GetPreamble().Concat(bytes).ToArray();
+0023          files[id] = new DownloadFile(bytes, contentType, name, DateTimeOffset.UtcNow.AddMinutes(30));
+0024          return "/download/" + id;
+0025      }
+0026
+0027      public DownloadFile? Get(string id) => files.TryGetValue(id, out var file)
+0028          && file.Expiry >= DateTimeOffset.UtcNow ? file : null;
+0029  }
+
+src/TrimContact.App/Program.cs
+======================================================================
+0001  using System.Globalization;
+0002  using TrimContact.App;
+0003  using TrimContact.App.Components;
+0004  using TrimContact.App.ViewModels;
+0005  using TrimContact.Core.IO;
+0006
+0007  var options = new Dictionary<string, string>();
+0008  for (int i = 0; i < args.Length; i += 2)
+0009  {
+0010      if (i + 1 >= args.Length || args[i] is not ("--port" or "--data-directory"))
+0011          throw new ArgumentException("参数：--port 8775 --data-directory 可写目录");
+0012      options[args[i]] = args[i + 1];
+0013  }
+0014  var port = options.TryGetValue("--port", out var value) ? int.Parse(value, CultureInfo.InvariantCulture) : 8775;
+0015  if (port is < 1024 or > 65535)
+0016      throw new ArgumentException("端口须为1024至65535");
+0017  var directory = options.GetValueOrDefault("--data-directory") ?? Path.Combine(AppContext.BaseDirectory, "Data");
+0018  CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+0019  CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("zh-CN");
+0020  var builder = WebApplication.CreateBuilder();
+0021  builder.WebHost.UseStaticWebAssets();
+0022  builder.WebHost.UseUrls("http://127.0.0.1:" + port);
+0023  builder.Services.AddRazorComponents().AddInteractiveServerComponents(options =>
+0024  {
+0025      options.DetailedErrors = false;
+0026      options.JSInteropDefaultCallTimeout = TimeSpan.FromMinutes(2);
+0027  }).AddHubOptions(options => options.MaximumReceiveMessageSize = 4 * 1024 * 1024);
+0028  builder.Services.AddSingleton(new ProjectStore(directory));
+0029  builder.Services.AddSingleton<DownloadVault>();
+0030  builder.Services.AddScoped<WorkspaceViewModel>();
+0031  var app = builder.Build();
+0032  app.UseStaticFiles();
+0033  app.MapStaticAssets();
+0034  app.UseAntiforgery();
+0035  app.MapGet("/download/{id}", (string id, DownloadVault vault) =>
+0036  {
+0037      var file = vault.Get(id);
+0038      return file is null ? Results.NotFound("下载链接已过期，请重新导出")
+0039          : Results.File(file.Bytes, file.ContentType, file.Name);
+0040  });
+0041  app.MapGet("/health", () => Results.Text("TrimContact V1.0 ready"));
+0042  app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
+0043  app.Run();
+
+src/TrimContact.App/ViewModels/ImportCommands.cs
+======================================================================
+0001  using TrimContact.Core.IO;
+0002
+0003  namespace TrimContact.App.ViewModels;
+0004
+0005  public sealed partial class WorkspaceViewModel
+0006  {
+0007      public string CsvInput { get; set; } = "";
+0008      public bool CsvReplace { get; set; }
+0009      public LayoutImportPreview? CsvPreview { get; private set; }
+0010      public string CsvPreviewText { get; private set; } = "尚未预检";
+0011      private string previewCsvHash = "";
+0012      public string CsvTemplateUrl { get; private set; } = "";
+0013
+0014      public void PreviewCsv() => Execute(() =>
+0015      {
+0016          CsvPreview = null;
+0017          if (Project.Archived)
+0018              throw new InvalidOperationException("归档项目只读，请先复制项目");
+0019          if (VariantId is null)
+0020              throw new InvalidOperationException("先在布置页建立并选择目标方案");
+0021          CsvPreview = LayoutCsv.Preview(Draft, VariantId.Value, CsvInput, CsvReplace);
+0022          CsvPreviewText = string.Join("\n", CsvPreview.Messages);
+0023          previewCsvHash = ProjectCodec.FileHash(CsvInput);
+0024          Message("CSV预检成功；工作项目尚未修改，请核对预览后应用导入。");
+0025      });
+0026
+0027      public void ApplyCsv() => Request("应用已预检CSV？替换模式会移除当前方案原有点位。", () =>
+0028      {
+0029          if (CsvPreview is null)
+0030              throw new InvalidOperationException("先执行CSV预检");
+0031          if (VariantId != CsvPreview.VariantId)
+0032              throw new InvalidOperationException("目标方案已变化，请重新预检");
+0033          if (ProjectCodec.FileHash(CsvInput) != previewCsvHash)
+0034              throw new InvalidOperationException("CSV文本已修改，请重新预检");
+0035          var verified = LayoutCsv.Preview(Draft, CsvPreview.VariantId, CsvInput, CsvReplace);
+0036          if (verified.Mode != CsvPreview.Mode || CsvPreview.BaseHash != verified.BaseHash)
+0037              throw new InvalidOperationException("预检后条件发生变化，请重新预检");
+0038          if (CsvPreviewText != string.Join("\n", verified.Messages))
+0039              throw new InvalidOperationException("预检后CSV发生变化，请重新预检");
+0040          Draft = LayoutCsv.Apply(Draft, verified);
+0041          ApplyDraft();
+0042          CsvPreview = null;
+0043          Message("CSV已整批应用，点位生成新ID；请核查来源、计算并保存。");
+0044      });
+0045
+0046      public void DownloadCsvTemplate() => Execute(() =>
+0047      {
+0048          CsvTemplateUrl = downloads.Add(LayoutCsv.Template, "text/csv; charset=utf-8", "布置导入模板-模拟.csv");
+0049          Message("布置CSV模板已生成，模板包含模拟参数。");
+0050      });
+0051
+0052      public void ExportLayoutCsv() => Execute(() =>
+0053      {
+0054          ApplyDraft();
+0055          if (Variant is null)
+0056              throw new InvalidOperationException("先选择一个方案");
+0057          var text = LayoutCsv.Export(Variant);
+0058          DownloadName = "当前布置-" + Variant.Id.ToString("N")[..8] + ".csv";
+0059          DownloadUrl = downloads.Add(text, "text/csv; charset=utf-8", DownloadName);
+0060          Message("布置交换CSV已生成；它只包含点位参数，不携带项目来源或试验标定链。");
+0061      });
+0062
+0063      public void LoadCsvText(string text)
+0064      {
+0065          CsvInput = text;
+0066          CsvPreview = null;
+0067          CsvPreviewText = "CSV内容已载入，尚未预检";
+0068          Message("CSV已读取到预检区，没有自动应用。");
+0069      }
+0070  }
+
+src/TrimContact.App/ViewModels/LayoutCommands.cs
+======================================================================
+0001  using TrimContact.Core.Domain;
+0002  using TrimContact.Core.Operations;
+0003
+0004  namespace TrimContact.App.ViewModels;
+0005
+0006  public sealed partial class WorkspaceViewModel
+0007  {
+0008      private void DraftEdit(Action action)
+0009      {
+0010          Execute(() =>
+0011          {
+0012              if (Project.Archived)
+0013                  throw new InvalidOperationException("归档项目只读，请先复制项目");
+0014              action();
+0015              NormalizeSelection();
+0016              Message("工作编辑已变化，点击应用编辑、计算或保存完成校验。");
+0017          });
+0018      }
+0019
+0020      public void AddVariant() => DraftEdit(() =>
+0021      {
+0022          if (Draft.Variants.Count >= 8)
+0023              throw new InvalidOperationException("最多8个方案");
+0024          var variant = new DesignVariant { Name = "方案 " + (Draft.Variants.Count + 1) };
+0025          Draft.Variants.Add(variant);
+0026          VariantId = variant.Id;
+0027      });
+0028
+0029      public void DuplicateVariant() => DraftEdit(() =>
+0030      {
+0031          if (Variant is null)
+0032              throw new InvalidOperationException("先选择方案");
+0033          if (Draft.Variants.Count >= 8)
+0034              throw new InvalidOperationException("最多8个方案");
+0035          var name = Variant.Name.Length > 95 ? Variant.Name[..95] : Variant.Name;
+0036          var variant = DesignOperations.CopyVariant(Variant, name + " 副本");
+0037          Draft.Variants.Add(variant);
+0038          VariantId = variant.Id;
+0039      });
+0040
+0041      public void DeleteVariant() => Request("删除当前方案？关联验证任务将保留并解除点位关联。", () =>
+0042      {
+0043          if (VariantId is null)
+0044              return;
+0045          DraftEdit(() => DesignOperations.RemoveVariant(Draft, VariantId.Value));
+0046      });
+0047
+0048      public void AddClip() => DraftEdit(() =>
+0049      {
+0050          if (Variant is null)
+0051              throw new InvalidOperationException("先建立方案");
+0052          if (Variant.Clips.Count >= 12)
+0053              throw new InvalidOperationException("每方案最多12个卡扣");
+0054          var clip = new Clip
+0055          {
+0056              Name = "卡扣 " + (Variant.Clips.Count + 1),
+0057              Xmm = Draft.Panel.CenterXmm,
+0058              Ymm = Draft.Panel.CenterYmm
+0059          };
+0060          Variant.Clips.Add(clip);
+0061          ClipId = clip.Id;
+0062      });
+0063
+0064      public void AddContact() => DraftEdit(() =>
+0065      {
+0066          if (Variant is null)
+0067              throw new InvalidOperationException("先建立方案");
+0068          if (Variant.Contacts.Count >= 6)
+0069              throw new InvalidOperationException("每方案最多6个接触点");
+0070          var contact = new ContactPoint
+0071          {
+0072              Name = "接触点 " + (Variant.Contacts.Count + 1),
+0073              Xmm = Draft.Panel.CenterXmm,
+0074              Ymm = Draft.Panel.CenterYmm
+0075          };
+0076          Variant.Contacts.Add(contact);
+0077          ContactId = contact.Id;
+0078      });
+0079
+0080      public void DeleteClip() => Request("删除选中卡扣？关联验证任务会解除点位关联。", () => DraftEdit(() =>
+0081      {
+0082          if (Clip is null || Variant is null)
+0083              return;
+0084          DesignOperations.DetachTasks(Draft, [Clip.Id]);
+0085          Variant.Clips.Remove(Clip);
+0086      }));
+0087
+0088      public void DeleteContact() => Request("删除选中接触点？关联验证任务会解除点位关联。", () => DraftEdit(() =>
+0089      {
+0090          if (Contact is null || Variant is null)
+0091              return;
+0092          DesignOperations.DetachTasks(Draft, [Contact.Id]);
+0093          Variant.Contacts.Remove(Contact);
+0094      }));
+0095
+0096      public void AddVertex() => DraftEdit(() =>
+0097      {
+0098          if (Draft.Panel.Outline.Count >= 24)
+0099              throw new InvalidOperationException("轮廓最多24个顶点");
+0100          Draft.Panel.Outline.Add(new Vertex());
+0101      });
+0102
+0103      public void Rectangle() => Request("以400×300mm矩形替换轮廓？点位和质心仍需在轮廓内。", () => DraftEdit(() =>
+0104      {
+0105          Draft.Panel.Outline = [new() { Xmm = 0, Ymm = 0 }, new() { Xmm = 400, Ymm = 0 },
+0106              new() { Xmm = 400, Ymm = 300 }, new() { Xmm = 0, Ymm = 300 }];
+0107          Draft.Panel.CenterXmm = 200;
+0108          Draft.Panel.CenterYmm = 150;
+0109      }));
+0110
+0111      public void DeleteVertex(Vertex vertex) => Request("删除轮廓顶点？请检查相邻边和自交。", () =>
+0112          DraftEdit(() => Draft.Panel.Outline.Remove(vertex)));
+0113
+0114      public void AddLoad() => DraftEdit(() =>
+0115      {
+0116          if (Draft.Loads.Count >= 6)
+0117              throw new InvalidOperationException("最多6个共用载荷");
+0118          var load = new LoadCase { Name = "载荷 " + (Draft.Loads.Count + 1) };
+0119          Draft.Loads.Add(load);
+0120          LoadId = load.Id;
+0121      });
+0122
+0123      public void DeleteLoad() => Request("删除选中载荷？下次计算将重新生成所有结果。", () => DraftEdit(() =>
+0124      {
+0125          if (Load is not null)
+0126              Draft.Loads.Remove(Load);
+0127      }));
+0128
+0129      public void AddTask() => DraftEdit(() =>
+0130      {
+0131          if (Draft.Tasks.Count >= 200)
+0132              throw new InvalidOperationException("最多200项验证任务");
+0133          var task = new VerificationTask();
+0134          Draft.Tasks.Add(task);
+0135          TaskId = task.Id;
+0136      });
+0137
+0138      public void DeleteTask() => Request("删除选中验证任务及其证据记录？", () => DraftEdit(() =>
+0139      {
+0140          if (Task is not null)
+0141              Draft.Tasks.Remove(Task);
+0142      }));
+0143  }
+
+src/TrimContact.App/ViewModels/ReviewCommands.cs
+======================================================================
+0001  using TrimContact.Core.Analysis;
+0002  using TrimContact.Core.IO;
+0003  using TrimContact.Core.Operations;
+0004
+0005  namespace TrimContact.App.ViewModels;
+0006
+0007  public sealed partial class WorkspaceViewModel
+0008  {
+0009      public BatchLayoutRequest BatchRequest { get; } = new();
+0010      public BatchPreview? BatchResult { get; private set; }
+0011      public DifferenceReport? Difference { get; private set; }
+0012      public string ReferenceText { get; private set; } = "";
+0013      private Guid? batchVariantId;
+0014
+0015      public void PreviewBatch() => Execute(() =>
+0016      {
+0017          BatchResult = null;
+0018          if (VariantId is null)
+0019              throw new InvalidOperationException("先选择目标方案");
+0020          BatchResult = BatchLayout.Preview(Draft, VariantId.Value, BatchRequest);
+0021          batchVariantId = VariantId;
+0022          Message("批量修改已预览，尚未应用。请逐行核对新旧值。");
+0023      });
+0024
+0025      public void ApplyBatch() => Request("确认应用预览中的全部参数修改？可在应用后撤销。", () =>
+0026      {
+0027          if (BatchResult is null || batchVariantId != VariantId)
+0028              throw new InvalidOperationException("目标方案已变化或尚无预览，请重新预览");
+0029          Draft = BatchLayout.Apply(Draft, BatchRequest, BatchResult);
+0030          ApplyDraft();
+0031          BatchResult = null;
+0032          Message("批量参数修改已应用；请重新计算当前全部方案。");
+0033      });
+0034
+0035      public void CompareReference(string text) => Execute(() =>
+0036      {
+0037          var reference = ProjectCodec.Parse(text);
+0038          Difference = ProjectDifference.Compare(Draft, reference);
+0039          ReferenceText = text;
+0040          Message("已核对当前输入与参考项目，工作项目未改变；按对象ID匹配差异。");
+0041      });
+0042
+0043      public void RefreshDifference() => Execute(() =>
+0044      {
+0045          if (ReferenceText.Length == 0)
+0046              throw new InvalidOperationException("先读取参考项目文件");
+0047          Difference = ProjectDifference.Compare(Draft, ProjectCodec.Parse(ReferenceText));
+0048          Message("输入差异已更新。");
+0049      });
+0050
+0051      public bool DifferenceCurrent => Difference is not null
+0052          && Difference.CurrentHash == ProjectCodec.InputHash(Draft);
+0053  }
+
+src/TrimContact.App/ViewModels/WorkspaceViewModel.cs
+======================================================================
+0001  using System.ComponentModel;
+0002  using System.Text.Json;
+0003  using TrimContact.Core.Analysis;
+0004  using TrimContact.Core.Domain;
+0005  using TrimContact.Core.IO;
+0006  using TrimContact.Core.Operations;
+0007
+0008  namespace TrimContact.App.ViewModels;
+0009
+0010  public sealed partial class WorkspaceViewModel : INotifyPropertyChanged, IDisposable
+0011  {
+0012      private readonly ProjectStore store;
+0013      private readonly DownloadVault downloads;
+0014      private CancellationTokenSource? calculation;
+0015      public ProjectSession Session { get; } = new();
+0016      public DesignProject Project => Session.Current;
+0017      public DesignProject Draft { get; private set; }
+0018      public AnalysisReport? Report { get; private set; }
+0019      public IReadOnlyList<SweepRow> SweepRows { get; private set; } = [];
+0020      public IReadOnlyList<StoredProject> Library { get; private set; } = [];
+0021      public string Tab { get; set; } = "项目";
+0022      public string Status { get; private set; } = "从空白项目开始，或明确载入模拟演示。";
+0023      public bool IsError { get; private set; }
+0024      public bool Busy { get; private set; }
+0025      public int Progress { get; private set; }
+0026      public string? DownloadUrl { get; private set; }
+0027      public string? DownloadName { get; private set; }
+0028      public string PendingTitle { get; private set; } = "";
+0029      private Action? pending;
+0030      public Guid? VariantId { get; set; }
+0031      public Guid? ContactId { get; set; }
+0032      public Guid? ClipId { get; set; }
+0033      public Guid? LoadId { get; set; }
+0034      public Guid? TaskId { get; set; }
+0035      public Guid? ResultVariantId { get; set; }
+0036      public Guid? ResultLoadId { get; set; }
+0037      public Guid? ResultPointId { get; set; }
+0038      public DesignVariant? Variant => Draft.Variants.FirstOrDefault(v => v.Id == VariantId);
+0039      public ContactPoint? Contact => Variant?.Contacts.FirstOrDefault(c => c.Id == ContactId);
+0040      public Clip? Clip => Variant?.Clips.FirstOrDefault(c => c.Id == ClipId);
+0041      public LoadCase? Load => Draft.Loads.FirstOrDefault(l => l.Id == LoadId);
+0042      public VerificationTask? Task => Draft.Tasks.FirstOrDefault(t => t.Id == TaskId);
+0043      public VariantResult? Result => Report?.Variants.FirstOrDefault(v => v.VariantId == ResultVariantId)
+0044          ?? Report?.Variants.FirstOrDefault();
+0045      public TraceResult? Trace => Result?.NominalTraces.FirstOrDefault(t => t.LoadId == ResultLoadId)
+0046          ?? Result?.NominalTraces.FirstOrDefault();
+0047      public PointEnvelope? ResultPoint => Result?.Contacts.Concat(Result.Clips).FirstOrDefault(c => c.PointId == ResultPointId)
+0048          ?? Result?.Contacts.FirstOrDefault() ?? Result?.Clips.FirstOrDefault();
+0049      private static string State(DesignProject p) => JsonSerializer.Serialize(p, ProjectCodec.Options);
+0050      public bool DraftChanged => State(Draft) != State(Project);
+0051      public bool Dirty => Session.Dirty || DraftChanged;
+0052      public bool CurrentResults => Report is not null && !DraftChanged && Report.InputHash == ProjectCodec.InputHash(Project);
+0053      public string SweepParameter { get; set; } = "预紧量mm";
+0054      public double SweepFrom { get; set; } = 0;
+0055      public double SweepTo { get; set; } = 0.5;
+0056      public int SweepSteps { get; set; } = 6;
+0057      private string sweepInputHash = "";
+0058      private string sweepParameterRun = "";
+0059      public bool CurrentSweep => SweepRows.Count > 0 && !DraftChanged && sweepInputHash == ProjectCodec.InputHash(Project);
+0060      public event PropertyChangedEventHandler? PropertyChanged;
+0061
+0062      public WorkspaceViewModel(ProjectStore store, DownloadVault downloads)
+0063      {
+0064          this.store = store;
+0065          this.downloads = downloads;
+0066          Draft = ProjectCodec.Clone(Project);
+0067          RefreshLibrary();
+0068      }
+0069
+0070      public void Notify() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
+0071
+0072      public void Message(string message, bool error = false)
+0073      {
+0074          Status = message;
+0075          IsError = error;
+0076          Notify();
+0077      }
+0078
+0079      public void Execute(Action action)
+0080      {
+0081          if (Busy)
+0082              return;
+0083          try
+0084          {
+0085              action();
+0086          }
+0087          catch (Exception error) when (error is InvalidDataException or InvalidOperationException
+0088              or IOException or UnauthorizedAccessException or ArgumentException)
+0089          {
+0090              Message(error.Message, true);
+0091          }
+0092          Notify();
+0093      }
+0094
+0095      private void SyncDraft()
+0096      {
+0097          Draft = ProjectCodec.Clone(Project);
+0098          NormalizeSelection();
+0099          DownloadUrl = null;
+0100      }
+0101
+0102      private void NormalizeSelection()
+0103      {
+0104          if (!Draft.Variants.Any(v => v.Id == VariantId))
+0105              VariantId = Draft.Variants.FirstOrDefault()?.Id;
+0106          if (Variant is null || !Variant.Contacts.Any(c => c.Id == ContactId))
+0107              ContactId = Variant?.Contacts.FirstOrDefault()?.Id;
+0108          if (Variant is null || !Variant.Clips.Any(c => c.Id == ClipId))
+0109              ClipId = Variant?.Clips.FirstOrDefault()?.Id;
+0110          if (!Draft.Loads.Any(l => l.Id == LoadId))
+0111              LoadId = Draft.Loads.FirstOrDefault()?.Id;
+0112          if (!Draft.Tasks.Any(t => t.Id == TaskId))
+0113              TaskId = Draft.Tasks.FirstOrDefault()?.Id;
+0114      }
+0115
+0116      public void SelectVariant(Guid id)
+0117      {
+0118          VariantId = id;
+0119          ContactId = Variant?.Contacts.FirstOrDefault()?.Id;
+0120          ClipId = Variant?.Clips.FirstOrDefault()?.Id;
+0121          Notify();
+0122      }
+0123
+0124      public void ApplyDraft()
+0125      {
+0126          if (!DraftChanged)
+0127          {
+0128              Message("编辑已应用；当前输入没有变化。");
+0129              return;
+0130          }
+0131          ProjectValidation.Require(Draft);
+0132          Session.Edit("应用项目、布置、载荷及验证任务编辑", p =>
+0133          {
+0134              var copy = ProjectCodec.Clone(Draft);
+0135              p.Name = copy.Name;
+0136              p.Revision = copy.Revision;
+0137              p.Owner = copy.Owner;
+0138              p.Goal = copy.Goal;
+0139              p.Source = copy.Source;
+0140              p.Origin = copy.Origin;
+0141              p.Panel = copy.Panel;
+0142              p.Settings = copy.Settings;
+0143              p.Variants = copy.Variants;
+0144              p.Loads = copy.Loads;
+0145              p.Tasks = copy.Tasks;
+0146          });
+0147          SyncDraft();
+0148          Message("编辑已应用；输入变化后需重新计算，保存后可重开。");
+0149      }
+0150
+0151      public void Request(string title, Action action)
+0152      {
+0153          if (Busy)
+0154              return;
+0155          PendingTitle = title;
+0156          pending = action;
+0157          Notify();
+0158      }
+0159
+0160      public void Confirm()
+0161      {
+0162          var action = pending;
+0163          pending = null;
+0164          PendingTitle = "";
+0165          if (action is not null)
+0166              Execute(action);
+0167      }
+0168
+0169      public void CancelPending()
+0170      {
+0171          pending = null;
+0172          PendingTitle = "";
+0173          Notify();
+0174      }
+0175
+0176      private void Replace(string title, Action action)
+0177      {
+0178          if (Dirty)
+0179              Request(title + "；当前有未保存或未应用内容，确认丢弃？", action);
+0180          else
+0181              Execute(action);
+0182      }
+0183
+0184      public void NewProject() => Replace("新建空白项目", () =>
+0185      {
+0186          Session.Load(new DesignProject());
+0187          Report = null;
+0188          SweepRows = [];
+0189          SyncDraft();
+0190          Message("已建立空白项目；请定义轮廓、点位和载荷。");
+0191      });
+0192
+0193      public void Demo() => Replace("载入固定模拟演示", () =>
+0194      {
+0195          Session.Load(Demonstration.Create());
+0196          Report = null;
+0197          SweepRows = [];
+0198          SyncDraft();
+0199          Message("已载入模拟参数；非实测。可修改并复制比较方案。");
+0200      });
+0201
+0202      public void CopyProject() => Execute(() =>
+0203      {
+0204          ApplyDraft();
+0205          Session.CopyProject();
+0206          SyncDraft();
+0207          Message("项目已复制并分配新ID，请保存。");
+0208      });
+0209
+0210      public void Archive() => Request("归档当前项目并保存；归档后只读，继续编辑需复制项目。", () =>
+0211      {
+0212          ApplyDraft();
+0213          Session.Edit("归档项目", p => p.Archived = true);
+0214          SyncDraft();
+0215          Save();
+0216      });
+0217
+0218      public void Undo() => Execute(() =>
+0219      {
+0220          if (DraftChanged)
+0221          {
+0222              Request("撤销前丢弃未应用编辑？", () => { Session.Undo(); SyncDraft(); });
+0223              return;
+0224          }
+0225          Session.Undo();
+0226          SyncDraft();
+0227          Message("已撤销最近一次应用；需要时重新计算。");
+0228      });
+0229
+0230      public void Redo() => Execute(() =>
+0231      {
+0232          if (DraftChanged)
+0233              throw new InvalidOperationException("请先应用或撤销未应用编辑");
+0234          Session.Redo();
+0235          SyncDraft();
+0236          Message("已重做。");
+0237      });
+0238
+0239      public void RefreshLibrary()
+0240      {
+0241          Library = store.List();
+0242          Notify();
+0243      }
+0244
+0245      public void Open(Guid id, bool backup = false) => Replace(backup ? "载入上次覆盖前备份" : "打开磁盘项目", () =>
+0246      {
+0247          var opened = store.Open(id, backup);
+0248          Session.Load(opened.Project, opened.Hash, store.FilePath(id));
+0249          Report = null;
+0250          SweepRows = [];
+0251          SyncDraft();
+0252          Message(backup ? "已载入备份；确认输入后保存可恢复主文件。" : "已从磁盘实际重开项目：" + opened.Path);
+0253      });
+0254
+0255      public void Save() => Execute(() =>
+0256      {
+0257          ApplyDraft();
+0258          var result = store.Save(Project, Session.DiskHash);
+0259          Session.Saved(result);
+0260          RefreshLibrary();
+0261          Message("已保存到：" + result.Path);
+0262      });
+0263
+0264      public void ImportProject(string text)
+0265      {
+0266          Execute(() =>
+0267          {
+0268              var imported = ProjectCodec.Parse(text);
+0269              Replace("导入项目文件", () =>
+0270              {
+0271                  Session.Load(imported);
+0272                  Report = null;
+0273                  SweepRows = [];
+0274                  SyncDraft();
+0275                  Message("项目已导入到工作副本；同ID文件不会直接覆盖，已有项目请先复制再保存。");
+0276              });
+0277          });
+0278      }
+0279
+0280      public async Task CalculateAsync()
+0281      {
+0282          if (Busy)
+0283              return;
+0284          try
+0285          {
+0286              ApplyDraft();
+0287              ProjectValidation.Require(Project, true);
+0288              var input = ProjectCodec.Clone(Project);
+0289              Busy = true;
+0290              Progress = 0;
+0291              calculation = new CancellationTokenSource();
+0292              Message("正在计算法向力平衡与切向库仑限幅……");
+0293              var result = await System.Threading.Tasks.Task.Run(() => AnalysisEngine.Run(input, (percent, message) =>
+0294              {
+0295                  Progress = percent;
+0296                  Status = message;
+0297                  Notify();
+0298              }, calculation.Token));
+0299              Report = result;
+0300              ResultVariantId = result.Variants.First().VariantId;
+0301              ResultLoadId = result.Variants.First().NominalTraces.First().LoadId;
+0302              ResultPointId = null;
+0303              Tab = "结果";
+0304              Message("计算完成。存在分离或滑移是简化模型筛查，需要实物核查。");
+0305          }
+0306          catch (OperationCanceledException)
+0307          {
+0308              Message("计算已取消，未发布部分结果。");
+0309          }
+0310          catch (Exception error) when (error is InvalidDataException or InvalidOperationException or ArgumentException)
+0311          {
+0312              Message(error.Message, true);
+0313          }
+0314          finally
+0315          {
+0316              Busy = false;
+0317              calculation?.Dispose();
+0318              calculation = null;
+0319              Notify();
+0320          }
+0321      }
+0322
+0323      public void CancelCalculation() => calculation?.Cancel();
+0324
+0325      public async Task ScanAsync()
+0326      {
+0327          if (Busy)
+0328              return;
+0329          try
+0330          {
+0331              ApplyDraft();
+0332              if (VariantId is null || ContactId is null)
+0333                  throw new InvalidOperationException("先在布置页选择一个方案和接触点");
+0334              ProjectValidation.Require(Project, true);
+0335              var input = ProjectCodec.Clone(Project);
+0336              var variant = VariantId.Value;
+0337              var contact = ContactId.Value;
+0338              var parameter = SweepParameter;
+0339              var from = SweepFrom;
+0340              var to = SweepTo;
+0341              var steps = SweepSteps;
+0342              Busy = true;
+0343              calculation = new CancellationTokenSource();
+0344              Message("正在逐个参数值重新求解；扫描不会修改设计参数……");
+0345              SweepRows = await System.Threading.Tasks.Task.Run(() => AnalysisEngine.Sweep(input, variant, contact,
+0346                  parameter, from, to, steps, calculation.Token));
+0347              sweepInputHash = ProjectCodec.InputHash(Project);
+0348              sweepParameterRun = parameter;
+0349              Message("扫描完成，请结合卡扣受力和接触压缩选择候选参数，再回布置页手动应用。");
+0350          }
+0351          catch (OperationCanceledException)
+0352          {
+0353              Message("扫描已取消。");
+0354          }
+0355          catch (Exception error) when (error is InvalidDataException or InvalidOperationException or ArgumentException)
+0356          {
+0357              Message(error.Message, true);
+0358          }
+0359          finally
+0360          {
+0361              Busy = false;
+0362              calculation?.Dispose();
+0363              calculation = null;
+0364              Notify();
+0365          }
+0366      }
+0367
+0368      public void GenerateTasks() => Execute(() =>
+0369      {
+0370          ApplyDraft();
+0371          if (!CurrentResults)
+0372              throw new InvalidOperationException("先计算当前输入再生成验证清单");
+0373          var count = 0;
+0374          Session.Edit("从当前接触筛查生成验证任务", p => count = DesignOperations.GenerateTasks(p, Report!));
+0375          SyncDraft();
+0376          Message($"已增加{count}项验证任务；相同标题与点位不重复生成。判据须由工程负责人确认。");
+0377      });
+0378
+0379      public void Export(string kind) => Execute(() =>
+0380      {
+0381          ApplyDraft();
+0382          var name = "接触设计-" + Project.Id.ToString("N")[..8];
+0383          string text;
+0384          string contentType;
+0385          string extension;
+0386          if (kind == "project")
+0387          {
+0388              text = ProjectCodec.Serialize(Project);
+0389              contentType = "application/json; charset=utf-8";
+0390              extension = ".trimproj";
+0391          }
+0392          else if (kind == "tasks")
+0393          {
+0394              text = ResultExport.TasksCsv(Project);
+0395              contentType = "text/csv; charset=utf-8";
+0396              extension = "-验证清单.csv";
+0397          }
+0398          else if (kind == "sweep")
+0399          {
+0400              if (!CurrentSweep)
+0401                  throw new InvalidOperationException("扫描已失效或尚未执行");
+0402              text = ResultExport.SweepCsv(Project, sweepParameterRun, SweepRows);
+0403              contentType = "text/csv; charset=utf-8";
+0404              extension = "-参数扫描.csv";
+0405          }
+0406          else
+0407          {
+0408              if (!CurrentResults)
+0409                  throw new InvalidOperationException("结果不存在或已失效，请计算后导出");
+0410              text = kind switch
+0411              {
+0412                  "csv" => ResultExport.Csv(Project, Report!),
+0413                  "balance" => BalanceExport.Csv(Project, Report!),
+0414                  "trace" => ResultExport.TraceCsv(Project, Report!),
+0415                  "json" => ResultExport.Json(Project, Report!),
+0416                  "html" => ResultExport.Html(Project, Report!),
+0417                  _ => throw new InvalidOperationException("未知导出类型")
+0418              };
+0419              contentType = kind == "html" ? "text/html; charset=utf-8"
+0420                  : kind == "json" ? "application/json; charset=utf-8" : "text/csv; charset=utf-8";
+0421              extension = kind == "balance" ? "-平衡核查.csv" : kind == "trace" ? "-逐相位.csv" : "." + kind;
+0422          }
+0423          DownloadName = name + extension;
+0424          DownloadUrl = downloads.Add(text, contentType, DownloadName);
+0425          Message("已生成下载文件：" + DownloadName + "；点击下载链接并在浏览器确认保存位置。");
+0426      });
+0427
+0428      public void Dispose()
+0429      {
+0430          calculation?.Cancel();
+0431          calculation?.Dispose();
+0432      }
+0433  }
+
+src/TrimContact.Core/Analysis/AnalysisEngine.cs
+======================================================================
+0001  using TrimContact.Core.Domain;
+0002  using TrimContact.Core.IO;
+0003
+0004  namespace TrimContact.Core.Analysis;
+0005
+0006  public static class AnalysisEngine
+0007  {
+0008      public static AnalysisReport Run(DesignProject project, Action<int, string>? progress = null,
+0009          CancellationToken cancellation = default)
+0010      {
+0011          ProjectValidation.Require(project, true);
+0012          var report = new AnalysisReport
+0013          {
+0014              InputHash = ProjectCodec.InputHash(project),
+0015              ProjectName = project.Name,
+0016              Origin = project.Origin.Label(),
+0017              Source = project.Source,
+0018              Phases = project.Settings.Phases,
+0019              ToleranceEnabled = project.Settings.EnumerateTolerance
+0020          };
+0021          for (int index = 0; index < project.Variants.Count; index++)
+0022          {
+0023              cancellation.ThrowIfCancellationRequested();
+0024              var variant = project.Variants[index];
+0025              progress?.Invoke(index * 100 / project.Variants.Count, "求解 " + variant.Name);
+0026              report.Variants.Add(RunVariant(project, variant, cancellation));
+0027          }
+0028          progress?.Invoke(100, "计算完成");
+0029          return report;
+0030      }
+0031
+0032      public static VariantResult RunVariant(DesignProject project, DesignVariant variant,
+0033          CancellationToken cancellation = default)
+0034      {
+0035          var solver = new ContactSolver(project.Panel, variant);
+0036          var result = new VariantResult
+0037          {
+0038              VariantId = variant.Id,
+0039              Name = variant.Name,
+0040              Contacts = variant.Contacts.Select(c => new PointEnvelope
+0041                  { PointId = c.Id, Name = c.Name, Kind = "接触点" }).ToList(),
+0042              Clips = variant.Clips.Select(c => new PointEnvelope
+0043                  { PointId = c.Id, Name = c.Name, Kind = "卡扣" }).ToList()
+0044          };
+0045          var toleranceCases = ToleranceCases(variant, project.Settings.EnumerateTolerance).ToArray();
+0046          result.ToleranceCases = toleranceCases.Length;
+0047          for (int cornerIndex = 0; cornerIndex < toleranceCases.Length; cornerIndex++)
+0048          {
+0049              var tolerance = toleranceCases[cornerIndex];
+0050              foreach (var load in project.Loads)
+0051              {
+0052                  cancellation.ThrowIfCancellationRequested();
+0053                  var trace = new TraceResult { LoadId = load.Id, LoadName = load.Name };
+0054                  for (int phaseIndex = 0; phaseIndex < project.Settings.Phases; phaseIndex++)
+0055                  {
+0056                      var degrees = 360.0 * phaseIndex / project.Settings.Phases;
+0057                      var radians = degrees * Math.PI / 180;
+0058                      var normal = load.NormalBiasG + load.NormalAmplitudeG * Math.Sin(radians);
+0059                      var shear = load.TangentialBiasG + load.TangentialAmplitudeG
+0060                          * Math.Sin(radians + load.PhaseDegrees * Math.PI / 180);
+0061                      var state = solver.Solve(degrees, normal, shear, tolerance);
+0062                      var corner = cornerIndex == 0 ? "名义" : $"角点{cornerIndex}[{string.Join(",", tolerance.Select(t => t.ToString("G4", System.Globalization.CultureInfo.InvariantCulture)))}]mm";
+0063                      var condition = $"{load.Name} / {corner} / {degrees:F1}°";
+0064                      for (int i = 0; i < result.Contacts.Count; i++)
+0065                          result.Contacts[i].Accumulate(state.Contacts[i], condition, false);
+0066                      for (int i = 0; i < result.Clips.Count; i++)
+0067                          result.Clips[i].Accumulate(state.Clips[i], condition, true);
+0068                      result.MaxResidualN = Math.Max(result.MaxResidualN, state.ResidualN);
+0069                      result.EvaluatedStates++;
+0070                      if (cornerIndex == 0)
+0071                          trace.Samples.Add(state);
+0072                  }
+0073                  if (cornerIndex == 0)
+0074                      result.NominalTraces.Add(trace);
+0075              }
+0076          }
+0077          return result;
+0078      }
+0079
+0080      public static IEnumerable<double[]> ToleranceCases(DesignVariant variant, bool enabled)
+0081      {
+0082          yield return new double[variant.Contacts.Count];
+0083          if (!enabled)
+0084              yield break;
+0085          var uncertain = variant.Contacts.Select((c, i) => (c, i)).Where(p => p.c.ToleranceMm > 0).ToArray();
+0086          if (uncertain.Length == 0)
+0087              yield break;
+0088          for (int mask = 0; mask < (1 << uncertain.Length); mask++)
+0089          {
+0090              var values = new double[variant.Contacts.Count];
+0091              for (int bit = 0; bit < uncertain.Length; bit++)
+0092                  values[uncertain[bit].i] = ((mask & (1 << bit)) == 0 ? -1 : 1) * uncertain[bit].c.ToleranceMm;
+0093              yield return values;
+0094          }
+0095      }
+0096
+0097      public static IReadOnlyList<SweepRow> Sweep(DesignProject project, Guid variantId, Guid pointId,
+0098          string parameter, double from, double to, int steps, CancellationToken cancellation = default)
+0099      {
+0100          if (steps is < 2 or > 15 || !double.IsFinite(from) || !double.IsFinite(to) || to <= from)
+0101              throw new InvalidDataException("扫描需要2至15个递增的有限参数值");
+0102          var clone = ProjectCodec.Clone(project);
+0103          var variant = clone.Variants.Single(v => v.Id == variantId);
+0104          clone.Variants = [variant];
+0105          var point = variant.Contacts.SingleOrDefault(c => c.Id == pointId)
+0106              ?? throw new InvalidDataException("先选择一个接触点");
+0107          var rows = new List<SweepRow>();
+0108          for (int i = 0; i < steps; i++)
+0109          {
+0110              cancellation.ThrowIfCancellationRequested();
+0111              var value = from + (to - from) * i / (steps - 1);
+0112              switch (parameter)
+0113              {
+0114                  case "预紧量mm": point.PreloadMm = value; break;
+0115                  case "间隙mm": point.GapMm = value; break;
+0116                  case "法向刚度N/mm": point.NormalStiffness = value; break;
+0117                  case "摩擦系数": point.Friction = value; break;
+0118                  default: throw new InvalidDataException("不支持的扫描参数");
+0119              }
+0120              ProjectValidation.Require(clone, true);
+0121              var result = RunVariant(clone, variant, cancellation);
+0122              rows.Add(new(value, result.SeparationPoints, result.SlidingPoints, result.OverLimitPoints,
+0123                  result.Clips.Max(c => c.MaxUtilization), result.Contacts.Max(c => c.MaxCompressionMm),
+0124                  result.Contacts.Max(c => c.MaxSlipMm)));
+0125          }
+0126          return rows;
+0127      }
+0128
+0129      public static IReadOnlyList<ComparisonRow> Compare(AnalysisReport report) => report.Variants
+0130          .Select(v => new ComparisonRow(v.Name, v.SeparationPoints, v.SlidingPoints, v.OverLimitPoints,
+0131              v.Clips.Max(c => c.MaxUtilization), v.Contacts.Select(c => c.MaxSlipMm).DefaultIfEmpty().Max()))
+0132          .ToArray();
+0133  }
+
+src/TrimContact.Core/Analysis/BalanceAudit.cs
+======================================================================
+0001  using TrimContact.Core.Domain;
+0002  using TrimContact.Core.IO;
+0003
+0004  namespace TrimContact.Core.Analysis;
+0005
+0006  public sealed record BalanceRow(string Variant, string Load, double PhaseDegrees,
+0007      double AppliedNormalN, double ReactionNormalN, double AppliedShearN, double ReactionShearN,
+0008      double NormalErrorN, double ShearErrorN, double MomentXErrorNmm, double MomentYErrorNmm,
+0009      double ElasticEnergyNmm);
+0010
+0011  public static class BalanceAudit
+0012  {
+0013      public static IReadOnlyList<BalanceRow> Evaluate(DesignProject project, AnalysisReport report)
+0014      {
+0015          ResultExport.RequireCurrent(project, report);
+0016          var rows = new List<BalanceRow>();
+0017          var scale = Geometry.BoundsOf(project.Panel.Outline).Scale;
+0018          foreach (var result in report.Variants)
+0019          {
+0020              var variant = project.Variants.Single(v => v.Id == result.VariantId);
+0021              var clips = variant.Clips.ToDictionary(c => c.Id);
+0022              var contacts = variant.Contacts.ToDictionary(c => c.Id);
+0023              foreach (var trace in result.NominalTraces)
+0024              {
+0025                  foreach (var state in trace.Samples)
+0026                  {
+0027                      double normal = 0;
+0028                      double shear = 0;
+0029                      double momentX = 0;
+0030                      double momentY = 0;
+0031                      double energy = 0;
+0032                      foreach (var point in state.Clips)
+0033                      {
+0034                          var clip = clips[point.Id];
+0035                          var dx = clip.Xmm - project.Panel.CenterXmm;
+0036                          var dy = clip.Ymm - project.Panel.CenterYmm;
+0037                          var displacement = state.Displacement.Z + dx / scale * state.Displacement.X
+0038                              + dy / scale * state.Displacement.Y;
+0039                          normal += point.NormalN;
+0040                          shear += point.ShearN;
+0041                          momentX += point.NormalN * dy;
+0042                          momentY -= point.NormalN * dx;
+0043                          energy += 0.5 * clip.NormalStiffness * displacement * displacement;
+0044                          energy += 0.5 * clip.TangentialStiffness * state.TangentialMm * state.TangentialMm;
+0045                      }
+0046                      foreach (var point in state.Contacts)
+0047                      {
+0048                          var contact = contacts[point.Id];
+0049                          normal += point.NormalN;
+0050                          shear += point.ShearN;
+0051                          momentX += point.NormalN * (contact.Ymm - project.Panel.CenterYmm);
+0052                          momentY -= point.NormalN * (contact.Xmm - project.Panel.CenterXmm);
+0053                          energy += 0.5 * contact.NormalStiffness * point.CompressionMm * point.CompressionMm;
+0054                          energy += 0.5 * point.ShearN * point.ShearN / contact.TangentialStiffness;
+0055                      }
+0056                      rows.Add(new(result.Name, trace.LoadName, state.PhaseDegrees, state.NormalForceN,
+0057                          normal, state.TangentialForceN, shear, normal - state.NormalForceN,
+0058                          shear - state.TangentialForceN, momentX, momentY, energy));
+0059                  }
+0060              }
+0061          }
+0062          return rows;
+0063      }
+0064  }
+
+src/TrimContact.Core/Analysis/ContactSolver.cs
+======================================================================
+0001  using TrimContact.Core.Domain;
+0002
+0003  namespace TrimContact.Core.Analysis;
+0004
+0005  public sealed record PointState(Guid Id, string Name, double CompressionMm, double NormalN,
+0006      double ShearN, double SlipMm, double Utilization);
+0007
+0008  public sealed record PhaseState(double PhaseDegrees, double NormalForceN, double TangentialForceN,
+0009      Vector3 Displacement, double TangentialMm, double ResidualN,
+0010      IReadOnlyList<PointState> Contacts, IReadOnlyList<PointState> Clips);
+0011
+0012  public sealed class ContactSolver
+0013  {
+0014      private readonly DesignVariant variant;
+0015      private readonly Panel panel;
+0016      private readonly Matrix3 clipMatrix = new();
+0017      private readonly Vector3[] clipBasis;
+0018      private readonly Vector3[] contactBasis;
+0019
+0020      public ContactSolver(Panel panel, DesignVariant variant)
+0021      {
+0022          this.panel = panel;
+0023          this.variant = variant;
+0024          var scale = Geometry.BoundsOf(panel.Outline).Scale;
+0025          Vector3 Basis(double x, double y) => new(1, (x - panel.CenterXmm) / scale, (y - panel.CenterYmm) / scale);
+0026          clipBasis = variant.Clips.Select(c => Basis(c.Xmm, c.Ymm)).ToArray();
+0027          contactBasis = variant.Contacts.Select(c => Basis(c.Xmm, c.Ymm)).ToArray();
+0028          for (int i = 0; i < variant.Clips.Count; i++)
+0029              clipMatrix.AddSpring(variant.Clips[i].NormalStiffness, clipBasis[i]);
+0030          clipMatrix.Solve(new Vector3(1, 0, 0));
+0031      }
+0032
+0033      private double Energy(Vector3 q, Vector3 force, IReadOnlyList<double> offsets)
+0034      {
+0035          var value = 0.5 * q.Dot(clipMatrix.Multiply(q)) - force.Dot(q);
+0036          for (int i = 0; i < variant.Contacts.Count; i++)
+0037          {
+0038              var compression = Math.Max(0, offsets[i] + contactBasis[i].Dot(q));
+0039              value += 0.5 * variant.Contacts[i].NormalStiffness * compression * compression;
+0040          }
+0041          return value;
+0042      }
+0043
+0044      private (Vector3 Q, double Residual) SolveNormal(double forceN, IReadOnlyList<double> tolerance)
+0045      {
+0046          var force = new Vector3(forceN, 0, 0);
+0047          var offsets = variant.Contacts.Select((c, i) => c.PreloadMm - c.GapMm - tolerance[i]).ToArray();
+0048          var q = clipMatrix.Solve(force);
+0049          var threshold = 1e-8 * Math.Max(1, Math.Abs(forceN));
+0050          for (int iteration = 0; iteration < 100; iteration++)
+0051          {
+0052              var gradient = clipMatrix.Multiply(q) - force;
+0053              var hessian = clipMatrix.Copy();
+0054              for (int i = 0; i < offsets.Length; i++)
+0055              {
+0056                  var compression = offsets[i] + contactBasis[i].Dot(q);
+0057                  if (compression <= 0)
+0058                      continue;
+0059                  var stiffness = variant.Contacts[i].NormalStiffness;
+0060                  gradient += stiffness * compression * contactBasis[i];
+0061                  hessian.AddSpring(stiffness, contactBasis[i]);
+0062              }
+0063              if (gradient.Norm <= threshold)
+0064                  return (q, gradient.Norm);
+0065              var step = hessian.Solve(-1 * gradient);
+0066              var oldEnergy = Energy(q, force, offsets);
+0067              var slope = gradient.Dot(step);
+0068              var alpha = 1.0;
+0069              while (alpha > 1e-10)
+0070              {
+0071                  var candidate = q + alpha * step;
+0072                  if (Energy(candidate, force, offsets) <= oldEnergy + 1e-4 * alpha * slope + 1e-12)
+0073                  {
+0074                      q = candidate;
+0075                      break;
+0076                  }
+0077                  alpha /= 2;
+0078              }
+0079              if (alpha <= 1e-10)
+0080                  throw new InvalidDataException("法向求解线搜索失败，请检查过大的刚度差和预紧量");
+0081          }
+0082          throw new InvalidDataException("法向求解100次未收敛，结果取消");
+0083      }
+0084
+0085      public PhaseState Solve(double phaseDegrees, double normalG, double tangentialG, IReadOnlyList<double> tolerance)
+0086      {
+0087          if (tolerance.Count != variant.Contacts.Count)
+0088              throw new ArgumentException("公差维度与接触点不一致");
+0089          var normalForce = panel.MassKg * Product.Gravity * normalG;
+0090          var shearForce = panel.MassKg * Product.Gravity * tangentialG;
+0091          var (q, normalResidual) = SolveNormal(normalForce, tolerance);
+0092          var compression = variant.Contacts.Select((c, i) => Math.Max(0,
+0093              c.PreloadMm - c.GapMm - tolerance[i] + contactBasis[i].Dot(q))).ToArray();
+0094          var normal = variant.Contacts.Select((c, i) => c.NormalStiffness * compression[i]).ToArray();
+0095          var clipKt = variant.Clips.Sum(c => c.TangentialStiffness);
+0096          double ShearAt(double u)
+0097          {
+0098              double force = clipKt * u;
+0099              for (int i = 0; i < variant.Contacts.Count; i++)
+0100                  force += Math.Min(variant.Contacts[i].TangentialStiffness * u, variant.Contacts[i].Friction * normal[i]);
+0101              return force;
+0102          }
+0103          double low = 0;
+0104          var high = Math.Abs(shearForce) / clipKt;
+0105          for (int iteration = 0; iteration < 70; iteration++)
+0106          {
+0107              var middle = (low + high) / 2;
+0108              if (ShearAt(middle) < Math.Abs(shearForce))
+0109                  low = middle;
+0110              else
+0111                  high = middle;
+0112          }
+0113          var magnitude = (low + high) / 2;
+0114          var sign = Math.Sign(shearForce);
+0115          var contacts = new List<PointState>();
+0116          for (int i = 0; i < variant.Contacts.Count; i++)
+0117          {
+0118              var c = variant.Contacts[i];
+0119              var cap = c.Friction * normal[i];
+0120              var shear = Math.Min(c.TangentialStiffness * magnitude, cap);
+0121              var slip = compression[i] > Product.ContactEpsilon
+0122                  ? Math.Max(0, magnitude - cap / c.TangentialStiffness) : 0;
+0123              contacts.Add(new(c.Id, c.Name, compression[i], normal[i], sign * shear,
+0124                  slip, compression[i] / c.CompressionLimitMm));
+0125          }
+0126          var clips = variant.Clips.Select((c, i) =>
+0127          {
+0128              var n = c.NormalStiffness * clipBasis[i].Dot(q);
+0129              var shear = c.TangentialStiffness * magnitude;
+0130              return new PointState(c.Id, c.Name, 0, n, sign * shear, 0,
+0131                  Math.Sqrt(n * n + shear * shear) / c.ForceLimitN);
+0132          }).ToArray();
+0133          var residual = Math.Max(normalResidual, Math.Abs(ShearAt(magnitude) - Math.Abs(shearForce)));
+0134          return new PhaseState(phaseDegrees, normalForce, shearForce, q, sign * magnitude,
+0135              residual, contacts, clips);
+0136      }
+0137  }
+
+src/TrimContact.Core/Analysis/LinearAlgebra.cs
+======================================================================
+0001  namespace TrimContact.Core.Analysis;
+0002
+0003  public readonly record struct Vector3(double Z, double X, double Y)
+0004  {
+0005      public static Vector3 operator +(Vector3 a, Vector3 b) => new(a.Z + b.Z, a.X + b.X, a.Y + b.Y);
+0006      public static Vector3 operator -(Vector3 a, Vector3 b) => new(a.Z - b.Z, a.X - b.X, a.Y - b.Y);
+0007      public static Vector3 operator *(double s, Vector3 v) => new(s * v.Z, s * v.X, s * v.Y);
+0008      public double Dot(Vector3 v) => Z * v.Z + X * v.X + Y * v.Y;
+0009      public double Norm => Math.Sqrt(Dot(this));
+0010  }
+0011
+0012  public sealed class Matrix3
+0013  {
+0014      private readonly double[,] values = new double[3, 3];
+0015
+0016      public void AddSpring(double stiffness, Vector3 b)
+0017      {
+0018          double[] v = [b.Z, b.X, b.Y];
+0019          for (int i = 0; i < 3; i++)
+0020              for (int j = 0; j < 3; j++)
+0021                  values[i, j] += stiffness * v[i] * v[j];
+0022      }
+0023
+0024      public Matrix3 Copy()
+0025      {
+0026          var copy = new Matrix3();
+0027          Array.Copy(values, copy.values, values.Length);
+0028          return copy;
+0029      }
+0030
+0031      public Vector3 Multiply(Vector3 q) => new(
+0032          values[0, 0] * q.Z + values[0, 1] * q.X + values[0, 2] * q.Y,
+0033          values[1, 0] * q.Z + values[1, 1] * q.X + values[1, 2] * q.Y,
+0034          values[2, 0] * q.Z + values[2, 1] * q.X + values[2, 2] * q.Y);
+0035
+0036      public Vector3 Solve(Vector3 rhs)
+0037      {
+0038          var a = new double[3, 4];
+0039          double[] b = [rhs.Z, rhs.X, rhs.Y];
+0040          var scale = 0.0;
+0041          for (int i = 0; i < 3; i++)
+0042          {
+0043              for (int j = 0; j < 3; j++)
+0044              {
+0045                  a[i, j] = values[i, j];
+0046                  scale = Math.Max(scale, Math.Abs(a[i, j]));
+0047              }
+0048              a[i, 3] = b[i];
+0049          }
+0050          for (int col = 0; col < 3; col++)
+0051          {
+0052              int pivot = col;
+0053              for (int row = col + 1; row < 3; row++)
+0054                  if (Math.Abs(a[row, col]) > Math.Abs(a[pivot, col]))
+0055                      pivot = row;
+0056              if (Math.Abs(a[pivot, col]) < Math.Max(1e-12, scale * 1e-10))
+0057                  throw new InvalidDataException("卡扣布置或刚度导致矩阵近奇异，请分散卡扣并检查刚度比");
+0058              for (int j = col; j < 4; j++)
+0059                  (a[col, j], a[pivot, j]) = (a[pivot, j], a[col, j]);
+0060              var diagonal = a[col, col];
+0061              for (int j = col; j < 4; j++)
+0062                  a[col, j] /= diagonal;
+0063              for (int row = 0; row < 3; row++)
+0064              {
+0065                  if (row == col)
+0066                      continue;
+0067                  var factor = a[row, col];
+0068                  for (int j = col; j < 4; j++)
+0069                      a[row, j] -= factor * a[col, j];
+0070              }
+0071          }
+0072          var result = new Vector3(a[0, 3], a[1, 3], a[2, 3]);
+0073          if (!double.IsFinite(result.Norm))
+0074              throw new InvalidDataException("求解结果非有限数值");
+0075          return result;
+0076      }
+0077  }
+
+src/TrimContact.Core/Analysis/ProjectDifference.cs
+======================================================================
+0001  using System.Globalization;
+0002  using TrimContact.Core.Domain;
+0003  using TrimContact.Core.IO;
+0004
+0005  namespace TrimContact.Core.Analysis;
+0006
+0007  public sealed record InputDifference(string Path, string Current, string Reference);
+0008
+0009  public sealed record DifferenceReport(string CurrentHash, string ReferenceHash, string ReferenceName,
+0010      bool SameSharedConditions, IReadOnlyList<InputDifference> Rows);
+0011
+0012  public static class ProjectDifference
+0013  {
+0014      private static string N(double value) => value.ToString("G17", CultureInfo.InvariantCulture);
+0015
+0016      private static Dictionary<string, string> Flatten(DesignProject project)
+0017      {
+0018          var rows = new Dictionary<string, string>(StringComparer.Ordinal)
+0019          {
+0020              ["项目/名称"] = project.Name,
+0021              ["项目/修订"] = project.Revision,
+0022              ["共同条件/来源类型"] = project.Origin.Label(),
+0023              ["共同条件/来源依据"] = project.Source,
+0024              ["共同条件/质量kg"] = N(project.Panel.MassKg),
+0025              ["共同条件/质心Xmm"] = N(project.Panel.CenterXmm),
+0026              ["共同条件/质心Ymm"] = N(project.Panel.CenterYmm),
+0027              ["共同条件/相位数"] = project.Settings.Phases.ToString(CultureInfo.InvariantCulture),
+0028              ["共同条件/公差角点"] = project.Settings.EnumerateTolerance.ToString()
+0029          };
+0030          for (int i = 0; i < project.Panel.Outline.Count; i++)
+0031          {
+0032              rows[$"共同条件/轮廓[{i + 1}]/Xmm"] = N(project.Panel.Outline[i].Xmm);
+0033              rows[$"共同条件/轮廓[{i + 1}]/Ymm"] = N(project.Panel.Outline[i].Ymm);
+0034          }
+0035          foreach (var load in project.Loads)
+0036          {
+0037              var root = "共同条件/载荷/" + load.Id;
+0038              rows[root + "/名称"] = load.Name;
+0039              rows[root + "/法向偏置g"] = N(load.NormalBiasG);
+0040              rows[root + "/法向幅值g"] = N(load.NormalAmplitudeG);
+0041              rows[root + "/切向偏置g"] = N(load.TangentialBiasG);
+0042              rows[root + "/切向幅值g"] = N(load.TangentialAmplitudeG);
+0043              rows[root + "/相差deg"] = N(load.PhaseDegrees);
+0044              rows[root + "/频率标签Hz"] = N(load.FrequencyHz);
+0045              rows[root + "/来源"] = load.Source;
+0046          }
+0047          foreach (var variant in project.Variants)
+0048          {
+0049              var root = "方案/" + variant.Id;
+0050              rows[root + "/名称"] = variant.Name;
+0051              rows[root + "/说明"] = variant.Note;
+0052              foreach (var clip in variant.Clips)
+0053              {
+0054                  var key = root + "/卡扣/" + clip.Id;
+0055                  rows[key + "/名称"] = clip.Name;
+0056                  rows[key + "/Xmm"] = N(clip.Xmm);
+0057                  rows[key + "/Ymm"] = N(clip.Ymm);
+0058                  rows[key + "/法向刚度N/mm"] = N(clip.NormalStiffness);
+0059                  rows[key + "/切向刚度N/mm"] = N(clip.TangentialStiffness);
+0060                  rows[key + "/合力限值N"] = N(clip.ForceLimitN);
+0061              }
+0062              foreach (var contact in variant.Contacts)
+0063              {
+0064                  var key = root + "/接触点/" + contact.Id;
+0065                  rows[key + "/名称"] = contact.Name;
+0066                  rows[key + "/材料"] = contact.Material;
+0067                  rows[key + "/Xmm"] = N(contact.Xmm);
+0068                  rows[key + "/Ymm"] = N(contact.Ymm);
+0069                  rows[key + "/法向刚度N/mm"] = N(contact.NormalStiffness);
+0070                  rows[key + "/切向刚度N/mm"] = N(contact.TangentialStiffness);
+0071                  rows[key + "/间隙mm"] = N(contact.GapMm);
+0072                  rows[key + "/公差mm"] = N(contact.ToleranceMm);
+0073                  rows[key + "/预紧mm"] = N(contact.PreloadMm);
+0074                  rows[key + "/摩擦系数"] = N(contact.Friction);
+0075                  rows[key + "/允许压缩mm"] = N(contact.CompressionLimitMm);
+0076              }
+0077          }
+0078          return rows;
+0079      }
+0080
+0081      public static DifferenceReport Compare(DesignProject current, DesignProject reference)
+0082      {
+0083          ProjectValidation.Require(current);
+0084          ProjectValidation.Require(reference);
+0085          var left = Flatten(current);
+0086          var right = Flatten(reference);
+0087          var keys = left.Keys.Concat(right.Keys).Distinct().OrderBy(k => k, StringComparer.Ordinal);
+0088          var rows = new List<InputDifference>();
+0089          foreach (var key in keys)
+0090          {
+0091              var a = left.GetValueOrDefault(key, "（不存在）");
+0092              var b = right.GetValueOrDefault(key, "（不存在）");
+0093              if (a != b)
+0094                  rows.Add(new(key, a, b));
+0095          }
+0096          return new(ProjectCodec.InputHash(current), ProjectCodec.InputHash(reference), reference.Name,
+0097              !rows.Any(r => r.Path.StartsWith("共同条件/", StringComparison.Ordinal)), rows);
+0098      }
+0099  }
+
+src/TrimContact.Core/Analysis/QualityInspector.cs
+======================================================================
+0001  using TrimContact.Core.Domain;
+0002
+0003  namespace TrimContact.Core.Analysis;
+0004
+0005  public sealed record QualityFinding(string Severity, string Target, string Finding, string Action);
+0006
+0007  public sealed record LayoutMetric(string Variant, string Point, string Kind,
+0008      double NearestClipDistanceMm, double EffectiveInterferenceMm, double MinimumInterferenceMm,
+0009      double MaximumInterferenceMm);
+0010
+0011  public static class QualityInspector
+0012  {
+0013      public static IReadOnlyList<LayoutMetric> Metrics(DesignProject project)
+0014      {
+0015          var rows = new List<LayoutMetric>();
+0016          foreach (var variant in project.Variants)
+0017          {
+0018              double Distance(double x, double y, Guid exclude)
+0019              {
+0020                  return variant.Clips.Where(c => c.Id != exclude)
+0021                      .Select(c => Math.Sqrt(Math.Pow(c.Xmm - x, 2) + Math.Pow(c.Ymm - y, 2)))
+0022                      .DefaultIfEmpty(double.NaN).Min();
+0023              }
+0024              foreach (var clip in variant.Clips)
+0025                  rows.Add(new(variant.Name, clip.Name, "卡扣", Distance(clip.Xmm, clip.Ymm, clip.Id), 0, 0, 0));
+0026              foreach (var contact in variant.Contacts)
+0027                  rows.Add(new(variant.Name, contact.Name, "接触点", Distance(contact.Xmm, contact.Ymm, Guid.Empty),
+0028                      contact.PreloadMm - contact.GapMm, contact.PreloadMm - contact.GapMm - contact.ToleranceMm,
+0029                      contact.PreloadMm - contact.GapMm + contact.ToleranceMm));
+0030          }
+0031          return rows;
+0032      }
+0033
+0034      public static IReadOnlyList<QualityFinding> Inspect(DesignProject project, AnalysisReport? report)
+0035      {
+0036          var rows = new List<QualityFinding>();
+0037          foreach (var issue in ProjectValidation.Check(project, true))
+0038              rows.Add(new("阻断", issue.Path, issue.Message, "在对应输入页修正，再应用并计算。"));
+0039          if (project.Origin == DataOrigin.Simulation)
+0040              rows.Add(new("来源", "整个项目", "当前为模拟演示参数，不能证明实车表现。", "完成参数识别与真实样件验证后，记录数据来源。"));
+0041          if (project.Origin == DataOrigin.MeasurementDeclared)
+0042              rows.Add(new("来源", "整个项目", "实测状态由用户声明，软件没有认证标定链。", "保存仪器、加载条件、温度与原始试验编号。"));
+0043          if (project.Source.Contains("待") || project.Source.Contains("估算"))
+0044              rows.Add(new("待核实", "参数来源", "来源含待确认或估算说明。", "逐项补充参数识别依据，不能仅改变来源类型。"));
+0045          foreach (var load in project.Loads)
+0046          {
+0047              if (load.NormalAmplitudeG == 0 && load.TangentialAmplitudeG == 0)
+0048                  rows.Add(new("说明", load.Name, "零幅值载荷等效于静态偏置。", "若目标为周期工况，请确认输入的是幅值而不是峰峰值。"));
+0049              if (load.FrequencyHz > 0)
+0050                  rows.Add(new("限制", load.Name, $"{load.FrequencyHz}Hz只用作工况标签，未进行动态放大。", "存在共振或冲击时，使用动力学模型与台架试验。"));
+0051          }
+0052          foreach (var variant in project.Variants)
+0053          {
+0054              var coordinates = variant.Clips.Select(c => (c.Xmm, c.Ymm, c.Name))
+0055                  .Concat(variant.Contacts.Select(c => (c.Xmm, c.Ymm, c.Name))).ToArray();
+0056              for (int i = 0; i < coordinates.Length; i++)
+0057                  for (int j = i + 1; j < coordinates.Length; j++)
+0058                      if (Math.Abs(coordinates[i].Xmm - coordinates[j].Xmm) < 1e-6
+0059                          && Math.Abs(coordinates[i].Ymm - coordinates[j].Ymm) < 1e-6)
+0060                          rows.Add(new("复核", variant.Name, coordinates[i].Name + "与" + coordinates[j].Name + "坐标重合。",
+0061                              "并联等效可能是有意设计，请核查重复输入与空间布置。"));
+0062              foreach (var c in variant.Contacts)
+0063              {
+0064                  if (c.PreloadMm - c.GapMm - c.ToleranceMm <= 0 && c.PreloadMm - c.GapMm + c.ToleranceMm > 0)
+0065                      rows.Add(new("敏感", variant.Name + "/" + c.Name, "未平衡的装配干涉范围跨过零。",
+0066                          "启用全部间隙公差角点，再核查平衡后的最小压缩。"));
+0067                  if (c.Friction == 0)
+0068                      rows.Add(new("说明", c.Name, "摩擦系数为零，不提供接触摩擦力。", "确认是否为有意的无摩擦筛查假设。"));
+0069              }
+0070          }
+0071          if (report is null)
+0072          {
+0073              rows.Add(new("待计算", "结果", "尚无当前结果。", "应用输入后运行全部方案。"));
+0074              return rows;
+0075          }
+0076          foreach (var variant in report.Variants)
+0077          {
+0078              var length = Geometry.BoundsOf(project.Panel.Outline).Scale;
+0079              var states = variant.NominalTraces.SelectMany(t => t.Samples).ToArray();
+0080              var maxRotation = states.Select(s => Math.Max(Math.Abs(s.Displacement.X), Math.Abs(s.Displacement.Y)) / length)
+0081                  .DefaultIfEmpty().Max();
+0082              var maxTranslation = states.Select(s => Math.Max(Math.Abs(s.Displacement.Z), Math.Abs(s.TangentialMm)) / length)
+0083                  .DefaultIfEmpty().Max();
+0084              if (maxRotation > 0.05 || maxTranslation > 0.05)
+0085                  rows.Add(new("适用性", variant.Name, "名义采样位移或等效转角超过几何尺度的5%工程提醒值。",
+0086                      "复核小位移假设；该提醒阈值不是经过验证的材料限值，角点仍须另行复核。"));
+0087              foreach (var c in variant.Contacts)
+0088              {
+0089                  if (c.MinCompressionMm <= Product.ContactEpsilon)
+0090                      rows.Add(new("分离", variant.Name + "/" + c.Name, c.State, "查看最小压缩控制工况并生成装配间隙验证任务。"));
+0091                  if (c.MaxSlipMm > Product.ContactEpsilon)
+0092                      rows.Add(new("滑移", variant.Name + "/" + c.Name, $"滑移余量包络{c.MaxSlipMm:G5}mm。",
+0093                          "核查材料副、切向刚度和摩擦试验，不以滑移直接判定有声音。"));
+0094                  if (c.MaxUtilization > 1)
+0095                      rows.Add(new("超限", c.Name, "压缩量超过用户输入允许值。", "确认允许压缩量来源并检查控制工况。"));
+0096              }
+0097              foreach (var c in variant.Clips.Where(c => c.MaxUtilization > 1))
+0098                  rows.Add(new("超限", c.Name, "卡扣合力超过用户输入限值。", "核查保持力方向、刚度和供应商试验数据。"));
+0099          }
+0100          if (!report.ToleranceEnabled)
+0101              rows.Add(new("限制", "公差", "本次结果只包含名义间隙。", "在载荷页启用公差角点后重新计算。"));
+0102          return rows;
+0103      }
+0104  }
+
+src/TrimContact.Core/Analysis/Results.cs
+======================================================================
+0001  namespace TrimContact.Core.Analysis;
+0002
+0003  public sealed class AnalysisReport
+0004  {
+0005      public string Method { get; set; } = Domain.Product.Method;
+0006      public string InputHash { get; set; } = "";
+0007      public DateTimeOffset CalculatedUtc { get; set; } = DateTimeOffset.UtcNow;
+0008      public string ProjectName { get; set; } = "";
+0009      public string Origin { get; set; } = "";
+0010      public string Source { get; set; } = "";
+0011      public int Phases { get; set; }
+0012      public bool ToleranceEnabled { get; set; }
+0013      public List<VariantResult> Variants { get; set; } = [];
+0014  }
+0015
+0016  public sealed class VariantResult
+0017  {
+0018      public Guid VariantId { get; set; }
+0019      public string Name { get; set; } = "";
+0020      public int EvaluatedStates { get; set; }
+0021      public int ToleranceCases { get; set; }
+0022      public double MaxResidualN { get; set; }
+0023      public List<PointEnvelope> Contacts { get; set; } = [];
+0024      public List<PointEnvelope> Clips { get; set; } = [];
+0025      public List<TraceResult> NominalTraces { get; set; } = [];
+0026      public int SeparationPoints => Contacts.Count(c => c.MinCompressionMm <= Domain.Product.ContactEpsilon);
+0027      public int SlidingPoints => Contacts.Count(c => c.MaxSlipMm > Domain.Product.ContactEpsilon);
+0028      public int OverLimitPoints => Clips.Count(c => c.MaxUtilization > 1) + Contacts.Count(c => c.MaxUtilization > 1);
+0029  }
+0030
+0031  public sealed class PointEnvelope
+0032  {
+0033      public Guid PointId { get; set; }
+0034      public string Name { get; set; } = "";
+0035      public string Kind { get; set; } = "";
+0036      public double MinCompressionMm { get; set; } = double.PositiveInfinity;
+0037      public double MaxCompressionMm { get; set; }
+0038      public double MinNormalN { get; set; } = double.PositiveInfinity;
+0039      public double MaxNormalN { get; set; } = double.NegativeInfinity;
+0040      public double MaxAbsShearN { get; set; }
+0041      public double MaxSlipMm { get; set; }
+0042      public double MaxUtilization { get; set; }
+0043      public int DetachedSamples { get; set; }
+0044      public int TotalSamples { get; set; }
+0045      public int SlidingSamples { get; set; }
+0046      public string GoverningCase { get; set; } = "";
+0047      public string CompressionCase { get; set; } = "";
+0048      public string SlipCase { get; set; } = "";
+0049      public string State => Kind == "卡扣" ? (MaxUtilization > 1 ? "合力超限" : "未超用户限值")
+0050          : MaxCompressionMm <= Domain.Product.ContactEpsilon ? "全采样脱离"
+0051          : MinCompressionMm <= Domain.Product.ContactEpsilon ? "存在分离"
+0052          : "持续接触";
+0053
+0054      public void Accumulate(PointState s, string caseName, bool isClip)
+0055      {
+0056          if (s.CompressionMm < MinCompressionMm)
+0057          {
+0058              MinCompressionMm = s.CompressionMm;
+0059              CompressionCase = caseName;
+0060          }
+0061          MaxCompressionMm = Math.Max(MaxCompressionMm, s.CompressionMm);
+0062          MinNormalN = Math.Min(MinNormalN, s.NormalN);
+0063          MaxNormalN = Math.Max(MaxNormalN, s.NormalN);
+0064          MaxAbsShearN = Math.Max(MaxAbsShearN, Math.Abs(s.ShearN));
+0065          if (s.SlipMm > MaxSlipMm)
+0066          {
+0067              MaxSlipMm = s.SlipMm;
+0068              SlipCase = caseName;
+0069          }
+0070          if (s.Utilization >= MaxUtilization)
+0071          {
+0072              MaxUtilization = s.Utilization;
+0073              GoverningCase = caseName;
+0074          }
+0075          if (!isClip && s.CompressionMm <= Domain.Product.ContactEpsilon)
+0076              DetachedSamples++;
+0077          if (s.SlipMm > Domain.Product.ContactEpsilon)
+0078              SlidingSamples++;
+0079          TotalSamples++;
+0080      }
+0081  }
+0082
+0083  public sealed class TraceResult
+0084  {
+0085      public Guid LoadId { get; set; }
+0086      public string LoadName { get; set; } = "";
+0087      public List<PhaseState> Samples { get; set; } = [];
+0088  }
+0089
+0090  public sealed record SweepRow(double Value, int SeparationPoints, int SlidingPoints,
+0091      int OverLimitPoints, double MaxClipUtilization, double MaxCompressionMm, double MaxSlipMm);
+0092
+0093  public sealed record ComparisonRow(string Name, int SeparationPoints, int SlidingPoints,
+0094      int OverLimitPoints, double MaxClipUtilization, double MaxSlipMm);
+
+src/TrimContact.Core/Domain/Demonstration.cs
+======================================================================
+0001  namespace TrimContact.Core.Domain;
+0002
+0003  public static class Demonstration
+0004  {
+0005      public static DesignProject Create()
+0006      {
+0007          var project = new DesignProject
+0008          {
+0009              Name = "门板四卡扣接触布置演示",
+0010              Owner = "演示工程师",
+0011              Goal = "比较缓冲块预紧量对接触保持和卡扣反力的影响",
+0012              Origin = DataOrigin.Simulation,
+0013              Source = "内置固定模拟参数；非实测，不证明实车效果",
+0014              Panel = new Panel
+0015              {
+0016                  Name = "400×300 mm刚性饰板示例",
+0017                  MassKg = 1,
+0018                  CenterXmm = 200,
+0019                  CenterYmm = 150,
+0020                  Outline = [new() { Xmm = 0, Ymm = 0 }, new() { Xmm = 400, Ymm = 0 },
+0021                      new() { Xmm = 400, Ymm = 300 }, new() { Xmm = 0, Ymm = 300 }]
+0022              },
+0023              Loads = [new LoadCase { Name = "一倍重力周期演示", Source = "模拟正弦惯性载荷" }]
+0024          };
+0025          var variant = new DesignVariant { Name = "A 基准接触布置" };
+0026          AddClip(variant, "左下卡扣", 40, 40);
+0027          AddClip(variant, "右下卡扣", 360, 40);
+0028          AddClip(variant, "右上卡扣", 360, 260);
+0029          AddClip(variant, "左上卡扣", 40, 260);
+0030          variant.Contacts.Add(new ContactPoint
+0031          {
+0032              Name = "中心缓冲块",
+0033              Xmm = 200,
+0034              Ymm = 150,
+0035              GapMm = 0.1,
+0036              PreloadMm = 0.2,
+0037              ToleranceMm = 0.15,
+0038              NormalStiffness = 100,
+0039              TangentialStiffness = 40,
+0040              Friction = 0.3
+0041          });
+0042          project.Variants.Add(variant);
+0043          project.Audit.Add(new AuditEntry { Action = "载入内置模拟演示" });
+0044          return project;
+0045      }
+0046
+0047      public static void AddClip(DesignVariant variant, string name, double x, double y)
+0048      {
+0049          variant.Clips.Add(new Clip { Name = name, Xmm = x, Ymm = y });
+0050      }
+0051  }
+
+src/TrimContact.Core/Domain/Geometry.cs
+======================================================================
+0001  namespace TrimContact.Core.Domain;
+0002
+0003  public readonly record struct Bounds(double MinX, double MinY, double MaxX, double MaxY)
+0004  {
+0005      public double Width => MaxX - MinX;
+0006      public double Height => MaxY - MinY;
+0007      public double Scale => Math.Max(Width, Height);
+0008  }
+0009
+0010  public static class Geometry
+0011  {
+0012      public static Bounds BoundsOf(IReadOnlyList<Vertex> points)
+0013      {
+0014          if (points.Count == 0)
+0015              return new Bounds(0, 0, 400, 300);
+0016          return new Bounds(points.Min(p => p.Xmm), points.Min(p => p.Ymm),
+0017              points.Max(p => p.Xmm), points.Max(p => p.Ymm));
+0018      }
+0019
+0020      public static double SignedArea(IReadOnlyList<Vertex> points)
+0021      {
+0022          double area = 0;
+0023          for (int i = 0; i < points.Count; i++)
+0024          {
+0025              var a = points[i];
+0026              var b = points[(i + 1) % points.Count];
+0027              area += a.Xmm * b.Ymm - b.Xmm * a.Ymm;
+0028          }
+0029          return area / 2;
+0030      }
+0031
+0032      private static double Cross(double ax, double ay, double bx, double by) => ax * by - ay * bx;
+0033
+0034      private static bool OnSegment(Vertex a, Vertex b, double x, double y)
+0035      {
+0036          const double eps = 1e-8;
+0037          return Math.Abs(Cross(b.Xmm - a.Xmm, b.Ymm - a.Ymm, x - a.Xmm, y - a.Ymm)) < eps
+0038              && x >= Math.Min(a.Xmm, b.Xmm) - eps && x <= Math.Max(a.Xmm, b.Xmm) + eps
+0039              && y >= Math.Min(a.Ymm, b.Ymm) - eps && y <= Math.Max(a.Ymm, b.Ymm) + eps;
+0040      }
+0041
+0042      public static bool Contains(IReadOnlyList<Vertex> points, double x, double y)
+0043      {
+0044          bool inside = false;
+0045          for (int i = 0, j = points.Count - 1; i < points.Count; j = i++)
+0046          {
+0047              var a = points[j];
+0048              var b = points[i];
+0049              if (OnSegment(a, b, x, y))
+0050                  return true;
+0051              if ((a.Ymm > y) != (b.Ymm > y)
+0052                  && x < (b.Xmm - a.Xmm) * (y - a.Ymm) / (b.Ymm - a.Ymm) + a.Xmm)
+0053                  inside = !inside;
+0054          }
+0055          return inside;
+0056      }
+0057
+0058      private static bool Intersects(Vertex a, Vertex b, Vertex c, Vertex d)
+0059      {
+0060          var abC = Cross(b.Xmm - a.Xmm, b.Ymm - a.Ymm, c.Xmm - a.Xmm, c.Ymm - a.Ymm);
+0061          var abD = Cross(b.Xmm - a.Xmm, b.Ymm - a.Ymm, d.Xmm - a.Xmm, d.Ymm - a.Ymm);
+0062          var cdA = Cross(d.Xmm - c.Xmm, d.Ymm - c.Ymm, a.Xmm - c.Xmm, a.Ymm - c.Ymm);
+0063          var cdB = Cross(d.Xmm - c.Xmm, d.Ymm - c.Ymm, b.Xmm - c.Xmm, b.Ymm - c.Ymm);
+0064          if (abC * abD < 0 && cdA * cdB < 0)
+0065              return true;
+0066          return OnSegment(a, b, c.Xmm, c.Ymm) || OnSegment(a, b, d.Xmm, d.Ymm)
+0067              || OnSegment(c, d, a.Xmm, a.Ymm) || OnSegment(c, d, b.Xmm, b.Ymm);
+0068      }
+0069
+0070      public static bool IsSimple(IReadOnlyList<Vertex> points)
+0071      {
+0072          if (points.Count < 3 || Math.Abs(SignedArea(points)) < 1)
+0073              return false;
+0074          for (int i = 0; i < points.Count; i++)
+0075          {
+0076              var next = (i + 1) % points.Count;
+0077              if (Math.Abs(points[i].Xmm - points[next].Xmm) + Math.Abs(points[i].Ymm - points[next].Ymm) < 1e-6)
+0078                  return false;
+0079              for (int j = i + 1; j < points.Count; j++)
+0080              {
+0081                  if (j == next || (j + 1) % points.Count == i)
+0082                      continue;
+0083                  if (Intersects(points[i], points[next], points[j], points[(j + 1) % points.Count]))
+0084                      return false;
+0085              }
+0086          }
+0087          return true;
+0088      }
+0089
+0090      public static double TriangleSpread(IReadOnlyList<Clip> clips, double scale)
+0091      {
+0092          double max = 0;
+0093          for (int i = 0; i < clips.Count; i++)
+0094              for (int j = i + 1; j < clips.Count; j++)
+0095                  for (int k = j + 1; k < clips.Count; k++)
+0096                  {
+0097                      var a = clips[i];
+0098                      var b = clips[j];
+0099                      var c = clips[k];
+0100                      max = Math.Max(max, Math.Abs(Cross(b.Xmm - a.Xmm, b.Ymm - a.Ymm,
+0101                          c.Xmm - a.Xmm, c.Ymm - a.Ymm)) / (scale * scale));
+0102                  }
+0103          return max;
+0104      }
+0105  }
+
+src/TrimContact.Core/Domain/Project.cs
+======================================================================
+0001  namespace TrimContact.Core.Domain;
+0002
+0003  public static class Product
+0004  {
+0005      public const string Name = "汽车内饰卡扣与防异响接触设计软件";
+0006      public const string Version = "V1.0";
+0007      public const string Method = "RigidContact-1.0";
+0008      public const int Schema = 1;
+0009      public const double Gravity = 9.80665;
+0010      public const double ContactEpsilon = 1e-7;
+0011      public const string Boundary = "刚性饰板、准静态采样、单方向切向接触筛查；不预测真实异响声压，不替代样件验证。";
+0012  }
+0013
+0014  public enum DataOrigin
+0015  {
+0016      Simulation,
+0017      MeasurementDeclared,
+0018      Estimate,
+0019      Manual
+0020  }
+0021
+0022  public static class OriginNames
+0023  {
+0024      public static string Label(this DataOrigin origin) => origin switch
+0025      {
+0026          DataOrigin.Simulation => "模拟演示",
+0027          DataOrigin.MeasurementDeclared => "实测（用户声明）",
+0028          DataOrigin.Estimate => "工程估算",
+0029          _ => "人工填写"
+0030      };
+0031  }
+0032
+0033  public sealed class DesignProject
+0034  {
+0035      public int Schema { get; set; } = Product.Schema;
+0036      public Guid Id { get; set; } = Guid.NewGuid();
+0037      public string Name { get; set; } = "未命名接触设计";
+0038      public string Revision { get; set; } = "A";
+0039      public string Owner { get; set; } = "";
+0040      public string Goal { get; set; } = "";
+0041      public DataOrigin Origin { get; set; } = DataOrigin.Manual;
+0042      public string Source { get; set; } = "待填写参数依据";
+0043      public bool Archived { get; set; }
+0044      public DateTimeOffset CreatedUtc { get; set; } = DateTimeOffset.UtcNow;
+0045      public DateTimeOffset ModifiedUtc { get; set; } = DateTimeOffset.UtcNow;
+0046      public Panel Panel { get; set; } = new();
+0047      public CalculationSettings Settings { get; set; } = new();
+0048      public List<DesignVariant> Variants { get; set; } = [];
+0049      public List<LoadCase> Loads { get; set; } = [];
+0050      public List<VerificationTask> Tasks { get; set; } = [];
+0051      public List<AuditEntry> Audit { get; set; } = [];
+0052  }
+0053
+0054  public sealed class Panel
+0055  {
+0056      public string Name { get; set; } = "待定义饰板";
+0057      public double MassKg { get; set; } = 1;
+0058      public double CenterXmm { get; set; } = 200;
+0059      public double CenterYmm { get; set; } = 150;
+0060      public List<Vertex> Outline { get; set; } = [];
+0061  }
+0062
+0063  public sealed class Vertex
+0064  {
+0065      public double Xmm { get; set; }
+0066      public double Ymm { get; set; }
+0067  }
+0068
+0069  public sealed class DesignVariant
+0070  {
+0071      public Guid Id { get; set; } = Guid.NewGuid();
+0072      public string Name { get; set; } = "新方案";
+0073      public string Note { get; set; } = "";
+0074      public List<Clip> Clips { get; set; } = [];
+0075      public List<ContactPoint> Contacts { get; set; } = [];
+0076  }
+0077
+0078  public sealed class Clip
+0079  {
+0080      public Guid Id { get; set; } = Guid.NewGuid();
+0081      public string Name { get; set; } = "卡扣";
+0082      public double Xmm { get; set; }
+0083      public double Ymm { get; set; }
+0084      public double NormalStiffness { get; set; } = 100;
+0085      public double TangentialStiffness { get; set; } = 50;
+0086      public double ForceLimitN { get; set; } = 80;
+0087  }
+0088
+0089  public sealed class ContactPoint
+0090  {
+0091      public Guid Id { get; set; } = Guid.NewGuid();
+0092      public string Name { get; set; } = "接触点";
+0093      public string Material { get; set; } = "缓冲块（待标定）";
+0094      public double Xmm { get; set; }
+0095      public double Ymm { get; set; }
+0096      public double GapMm { get; set; } = 0.1;
+0097      public double ToleranceMm { get; set; } = 0.05;
+0098      public double PreloadMm { get; set; } = 0.2;
+0099      public double NormalStiffness { get; set; } = 80;
+0100      public double TangentialStiffness { get; set; } = 30;
+0101      public double Friction { get; set; } = 0.3;
+0102      public double CompressionLimitMm { get; set; } = 0.8;
+0103  }
+0104
+0105  public sealed class LoadCase
+0106  {
+0107      public Guid Id { get; set; } = Guid.NewGuid();
+0108      public string Name { get; set; } = "新载荷";
+0109      public double NormalBiasG { get; set; }
+0110      public double NormalAmplitudeG { get; set; } = 1;
+0111      public double TangentialBiasG { get; set; }
+0112      public double TangentialAmplitudeG { get; set; } = 0.5;
+0113      public double PhaseDegrees { get; set; } = 90;
+0114      public double FrequencyHz { get; set; } = 10;
+0115      public string Source { get; set; } = "工程估算，待测量";
+0116  }
+0117
+0118  public sealed class CalculationSettings
+0119  {
+0120      public int Phases { get; set; } = 24;
+0121      public bool EnumerateTolerance { get; set; } = true;
+0122  }
+0123
+0124  public sealed class VerificationTask
+0125  {
+0126      public Guid Id { get; set; } = Guid.NewGuid();
+0127      public Guid? PointId { get; set; }
+0128      public string Title { get; set; } = "新验证任务";
+0129      public string Method { get; set; } = "";
+0130      public string Acceptance { get; set; } = "";
+0131      public string Owner { get; set; } = "";
+0132      public bool Completed { get; set; }
+0133      public string Evidence { get; set; } = "";
+0134  }
+0135
+0136  public sealed class AuditEntry
+0137  {
+0138      public DateTimeOffset Utc { get; set; } = DateTimeOffset.UtcNow;
+0139      public string Action { get; set; } = "";
+0140  }
+
+src/TrimContact.Core/Domain/Validation.cs
+======================================================================
+0001  namespace TrimContact.Core.Domain;
+0002
+0003  public sealed record ValidationIssue(string Path, string Message);
+0004
+0005  public static class ProjectValidation
+0006  {
+0007      public static IReadOnlyList<ValidationIssue> Check(DesignProject p, bool forCalculation = false)
+0008      {
+0009          var issues = new List<ValidationIssue>();
+0010          void Text(string? value, string path, int length, bool required = false)
+0011          {
+0012              if (value is null || value.Length > length || (required && string.IsNullOrWhiteSpace(value)))
+0013                  issues.Add(new(path, $"应为{(required ? "非空" : "可空")}文本，最长{length}字"));
+0014          }
+0015          void Number(double value, string path, double min, double max)
+0016          {
+0017              if (!double.IsFinite(value) || value < min || value > max)
+0018                  issues.Add(new(path, $"须为{min}至{max}之间的有限数值"));
+0019          }
+0020          void Count(int value, string path, int max)
+0021          {
+0022              if (value > max)
+0023                  issues.Add(new(path, $"最多{max}项"));
+0024          }
+0025          var ids = new HashSet<Guid>();
+0026          void Id(Guid id, string path)
+0027          {
+0028              if (id == Guid.Empty || !ids.Add(id))
+0029                  issues.Add(new(path, "ID为空或重复"));
+0030          }
+0031          if (p.Schema != Product.Schema)
+0032              issues.Add(new("格式版本", "仅支持schema=1，请使用匹配版本"));
+0033          Id(p.Id, "项目ID");
+0034          Text(p.Name, "项目名称", 100, true);
+0035          Text(p.Revision, "项目修订", 30, true);
+0036          Text(p.Owner, "负责人", 100);
+0037          Text(p.Goal, "目标", 2000);
+0038          Text(p.Source, "数据来源", 2000, true);
+0039          if (!Enum.IsDefined(p.Origin))
+0040              issues.Add(new("来源类型", "来源类型无效"));
+0041          if (p.Panel is null || p.Settings is null || p.Variants is null || p.Loads is null || p.Tasks is null || p.Audit is null)
+0042          {
+0043              issues.Add(new("项目结构", "必需对象或列表缺失"));
+0044              return issues;
+0045          }
+0046          var panel = p.Panel;
+0047          Text(panel.Name, "饰板名称", 100, true);
+0048          Number(panel.MassKg, "质量kg", 0.001, 100);
+0049          Number(panel.CenterXmm, "质心Xmm", -10000, 10000);
+0050          Number(panel.CenterYmm, "质心Ymm", -10000, 10000);
+0051          if (panel.Outline is null)
+0052          {
+0053              issues.Add(new("轮廓", "轮廓列表缺失"));
+0054              return issues;
+0055          }
+0056          Count(panel.Outline.Count, "轮廓顶点", 24);
+0057          foreach (var vertex in panel.Outline)
+0058          {
+0059              if (vertex is null)
+0060              {
+0061                  issues.Add(new("轮廓", "顶点不能为null"));
+0062                  continue;
+0063              }
+0064              Number(vertex.Xmm, "顶点Xmm", -10000, 10000);
+0065              Number(vertex.Ymm, "顶点Ymm", -10000, 10000);
+0066          }
+0067          var outlineReady = panel.Outline.Count >= 3 && panel.Outline.All(v => v is not null);
+0068          if (outlineReady && !Geometry.IsSimple(panel.Outline))
+0069              issues.Add(new("轮廓", "轮廓须为无自交、无重复边的简单多边形，面积至少1 mm²"));
+0070          if (forCalculation && !outlineReady)
+0071              issues.Add(new("轮廓", "计算前至少定义3个顶点"));
+0072          if (outlineReady && !Geometry.Contains(panel.Outline, panel.CenterXmm, panel.CenterYmm))
+0073              issues.Add(new("质心", "须位于轮廓内或边界上"));
+0074          if (p.Settings.Phases is not (24 or 48 or 72))
+0075              issues.Add(new("相位采样", "仅支持24、48或72点"));
+0076          Count(p.Variants.Count, "方案", 8);
+0077          Count(p.Loads.Count, "载荷", 6);
+0078          Count(p.Tasks.Count, "验证任务", 200);
+0079          Count(p.Audit.Count, "操作记录", 500);
+0080          if (forCalculation && (p.Variants.Count == 0 || p.Loads.Count == 0))
+0081              issues.Add(new("计算条件", "至少建立一个方案和一个载荷"));
+0082          void Position(double x, double y, string path)
+0083          {
+0084              Number(x, path + "/Xmm", -10000, 10000);
+0085              Number(y, path + "/Ymm", -10000, 10000);
+0086              if (outlineReady && !Geometry.Contains(panel.Outline, x, y))
+0087                  issues.Add(new(path, "点位须位于饰板轮廓内或边界上"));
+0088          }
+0089          foreach (var v in p.Variants)
+0090          {
+0091              if (v is null || v.Clips is null || v.Contacts is null)
+0092              {
+0093                  issues.Add(new("方案", "方案或点位列表缺失"));
+0094                  continue;
+0095              }
+0096              Id(v.Id, "方案ID");
+0097              Text(v.Name, "方案名称", 100, true);
+0098              Text(v.Note, v.Name + "/说明", 2000);
+0099              Count(v.Clips.Count, v.Name + "/卡扣", 12);
+0100              Count(v.Contacts.Count, v.Name + "/接触点", 6);
+0101              if (forCalculation && v.Clips.All(c => c is not null) && (v.Clips.Count < 3 || Geometry.TriangleSpread(v.Clips,
+0102                  Math.Max(1, Geometry.BoundsOf(panel.Outline).Scale)) < 1e-4))
+0103                  issues.Add(new(v.Name, "至少3个非共线卡扣，且归一化三角形面积不得过小"));
+0104              foreach (var c in v.Clips)
+0105              {
+0106                  if (c is null)
+0107                  {
+0108                      issues.Add(new(v.Name, "卡扣不能为null"));
+0109                      continue;
+0110                  }
+0111                  Id(c.Id, "卡扣ID");
+0112                  Text(c.Name, "卡扣名称", 100, true);
+0113                  Position(c.Xmm, c.Ymm, c.Name);
+0114                  Number(c.NormalStiffness, c.Name + "/法向刚度N/mm", 0.01, 100000);
+0115                  Number(c.TangentialStiffness, c.Name + "/切向刚度N/mm", 0.01, 100000);
+0116                  Number(c.ForceLimitN, c.Name + "/合力限值N", 0.01, 100000);
+0117              }
+0118              foreach (var c in v.Contacts)
+0119              {
+0120                  if (c is null)
+0121                  {
+0122                      issues.Add(new(v.Name, "接触点不能为null"));
+0123                      continue;
+0124                  }
+0125                  Id(c.Id, "接触点ID");
+0126                  Text(c.Name, "接触点名称", 100, true);
+0127                  Text(c.Material, c.Name + "/材料", 100, true);
+0128                  Position(c.Xmm, c.Ymm, c.Name);
+0129                  Number(c.GapMm, c.Name + "/间隙mm", 0, 20);
+0130                  Number(c.ToleranceMm, c.Name + "/公差±mm", 0, 5);
+0131                  Number(c.PreloadMm, c.Name + "/预紧mm", 0, 20);
+0132                  Number(c.NormalStiffness, c.Name + "/法向刚度N/mm", 0.01, 100000);
+0133                  Number(c.TangentialStiffness, c.Name + "/切向刚度N/mm", 0.01, 100000);
+0134                  Number(c.Friction, c.Name + "/摩擦系数", 0, 2);
+0135                  Number(c.CompressionLimitMm, c.Name + "/压缩限值mm", 0.0001, 20);
+0136              }
+0137          }
+0138          foreach (var l in p.Loads)
+0139          {
+0140              if (l is null)
+0141              {
+0142                  issues.Add(new("载荷", "载荷不能为null"));
+0143                  continue;
+0144              }
+0145              Id(l.Id, "载荷ID");
+0146              Text(l.Name, "载荷名称", 100, true);
+0147              Text(l.Source, l.Name + "/来源", 2000, true);
+0148              Number(l.NormalBiasG, l.Name + "/法向偏置g", -20, 20);
+0149              Number(l.NormalAmplitudeG, l.Name + "/法向幅值g", 0, 20);
+0150              Number(l.TangentialBiasG, l.Name + "/切向偏置g", -20, 20);
+0151              Number(l.TangentialAmplitudeG, l.Name + "/切向幅值g", 0, 20);
+0152              Number(l.PhaseDegrees, l.Name + "/相差°", -360, 360);
+0153              Number(l.FrequencyHz, l.Name + "/频率标签Hz", 0, 1000);
+0154          }
+0155          var points = p.Variants.Where(v => v is not null && v.Clips is not null && v.Contacts is not null)
+0156              .SelectMany(v => v.Clips.Where(c => c is not null).Select(c => c.Id)
+0157                  .Concat(v.Contacts.Where(c => c is not null).Select(c => c.Id))).ToHashSet();
+0158          foreach (var t in p.Tasks)
+0159          {
+0160              if (t is null)
+0161              {
+0162                  issues.Add(new("验证任务", "任务不能为null"));
+0163                  continue;
+0164              }
+0165              Id(t.Id, "任务ID");
+0166              Text(t.Title, "任务标题", 200, true);
+0167              Text(t.Method, t.Title + "/方法", 2000);
+0168              Text(t.Acceptance, t.Title + "/判据", 2000);
+0169              Text(t.Owner, t.Title + "/负责人", 100);
+0170              Text(t.Evidence, t.Title + "/证据", 2000);
+0171              if (t.PointId.HasValue && !points.Contains(t.PointId.Value))
+0172                  issues.Add(new(t.Title, "关联点位不存在"));
+0173              if (t.Completed && string.IsNullOrWhiteSpace(t.Evidence))
+0174                  issues.Add(new(t.Title, "标记完成前须填写验证证据"));
+0175          }
+0176          foreach (var a in p.Audit)
+0177              if (a is null || a.Action is null || a.Action.Length > 2000)
+0178                  issues.Add(new("操作记录", "记录缺失或超长"));
+0179          return issues;
+0180      }
+0181
+0182      public static void Require(DesignProject p, bool forCalculation = false)
+0183      {
+0184          var issues = Check(p, forCalculation);
+0185          if (issues.Count > 0)
+0186              throw new InvalidDataException(string.Join("；", issues.Take(12).Select(i => i.Path + "：" + i.Message)));
+0187      }
+0188  }
+
+src/TrimContact.Core/IO/BalanceExport.cs
+======================================================================
+0001  using System.Globalization;
+0002  using System.Text;
+0003  using TrimContact.Core.Analysis;
+0004  using TrimContact.Core.Domain;
+0005
+0006  namespace TrimContact.Core.IO;
+0007
+0008  public static class BalanceExport
+0009  {
+0010      private static string Cell(string value)
+0011      {
+0012          if (value.Length > 0 && "=+-@".Contains(value[0])
+0013              && !double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out _))
+0014              value = "'" + value;
+0015          return "\"" + value.Replace("\"", "\"\"") + "\"";
+0016      }
+0017
+0018      private static string Number(double value) => value.ToString("G17", CultureInfo.InvariantCulture);
+0019
+0020      private static void Add(StringBuilder text, params string[] values)
+0021      {
+0022          text.AppendLine(string.Join(",", values.Select(Cell)));
+0023      }
+0024
+0025      public static string Csv(DesignProject project, AnalysisReport report)
+0026      {
+0027          var rows = BalanceAudit.Evaluate(project, report);
+0028          var text = new StringBuilder();
+0029          Add(text, "软件", Product.Name, Product.Version, "输入SHA256", report.InputHash);
+0030          Add(text, "来源", project.Origin.Label(), project.Source, "范围", "仅名义公差相位");
+0031          Add(text, "限制", "仅法向力矩平衡；切向不包含扭转或高度偏心；弹性能不是异响能量");
+0032          Add(text, "方案", "载荷", "相位deg", "外加法向N", "法向反力合计N", "外加切向N", "切向反力合计N",
+0033              "法向差N", "切向差N", "X轴力矩差Nmm", "Y轴力矩差Nmm", "储存弹性能Nmm");
+0034          foreach (var row in rows)
+0035          {
+0036              Add(text, row.Variant, row.Load, Number(row.PhaseDegrees), Number(row.AppliedNormalN),
+0037                  Number(row.ReactionNormalN), Number(row.AppliedShearN), Number(row.ReactionShearN),
+0038                  Number(row.NormalErrorN), Number(row.ShearErrorN), Number(row.MomentXErrorNmm),
+0039                  Number(row.MomentYErrorNmm), Number(row.ElasticEnergyNmm));
+0040          }
+0041          return text.ToString();
+0042      }
+0043  }
+
+src/TrimContact.Core/IO/CsvTable.cs
+======================================================================
+0001  using System.Text;
+0002
+0003  namespace TrimContact.Core.IO;
+0004
+0005  public sealed record CsvRecord(int Line, IReadOnlyList<string> Cells);
+0006
+0007  public static class CsvTable
+0008  {
+0009      public static IReadOnlyList<CsvRecord> Read(string text)
+0010      {
+0011          if (Encoding.UTF8.GetByteCount(text) > 128 * 1024)
+0012              throw new InvalidDataException("CSV最多128KB");
+0013          text = text.TrimStart('\uFEFF');
+0014          var rows = new List<CsvRecord>();
+0015          var cells = new List<string>();
+0016          var field = new StringBuilder();
+0017          bool quoted = false;
+0018          bool closedQuote = false;
+0019          bool fieldStarted = false;
+0020          int line = 1;
+0021          int recordLine = 1;
+0022          void EndField()
+0023          {
+0024              cells.Add(field.ToString());
+0025              field.Clear();
+0026              closedQuote = false;
+0027              fieldStarted = false;
+0028          }
+0029          void EndRecord()
+0030          {
+0031              EndField();
+0032              rows.Add(new CsvRecord(recordLine, cells.ToArray()));
+0033              cells.Clear();
+0034              if (rows.Count > 101)
+0035                  throw new InvalidDataException("CSV最多100条数据记录，加一行表头");
+0036              recordLine = line + 1;
+0037          }
+0038          for (int i = 0; i < text.Length; i++)
+0039          {
+0040              var c = text[i];
+0041              if (quoted)
+0042              {
+0043                  if (c == '"')
+0044                  {
+0045                      if (i + 1 < text.Length && text[i + 1] == '"')
+0046                      {
+0047                          field.Append('"');
+0048                          i++;
+0049                      }
+0050                      else
+0051                      {
+0052                          quoted = false;
+0053                          closedQuote = true;
+0054                      }
+0055                  }
+0056                  else
+0057                  {
+0058                      field.Append(c);
+0059                      if (c == '\n')
+0060                          line++;
+0061                  }
+0062                  continue;
+0063              }
+0064              if (c == ',')
+0065              {
+0066                  EndField();
+0067                  continue;
+0068              }
+0069              if (c is '\r' or '\n')
+0070              {
+0071                  EndRecord();
+0072                  if (c == '\r' && i + 1 < text.Length && text[i + 1] == '\n')
+0073                      i++;
+0074                  line++;
+0075                  recordLine = line;
+0076                  continue;
+0077              }
+0078              if (closedQuote)
+0079                  throw new InvalidDataException($"CSV第{line}行：闭引号后只能是分隔符或换行");
+0080              if (c == '"')
+0081              {
+0082                  if (fieldStarted)
+0083                      throw new InvalidDataException($"CSV第{line}行：未引用字段中含引号");
+0084                  quoted = true;
+0085                  fieldStarted = true;
+0086                  continue;
+0087              }
+0088              field.Append(c);
+0089              fieldStarted = true;
+0090          }
+0091          if (quoted)
+0092              throw new InvalidDataException($"CSV第{recordLine}行：引号未闭合");
+0093          if (field.Length > 0 || cells.Count > 0 || closedQuote)
+0094              EndRecord();
+0095          if (rows.Count < 2)
+0096              throw new InvalidDataException("CSV至少包含表头和一条数据");
+0097          return rows;
+0098      }
+0099  }
+
+src/TrimContact.Core/IO/LayoutCsv.cs
+======================================================================
+0001  using System.Globalization;
+0002  using TrimContact.Core.Domain;
+0003  using TrimContact.Core.Operations;
+0004
+0005  namespace TrimContact.Core.IO;
+0006
+0007  public sealed record LayoutImportPreview(DesignProject Proposed, string BaseHash, Guid VariantId,
+0008      int ClipCount, int ContactCount, string Mode, IReadOnlyList<string> Messages);
+0009
+0010  public static class LayoutCsv
+0011  {
+0012      public static readonly string[] Header =
+0013      [
+0014          "kind", "name", "x_mm", "y_mm", "kn_N_per_mm", "kt_N_per_mm", "gap_mm",
+0015          "tolerance_mm", "preload_mm", "mu", "compression_limit_mm", "force_limit_N", "material"
+0016      ];
+0017
+0018      public static string Template => string.Join(",", Header) + "\r\n"
+0019          + "Clip,左下卡扣,40,40,100,50,,,,,,80,\r\n"
+0020          + "Clip,右下卡扣,360,40,100,50,,,,,,80,\r\n"
+0021          + "Clip,右上卡扣,360,260,100,50,,,,,,80,\r\n"
+0022          + "Clip,左上卡扣,40,260,100,50,,,,,,80,\r\n"
+0023          + "Contact,中心缓冲块,200,150,100,40,0.1,0.15,0.2,0.3,0.8,,缓冲块（模拟）\r\n";
+0024
+0025      public static LayoutImportPreview Preview(DesignProject project, Guid variantId, string csv, bool replace)
+0026      {
+0027          var rows = CsvTable.Read(csv);
+0028          if (!rows[0].Cells.SequenceEqual(Header))
+0029              throw new InvalidDataException("CSV表头、顺序或大小写不匹配，请下载布置CSV模板");
+0030          var clone = ProjectCodec.Clone(project);
+0031          var variant = clone.Variants.SingleOrDefault(v => v.Id == variantId)
+0032              ?? throw new InvalidDataException("先选择目标方案");
+0033          var issues = new List<string>();
+0034          var messages = new List<string>();
+0035          if (replace)
+0036          {
+0037              var oldIds = variant.Clips.Select(c => c.Id).Concat(variant.Contacts.Select(c => c.Id)).ToHashSet();
+0038              DesignOperations.DetachTasks(clone, oldIds);
+0039              variant.Clips.Clear();
+0040              variant.Contacts.Clear();
+0041              messages.Add("替换当前方案全部点位；原关联验证任务保留并解除关联。其他方案不受影响。");
+0042          }
+0043          else
+0044              messages.Add("追加点位；不按名称覆盖或合并，所有导入点位生成新ID。");
+0045          int clipCount = 0;
+0046          int contactCount = 0;
+0047          foreach (var row in rows.Skip(1))
+0048          {
+0049              if (row.Cells.Count != Header.Length)
+0050              {
+0051                  issues.Add($"第{row.Line}行：应有{Header.Length}列，实际{row.Cells.Count}列");
+0052                  continue;
+0053              }
+0054              var cells = row.Cells;
+0055              var before = issues.Count;
+0056              double Number(int column)
+0057              {
+0058                  if (!double.TryParse(cells[column], NumberStyles.Float, CultureInfo.InvariantCulture, out var value)
+0059                      || !double.IsFinite(value))
+0060                  {
+0061                      issues.Add($"第{row.Line}行/{Header[column]}：需要有限数值，英文小数点，无千位符");
+0062                      return 0;
+0063                  }
+0064                  return value;
+0065              }
+0066              void Empty(params int[] columns)
+0067              {
+0068                  foreach (var column in columns)
+0069                      if (cells[column].Length != 0)
+0070                          issues.Add($"第{row.Line}行/{Header[column]}：该类型不使用此字段，须留空");
+0071              }
+0072              if (string.IsNullOrWhiteSpace(cells[1]))
+0073                  issues.Add($"第{row.Line}行/name：名称不能为空");
+0074              if (cells[0] == "Clip")
+0075              {
+0076                  var clip = new Clip
+0077                  {
+0078                      Name = cells[1],
+0079                      Xmm = Number(2),
+0080                      Ymm = Number(3),
+0081                      NormalStiffness = Number(4),
+0082                      TangentialStiffness = Number(5),
+0083                      ForceLimitN = Number(11)
+0084                  };
+0085                  Empty(6, 7, 8, 9, 10, 12);
+0086                  if (issues.Count == before)
+0087                  {
+0088                      variant.Clips.Add(clip);
+0089                      clipCount++;
+0090                  }
+0091              }
+0092              else if (cells[0] == "Contact")
+0093              {
+0094                  var contact = new ContactPoint
+0095                  {
+0096                      Name = cells[1],
+0097                      Xmm = Number(2),
+0098                      Ymm = Number(3),
+0099                      NormalStiffness = Number(4),
+0100                      TangentialStiffness = Number(5),
+0101                      GapMm = Number(6),
+0102                      ToleranceMm = Number(7),
+0103                      PreloadMm = Number(8),
+0104                      Friction = Number(9),
+0105                      CompressionLimitMm = Number(10),
+0106                      Material = cells[12]
+0107                  };
+0108                  Empty(11);
+0109                  if (issues.Count == before)
+0110                  {
+0111                      variant.Contacts.Add(contact);
+0112                      contactCount++;
+0113                  }
+0114              }
+0115              else
+0116                  issues.Add($"第{row.Line}行/kind：只接受Clip或Contact");
+0117          }
+0118          issues.AddRange(ProjectValidation.Check(clone).Select(i => i.Path + "：" + i.Message));
+0119          if (issues.Count > 0)
+0120              throw new InvalidDataException("CSV整批取消：" + string.Join("；", issues.Take(20)));
+0121          messages.Add($"成功预检{clipCount}个卡扣、{contactCount}个接触点；目标方案最终{variant.Clips.Count}卡扣、{variant.Contacts.Count}接触点。");
+0122          messages.Add("CSV不携带试验标定链，导入后须核实项目与载荷来源声明。");
+0123          return new LayoutImportPreview(clone, ProjectCodec.FileHash(System.Text.Json.JsonSerializer.Serialize(project, ProjectCodec.Options)),
+0124              variantId, clipCount, contactCount, replace ? "替换" : "追加", messages);
+0125      }
+0126
+0127      public static string Export(DesignVariant variant)
+0128      {
+0129          var text = new System.Text.StringBuilder();
+0130          text.AppendLine(string.Join(",", Header));
+0131          string Cell(string value) => "\"" + value.Replace("\"", "\"\"") + "\"";
+0132          string N(double value) => value.ToString("G17", CultureInfo.InvariantCulture);
+0133          void Add(params string[] cells) => text.AppendLine(string.Join(",", cells.Select(Cell)));
+0134          foreach (var clip in variant.Clips)
+0135          {
+0136              Add("Clip", clip.Name, N(clip.Xmm), N(clip.Ymm), N(clip.NormalStiffness),
+0137                  N(clip.TangentialStiffness), "", "", "", "", "", N(clip.ForceLimitN), "");
+0138          }
+0139          foreach (var contact in variant.Contacts)
+0140          {
+0141              Add("Contact", contact.Name, N(contact.Xmm), N(contact.Ymm), N(contact.NormalStiffness),
+0142                  N(contact.TangentialStiffness), N(contact.GapMm), N(contact.ToleranceMm),
+0143                  N(contact.PreloadMm), N(contact.Friction), N(contact.CompressionLimitMm), "", contact.Material);
+0144          }
+0145          return text.ToString();
+0146      }
+0147
+0148      public static DesignProject Apply(DesignProject current, LayoutImportPreview preview)
+0149      {
+0150          var hash = ProjectCodec.FileHash(System.Text.Json.JsonSerializer.Serialize(current, ProjectCodec.Options));
+0151          if (hash != preview.BaseHash)
+0152              throw new InvalidOperationException("预检后项目已有变化，请重新预检，已阻止过期导入");
+0153          ProjectValidation.Require(preview.Proposed);
+0154          return ProjectCodec.Clone(preview.Proposed);
+0155      }
+0156  }
+
+src/TrimContact.Core/IO/ProjectCodec.cs
+======================================================================
+0001  using System.Reflection;
+0002  using System.Security.Cryptography;
+0003  using System.Text;
+0004  using System.Text.Json;
+0005  using System.Text.Json.Serialization;
+0006  using TrimContact.Core.Domain;
+0007
+0008  namespace TrimContact.Core.IO;
+0009
+0010  public static class ProjectCodec
+0011  {
+0012      public const int MaxBytes = 2 * 1024 * 1024;
+0013      public static readonly JsonSerializerOptions Options = new()
+0014      {
+0015          WriteIndented = true,
+0016          PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+0017          UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
+0018          MaxDepth = 32,
+0019          Converters = { new JsonStringEnumConverter() }
+0020      };
+0021
+0022      public static string Serialize(DesignProject project)
+0023      {
+0024          ProjectValidation.Require(project);
+0025          return JsonSerializer.Serialize(project, Options);
+0026      }
+0027
+0028      public static DesignProject Parse(string json)
+0029      {
+0030          if (Encoding.UTF8.GetByteCount(json) > MaxBytes)
+0031              throw new InvalidDataException("项目文件超过2MB限制");
+0032          try
+0033          {
+0034              using var document = JsonDocument.Parse(json, new JsonDocumentOptions { MaxDepth = 32 });
+0035              RequireMembers(document.RootElement, typeof(DesignProject), "项目");
+0036              var project = JsonSerializer.Deserialize<DesignProject>(json, Options)
+0037                  ?? throw new InvalidDataException("项目内容为空");
+0038              ProjectValidation.Require(project);
+0039              return project;
+0040          }
+0041          catch (JsonException error)
+0042          {
+0043              throw new InvalidDataException("JSON格式错误：" + error.Message, error);
+0044          }
+0045      }
+0046
+0047      private static void RequireMembers(JsonElement element, Type type, string path)
+0048      {
+0049          if (element.ValueKind == JsonValueKind.Null)
+0050          {
+0051              if (Nullable.GetUnderlyingType(type) is not null)
+0052                  return;
+0053              throw new InvalidDataException(path + "不能为null");
+0054          }
+0055          if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
+0056          {
+0057              if (element.ValueKind != JsonValueKind.Array)
+0058                  throw new InvalidDataException(path + "应为数组");
+0059              int index = 0;
+0060              foreach (var child in element.EnumerateArray())
+0061                  RequireMembers(child, type.GenericTypeArguments[0], path + $"[{index++}]");
+0062              return;
+0063          }
+0064          if (type.Namespace != typeof(DesignProject).Namespace || type.IsEnum)
+0065              return;
+0066          if (element.ValueKind != JsonValueKind.Object)
+0067              throw new InvalidDataException(path + "应为对象");
+0068          foreach (var property in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
+0069          {
+0070              var name = JsonNamingPolicy.CamelCase.ConvertName(property.Name);
+0071              if (!element.TryGetProperty(name, out var child))
+0072                  throw new InvalidDataException(path + "/" + name + "缺失；不自动填充未知旧版本");
+0073              RequireMembers(child, property.PropertyType, path + "/" + name);
+0074          }
+0075          var names = new HashSet<string>();
+0076          foreach (var property in element.EnumerateObject())
+0077              if (!names.Add(property.Name))
+0078                  throw new InvalidDataException(path + "/" + property.Name + "重复字段");
+0079      }
+0080
+0081      public static DesignProject Clone(DesignProject project) => JsonSerializer.Deserialize<DesignProject>(
+0082          JsonSerializer.Serialize(project, Options), Options)!;
+0083
+0084      public static string FileHash(string json) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(json)));
+0085
+0086      public static string InputHash(DesignProject project)
+0087      {
+0088          var input = new
+0089          {
+0090              project.Panel,
+0091              project.Settings,
+0092              project.Variants,
+0093              project.Loads,
+0094              project.Origin,
+0095              project.Source
+0096          };
+0097          return FileHash(JsonSerializer.Serialize(input, Options));
+0098      }
+0099  }
+
+src/TrimContact.Core/IO/ProjectStore.cs
+======================================================================
+0001  using System.Text;
+0002  using TrimContact.Core.Domain;
+0003
+0004  namespace TrimContact.Core.IO;
+0005
+0006  public sealed record StoredProject(Guid Id, string Name, string Revision, string Origin,
+0007      bool Archived, DateTimeOffset Modified, string? Error);
+0008
+0009  public sealed record OpenedProject(DesignProject Project, string Hash, string Path);
+0010
+0011  public sealed class ProjectStore
+0012  {
+0013      private readonly string directory;
+0014      private static readonly object FileGate = new();
+0015
+0016      public ProjectStore(string directory)
+0017      {
+0018          this.directory = System.IO.Path.GetFullPath(directory);
+0019          Directory.CreateDirectory(this.directory);
+0020      }
+0021
+0022      public string FilePath(Guid id) => System.IO.Path.Combine(directory, id.ToString("D") + ".trimproj");
+0023
+0024      public IReadOnlyList<StoredProject> List()
+0025      {
+0026          var items = new List<StoredProject>();
+0027          lock (FileGate)
+0028          {
+0029              foreach (var path in Directory.EnumerateFiles(directory, "*.trimproj").Order())
+0030              {
+0031                  if (!Guid.TryParse(System.IO.Path.GetFileNameWithoutExtension(path), out var id))
+0032                      continue;
+0033                  try
+0034                  {
+0035                      var p = Read(path);
+0036                      items.Add(new(id, p.Name, p.Revision, p.Origin.Label(), p.Archived, p.ModifiedUtc, null));
+0037                  }
+0038                  catch (Exception error) when (error is IOException or InvalidDataException or UnauthorizedAccessException)
+0039                  {
+0040                      items.Add(new(id, "文件不可读取", "", "", false, DateTimeOffset.MinValue, error.Message));
+0041                  }
+0042              }
+0043          }
+0044          return items.OrderByDescending(p => p.Modified).ToArray();
+0045      }
+0046
+0047      private static string ReadText(string path)
+0048      {
+0049          var file = new FileInfo(path);
+0050          if (file.Length > ProjectCodec.MaxBytes)
+0051              throw new InvalidDataException("项目文件超过2MB限制");
+0052          return File.ReadAllText(path, Encoding.UTF8);
+0053      }
+0054
+0055      private static DesignProject Read(string path) => ProjectCodec.Parse(ReadText(path));
+0056
+0057      public OpenedProject Open(Guid id, bool backup = false)
+0058      {
+0059          lock (FileGate)
+0060          {
+0061              var main = FilePath(id);
+0062              var path = main + (backup ? ".bak" : "");
+0063              var text = ReadText(path);
+0064              var p = ProjectCodec.Parse(text);
+0065              if (p.Id != id)
+0066                  throw new InvalidDataException("文件名ID与项目内容不一致");
+0067              var hash = File.Exists(main) ? ProjectCodec.FileHash(ReadText(main)) : null;
+0068              return new(p, hash ?? "", path);
+0069          }
+0070      }
+0071
+0072      public OpenedProject Save(DesignProject project, string? expectedHash)
+0073      {
+0074          var text = ProjectCodec.Serialize(project);
+0075          if (Encoding.UTF8.GetByteCount(text) > ProjectCodec.MaxBytes)
+0076              throw new InvalidDataException("项目超过2MB，请精简操作记录或方案后保存");
+0077          var path = FilePath(project.Id);
+0078          lock (FileGate)
+0079          {
+0080              if (File.Exists(path))
+0081              {
+0082                  if (expectedHash is null)
+0083                      throw new InvalidDataException("项目库已存在相同ID；请打开磁盘版继续或复制为新项目");
+0084                  if (ProjectCodec.FileHash(ReadText(path)) != expectedHash)
+0085                      throw new InvalidDataException("磁盘文件已变化，已阻止覆盖；请下载当前副本后重新打开磁盘版");
+0086              }
+0087              else if (expectedHash is not null)
+0088                  throw new InvalidDataException("原磁盘文件已被移走，已阻止静默重建；请复制为新项目");
+0089              var temporary = path + ".tmp-" + Guid.NewGuid().ToString("N");
+0090              try
+0091              {
+0092                  File.WriteAllText(temporary, text, new UTF8Encoding(false));
+0093                  if (File.Exists(path))
+0094                      File.Copy(path, path + ".bak", true);
+0095                  File.Move(temporary, path, true);
+0096              }
+0097              finally
+0098              {
+0099                  if (File.Exists(temporary))
+0100                      File.Delete(temporary);
+0101              }
+0102              return new(ProjectCodec.Clone(project), ProjectCodec.FileHash(text), path);
+0103          }
+0104      }
+0105  }
+
+src/TrimContact.Core/IO/ResultExport.cs
+======================================================================
+0001  using System.Globalization;
+0002  using System.Net;
+0003  using System.Text;
+0004  using System.Text.Json;
+0005  using TrimContact.Core.Analysis;
+0006  using TrimContact.Core.Domain;
+0007
+0008  namespace TrimContact.Core.IO;
+0009
+0010  public static class ResultExport
+0011  {
+0012      private static string N(double value) => value.ToString("G17", CultureInfo.InvariantCulture);
+0013      private static string Cell(string value)
+0014      {
+0015          if (value.Length > 0 && "=+-@\t\r".Contains(value[0])
+0016              && !double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out _))
+0017              value = "'" + value;
+0018          return "\"" + value.Replace("\"", "\"\"") + "\"";
+0019      }
+0020      private static string Row(params string[] cells) => string.Join(",", cells.Select(Cell));
+0021      private static string H(string value) => WebUtility.HtmlEncode(value);
+0022
+0023      public static void RequireCurrent(DesignProject project, AnalysisReport report)
+0024      {
+0025          if (report.InputHash != ProjectCodec.InputHash(project))
+0026              throw new InvalidOperationException("输入已变化，必须重新计算后导出结果");
+0027      }
+0028
+0029      public static string Json(DesignProject project, AnalysisReport report)
+0030      {
+0031          RequireCurrent(project, report);
+0032          return JsonSerializer.Serialize(new
+0033          {
+0034              software = Product.Name,
+0035              version = Product.Version,
+0036              boundary = Product.Boundary,
+0037              project,
+0038              report
+0039          }, ProjectCodec.Options);
+0040      }
+0041
+0042      public static string Csv(DesignProject project, AnalysisReport report)
+0043      {
+0044          RequireCurrent(project, report);
+0045          var text = new StringBuilder();
+0046          text.AppendLine(Row("软件", Product.Name, Product.Version, report.Method));
+0047          text.AppendLine(Row("输入SHA256", report.InputHash, "来源", project.Origin.Label(), project.Source));
+0048          text.AppendLine(Row("限制", Product.Boundary, "采样", report.Phases.ToString(CultureInfo.InvariantCulture),
+0049              "公差角点不是概率"));
+0050          text.AppendLine(Row("方案", "点位ID", "点位", "类型", "状态", "最小压缩mm", "最大压缩mm",
+0051              "最小法向力N", "最大法向力N", "最大切向力绝对值N", "最大滑移余量mm", "最大限值比",
+0052              "分离采样数", "滑移采样数", "总采样数", "压缩控制工况", "滑移控制工况", "限值控制工况"));
+0053          foreach (var variant in report.Variants)
+0054              foreach (var point in variant.Contacts.Concat(variant.Clips))
+0055                  text.AppendLine(Row(variant.Name, point.PointId.ToString(), point.Name, point.Kind, point.State,
+0056                      N(point.MinCompressionMm), N(point.MaxCompressionMm), N(point.MinNormalN), N(point.MaxNormalN),
+0057                      N(point.MaxAbsShearN), N(point.MaxSlipMm), N(point.MaxUtilization), point.DetachedSamples.ToString(),
+0058                      point.SlidingSamples.ToString(), point.TotalSamples.ToString(), point.CompressionCase,
+0059                      point.SlipCase, point.GoverningCase));
+0060          return text.ToString();
+0061      }
+0062
+0063      public static string TraceCsv(DesignProject project, AnalysisReport report)
+0064      {
+0065          RequireCurrent(project, report);
+0066          var text = new StringBuilder();
+0067          text.AppendLine(Row("输入SHA256", report.InputHash, "来源", project.Origin.Label(), "仅名义公差逐相位"));
+0068          text.AppendLine(Row("方案", "载荷", "相位deg", "类型", "点位ID", "点位", "压缩mm", "法向力N",
+0069              "切向力N", "滑移余量mm", "限值比", "饰板Zmm", "切向位移mm", "平衡残差N"));
+0070          foreach (var variant in report.Variants)
+0071              foreach (var trace in variant.NominalTraces)
+0072                  foreach (var state in trace.Samples)
+0073                      foreach (var item in state.Contacts.Select(p => (p, kind: "接触点"))
+0074                          .Concat(state.Clips.Select(p => (p, kind: "卡扣"))))
+0075                          text.AppendLine(Row(variant.Name, trace.LoadName, N(state.PhaseDegrees), item.kind,
+0076                              item.p.Id.ToString(), item.p.Name, N(item.p.CompressionMm), N(item.p.NormalN),
+0077                              N(item.p.ShearN), N(item.p.SlipMm), N(item.p.Utilization), N(state.Displacement.Z),
+0078                              N(state.TangentialMm), N(state.ResidualN)));
+0079          return text.ToString();
+0080      }
+0081
+0082      public static string TasksCsv(DesignProject project)
+0083      {
+0084          var text = new StringBuilder();
+0085          text.AppendLine(Row("软件", Product.Name, Product.Version, "来源", project.Origin.Label(), project.Source));
+0086          text.AppendLine(Row("任务ID", "关联点位ID", "标题", "方法", "判据", "负责人", "完成", "证据"));
+0087          foreach (var t in project.Tasks)
+0088              text.AppendLine(Row(t.Id.ToString(), t.PointId?.ToString() ?? "", t.Title, t.Method,
+0089                  t.Acceptance, t.Owner, t.Completed ? "是（用户记录）" : "否", t.Evidence));
+0090          return text.ToString();
+0091      }
+0092
+0093      public static string SweepCsv(DesignProject project, string parameter, IReadOnlyList<SweepRow> rows)
+0094      {
+0095          var text = new StringBuilder();
+0096          text.AppendLine(Row("软件", Product.Name, Product.Version, "输入SHA256", ProjectCodec.InputHash(project)));
+0097          text.AppendLine(Row("来源", project.Origin.Label(), project.Source, "扫描参数", parameter));
+0098          text.AppendLine(Row("参数值", "存在分离点数", "存在滑移点数", "超限点数", "最大卡扣限值比", "最大压缩mm", "最大滑移余量mm"));
+0099          foreach (var r in rows)
+0100              text.AppendLine(Row(N(r.Value), r.SeparationPoints.ToString(), r.SlidingPoints.ToString(),
+0101                  r.OverLimitPoints.ToString(), N(r.MaxClipUtilization), N(r.MaxCompressionMm), N(r.MaxSlipMm)));
+0102          return text.ToString();
+0103      }
+0104
+0105      public static string Html(DesignProject project, AnalysisReport report)
+0106      {
+0107          RequireCurrent(project, report);
+0108          var html = new StringBuilder("<!doctype html><html lang='zh-CN'><meta charset='utf-8'><title>接触设计报告</title><style>body{font-family:system-ui,sans-serif;max-width:1200px;margin:40px auto;color:#183239}table{border-collapse:collapse;width:100%;font-size:14px}td,th{border:1px solid #afc4c7;padding:8px;text-align:left}pre{white-space:pre-wrap;overflow-wrap:anywhere}h2{border-bottom:2px solid #317c80;padding-bottom:8px}.note{background:#fff0d0;padding:16px} @media print{body{margin:10mm}tr{break-inside:avoid}}</style><body>");
+0109          html.Append($"<h1>{H(Product.Name)} {Product.Version}</h1><p>{H(project.Name)} / 修订{H(project.Revision)}</p>");
+0110          html.Append($"<p>来源：{H(project.Origin.Label())}；{H(project.Source)}</p><p class='note'>{H(Product.Boundary)}</p>");
+0111          html.Append($"<p>方法{report.Method}；计算UTC {report.CalculatedUtc:O}；{report.Phases}相位；公差角点{report.ToleranceEnabled}。角点采样比例不是概率。</p><pre>输入SHA256 {report.InputHash}</pre>");
+0112          foreach (var variant in report.Variants)
+0113          {
+0114              html.Append($"<h2>{H(variant.Name)}</h2><p>总采样{variant.EvaluatedStates}；公差条件{variant.ToleranceCases}；最大平衡残差{N(variant.MaxResidualN)} N</p>");
+0115              html.Append("<table><tr><th>点位</th><th>类型/状态</th><th>压缩范围mm</th><th>法向力范围N</th><th>最大滑移余量mm</th><th>最大限值比</th><th>控制工况</th></tr>");
+0116              foreach (var point in variant.Contacts.Concat(variant.Clips))
+0117                  html.Append($"<tr><td>{H(point.Name)}</td><td>{H(point.Kind)} / {H(point.State)}</td><td>{N(point.MinCompressionMm)} ～ {N(point.MaxCompressionMm)}</td><td>{N(point.MinNormalN)} ～ {N(point.MaxNormalN)}</td><td>{N(point.MaxSlipMm)}</td><td>{N(point.MaxUtilization)}</td><td>{H(point.GoverningCase)}<br>{H(point.CompressionCase)}<br>{H(point.SlipCase)}</td></tr>");
+0118              html.Append("</table>");
+0119          }
+0120          html.Append("<h2>验证清单（完成状态由用户记录）</h2><table><tr><th>任务</th><th>方法</th><th>判据</th><th>状态与证据</th></tr>");
+0121          foreach (var task in project.Tasks)
+0122              html.Append($"<tr><td>{H(task.Title)}</td><td>{H(task.Method)}</td><td>{H(task.Acceptance)}</td><td>{(task.Completed ? "用户标记完成" : "待验证")}；{H(task.Owner)}；{H(task.Evidence)}</td></tr>");
+0123          html.Append("</table><h2>全部设计输入</h2><pre>");
+0124          html.Append(H(ProjectCodec.Serialize(project)));
+0125          html.Append("</pre></body></html>");
+0126          return html.ToString();
+0127      }
+0128  }
+
+src/TrimContact.Core/Operations/BatchLayout.cs
+======================================================================
+0001  using TrimContact.Core.Domain;
+0002  using TrimContact.Core.IO;
+0003
+0004  namespace TrimContact.Core.Operations;
+0005
+0006  public sealed class BatchLayoutRequest
+0007  {
+0008      public string Target { get; set; } = "接触点";
+0009      public double ShiftXmm { get; set; }
+0010      public double ShiftYmm { get; set; }
+0011      public double NormalStiffnessFactor { get; set; } = 1;
+0012      public double TangentialStiffnessFactor { get; set; } = 1;
+0013      public double GapDeltaMm { get; set; }
+0014      public double PreloadDeltaMm { get; set; }
+0015  }
+0016
+0017  public sealed record BatchChange(string Point, string Field, string Unit, double Before, double After);
+0018
+0019  public sealed record BatchPreview(DesignProject Proposed, string BaseState, string RequestState,
+0020      string VariantName, IReadOnlyList<BatchChange> Changes);
+0021
+0022  public static class BatchLayout
+0023  {
+0024      public static string State<T>(T value) => System.Text.Json.JsonSerializer.Serialize(value, ProjectCodec.Options);
+0025
+0026      public static BatchPreview Preview(DesignProject project, Guid variantId, BatchLayoutRequest request)
+0027      {
+0028          if (project.Archived)
+0029              throw new InvalidOperationException("归档项目不能批量修改");
+0030          if (request.Target is not ("接触点" or "卡扣" or "全部点位"))
+0031              throw new InvalidDataException("未知批量修改范围");
+0032          double[] values = [request.ShiftXmm, request.ShiftYmm, request.NormalStiffnessFactor,
+0033              request.TangentialStiffnessFactor, request.GapDeltaMm, request.PreloadDeltaMm];
+0034          if (values.Any(v => !double.IsFinite(v)))
+0035              throw new InvalidDataException("批量参数须为有限数值");
+0036          if (Math.Abs(request.ShiftXmm) > 1000 || Math.Abs(request.ShiftYmm) > 1000)
+0037              throw new InvalidDataException("单次点位平移不超过±1000mm");
+0038          if (request.NormalStiffnessFactor is <= 0 or > 100 || request.TangentialStiffnessFactor is <= 0 or > 100)
+0039              throw new InvalidDataException("刚度缩放系数须大于0且不超过100");
+0040          if (Math.Abs(request.GapDeltaMm) > 20 || Math.Abs(request.PreloadDeltaMm) > 20)
+0041              throw new InvalidDataException("单次间隙和预紧增量不超过±20mm");
+0042          if (request.Target == "卡扣" && (request.GapDeltaMm != 0 || request.PreloadDeltaMm != 0))
+0043              throw new InvalidDataException("卡扣不使用间隙和预紧量，增量须为0");
+0044          var clone = ProjectCodec.Clone(project);
+0045          var variant = clone.Variants.SingleOrDefault(v => v.Id == variantId)
+0046              ?? throw new InvalidDataException("目标方案不存在");
+0047          var changes = new List<BatchChange>();
+0048          double Record(string name, string field, string unit, double before, double after)
+0049          {
+0050              if (before != after)
+0051                  changes.Add(new(name, field, unit, before, after));
+0052              return after;
+0053          }
+0054          if (request.Target is "卡扣" or "全部点位")
+0055          {
+0056              foreach (var clip in variant.Clips)
+0057              {
+0058                  clip.Xmm = Record(clip.Name, "X", "mm", clip.Xmm, clip.Xmm + request.ShiftXmm);
+0059                  clip.Ymm = Record(clip.Name, "Y", "mm", clip.Ymm, clip.Ymm + request.ShiftYmm);
+0060                  clip.NormalStiffness = Record(clip.Name, "法向刚度", "N/mm", clip.NormalStiffness,
+0061                      clip.NormalStiffness * request.NormalStiffnessFactor);
+0062                  clip.TangentialStiffness = Record(clip.Name, "切向刚度", "N/mm", clip.TangentialStiffness,
+0063                      clip.TangentialStiffness * request.TangentialStiffnessFactor);
+0064              }
+0065          }
+0066          if (request.Target is "接触点" or "全部点位")
+0067          {
+0068              foreach (var contact in variant.Contacts)
+0069              {
+0070                  contact.Xmm = Record(contact.Name, "X", "mm", contact.Xmm, contact.Xmm + request.ShiftXmm);
+0071                  contact.Ymm = Record(contact.Name, "Y", "mm", contact.Ymm, contact.Ymm + request.ShiftYmm);
+0072                  contact.NormalStiffness = Record(contact.Name, "法向刚度", "N/mm", contact.NormalStiffness,
+0073                      contact.NormalStiffness * request.NormalStiffnessFactor);
+0074                  contact.TangentialStiffness = Record(contact.Name, "切向刚度", "N/mm", contact.TangentialStiffness,
+0075                      contact.TangentialStiffness * request.TangentialStiffnessFactor);
+0076                  contact.GapMm = Record(contact.Name, "名义间隙", "mm", contact.GapMm,
+0077                      contact.GapMm + request.GapDeltaMm);
+0078                  contact.PreloadMm = Record(contact.Name, "预紧量", "mm", contact.PreloadMm,
+0079                      contact.PreloadMm + request.PreloadDeltaMm);
+0080              }
+0081          }
+0082          if (changes.Count == 0)
+0083              throw new InvalidDataException("没有参数发生变化，请选择有效点位并输入非默认增量或缩放");
+0084          ProjectValidation.Require(clone);
+0085          return new(clone, State(project), State(request), variant.Name, changes);
+0086      }
+0087
+0088      public static DesignProject Apply(DesignProject project, BatchLayoutRequest request, BatchPreview preview)
+0089      {
+0090          if (State(project) != preview.BaseState || State(request) != preview.RequestState)
+0091              throw new InvalidOperationException("批量预览后输入已变化，请重新预览");
+0092          ProjectValidation.Require(preview.Proposed);
+0093          return ProjectCodec.Clone(preview.Proposed);
+0094      }
+0095  }
+
+src/TrimContact.Core/Operations/DesignOperations.cs
+======================================================================
+0001  using TrimContact.Core.Analysis;
+0002  using TrimContact.Core.Domain;
+0003  using TrimContact.Core.IO;
+0004
+0005  namespace TrimContact.Core.Operations;
+0006
+0007  public static class DesignOperations
+0008  {
+0009      public static DesignVariant CopyVariant(DesignVariant source, string name)
+0010      {
+0011          var project = new DesignProject { Variants = [source] };
+0012          var result = ProjectCodec.Clone(project).Variants[0];
+0013          result.Id = Guid.NewGuid();
+0014          result.Name = name;
+0015          foreach (var clip in result.Clips)
+0016              clip.Id = Guid.NewGuid();
+0017          foreach (var contact in result.Contacts)
+0018              contact.Id = Guid.NewGuid();
+0019          return result;
+0020      }
+0021
+0022      public static void RemoveVariant(DesignProject project, Guid id)
+0023      {
+0024          var variant = project.Variants.Single(v => v.Id == id);
+0025          var ids = variant.Clips.Select(c => c.Id).Concat(variant.Contacts.Select(c => c.Id)).ToHashSet();
+0026          DetachTasks(project, ids);
+0027          project.Variants.Remove(variant);
+0028      }
+0029
+0030      public static void DetachTasks(DesignProject project, HashSet<Guid> ids)
+0031      {
+0032          foreach (var task in project.Tasks.Where(t => t.PointId.HasValue && ids.Contains(t.PointId.Value)))
+0033          {
+0034              task.PointId = null;
+0035              task.Title = "[原点位已删除] " + task.Title;
+0036              if (task.Title.Length > 200)
+0037                  task.Title = task.Title[..200];
+0038          }
+0039      }
+0040
+0041      public static int GenerateTasks(DesignProject project, AnalysisReport report)
+0042      {
+0043          if (report.InputHash != ProjectCodec.InputHash(project))
+0044              throw new InvalidOperationException("结果已失效，请重新计算后生成验证任务");
+0045          var added = 0;
+0046          void Add(Guid? point, string title, string method, string acceptance)
+0047          {
+0048              if (project.Tasks.Any(t => t.PointId == point && t.Title == title))
+0049                  return;
+0050              if (project.Tasks.Count >= 200)
+0051                  throw new InvalidDataException("任务超过200项，请整理已有任务");
+0052              project.Tasks.Add(new VerificationTask
+0053              {
+0054                  PointId = point,
+0055                  Title = title,
+0056                  Method = method,
+0057                  Acceptance = acceptance
+0058              });
+0059              added++;
+0060          }
+0061          Add(null, "参数识别与模型复核", "测量装配间隙、公差、卡扣刚度、接触压缩曲线和材料摩擦；记录温度与加载条件。",
+0062              "由项目负责人填写经试验认可的参数范围；本软件不提供行业合格限值。");
+0063          foreach (var variant in report.Variants)
+0064          {
+0065              foreach (var c in variant.Contacts)
+0066              {
+0067                  if (c.MinCompressionMm <= Product.ContactEpsilon)
+0068                      Add(c.PointId, c.Name + "接触保持核查", "按控制工况装配上下限样件，测量间隙和分离；控制工况：" + c.CompressionCase,
+0069                          "记录允许分离条件及实测证据，结合道路或台架人工听辨确认。");
+0070                  if (c.MaxSlipMm > Product.ContactEpsilon)
+0071                      Add(c.PointId, c.Name + "摩擦滑移核查", "对材料副进行切向位移与摩擦试验；控制工况：" + c.SlipCase,
+0072                          "比较材料磨耗与实测异响表现，判据由项目约定，不以模拟滑移直接判异响。");
+0073                  if (c.MaxUtilization > 1)
+0074                      Add(c.PointId, c.Name + "压缩行程核查", "核实缓冲块可压缩行程与装配压缩量：" + c.GoverningCase,
+0075                          "实测压缩量不超过经确认的材料允许值。");
+0076              }
+0077              foreach (var c in variant.Clips.Where(c => c.MaxUtilization > 1))
+0078                  Add(c.PointId, c.Name + "卡扣合力核查", "复核卡扣合力与方向；控制工况：" + c.GoverningCase,
+0079                      "与供应商保持力和耐久试验结果比较，不能将软件初值当作允许载荷。");
+0080          }
+0081          return added;
+0082      }
+0083  }
+
+src/TrimContact.Core/Operations/ProjectSession.cs
+======================================================================
+0001  using TrimContact.Core.Domain;
+0002  using TrimContact.Core.IO;
+0003
+0004  namespace TrimContact.Core.Operations;
+0005
+0006  public sealed class ProjectSession
+0007  {
+0008      private readonly Stack<DesignProject> undo = new();
+0009      private readonly Stack<DesignProject> redo = new();
+0010      public DesignProject Current { get; private set; } = new();
+0011      public string? DiskHash { get; private set; }
+0012      public string? SavedPath { get; private set; }
+0013      private string savedState = "";
+0014      public bool CanUndo => undo.Count > 0;
+0015      public bool CanRedo => redo.Count > 0;
+0016      public bool Dirty => JsonState(Current) != savedState;
+0017
+0018      public ProjectSession()
+0019      {
+0020          savedState = JsonState(Current);
+0021      }
+0022
+0023      private static string JsonState(DesignProject p) => System.Text.Json.JsonSerializer.Serialize(p, ProjectCodec.Options);
+0024
+0025      public void Load(DesignProject project, string? hash = null, string? path = null)
+0026      {
+0027          ProjectValidation.Require(project);
+0028          Current = ProjectCodec.Clone(project);
+0029          DiskHash = hash;
+0030          SavedPath = path;
+0031          undo.Clear();
+0032          redo.Clear();
+0033          savedState = JsonState(Current);
+0034      }
+0035
+0036      public void Edit(string action, Action<DesignProject> change)
+0037      {
+0038          if (Current.Archived)
+0039              throw new InvalidOperationException("归档项目为只读，请复制项目后继续设计");
+0040          var next = ProjectCodec.Clone(Current);
+0041          change(next);
+0042          ProjectValidation.Require(next);
+0043          next.ModifiedUtc = DateTimeOffset.UtcNow;
+0044          next.Audit.Add(new AuditEntry { Action = action });
+0045          if (next.Audit.Count > 500)
+0046              next.Audit.RemoveRange(0, next.Audit.Count - 500);
+0047          undo.Push(ProjectCodec.Clone(Current));
+0048          if (undo.Count > 20)
+0049          {
+0050              var keep = undo.Take(20).Reverse().ToArray();
+0051              undo.Clear();
+0052              foreach (var item in keep)
+0053                  undo.Push(item);
+0054          }
+0055          Current = next;
+0056          redo.Clear();
+0057      }
+0058
+0059      public void Undo()
+0060      {
+0061          if (!CanUndo)
+0062              return;
+0063          redo.Push(Current);
+0064          Current = undo.Pop();
+0065      }
+0066
+0067      public void Redo()
+0068      {
+0069          if (!CanRedo)
+0070              return;
+0071          undo.Push(Current);
+0072          Current = redo.Pop();
+0073      }
+0074
+0075      public void Saved(OpenedProject result)
+0076      {
+0077          DiskHash = result.Hash;
+0078          SavedPath = result.Path;
+0079          savedState = JsonState(Current);
+0080      }
+0081
+0082      public void CopyProject()
+0083      {
+0084          var copy = ProjectCodec.Clone(Current);
+0085          copy.Id = Guid.NewGuid();
+0086          copy.Name += " 副本";
+0087          if (copy.Name.Length > 100)
+0088              copy.Name = copy.Name[..100];
+0089          copy.Archived = false;
+0090          copy.CreatedUtc = DateTimeOffset.UtcNow;
+0091          copy.ModifiedUtc = copy.CreatedUtc;
+0092          copy.Audit.Add(new AuditEntry { Action = "从项目 " + Current.Id + " 复制" });
+0093          if (copy.Audit.Count > 500)
+0094              copy.Audit.RemoveAt(0);
+0095          Load(copy);
+0096          savedState = "";
+0097      }
+0098  }

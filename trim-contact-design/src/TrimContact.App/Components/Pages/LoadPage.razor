@@ -1,0 +1,49 @@
+@inherits VmView
+<section class="page-heading"><div><span class="eyebrow">LOAD ENVELOPE</span><h2>振动载荷与采样条件</h2><p>正法向惯性力使饰板朝接触支撑方向移动。切向仅表示一个平移方向。</p></div></section>
+<div class="two-column">
+<section class="card"><h3>共用载荷列表</h3>
+@foreach (var load in Vm.Draft.Loads)
+{
+    <button class="point-choice @(Vm.LoadId == load.Id ? "selected" : "")" @onclick="() => { Vm.LoadId = load.Id; Vm.Notify(); }">@load.Name <small>@F(load.FrequencyHz) Hz标签</small></button>
+}
+@if (Vm.Draft.Loads.Count == 0)
+{
+    <p class="empty">暂无载荷。先增加一个工况。</p>
+}
+<button @onclick="Vm.AddLoad" disabled="@Vm.Project.Archived">增加载荷</button>
+<h3>计算设置</h3>
+<fieldset disabled="@Vm.Project.Archived">
+    <label>一周期相位采样数<select @bind="Vm.Draft.Settings.Phases" @bind:after="Vm.Notify"><option value="24">24（每15°）</option><option value="48">48（每7.5°）</option><option value="72">72（每5°）</option></select></label>
+    <label class="checkbox"><input type="checkbox" @bind="Vm.Draft.Settings.EnumerateTolerance" @bind:after="Vm.Notify" />枚举全部接触间隙公差角点，另保留名义工况</label>
+    <p class="hint">6个非零公差接触点最多64个角点，加名义共65条件。对每个载荷、每个相位重复求解；角点计数不代表发生概率。</p>
+    <button class="primary" @onclick="() => Vm.Execute(Vm.ApplyDraft)">应用编辑</button>
+</fieldset>
+<div class="callout"><strong>频率不是动态放大输入。</strong>本版频率仅为工况标签和试验计划参考；无法表示共振、阻尼或相位历程记忆。</div>
+</section>
+<section class="card">
+@if (Vm.Load is not null)
+{
+    <fieldset disabled="@Vm.Project.Archived">
+    <h3>选中载荷参数</h3>
+    <label>工况名称<input maxlength="100" @bind="Vm.Load.Name" @bind:after="Vm.Notify" /></label>
+    <div class="form-grid">
+        <label>法向偏置 g<input type="number" step="any" min="-20" max="20" @bind="Vm.Load.NormalBiasG" @bind:after="Vm.Notify" /></label>
+        <label>法向幅值 g<input type="number" step="any" min="0" max="20" @bind="Vm.Load.NormalAmplitudeG" @bind:after="Vm.Notify" /></label>
+        <label>切向偏置 g<input type="number" step="any" min="-20" max="20" @bind="Vm.Load.TangentialBiasG" @bind:after="Vm.Notify" /></label>
+        <label>切向幅值 g<input type="number" step="any" min="0" max="20" @bind="Vm.Load.TangentialAmplitudeG" @bind:after="Vm.Notify" /></label>
+        <label>切向相对法向相差 °<input type="number" step="any" min="-360" max="360" @bind="Vm.Load.PhaseDegrees" @bind:after="Vm.Notify" /></label>
+        <label>频率标签 Hz<input type="number" step="any" min="0" max="1000" @bind="Vm.Load.FrequencyHz" @bind:after="Vm.Notify" /></label>
+    </div>
+    <label>载荷来源<textarea rows="4" maxlength="2000" @bind="Vm.Load.Source" @bind:after="Vm.Notify"></textarea></label>
+    <button class="text-danger" @onclick="Vm.DeleteLoad">删除选中载荷</button>
+    </fieldset>
+}
+else
+{
+    <p class="empty">选择一个载荷后编辑。</p>
+}
+<h3>计算定义</h3>
+<p class="formula">aₙ = 偏置 + 幅值 × sin(φ)<br />aₜ = 偏置 + 幅值 × sin(φ + 相差)<br />F = 质量 × 9.80665 × a</p>
+<p>加速度输入单位g；1g = 9.80665m/s²。输入幅值非负，偏置可正可负。法向与切向幅值为零时表示静态偏置载荷。</p>
+</section>
+</div>

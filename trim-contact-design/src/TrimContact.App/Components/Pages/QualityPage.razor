@@ -1,0 +1,23 @@
+@inherits VmView
+@{
+    var findings = QualityInspector.Inspect(Vm.Draft, Vm.CurrentResults ? Vm.Report : null);
+    var metrics = QualityInspector.Metrics(Vm.Draft);
+}
+<section class="page-heading"><div><span class="eyebrow">ENGINEERING REVIEW</span><h2>输入与模型适用性复核</h2><p>复核提示逐项列明依据与后续行动，不生成总评分或自动认证。</p></div></section>
+<section class="card"><h3>复核发现 @findings.Count 项</h3><div class="table-wrap"><table><thead><tr><th>性质</th><th>对象</th><th>发现</th><th>建议行动</th></tr></thead><tbody>
+@foreach (var row in findings)
+{
+    <tr><td><span class="badge @(row.Severity is "阻断" or "超限" ? "warn" : "")">@row.Severity</span></td><td>@row.Target</td><td>@row.Finding</td><td>@row.Action</td></tr>
+}
+</tbody></table></div>
+<p class="hint">页面使用当前编辑内容检查；未应用编辑或输入变化时，不使用旧分析结果。位移适用性检查仅覆盖名义采样，角点位移需进一步复核。</p>
+</section>
+<section class="card"><h3>布置与未平衡干涉量</h3><div class="table-wrap"><table><thead><tr><th>方案</th><th>点位</th><th>类型</th><th>最近其他卡扣距离mm</th><th>名义干涉mm</th><th>最小干涉mm</th><th>最大干涉mm</th></tr></thead><tbody>
+@foreach (var row in metrics)
+{
+    <tr><td>@row.Variant</td><td>@row.Point</td><td>@row.Kind</td><td>@(double.IsNaN(row.NearestClipDistanceMm) ? "无其他卡扣" : F(row.NearestClipDistanceMm))</td><td>@F(row.EffectiveInterferenceMm)</td><td>@F(row.MinimumInterferenceMm)</td><td>@F(row.MaximumInterferenceMm)</td></tr>
+}
+</tbody></table></div>
+<p>干涉量为预紧量减间隙，范围再加减间隙公差。它尚未考虑饰板位移，不能代替结果页的实际平衡压缩。卡扣干涉栏0为占位，不代表实测装配间隙。</p>
+<p class="hint">最近卡扣距离只为布置复核提供几何依据，模型未包含随距离变化的板柔性，距离较远不会自动触发声学风险等级。</p>
+</section>

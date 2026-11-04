@@ -1,0 +1,30 @@
+{
+  "utc": "2026-11-04T01:55:32.321454+00:00",
+  "count": 6,
+  "checks": [
+    {
+      "name": "manual static case renders four clip forces 2.45166N",
+      "passed": true
+    },
+    {
+      "name": "manual static case center displacement 0.02452mm rendered",
+      "passed": true
+    },
+    {
+      "name": "manual preload case renders 0.16mm compression and 16N reaction",
+      "passed": true
+    },
+    {
+      "name": "manual preload case renders four clips at negative 4N",
+      "passed": true
+    },
+    {
+      "name": "manual preload case renders negative 0.04mm center displacement",
+      "passed": true
+    },
+    {
+      "name": "manual hand-check case saved reopened recalculated without change",
+      "passed": true
+    }
+  ]
+}

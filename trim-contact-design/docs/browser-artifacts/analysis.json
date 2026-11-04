@@ -1,0 +1,3465 @@
+{
+  "software": "\u6C7D\u8F66\u5185\u9970\u5361\u6263\u4E0E\u9632\u5F02\u54CD\u63A5\u89E6\u8BBE\u8BA1\u8F6F\u4EF6",
+  "version": "V1.0",
+  "boundary": "\u521A\u6027\u9970\u677F\u3001\u51C6\u9759\u6001\u91C7\u6837\u3001\u5355\u65B9\u5411\u5207\u5411\u63A5\u89E6\u7B5B\u67E5\uFF1B\u4E0D\u9884\u6D4B\u771F\u5B9E\u5F02\u54CD\u58F0\u538B\uFF0C\u4E0D\u66FF\u4EE3\u6837\u4EF6\u9A8C\u8BC1\u3002",
+  "project": {
+    "schema": 1,
+    "id": "b9b640d0-e52f-4004-abb9-1e22dcf1ad6b",
+    "name": "\u95E8\u677F\u63A5\u89E6\u5E03\u7F6E\u64CD\u4F5C\u6848\u4F8B",
+    "revision": "A",
+    "owner": "",
+    "goal": "",
+    "origin": "Simulation",
+    "source": "\u6A21\u62DF\u64CD\u4F5C\u6848\u4F8B\uFF1B\u975E\u5B9E\u6D4B\uFF0C\u5F85\u6750\u6599\u4E0E\u88C5\u914D\u9A8C\u8BC1",
+    "archived": false,
+    "createdUtc": "2026-11-04T01:56:06.9005972+00:00",
+    "modifiedUtc": "2026-11-04T01:56:12.4741696+00:00",
+    "panel": {
+      "name": "\u5F85\u5B9A\u4E49\u9970\u677F",
+      "massKg": 1,
+      "centerXmm": 200,
+      "centerYmm": 150,
+      "outline": [
+        {
+          "xmm": 0,
+          "ymm": 0
+        },
+        {
+          "xmm": 400,
+          "ymm": 0
+        },
+        {
+          "xmm": 400,
+          "ymm": 300
+        },
+        {
+          "xmm": 0,
+          "ymm": 300
+        }
+      ]
+    },
+    "settings": {
+      "phases": 24,
+      "enumerateTolerance": true
+    },
+    "variants": [
+      {
+        "id": "6d1bf9a0-f974-4880-ace6-4c36acea42b8",
+        "name": "A \u57FA\u51C6\u5E03\u7F6E",
+        "note": "",
+        "clips": [
+          {
+            "id": "d2c24e71-9fdc-4686-be5d-8695d2d9d111",
+            "name": "\u5DE6\u4E0B\u5361\u6263",
+            "xmm": 40,
+            "ymm": 40,
+            "normalStiffness": 100,
+            "tangentialStiffness": 50,
+            "forceLimitN": 80
+          },
+          {
+            "id": "ae50ed2a-3782-4799-9159-b5e071e43603",
+            "name": "\u53F3\u4E0B\u5361\u6263",
+            "xmm": 360,
+            "ymm": 40,
+            "normalStiffness": 100,
+            "tangentialStiffness": 50,
+            "forceLimitN": 80
+          },
+          {
+            "id": "fbe00267-73c9-4e22-b523-9ee03f610c63",
+            "name": "\u53F3\u4E0A\u5361\u6263",
+            "xmm": 360,
+            "ymm": 260,
+            "normalStiffness": 100,
+            "tangentialStiffness": 50,
+            "forceLimitN": 80
+          },
+          {
+            "id": "08e8b49b-8691-4f12-a4a2-2bfb63696732",
+            "name": "\u5DE6\u4E0A\u5361\u6263",
+            "xmm": 40,
+            "ymm": 260,
+            "normalStiffness": 100,
+            "tangentialStiffness": 50,
+            "forceLimitN": 80
+          }
+        ],
+        "contacts": [
+          {
+            "id": "55cd7554-08be-4eee-9a4b-a94b838d1124",
+            "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+            "material": "\u7F13\u51B2\u5757\uFF08\u6A21\u62DF\uFF09",
+            "xmm": 200,
+            "ymm": 150,
+            "gapMm": 0.1,
+            "toleranceMm": 0.15,
+            "preloadMm": 0.2,
+            "normalStiffness": 100,
+            "tangentialStiffness": 40,
+            "friction": 0.3,
+            "compressionLimitMm": 0.8
+          }
+        ]
+      },
+      {
+        "id": "dae32c17-1e28-4b0d-af97-d514e1f2eb0b",
+        "name": "B \u589E\u52A0\u9884\u7D27",
+        "note": "",
+        "clips": [
+          {
+            "id": "5c0cfa2f-60bc-4283-8dd5-f736e2251b1e",
+            "name": "\u5DE6\u4E0B\u5361\u6263",
+            "xmm": 40,
+            "ymm": 40,
+            "normalStiffness": 100,
+            "tangentialStiffness": 50,
+            "forceLimitN": 80
+          },
+          {
+            "id": "f1331307-878a-4caa-84b6-451ef641fa3c",
+            "name": "\u53F3\u4E0B\u5361\u6263",
+            "xmm": 360,
+            "ymm": 40,
+            "normalStiffness": 100,
+            "tangentialStiffness": 50,
+            "forceLimitN": 80
+          },
+          {
+            "id": "f2001500-96b2-4d14-8b29-cb126e966d9c",
+            "name": "\u53F3\u4E0A\u5361\u6263",
+            "xmm": 360,
+            "ymm": 260,
+            "normalStiffness": 100,
+            "tangentialStiffness": 50,
+            "forceLimitN": 80
+          },
+          {
+            "id": "5ee417ff-0176-4ecc-9c84-d97eb3739092",
+            "name": "\u5DE6\u4E0A\u5361\u6263",
+            "xmm": 40,
+            "ymm": 260,
+            "normalStiffness": 100,
+            "tangentialStiffness": 50,
+            "forceLimitN": 80
+          }
+        ],
+        "contacts": [
+          {
+            "id": "28393693-ee77-4208-b95c-7d2f0afcdce3",
+            "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+            "material": "\u7F13\u51B2\u5757\uFF08\u6A21\u62DF\uFF09",
+            "xmm": 200,
+            "ymm": 150,
+            "gapMm": 0.1,
+            "toleranceMm": 0.15,
+            "preloadMm": 0.4,
+            "normalStiffness": 100,
+            "tangentialStiffness": 40,
+            "friction": 0.3,
+            "compressionLimitMm": 0.8
+          }
+        ]
+      }
+    ],
+    "loads": [
+      {
+        "id": "bce39cc1-7cc6-40c3-8819-80acd42dcee7",
+        "name": "\u4E00\u500D\u91CD\u529B\u5468\u671F\u6848\u4F8B",
+        "normalBiasG": 0,
+        "normalAmplitudeG": 1,
+        "tangentialBiasG": 0,
+        "tangentialAmplitudeG": 0.5,
+        "phaseDegrees": 90,
+        "frequencyHz": 10,
+        "source": "\u5DE5\u7A0B\u4F30\u7B97\uFF0C\u5F85\u6D4B\u91CF"
+      }
+    ],
+    "tasks": [
+      {
+        "id": "0c642653-fcf0-487e-961a-d695c7e940e3",
+        "pointId": null,
+        "title": "\u53C2\u6570\u8BC6\u522B\u4E0E\u6A21\u578B\u590D\u6838",
+        "method": "\u6D4B\u91CF\u88C5\u914D\u95F4\u9699\u3001\u516C\u5DEE\u3001\u5361\u6263\u521A\u5EA6\u3001\u63A5\u89E6\u538B\u7F29\u66F2\u7EBF\u548C\u6750\u6599\u6469\u64E6\uFF1B\u8BB0\u5F55\u6E29\u5EA6\u4E0E\u52A0\u8F7D\u6761\u4EF6\u3002",
+        "acceptance": "\u7531\u9879\u76EE\u8D1F\u8D23\u4EBA\u586B\u5199\u7ECF\u8BD5\u9A8C\u8BA4\u53EF\u7684\u53C2\u6570\u8303\u56F4\uFF1B\u672C\u8F6F\u4EF6\u4E0D\u63D0\u4F9B\u884C\u4E1A\u5408\u683C\u9650\u503C\u3002",
+        "owner": "",
+        "completed": false,
+        "evidence": "\u6D4F\u89C8\u5668\u6D41\u7A0B\u6F14\u793A\uFF0C\u5C1A\u975E\u771F\u5B9E\u8BD5\u9A8C"
+      },
+      {
+        "id": "b96ce747-b3aa-4b92-9be9-a5f95f93f2df",
+        "pointId": "55cd7554-08be-4eee-9a4b-a94b838d1124",
+        "title": "\u4E2D\u5FC3\u7F13\u51B2\u5757\u63A5\u89E6\u4FDD\u6301\u6838\u67E5",
+        "method": "\u6309\u63A7\u5236\u5DE5\u51B5\u88C5\u914D\u4E0A\u4E0B\u9650\u6837\u4EF6\uFF0C\u6D4B\u91CF\u95F4\u9699\u548C\u5206\u79BB\uFF1B\u63A7\u5236\u5DE5\u51B5\uFF1A\u4E00\u500D\u91CD\u529B\u5468\u671F\u6848\u4F8B / \u89D2\u70B92[0.15]mm / 0.0\u00B0",
+        "acceptance": "\u8BB0\u5F55\u5141\u8BB8\u5206\u79BB\u6761\u4EF6\u53CA\u5B9E\u6D4B\u8BC1\u636E\uFF0C\u7ED3\u5408\u9053\u8DEF\u6216\u53F0\u67B6\u4EBA\u5DE5\u542C\u8FA8\u786E\u8BA4\u3002",
+        "owner": "",
+        "completed": false,
+        "evidence": ""
+      }
+    ],
+    "audit": [
+      {
+        "utc": "2026-11-04T01:56:07.4902036+00:00",
+        "action": "\u5E94\u7528\u9879\u76EE\u3001\u5E03\u7F6E\u3001\u8F7D\u8377\u53CA\u9A8C\u8BC1\u4EFB\u52A1\u7F16\u8F91"
+      },
+      {
+        "utc": "2026-11-04T01:56:07.7440582+00:00",
+        "action": "\u5E94\u7528\u9879\u76EE\u3001\u5E03\u7F6E\u3001\u8F7D\u8377\u53CA\u9A8C\u8BC1\u4EFB\u52A1\u7F16\u8F91"
+      },
+      {
+        "utc": "2026-11-04T01:56:08.506237+00:00",
+        "action": "\u5E94\u7528\u9879\u76EE\u3001\u5E03\u7F6E\u3001\u8F7D\u8377\u53CA\u9A8C\u8BC1\u4EFB\u52A1\u7F16\u8F91"
+      },
+      {
+        "utc": "2026-11-04T01:56:09.1392456+00:00",
+        "action": "\u5E94\u7528\u9879\u76EE\u3001\u5E03\u7F6E\u3001\u8F7D\u8377\u53CA\u9A8C\u8BC1\u4EFB\u52A1\u7F16\u8F91"
+      },
+      {
+        "utc": "2026-11-04T01:56:09.6392331+00:00",
+        "action": "\u5E94\u7528\u9879\u76EE\u3001\u5E03\u7F6E\u3001\u8F7D\u8377\u53CA\u9A8C\u8BC1\u4EFB\u52A1\u7F16\u8F91"
+      },
+      {
+        "utc": "2026-11-04T01:56:10.8558258+00:00",
+        "action": "\u5E94\u7528\u9879\u76EE\u3001\u5E03\u7F6E\u3001\u8F7D\u8377\u53CA\u9A8C\u8BC1\u4EFB\u52A1\u7F16\u8F91"
+      },
+      {
+        "utc": "2026-11-04T01:56:12.0082111+00:00",
+        "action": "\u4ECE\u5F53\u524D\u63A5\u89E6\u7B5B\u67E5\u751F\u6210\u9A8C\u8BC1\u4EFB\u52A1"
+      },
+      {
+        "utc": "2026-11-04T01:56:12.0741824+00:00",
+        "action": "\u4ECE\u5F53\u524D\u63A5\u89E6\u7B5B\u67E5\u751F\u6210\u9A8C\u8BC1\u4EFB\u52A1"
+      },
+      {
+        "utc": "2026-11-04T01:56:12.3723061+00:00",
+        "action": "\u5E94\u7528\u9879\u76EE\u3001\u5E03\u7F6E\u3001\u8F7D\u8377\u53CA\u9A8C\u8BC1\u4EFB\u52A1\u7F16\u8F91"
+      },
+      {
+        "utc": "2026-11-04T01:56:12.4741698+00:00",
+        "action": "\u5E94\u7528\u9879\u76EE\u3001\u5E03\u7F6E\u3001\u8F7D\u8377\u53CA\u9A8C\u8BC1\u4EFB\u52A1\u7F16\u8F91"
+      }
+    ]
+  },
+  "report": {
+    "method": "RigidContact-1.0",
+    "inputHash": "5F4E163923497D2CBCE5391D9FCD65FA578A68D9392701F07113AFF6D4744175",
+    "calculatedUtc": "2026-11-04T01:56:13.4068764+00:00",
+    "projectName": "\u95E8\u677F\u63A5\u89E6\u5E03\u7F6E\u64CD\u4F5C\u6848\u4F8B",
+    "origin": "\u6A21\u62DF\u6F14\u793A",
+    "source": "\u6A21\u62DF\u64CD\u4F5C\u6848\u4F8B\uFF1B\u975E\u5B9E\u6D4B\uFF0C\u5F85\u6750\u6599\u4E0E\u88C5\u914D\u9A8C\u8BC1",
+    "phases": 24,
+    "toleranceEnabled": true,
+    "variants": [
+      {
+        "variantId": "6d1bf9a0-f974-4880-ace6-4c36acea42b8",
+        "name": "A \u57FA\u51C6\u5E03\u7F6E",
+        "evaluatedStates": 72,
+        "toleranceCases": 3,
+        "maxResidualN": 7.105427357601002E-15,
+        "contacts": [
+          {
+            "pointId": "55cd7554-08be-4eee-9a4b-a94b838d1124",
+            "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+            "kind": "\u63A5\u89E6\u70B9",
+            "minCompressionMm": 0,
+            "maxCompressionMm": 0.2196133,
+            "minNormalN": 0,
+            "maxNormalN": 21.96133,
+            "maxAbsShearN": 0.8172208333333333,
+            "maxSlipMm": 0,
+            "maxUtilization": 0.274516625,
+            "detachedSamples": 24,
+            "totalSamples": 72,
+            "slidingSamples": 0,
+            "governingCase": "\u4E00\u500D\u91CD\u529B\u5468\u671F\u6848\u4F8B / \u89D2\u70B91[-0.15]mm / 90.0\u00B0",
+            "compressionCase": "\u4E00\u500D\u91CD\u529B\u5468\u671F\u6848\u4F8B / \u89D2\u70B92[0.15]mm / 0.0\u00B0",
+            "slipCase": "",
+            "state": "\u5B58\u5728\u5206\u79BB"
+          }
+        ],
+        "clips": [
+          {
+            "pointId": "d2c24e71-9fdc-4686-be5d-8695d2d9d111",
+            "name": "\u5DE6\u4E0B\u5361\u6263",
+            "kind": "\u5361\u6263",
+            "minCompressionMm": 0,
+            "maxCompressionMm": 0,
+            "minNormalN": -6.9613299999999985,
+            "maxNormalN": 2.4516625,
+            "maxAbsShearN": 1.2258312499999997,
+            "maxSlipMm": 0,
+            "maxUtilization": 0.08701662499999999,
+            "detachedSamples": 0,
+            "totalSamples": 72,
+            "slidingSamples": 0,
+            "governingCase": "\u4E00\u500D\u91CD\u529B\u5468\u671F\u6848\u4F8B / \u89D2\u70B91[-0.15]mm / 270.0\u00B0",
+            "compressionCase": "\u4E00\u500D\u91CD\u529B\u5468\u671F\u6848\u4F8B / \u540D\u4E49 / 0.0\u00B0",
+            "slipCase": "",
+            "state": "\u672A\u8D85\u7528\u6237\u9650\u503C"
+          },
+          {
+            "pointId": "ae50ed2a-3782-4799-9159-b5e071e43603",
+            "name": "\u53F3\u4E0B\u5361\u6263",
+            "kind": "\u5361\u6263",
+            "minCompressionMm": 0,
+            "maxCompressionMm": 0,
+            "minNormalN": -6.9613299999999985,
+            "maxNormalN": 2.4516625,
+            "maxAbsShearN": 1.2258312499999997,
+            "maxSlipMm": 0,
+            "maxUtilization": 0.08701662499999999,
+            "detachedSamples": 0,
+            "totalSamples": 72,
+            "slidingSamples": 0,
+            "governingCase": "\u4E00\u500D\u91CD\u529B\u5468\u671F\u6848\u4F8B / \u89D2\u70B91[-0.15]mm / 270.0\u00B0",
+            "compressionCase": "\u4E00\u500D\u91CD\u529B\u5468\u671F\u6848\u4F8B / \u540D\u4E49 / 0.0\u00B0",
+            "slipCase": "",
+            "state": "\u672A\u8D85\u7528\u6237\u9650\u503C"
+          },
+          {
+            "pointId": "fbe00267-73c9-4e22-b523-9ee03f610c63",
+            "name": "\u53F3\u4E0A\u5361\u6263",
+            "kind": "\u5361\u6263",
+            "minCompressionMm": 0,
+            "maxCompressionMm": 0,
+            "minNormalN": -6.9613299999999985,
+            "maxNormalN": 2.4516625,
+            "maxAbsShearN": 1.2258312499999997,
+            "maxSlipMm": 0,
+            "maxUtilization": 0.08701662499999999,
+            "detachedSamples": 0,
+            "totalSamples": 72,
+            "slidingSamples": 0,
+            "governingCase": "\u4E00\u500D\u91CD\u529B\u5468\u671F\u6848\u4F8B / \u89D2\u70B91[-0.15]mm / 270.0\u00B0",
+            "compressionCase": "\u4E00\u500D\u91CD\u529B\u5468\u671F\u6848\u4F8B / \u540D\u4E49 / 0.0\u00B0",
+            "slipCase": "",
+            "state": "\u672A\u8D85\u7528\u6237\u9650\u503C"
+          },
+          {
+            "pointId": "08e8b49b-8691-4f12-a4a2-2bfb63696732",
+            "name": "\u5DE6\u4E0A\u5361\u6263",
+            "kind": "\u5361\u6263",
+            "minCompressionMm": 0,
+            "maxCompressionMm": 0,
+            "minNormalN": -6.9613299999999985,
+            "maxNormalN": 2.4516625,
+            "maxAbsShearN": 1.2258312499999997,
+            "maxSlipMm": 0,
+            "maxUtilization": 0.08701662499999999,
+            "detachedSamples": 0,
+            "totalSamples": 72,
+            "slidingSamples": 0,
+            "governingCase": "\u4E00\u500D\u91CD\u529B\u5468\u671F\u6848\u4F8B / \u89D2\u70B91[-0.15]mm / 270.0\u00B0",
+            "compressionCase": "\u4E00\u500D\u91CD\u529B\u5468\u671F\u6848\u4F8B / \u540D\u4E49 / 0.0\u00B0",
+            "slipCase": "",
+            "state": "\u672A\u8D85\u7528\u6237\u9650\u503C"
+          }
+        ],
+        "nominalTraces": [
+          {
+            "loadId": "bce39cc1-7cc6-40c3-8819-80acd42dcee7",
+            "loadName": "\u4E00\u500D\u91CD\u529B\u5468\u671F\u6848\u4F8B",
+            "samples": [
+              {
+                "phaseDegrees": 0,
+                "normalForceN": 0,
+                "tangentialForceN": 4.903325,
+                "displacement": {
+                  "z": -0.02,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.02
+                },
+                "tangentialMm": 0.020430520833333334,
+                "residualN": 8.881784197001252E-16,
+                "contacts": [
+                  {
+                    "id": "55cd7554-08be-4eee-9a4b-a94b838d1124",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.08,
+                    "normalN": 8,
+                    "shearN": 0.8172208333333333,
+                    "slipMm": 0,
+                    "utilization": 0.09999999999999999
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "d2c24e71-9fdc-4686-be5d-8695d2d9d111",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -2,
+                    "shearN": 1.0215260416666667,
+                    "slipMm": 0,
+                    "utilization": 0.02807221561716754
+                  },
+                  {
+                    "id": "ae50ed2a-3782-4799-9159-b5e071e43603",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -2,
+                    "shearN": 1.0215260416666667,
+                    "slipMm": 0,
+                    "utilization": 0.02807221561716754
+                  },
+                  {
+                    "id": "fbe00267-73c9-4e22-b523-9ee03f610c63",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -2,
+                    "shearN": 1.0215260416666667,
+                    "slipMm": 0,
+                    "utilization": 0.02807221561716754
+                  },
+                  {
+                    "id": "08e8b49b-8691-4f12-a4a2-2bfb63696732",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -2,
+                    "shearN": 1.0215260416666667,
+                    "slipMm": 0,
+                    "utilization": 0.02807221561716754
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 15,
+                "normalForceN": 2.538147788654635,
+                "tangentialForceN": 4.736248252188846,
+                "displacement": {
+                  "z": -0.014923704422690729,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.014923704422690729
+                },
+                "tangentialMm": 0.019734367717453523,
+                "residualN": 1.7763568394002505E-15,
+                "contacts": [
+                  {
+                    "id": "55cd7554-08be-4eee-9a4b-a94b838d1124",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.08507629557730928,
+                    "normalN": 8.507629557730928,
+                    "shearN": 0.7893747086981409,
+                    "slipMm": 0,
+                    "utilization": 0.1063453694716366
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "d2c24e71-9fdc-4686-be5d-8695d2d9d111",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -1.492370442269073,
+                    "shearN": 0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.022363414283914588
+                  },
+                  {
+                    "id": "ae50ed2a-3782-4799-9159-b5e071e43603",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -1.492370442269073,
+                    "shearN": 0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.022363414283914588
+                  },
+                  {
+                    "id": "fbe00267-73c9-4e22-b523-9ee03f610c63",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -1.492370442269073,
+                    "shearN": 0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.022363414283914588
+                  },
+                  {
+                    "id": "08e8b49b-8691-4f12-a4a2-2bfb63696732",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -1.492370442269073,
+                    "shearN": 0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.022363414283914588
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 30,
+                "normalForceN": 4.903324999999999,
+                "tangentialForceN": 4.2464040130113325,
+                "displacement": {
+                  "z": -0.010193350000000004,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.010193350000000004
+                },
+                "tangentialMm": 0.017693350054213887,
+                "residualN": 0,
+                "contacts": [
+                  {
+                    "id": "55cd7554-08be-4eee-9a4b-a94b838d1124",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.08980665,
+                    "normalN": 8.980665,
+                    "shearN": 0.7077340021685554,
+                    "slipMm": 0,
+                    "utilization": 0.1122583125
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "d2c24e71-9fdc-4686-be5d-8695d2d9d111",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -1.0193350000000003,
+                    "shearN": 0.8846675027106944,
+                    "slipMm": 0,
+                    "utilization": 0.016871205279712982
+                  },
+                  {
+                    "id": "ae50ed2a-3782-4799-9159-b5e071e43603",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -1.0193350000000003,
+                    "shearN": 0.8846675027106944,
+                    "slipMm": 0,
+                    "utilization": 0.016871205279712982
+                  },
+                  {
+                    "id": "fbe00267-73c9-4e22-b523-9ee03f610c63",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -1.0193350000000003,
+                    "shearN": 0.8846675027106944,
+                    "slipMm": 0,
+                    "utilization": 0.016871205279712982
+                  },
+                  {
+                    "id": "08e8b49b-8691-4f12-a4a2-2bfb63696732",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -1.0193350000000003,
+                    "shearN": 0.8846675027106944,
+                    "slipMm": 0,
+                    "utilization": 0.016871205279712982
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 45,
+                "normalForceN": 6.934348715723055,
+                "tangentialForceN": 3.4671743578615284,
+                "displacement": {
+                  "z": -0.006131302568553886,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.006131302568553886
+                },
+                "tangentialMm": 0.014446559824423034,
+                "residualN": 1.7763568394002505E-15,
+                "contacts": [
+                  {
+                    "id": "55cd7554-08be-4eee-9a4b-a94b838d1124",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.09386869743144612,
+                    "normalN": 9.386869743144612,
+                    "shearN": 0.5778623929769213,
+                    "slipMm": 0,
+                    "utilization": 0.11733587178930764
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "d2c24e71-9fdc-4686-be5d-8695d2d9d111",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -0.6131302568553886,
+                    "shearN": 0.7223279912211518,
+                    "slipMm": 0,
+                    "utilization": 0.011843289494827988
+                  },
+                  {
+                    "id": "ae50ed2a-3782-4799-9159-b5e071e43603",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -0.6131302568553886,
+                    "shearN": 0.7223279912211518,
+                    "slipMm": 0,
+                    "utilization": 0.011843289494827988
+                  },
+                  {
+                    "id": "fbe00267-73c9-4e22-b523-9ee03f610c63",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -0.6131302568553886,
+                    "shearN": 0.7223279912211518,
+                    "slipMm": 0,
+                    "utilization": 0.011843289494827988
+                  },
+                  {
+                    "id": "08e8b49b-8691-4f12-a4a2-2bfb63696732",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -0.6131302568553886,
+                    "shearN": 0.7223279912211518,
+                    "slipMm": 0,
+                    "utilization": 0.011843289494827988
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 60,
+                "normalForceN": 8.492808026022665,
+                "tangentialForceN": 2.4516625000000016,
+                "displacement": {
+                  "z": -0.003014383947954672,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.003014383947954672
+                },
+                "tangentialMm": 0.010215260416666674,
+                "residualN": 0,
+                "contacts": [
+                  {
+                    "id": "55cd7554-08be-4eee-9a4b-a94b838d1124",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.09698561605204534,
+                    "normalN": 9.698561605204533,
+                    "shearN": 0.408610416666667,
+                    "slipMm": 0,
+                    "utilization": 0.12123202006505666
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "d2c24e71-9fdc-4686-be5d-8695d2d9d111",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -0.3014383947954672,
+                    "shearN": 0.5107630208333337,
+                    "slipMm": 0,
+                    "utilization": 0.007413500873698062
+                  },
+                  {
+                    "id": "ae50ed2a-3782-4799-9159-b5e071e43603",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -0.3014383947954672,
+                    "shearN": 0.5107630208333337,
+                    "slipMm": 0,
+                    "utilization": 0.007413500873698062
+                  },
+                  {
+                    "id": "fbe00267-73c9-4e22-b523-9ee03f610c63",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -0.3014383947954672,
+                    "shearN": 0.5107630208333337,
+                    "slipMm": 0,
+                    "utilization": 0.007413500873698062
+                  },
+                  {
+                    "id": "08e8b49b-8691-4f12-a4a2-2bfb63696732",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -0.3014383947954672,
+                    "shearN": 0.5107630208333337,
+                    "slipMm": 0,
+                    "utilization": 0.007413500873698062
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 75,
+                "normalForceN": 9.472496504377691,
+                "tangentialForceN": 1.2690738943273165,
+                "displacement": {
+                  "z": -0.0010550069912446218,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.0010550069912446218
+                },
+                "tangentialMm": 0.005287807893030485,
+                "residualN": 1.7763568394002505E-15,
+                "contacts": [
+                  {
+                    "id": "55cd7554-08be-4eee-9a4b-a94b838d1124",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.09894499300875538,
+                    "normalN": 9.894499300875538,
+                    "shearN": 0.2115123157212194,
+                    "slipMm": 0,
+                    "utilization": 0.12368124126094422
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "d2c24e71-9fdc-4686-be5d-8695d2d9d111",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -0.10550069912446218,
+                    "shearN": 0.26439039465152425,
+                    "slipMm": 0,
+                    "utilization": 0.00355827991933381
+                  },
+                  {
+                    "id": "ae50ed2a-3782-4799-9159-b5e071e43603",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -0.10550069912446218,
+                    "shearN": 0.26439039465152425,
+                    "slipMm": 0,
+                    "utilization": 0.00355827991933381
+                  },
+                  {
+                    "id": "fbe00267-73c9-4e22-b523-9ee03f610c63",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -0.10550069912446218,
+                    "shearN": 0.26439039465152425,
+                    "slipMm": 0,
+                    "utilization": 0.00355827991933381
+                  },
+                  {
+                    "id": "08e8b49b-8691-4f12-a4a2-2bfb63696732",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -0.10550069912446218,
+                    "shearN": 0.26439039465152425,
+                    "slipMm": 0,
+                    "utilization": 0.00355827991933381
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 90,
+                "normalForceN": 9.80665,
+                "tangentialForceN": 6.004841266429195E-16,
+                "displacement": {
+                  "z": -0.0003867000000000037,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.0003867000000000037
+                },
+                "tangentialMm": 2.502017194345497E-18,
+                "residualN": 1.9721522630525295E-31,
+                "contacts": [
+                  {
+                    "id": "55cd7554-08be-4eee-9a4b-a94b838d1124",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.0996133,
+                    "normalN": 9.96133,
+                    "shearN": 1.0008068777381988E-16,
+                    "slipMm": 0,
+                    "utilization": 0.12451662499999999
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "d2c24e71-9fdc-4686-be5d-8695d2d9d111",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -0.03867000000000037,
+                    "shearN": 1.2510085971727486E-16,
+                    "slipMm": 0,
+                    "utilization": 0.00048337500000000463
+                  },
+                  {
+                    "id": "ae50ed2a-3782-4799-9159-b5e071e43603",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -0.03867000000000037,
+                    "shearN": 1.2510085971727486E-16,
+                    "slipMm": 0,
+                    "utilization": 0.00048337500000000463
+                  },
+                  {
+                    "id": "fbe00267-73c9-4e22-b523-9ee03f610c63",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -0.03867000000000037,
+                    "shearN": 1.2510085971727486E-16,
+                    "slipMm": 0,
+                    "utilization": 0.00048337500000000463
+                  },
+                  {
+                    "id": "08e8b49b-8691-4f12-a4a2-2bfb63696732",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -0.03867000000000037,
+                    "shearN": 1.2510085971727486E-16,
+                    "slipMm": 0,
+                    "utilization": 0.00048337500000000463
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 105,
+                "normalForceN": 9.472496504377691,
+                "tangentialForceN": -1.2690738943273177,
+                "displacement": {
+                  "z": -0.0010550069912446218,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.0010550069912446218
+                },
+                "tangentialMm": -0.00528780789303049,
+                "residualN": 1.7763568394002505E-15,
+                "contacts": [
+                  {
+                    "id": "55cd7554-08be-4eee-9a4b-a94b838d1124",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.09894499300875538,
+                    "normalN": 9.894499300875538,
+                    "shearN": -0.2115123157212196,
+                    "slipMm": 0,
+                    "utilization": 0.12368124126094422
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "d2c24e71-9fdc-4686-be5d-8695d2d9d111",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -0.10550069912446218,
+                    "shearN": -0.26439039465152453,
+                    "slipMm": 0,
+                    "utilization": 0.0035582799193338128
+                  },
+                  {
+                    "id": "ae50ed2a-3782-4799-9159-b5e071e43603",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -0.10550069912446218,
+                    "shearN": -0.26439039465152453,
+                    "slipMm": 0,
+                    "utilization": 0.0035582799193338128
+                  },
+                  {
+                    "id": "fbe00267-73c9-4e22-b523-9ee03f610c63",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -0.10550069912446218,
+                    "shearN": -0.26439039465152453,
+                    "slipMm": 0,
+                    "utilization": 0.0035582799193338128
+                  },
+                  {
+                    "id": "08e8b49b-8691-4f12-a4a2-2bfb63696732",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -0.10550069912446218,
+                    "shearN": -0.26439039465152453,
+                    "slipMm": 0,
+                    "utilization": 0.0035582799193338128
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 120,
+                "normalForceN": 8.492808026022665,
+                "tangentialForceN": -2.4516624999999985,
+                "displacement": {
+                  "z": -0.003014383947954672,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.003014383947954672
+                },
+                "tangentialMm": -0.01021526041666666,
+                "residualN": 0,
+                "contacts": [
+                  {
+                    "id": "55cd7554-08be-4eee-9a4b-a94b838d1124",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.09698561605204534,
+                    "normalN": 9.698561605204533,
+                    "shearN": -0.4086104166666664,
+                    "slipMm": 0,
+                    "utilization": 0.12123202006505666
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "d2c24e71-9fdc-4686-be5d-8695d2d9d111",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -0.3014383947954672,
+                    "shearN": -0.510763020833333,
+                    "slipMm": 0,
+                    "utilization": 0.007413500873698055
+                  },
+                  {
+                    "id": "ae50ed2a-3782-4799-9159-b5e071e43603",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -0.3014383947954672,
+                    "shearN": -0.510763020833333,
+                    "slipMm": 0,
+                    "utilization": 0.007413500873698055
+                  },
+                  {
+                    "id": "fbe00267-73c9-4e22-b523-9ee03f610c63",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -0.3014383947954672,
+                    "shearN": -0.510763020833333,
+                    "slipMm": 0,
+                    "utilization": 0.007413500873698055
+                  },
+                  {
+                    "id": "08e8b49b-8691-4f12-a4a2-2bfb63696732",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -0.3014383947954672,
+                    "shearN": -0.510763020833333,
+                    "slipMm": 0,
+                    "utilization": 0.007413500873698055
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 135,
+                "normalForceN": 6.934348715723057,
+                "tangentialForceN": -3.4671743578615275,
+                "displacement": {
+                  "z": -0.006131302568553886,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.006131302568553886
+                },
+                "tangentialMm": -0.014446559824423031,
+                "residualN": 0,
+                "contacts": [
+                  {
+                    "id": "55cd7554-08be-4eee-9a4b-a94b838d1124",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.09386869743144612,
+                    "normalN": 9.386869743144612,
+                    "shearN": -0.5778623929769212,
+                    "slipMm": 0,
+                    "utilization": 0.11733587178930764
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "d2c24e71-9fdc-4686-be5d-8695d2d9d111",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -0.6131302568553886,
+                    "shearN": -0.7223279912211515,
+                    "slipMm": 0,
+                    "utilization": 0.011843289494827986
+                  },
+                  {
+                    "id": "ae50ed2a-3782-4799-9159-b5e071e43603",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -0.6131302568553886,
+                    "shearN": -0.7223279912211515,
+                    "slipMm": 0,
+                    "utilization": 0.011843289494827986
+                  },
+                  {
+                    "id": "fbe00267-73c9-4e22-b523-9ee03f610c63",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -0.6131302568553886,
+                    "shearN": -0.7223279912211515,
+                    "slipMm": 0,
+                    "utilization": 0.011843289494827986
+                  },
+                  {
+                    "id": "08e8b49b-8691-4f12-a4a2-2bfb63696732",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -0.6131302568553886,
+                    "shearN": -0.7223279912211515,
+                    "slipMm": 0,
+                    "utilization": 0.011843289494827986
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 150,
+                "normalForceN": 4.903324999999999,
+                "tangentialForceN": -4.246404013011333,
+                "displacement": {
+                  "z": -0.010193350000000004,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.010193350000000004
+                },
+                "tangentialMm": -0.017693350054213887,
+                "residualN": 8.881784197001252E-16,
+                "contacts": [
+                  {
+                    "id": "55cd7554-08be-4eee-9a4b-a94b838d1124",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.08980665,
+                    "normalN": 8.980665,
+                    "shearN": -0.7077340021685554,
+                    "slipMm": 0,
+                    "utilization": 0.1122583125
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "d2c24e71-9fdc-4686-be5d-8695d2d9d111",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -1.0193350000000003,
+                    "shearN": -0.8846675027106944,
+                    "slipMm": 0,
+                    "utilization": 0.016871205279712982
+                  },
+                  {
+                    "id": "ae50ed2a-3782-4799-9159-b5e071e43603",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -1.0193350000000003,
+                    "shearN": -0.8846675027106944,
+                    "slipMm": 0,
+                    "utilization": 0.016871205279712982
+                  },
+                  {
+                    "id": "fbe00267-73c9-4e22-b523-9ee03f610c63",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -1.0193350000000003,
+                    "shearN": -0.8846675027106944,
+                    "slipMm": 0,
+                    "utilization": 0.016871205279712982
+                  },
+                  {
+                    "id": "08e8b49b-8691-4f12-a4a2-2bfb63696732",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -1.0193350000000003,
+                    "shearN": -0.8846675027106944,
+                    "slipMm": 0,
+                    "utilization": 0.016871205279712982
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 165,
+                "normalForceN": 2.5381477886546375,
+                "tangentialForceN": -4.736248252188846,
+                "displacement": {
+                  "z": -0.014923704422690726,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.014923704422690726
+                },
+                "tangentialMm": -0.019734367717453523,
+                "residualN": 0,
+                "contacts": [
+                  {
+                    "id": "55cd7554-08be-4eee-9a4b-a94b838d1124",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.08507629557730928,
+                    "normalN": 8.507629557730928,
+                    "shearN": -0.7893747086981409,
+                    "slipMm": 0,
+                    "utilization": 0.1063453694716366
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "d2c24e71-9fdc-4686-be5d-8695d2d9d111",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -1.4923704422690727,
+                    "shearN": -0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.022363414283914584
+                  },
+                  {
+                    "id": "ae50ed2a-3782-4799-9159-b5e071e43603",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -1.4923704422690727,
+                    "shearN": -0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.022363414283914584
+                  },
+                  {
+                    "id": "fbe00267-73c9-4e22-b523-9ee03f610c63",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -1.4923704422690727,
+                    "shearN": -0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.022363414283914584
+                  },
+                  {
+                    "id": "08e8b49b-8691-4f12-a4a2-2bfb63696732",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -1.4923704422690727,
+                    "shearN": -0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.022363414283914584
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 180,
+                "normalForceN": 1.200968253285839E-15,
+                "tangentialForceN": -4.903325,
+                "displacement": {
+                  "z": -0.019999999999999997,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.019999999999999997
+                },
+                "tangentialMm": -0.020430520833333334,
+                "residualN": 1.7763568394002505E-15,
+                "contacts": [
+                  {
+                    "id": "55cd7554-08be-4eee-9a4b-a94b838d1124",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.08000000000000002,
+                    "normalN": 8.000000000000002,
+                    "shearN": -0.8172208333333333,
+                    "slipMm": 0,
+                    "utilization": 0.10000000000000002
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "d2c24e71-9fdc-4686-be5d-8695d2d9d111",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -1.9999999999999998,
+                    "shearN": -1.0215260416666667,
+                    "slipMm": 0,
+                    "utilization": 0.028072215617167533
+                  },
+                  {
+                    "id": "ae50ed2a-3782-4799-9159-b5e071e43603",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -1.9999999999999998,
+                    "shearN": -1.0215260416666667,
+                    "slipMm": 0,
+                    "utilization": 0.028072215617167533
+                  },
+                  {
+                    "id": "fbe00267-73c9-4e22-b523-9ee03f610c63",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -1.9999999999999998,
+                    "shearN": -1.0215260416666667,
+                    "slipMm": 0,
+                    "utilization": 0.028072215617167533
+                  },
+                  {
+                    "id": "08e8b49b-8691-4f12-a4a2-2bfb63696732",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -1.9999999999999998,
+                    "shearN": -1.0215260416666667,
+                    "slipMm": 0,
+                    "utilization": 0.028072215617167533
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 195,
+                "normalForceN": -2.538147788654631,
+                "tangentialForceN": -4.7362482521888465,
+                "displacement": {
+                  "z": -0.025076295577309265,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.025076295577309265
+                },
+                "tangentialMm": -0.019734367717453523,
+                "residualN": 8.881784197001252E-16,
+                "contacts": [
+                  {
+                    "id": "55cd7554-08be-4eee-9a4b-a94b838d1124",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.07492370442269074,
+                    "normalN": 7.492370442269074,
+                    "shearN": -0.7893747086981409,
+                    "slipMm": 0,
+                    "utilization": 0.09365463052836341
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "d2c24e71-9fdc-4686-be5d-8695d2d9d111",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -2.5076295577309264,
+                    "shearN": -0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.03368470343639162
+                  },
+                  {
+                    "id": "ae50ed2a-3782-4799-9159-b5e071e43603",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -2.5076295577309264,
+                    "shearN": -0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.03368470343639162
+                  },
+                  {
+                    "id": "fbe00267-73c9-4e22-b523-9ee03f610c63",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -2.5076295577309264,
+                    "shearN": -0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.03368470343639162
+                  },
+                  {
+                    "id": "08e8b49b-8691-4f12-a4a2-2bfb63696732",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -2.5076295577309264,
+                    "shearN": -0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.03368470343639162
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 210,
+                "normalForceN": -4.903325000000001,
+                "tangentialForceN": -4.2464040130113325,
+                "displacement": {
+                  "z": -0.029806650000000004,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.029806650000000004
+                },
+                "tangentialMm": -0.017693350054213887,
+                "residualN": 1.7763568394002505E-15,
+                "contacts": [
+                  {
+                    "id": "55cd7554-08be-4eee-9a4b-a94b838d1124",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.07019335,
+                    "normalN": 7.019335,
+                    "shearN": -0.7077340021685554,
+                    "slipMm": 0,
+                    "utilization": 0.0877416875
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "d2c24e71-9fdc-4686-be5d-8695d2d9d111",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -2.9806650000000006,
+                    "shearN": -0.8846675027106944,
+                    "slipMm": 0,
+                    "utilization": 0.038864750321984776
+                  },
+                  {
+                    "id": "ae50ed2a-3782-4799-9159-b5e071e43603",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -2.9806650000000006,
+                    "shearN": -0.8846675027106944,
+                    "slipMm": 0,
+                    "utilization": 0.038864750321984776
+                  },
+                  {
+                    "id": "fbe00267-73c9-4e22-b523-9ee03f610c63",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -2.9806650000000006,
+                    "shearN": -0.8846675027106944,
+                    "slipMm": 0,
+                    "utilization": 0.038864750321984776
+                  },
+                  {
+                    "id": "08e8b49b-8691-4f12-a4a2-2bfb63696732",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -2.9806650000000006,
+                    "shearN": -0.8846675027106944,
+                    "slipMm": 0,
+                    "utilization": 0.038864750321984776
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 225,
+                "normalForceN": -6.934348715723055,
+                "tangentialForceN": -3.467174357861529,
+                "displacement": {
+                  "z": -0.03386869743144611,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.03386869743144611
+                },
+                "tangentialMm": -0.014446559824423038,
+                "residualN": 8.881784197001252E-16,
+                "contacts": [
+                  {
+                    "id": "55cd7554-08be-4eee-9a4b-a94b838d1124",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.0661313025685539,
+                    "normalN": 6.61313025685539,
+                    "shearN": -0.5778623929769215,
+                    "slipMm": 0,
+                    "utilization": 0.08266412821069237
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "d2c24e71-9fdc-4686-be5d-8695d2d9d111",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -3.386869743144611,
+                    "shearN": -0.7223279912211519,
+                    "slipMm": 0,
+                    "utilization": 0.04328799700828241
+                  },
+                  {
+                    "id": "ae50ed2a-3782-4799-9159-b5e071e43603",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -3.386869743144611,
+                    "shearN": -0.7223279912211519,
+                    "slipMm": 0,
+                    "utilization": 0.04328799700828241
+                  },
+                  {
+                    "id": "fbe00267-73c9-4e22-b523-9ee03f610c63",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -3.386869743144611,
+                    "shearN": -0.7223279912211519,
+                    "slipMm": 0,
+                    "utilization": 0.04328799700828241
+                  },
+                  {
+                    "id": "08e8b49b-8691-4f12-a4a2-2bfb63696732",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -3.386869743144611,
+                    "shearN": -0.7223279912211519,
+                    "slipMm": 0,
+                    "utilization": 0.04328799700828241
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 240,
+                "normalForceN": -8.492808026022661,
+                "tangentialForceN": -2.451662500000002,
+                "displacement": {
+                  "z": -0.036985616052045325,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.036985616052045325
+                },
+                "tangentialMm": -0.010215260416666674,
+                "residualN": 4.440892098500626E-16,
+                "contacts": [
+                  {
+                    "id": "55cd7554-08be-4eee-9a4b-a94b838d1124",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.06301438394795468,
+                    "normalN": 6.301438394795468,
+                    "shearN": -0.408610416666667,
+                    "slipMm": 0,
+                    "utilization": 0.07876797993494335
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "d2c24e71-9fdc-4686-be5d-8695d2d9d111",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -3.6985616052045325,
+                    "shearN": -0.5107630208333337,
+                    "slipMm": 0,
+                    "utilization": 0.046670783170094626
+                  },
+                  {
+                    "id": "ae50ed2a-3782-4799-9159-b5e071e43603",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -3.6985616052045325,
+                    "shearN": -0.5107630208333337,
+                    "slipMm": 0,
+                    "utilization": 0.046670783170094626
+                  },
+                  {
+                    "id": "fbe00267-73c9-4e22-b523-9ee03f610c63",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -3.6985616052045325,
+                    "shearN": -0.5107630208333337,
+                    "slipMm": 0,
+                    "utilization": 0.046670783170094626
+                  },
+                  {
+                    "id": "08e8b49b-8691-4f12-a4a2-2bfb63696732",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -3.6985616052045325,
+                    "shearN": -0.5107630208333337,
+                    "slipMm": 0,
+                    "utilization": 0.046670783170094626
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 255,
+                "normalForceN": -9.472496504377691,
+                "tangentialForceN": -1.2690738943273172,
+                "displacement": {
+                  "z": -0.03894499300875538,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.03894499300875538
+                },
+                "tangentialMm": -0.005287807893030488,
+                "residualN": 0,
+                "contacts": [
+                  {
+                    "id": "55cd7554-08be-4eee-9a4b-a94b838d1124",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.06105500699124462,
+                    "normalN": 6.1055006991244625,
+                    "shearN": -0.21151231572121953,
+                    "slipMm": 0,
+                    "utilization": 0.07631875873905578
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "d2c24e71-9fdc-4686-be5d-8695d2d9d111",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -3.8944993008755384,
+                    "shearN": -0.2643903946515244,
+                    "slipMm": 0,
+                    "utilization": 0.04879329341291441
+                  },
+                  {
+                    "id": "ae50ed2a-3782-4799-9159-b5e071e43603",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -3.8944993008755384,
+                    "shearN": -0.2643903946515244,
+                    "slipMm": 0,
+                    "utilization": 0.04879329341291441
+                  },
+                  {
+                    "id": "fbe00267-73c9-4e22-b523-9ee03f610c63",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -3.8944993008755384,
+                    "shearN": -0.2643903946515244,
+                    "slipMm": 0,
+                    "utilization": 0.04879329341291441
+                  },
+                  {
+                    "id": "08e8b49b-8691-4f12-a4a2-2bfb63696732",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -3.8944993008755384,
+                    "shearN": -0.2643903946515244,
+                    "slipMm": 0,
+                    "utilization": 0.04879329341291441
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 270,
+                "normalForceN": -9.80665,
+                "tangentialForceN": -1.200968253285839E-15,
+                "displacement": {
+                  "z": -0.039613300000000004,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.039613300000000004
+                },
+                "tangentialMm": -5.004034388690994E-18,
+                "residualN": 1.7763568394002505E-15,
+                "contacts": [
+                  {
+                    "id": "55cd7554-08be-4eee-9a4b-a94b838d1124",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.0603867,
+                    "normalN": 6.03867,
+                    "shearN": -2.0016137554763977E-16,
+                    "slipMm": 0,
+                    "utilization": 0.07548337499999999
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "d2c24e71-9fdc-4686-be5d-8695d2d9d111",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -3.9613300000000002,
+                    "shearN": -2.502017194345497E-16,
+                    "slipMm": 0,
+                    "utilization": 0.049516625
+                  },
+                  {
+                    "id": "ae50ed2a-3782-4799-9159-b5e071e43603",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -3.9613300000000002,
+                    "shearN": -2.502017194345497E-16,
+                    "slipMm": 0,
+                    "utilization": 0.049516625
+                  },
+                  {
+                    "id": "fbe00267-73c9-4e22-b523-9ee03f610c63",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -3.9613300000000002,
+                    "shearN": -2.502017194345497E-16,
+                    "slipMm": 0,
+                    "utilization": 0.049516625
+                  },
+                  {
+                    "id": "08e8b49b-8691-4f12-a4a2-2bfb63696732",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -3.9613300000000002,
+                    "shearN": -2.502017194345497E-16,
+                    "slipMm": 0,
+                    "utilization": 0.049516625
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 285,
+                "normalForceN": -9.47249650437769,
+                "tangentialForceN": 1.269073894327319,
+                "displacement": {
+                  "z": -0.038944993008755376,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.038944993008755376
+                },
+                "tangentialMm": 0.005287807893030495,
+                "residualN": 2.6645352591003757E-15,
+                "contacts": [
+                  {
+                    "id": "55cd7554-08be-4eee-9a4b-a94b838d1124",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.06105500699124463,
+                    "normalN": 6.105500699124463,
+                    "shearN": 0.2115123157212198,
+                    "slipMm": 0,
+                    "utilization": 0.07631875873905579
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "d2c24e71-9fdc-4686-be5d-8695d2d9d111",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -3.8944993008755375,
+                    "shearN": 0.26439039465152475,
+                    "slipMm": 0,
+                    "utilization": 0.0487932934129144
+                  },
+                  {
+                    "id": "ae50ed2a-3782-4799-9159-b5e071e43603",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -3.8944993008755375,
+                    "shearN": 0.26439039465152475,
+                    "slipMm": 0,
+                    "utilization": 0.0487932934129144
+                  },
+                  {
+                    "id": "fbe00267-73c9-4e22-b523-9ee03f610c63",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -3.8944993008755375,
+                    "shearN": 0.26439039465152475,
+                    "slipMm": 0,
+                    "utilization": 0.0487932934129144
+                  },
+                  {
+                    "id": "08e8b49b-8691-4f12-a4a2-2bfb63696732",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -3.8944993008755375,
+                    "shearN": 0.26439039465152475,
+                    "slipMm": 0,
+                    "utilization": 0.0487932934129144
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 300,
+                "normalForceN": -8.492808026022665,
+                "tangentialForceN": 2.4516625,
+                "displacement": {
+                  "z": -0.03698561605204533,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.03698561605204533
+                },
+                "tangentialMm": 0.010215260416666667,
+                "residualN": 1.7763568394002505E-15,
+                "contacts": [
+                  {
+                    "id": "55cd7554-08be-4eee-9a4b-a94b838d1124",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.06301438394795467,
+                    "normalN": 6.301438394795467,
+                    "shearN": 0.40861041666666664,
+                    "slipMm": 0,
+                    "utilization": 0.07876797993494333
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "d2c24e71-9fdc-4686-be5d-8695d2d9d111",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -3.6985616052045334,
+                    "shearN": 0.5107630208333334,
+                    "slipMm": 0,
+                    "utilization": 0.04667078317009463
+                  },
+                  {
+                    "id": "ae50ed2a-3782-4799-9159-b5e071e43603",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -3.6985616052045334,
+                    "shearN": 0.5107630208333334,
+                    "slipMm": 0,
+                    "utilization": 0.04667078317009463
+                  },
+                  {
+                    "id": "fbe00267-73c9-4e22-b523-9ee03f610c63",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -3.6985616052045334,
+                    "shearN": 0.5107630208333334,
+                    "slipMm": 0,
+                    "utilization": 0.04667078317009463
+                  },
+                  {
+                    "id": "08e8b49b-8691-4f12-a4a2-2bfb63696732",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -3.6985616052045334,
+                    "shearN": 0.5107630208333334,
+                    "slipMm": 0,
+                    "utilization": 0.04667078317009463
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 315,
+                "normalForceN": -6.934348715723058,
+                "tangentialForceN": 3.467174357861527,
+                "displacement": {
+                  "z": -0.03386869743144611,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.03386869743144611
+                },
+                "tangentialMm": 0.014446559824423028,
+                "residualN": 3.552713678800501E-15,
+                "contacts": [
+                  {
+                    "id": "55cd7554-08be-4eee-9a4b-a94b838d1124",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.0661313025685539,
+                    "normalN": 6.61313025685539,
+                    "shearN": 0.5778623929769211,
+                    "slipMm": 0,
+                    "utilization": 0.08266412821069237
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "d2c24e71-9fdc-4686-be5d-8695d2d9d111",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -3.386869743144611,
+                    "shearN": 0.7223279912211513,
+                    "slipMm": 0,
+                    "utilization": 0.04328799700828241
+                  },
+                  {
+                    "id": "ae50ed2a-3782-4799-9159-b5e071e43603",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -3.386869743144611,
+                    "shearN": 0.7223279912211513,
+                    "slipMm": 0,
+                    "utilization": 0.04328799700828241
+                  },
+                  {
+                    "id": "fbe00267-73c9-4e22-b523-9ee03f610c63",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -3.386869743144611,
+                    "shearN": 0.7223279912211513,
+                    "slipMm": 0,
+                    "utilization": 0.04328799700828241
+                  },
+                  {
+                    "id": "08e8b49b-8691-4f12-a4a2-2bfb63696732",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -3.386869743144611,
+                    "shearN": 0.7223279912211513,
+                    "slipMm": 0,
+                    "utilization": 0.04328799700828241
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 330,
+                "normalForceN": -4.903325000000004,
+                "tangentialForceN": 4.246404013011331,
+                "displacement": {
+                  "z": -0.02980665000000001,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.02980665000000001
+                },
+                "tangentialMm": 0.017693350054213873,
+                "residualN": 1.7763568394002505E-15,
+                "contacts": [
+                  {
+                    "id": "55cd7554-08be-4eee-9a4b-a94b838d1124",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.07019334999999999,
+                    "normalN": 7.019334999999999,
+                    "shearN": 0.707734002168555,
+                    "slipMm": 0,
+                    "utilization": 0.08774168749999998
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "d2c24e71-9fdc-4686-be5d-8695d2d9d111",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -2.980665000000001,
+                    "shearN": 0.8846675027106936,
+                    "slipMm": 0,
+                    "utilization": 0.038864750321984776
+                  },
+                  {
+                    "id": "ae50ed2a-3782-4799-9159-b5e071e43603",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -2.980665000000001,
+                    "shearN": 0.8846675027106936,
+                    "slipMm": 0,
+                    "utilization": 0.038864750321984776
+                  },
+                  {
+                    "id": "fbe00267-73c9-4e22-b523-9ee03f610c63",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -2.980665000000001,
+                    "shearN": 0.8846675027106936,
+                    "slipMm": 0,
+                    "utilization": 0.038864750321984776
+                  },
+                  {
+                    "id": "08e8b49b-8691-4f12-a4a2-2bfb63696732",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -2.980665000000001,
+                    "shearN": 0.8846675027106936,
+                    "slipMm": 0,
+                    "utilization": 0.038864750321984776
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 345,
+                "normalForceN": -2.5381477886546344,
+                "tangentialForceN": 4.736248252188846,
+                "displacement": {
+                  "z": -0.025076295577309275,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.025076295577309275
+                },
+                "tangentialMm": 0.019734367717453523,
+                "residualN": 2.6645352591003757E-15,
+                "contacts": [
+                  {
+                    "id": "55cd7554-08be-4eee-9a4b-a94b838d1124",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.07492370442269072,
+                    "normalN": 7.492370442269072,
+                    "shearN": 0.7893747086981409,
+                    "slipMm": 0,
+                    "utilization": 0.0936546305283634
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "d2c24e71-9fdc-4686-be5d-8695d2d9d111",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -2.5076295577309273,
+                    "shearN": 0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.03368470343639163
+                  },
+                  {
+                    "id": "ae50ed2a-3782-4799-9159-b5e071e43603",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -2.5076295577309273,
+                    "shearN": 0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.03368470343639163
+                  },
+                  {
+                    "id": "fbe00267-73c9-4e22-b523-9ee03f610c63",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -2.5076295577309273,
+                    "shearN": 0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.03368470343639163
+                  },
+                  {
+                    "id": "08e8b49b-8691-4f12-a4a2-2bfb63696732",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -2.5076295577309273,
+                    "shearN": 0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.03368470343639163
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "separationPoints": 1,
+        "slidingPoints": 0,
+        "overLimitPoints": 0
+      },
+      {
+        "variantId": "dae32c17-1e28-4b0d-af97-d514e1f2eb0b",
+        "name": "B \u589E\u52A0\u9884\u7D27",
+        "evaluatedStates": 72,
+        "toleranceCases": 3,
+        "maxResidualN": 1.4210854715202004E-14,
+        "contacts": [
+          {
+            "pointId": "28393693-ee77-4208-b95c-7d2f0afcdce3",
+            "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+            "kind": "\u63A5\u89E6\u70B9",
+            "minCompressionMm": 0.10038670000000004,
+            "maxCompressionMm": 0.37961330000000004,
+            "minNormalN": 10.038670000000003,
+            "maxNormalN": 37.961330000000004,
+            "maxAbsShearN": 0.8172208333333333,
+            "maxSlipMm": 0,
+            "maxUtilization": 0.474516625,
+            "detachedSamples": 0,
+            "totalSamples": 72,
+            "slidingSamples": 0,
+            "governingCase": "\u4E00\u500D\u91CD\u529B\u5468\u671F\u6848\u4F8B / \u89D2\u70B91[-0.15]mm / 90.0\u00B0",
+            "compressionCase": "\u4E00\u500D\u91CD\u529B\u5468\u671F\u6848\u4F8B / \u89D2\u70B92[0.15]mm / 270.0\u00B0",
+            "slipCase": "",
+            "state": "\u6301\u7EED\u63A5\u89E6"
+          }
+        ],
+        "clips": [
+          {
+            "pointId": "5c0cfa2f-60bc-4283-8dd5-f736e2251b1e",
+            "name": "\u5DE6\u4E0B\u5361\u6263",
+            "kind": "\u5361\u6263",
+            "minCompressionMm": 0,
+            "maxCompressionMm": 0,
+            "minNormalN": -10.96133,
+            "maxNormalN": -1.0386700000000013,
+            "maxAbsShearN": 1.0215260416666667,
+            "maxSlipMm": 0,
+            "maxUtilization": 0.137016625,
+            "detachedSamples": 0,
+            "totalSamples": 72,
+            "slidingSamples": 0,
+            "governingCase": "\u4E00\u500D\u91CD\u529B\u5468\u671F\u6848\u4F8B / \u89D2\u70B91[-0.15]mm / 270.0\u00B0",
+            "compressionCase": "\u4E00\u500D\u91CD\u529B\u5468\u671F\u6848\u4F8B / \u540D\u4E49 / 0.0\u00B0",
+            "slipCase": "",
+            "state": "\u672A\u8D85\u7528\u6237\u9650\u503C"
+          },
+          {
+            "pointId": "f1331307-878a-4caa-84b6-451ef641fa3c",
+            "name": "\u53F3\u4E0B\u5361\u6263",
+            "kind": "\u5361\u6263",
+            "minCompressionMm": 0,
+            "maxCompressionMm": 0,
+            "minNormalN": -10.96133,
+            "maxNormalN": -1.0386700000000013,
+            "maxAbsShearN": 1.0215260416666667,
+            "maxSlipMm": 0,
+            "maxUtilization": 0.137016625,
+            "detachedSamples": 0,
+            "totalSamples": 72,
+            "slidingSamples": 0,
+            "governingCase": "\u4E00\u500D\u91CD\u529B\u5468\u671F\u6848\u4F8B / \u89D2\u70B91[-0.15]mm / 270.0\u00B0",
+            "compressionCase": "\u4E00\u500D\u91CD\u529B\u5468\u671F\u6848\u4F8B / \u540D\u4E49 / 0.0\u00B0",
+            "slipCase": "",
+            "state": "\u672A\u8D85\u7528\u6237\u9650\u503C"
+          },
+          {
+            "pointId": "f2001500-96b2-4d14-8b29-cb126e966d9c",
+            "name": "\u53F3\u4E0A\u5361\u6263",
+            "kind": "\u5361\u6263",
+            "minCompressionMm": 0,
+            "maxCompressionMm": 0,
+            "minNormalN": -10.96133,
+            "maxNormalN": -1.0386700000000013,
+            "maxAbsShearN": 1.0215260416666667,
+            "maxSlipMm": 0,
+            "maxUtilization": 0.137016625,
+            "detachedSamples": 0,
+            "totalSamples": 72,
+            "slidingSamples": 0,
+            "governingCase": "\u4E00\u500D\u91CD\u529B\u5468\u671F\u6848\u4F8B / \u89D2\u70B91[-0.15]mm / 270.0\u00B0",
+            "compressionCase": "\u4E00\u500D\u91CD\u529B\u5468\u671F\u6848\u4F8B / \u540D\u4E49 / 0.0\u00B0",
+            "slipCase": "",
+            "state": "\u672A\u8D85\u7528\u6237\u9650\u503C"
+          },
+          {
+            "pointId": "5ee417ff-0176-4ecc-9c84-d97eb3739092",
+            "name": "\u5DE6\u4E0A\u5361\u6263",
+            "kind": "\u5361\u6263",
+            "minCompressionMm": 0,
+            "maxCompressionMm": 0,
+            "minNormalN": -10.96133,
+            "maxNormalN": -1.0386700000000013,
+            "maxAbsShearN": 1.0215260416666667,
+            "maxSlipMm": 0,
+            "maxUtilization": 0.137016625,
+            "detachedSamples": 0,
+            "totalSamples": 72,
+            "slidingSamples": 0,
+            "governingCase": "\u4E00\u500D\u91CD\u529B\u5468\u671F\u6848\u4F8B / \u89D2\u70B91[-0.15]mm / 270.0\u00B0",
+            "compressionCase": "\u4E00\u500D\u91CD\u529B\u5468\u671F\u6848\u4F8B / \u540D\u4E49 / 0.0\u00B0",
+            "slipCase": "",
+            "state": "\u672A\u8D85\u7528\u6237\u9650\u503C"
+          }
+        ],
+        "nominalTraces": [
+          {
+            "loadId": "bce39cc1-7cc6-40c3-8819-80acd42dcee7",
+            "loadName": "\u4E00\u500D\u91CD\u529B\u5468\u671F\u6848\u4F8B",
+            "samples": [
+              {
+                "phaseDegrees": 0,
+                "normalForceN": 0,
+                "tangentialForceN": 4.903325,
+                "displacement": {
+                  "z": -0.060000000000000005,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.060000000000000005
+                },
+                "tangentialMm": 0.020430520833333334,
+                "residualN": 8.881784197001252E-16,
+                "contacts": [
+                  {
+                    "id": "28393693-ee77-4208-b95c-7d2f0afcdce3",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.24000000000000005,
+                    "normalN": 24.000000000000004,
+                    "shearN": 0.8172208333333333,
+                    "slipMm": 0,
+                    "utilization": 0.30000000000000004
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "5c0cfa2f-60bc-4283-8dd5-f736e2251b1e",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -6.000000000000001,
+                    "shearN": 1.0215260416666667,
+                    "slipMm": 0,
+                    "utilization": 0.07607923034348302
+                  },
+                  {
+                    "id": "f1331307-878a-4caa-84b6-451ef641fa3c",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -6.000000000000001,
+                    "shearN": 1.0215260416666667,
+                    "slipMm": 0,
+                    "utilization": 0.07607923034348302
+                  },
+                  {
+                    "id": "f2001500-96b2-4d14-8b29-cb126e966d9c",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -6.000000000000001,
+                    "shearN": 1.0215260416666667,
+                    "slipMm": 0,
+                    "utilization": 0.07607923034348302
+                  },
+                  {
+                    "id": "5ee417ff-0176-4ecc-9c84-d97eb3739092",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -6.000000000000001,
+                    "shearN": 1.0215260416666667,
+                    "slipMm": 0,
+                    "utilization": 0.07607923034348302
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 15,
+                "normalForceN": 2.538147788654635,
+                "tangentialForceN": 4.736248252188846,
+                "displacement": {
+                  "z": -0.05492370442269074,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.05492370442269074
+                },
+                "tangentialMm": 0.019734367717453523,
+                "residualN": 0,
+                "contacts": [
+                  {
+                    "id": "28393693-ee77-4208-b95c-7d2f0afcdce3",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.2450762955773093,
+                    "normalN": 24.50762955773093,
+                    "shearN": 0.7893747086981409,
+                    "slipMm": 0,
+                    "utilization": 0.3063453694716366
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "5c0cfa2f-60bc-4283-8dd5-f736e2251b1e",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -5.492370442269074,
+                    "shearN": 0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.06975374793708464
+                  },
+                  {
+                    "id": "f1331307-878a-4caa-84b6-451ef641fa3c",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -5.492370442269074,
+                    "shearN": 0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.06975374793708464
+                  },
+                  {
+                    "id": "f2001500-96b2-4d14-8b29-cb126e966d9c",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -5.492370442269074,
+                    "shearN": 0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.06975374793708464
+                  },
+                  {
+                    "id": "5ee417ff-0176-4ecc-9c84-d97eb3739092",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -5.492370442269074,
+                    "shearN": 0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.06975374793708464
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 30,
+                "normalForceN": 4.903324999999999,
+                "tangentialForceN": 4.2464040130113325,
+                "displacement": {
+                  "z": -0.05019335000000001,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.05019335000000001
+                },
+                "tangentialMm": 0.017693350054213887,
+                "residualN": 0,
+                "contacts": [
+                  {
+                    "id": "28393693-ee77-4208-b95c-7d2f0afcdce3",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.24980665000000002,
+                    "normalN": 24.980665000000002,
+                    "shearN": 0.7077340021685554,
+                    "slipMm": 0,
+                    "utilization": 0.3122583125
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "5c0cfa2f-60bc-4283-8dd5-f736e2251b1e",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -5.019335000000001,
+                    "shearN": 0.8846675027106944,
+                    "slipMm": 0,
+                    "utilization": 0.06370876170190579
+                  },
+                  {
+                    "id": "f1331307-878a-4caa-84b6-451ef641fa3c",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -5.019335000000001,
+                    "shearN": 0.8846675027106944,
+                    "slipMm": 0,
+                    "utilization": 0.06370876170190579
+                  },
+                  {
+                    "id": "f2001500-96b2-4d14-8b29-cb126e966d9c",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -5.019335000000001,
+                    "shearN": 0.8846675027106944,
+                    "slipMm": 0,
+                    "utilization": 0.06370876170190579
+                  },
+                  {
+                    "id": "5ee417ff-0176-4ecc-9c84-d97eb3739092",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -5.019335000000001,
+                    "shearN": 0.8846675027106944,
+                    "slipMm": 0,
+                    "utilization": 0.06370876170190579
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 45,
+                "normalForceN": 6.934348715723055,
+                "tangentialForceN": 3.4671743578615284,
+                "displacement": {
+                  "z": -0.0461313025685539,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.0461313025685539
+                },
+                "tangentialMm": 0.014446559824423034,
+                "residualN": 3.552713678800501E-15,
+                "contacts": [
+                  {
+                    "id": "28393693-ee77-4208-b95c-7d2f0afcdce3",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.25386869743144613,
+                    "normalN": 25.386869743144615,
+                    "shearN": 0.5778623929769213,
+                    "slipMm": 0,
+                    "utilization": 0.31733587178930767
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "5c0cfa2f-60bc-4283-8dd5-f736e2251b1e",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -4.613130256855389,
+                    "shearN": 0.7223279912211518,
+                    "slipMm": 0,
+                    "utilization": 0.05836673990491108
+                  },
+                  {
+                    "id": "f1331307-878a-4caa-84b6-451ef641fa3c",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -4.613130256855389,
+                    "shearN": 0.7223279912211518,
+                    "slipMm": 0,
+                    "utilization": 0.05836673990491108
+                  },
+                  {
+                    "id": "f2001500-96b2-4d14-8b29-cb126e966d9c",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -4.613130256855389,
+                    "shearN": 0.7223279912211518,
+                    "slipMm": 0,
+                    "utilization": 0.05836673990491108
+                  },
+                  {
+                    "id": "5ee417ff-0176-4ecc-9c84-d97eb3739092",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -4.613130256855389,
+                    "shearN": 0.7223279912211518,
+                    "slipMm": 0,
+                    "utilization": 0.05836673990491108
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 60,
+                "normalForceN": 8.492808026022665,
+                "tangentialForceN": 2.4516625000000016,
+                "displacement": {
+                  "z": -0.04301438394795469,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.04301438394795469
+                },
+                "tangentialMm": 0.010215260416666674,
+                "residualN": 7.105427357601002E-15,
+                "contacts": [
+                  {
+                    "id": "28393693-ee77-4208-b95c-7d2f0afcdce3",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.25698561605204534,
+                    "normalN": 25.698561605204535,
+                    "shearN": 0.408610416666667,
+                    "slipMm": 0,
+                    "utilization": 0.32123202006505663
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "5c0cfa2f-60bc-4283-8dd5-f736e2251b1e",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -4.301438394795469,
+                    "shearN": 0.5107630208333337,
+                    "slipMm": 0,
+                    "utilization": 0.05414571071376438
+                  },
+                  {
+                    "id": "f1331307-878a-4caa-84b6-451ef641fa3c",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -4.301438394795469,
+                    "shearN": 0.5107630208333337,
+                    "slipMm": 0,
+                    "utilization": 0.05414571071376438
+                  },
+                  {
+                    "id": "f2001500-96b2-4d14-8b29-cb126e966d9c",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -4.301438394795469,
+                    "shearN": 0.5107630208333337,
+                    "slipMm": 0,
+                    "utilization": 0.05414571071376438
+                  },
+                  {
+                    "id": "5ee417ff-0176-4ecc-9c84-d97eb3739092",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -4.301438394795469,
+                    "shearN": 0.5107630208333337,
+                    "slipMm": 0,
+                    "utilization": 0.05414571071376438
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 75,
+                "normalForceN": 9.472496504377691,
+                "tangentialForceN": 1.2690738943273165,
+                "displacement": {
+                  "z": -0.04105500699124463,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.04105500699124463
+                },
+                "tangentialMm": 0.005287807893030485,
+                "residualN": 3.552713678800501E-15,
+                "contacts": [
+                  {
+                    "id": "28393693-ee77-4208-b95c-7d2f0afcdce3",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.2589449930087554,
+                    "normalN": 25.89449930087554,
+                    "shearN": 0.2115123157212194,
+                    "slipMm": 0,
+                    "utilization": 0.3236812412609442
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "5c0cfa2f-60bc-4283-8dd5-f736e2251b1e",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -4.105500699124463,
+                    "shearN": 0.26439039465152425,
+                    "slipMm": 0,
+                    "utilization": 0.051425064218627026
+                  },
+                  {
+                    "id": "f1331307-878a-4caa-84b6-451ef641fa3c",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -4.105500699124463,
+                    "shearN": 0.26439039465152425,
+                    "slipMm": 0,
+                    "utilization": 0.051425064218627026
+                  },
+                  {
+                    "id": "f2001500-96b2-4d14-8b29-cb126e966d9c",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -4.105500699124463,
+                    "shearN": 0.26439039465152425,
+                    "slipMm": 0,
+                    "utilization": 0.051425064218627026
+                  },
+                  {
+                    "id": "5ee417ff-0176-4ecc-9c84-d97eb3739092",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -4.105500699124463,
+                    "shearN": 0.26439039465152425,
+                    "slipMm": 0,
+                    "utilization": 0.051425064218627026
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 90,
+                "normalForceN": 9.80665,
+                "tangentialForceN": 6.004841266429195E-16,
+                "displacement": {
+                  "z": -0.04038670000000001,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.04038670000000001
+                },
+                "tangentialMm": 2.502017194345497E-18,
+                "residualN": 1.9721522630525295E-31,
+                "contacts": [
+                  {
+                    "id": "28393693-ee77-4208-b95c-7d2f0afcdce3",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.25961330000000005,
+                    "normalN": 25.961330000000004,
+                    "shearN": 1.0008068777381988E-16,
+                    "slipMm": 0,
+                    "utilization": 0.32451662500000006
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "5c0cfa2f-60bc-4283-8dd5-f736e2251b1e",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -4.0386700000000015,
+                    "shearN": 1.2510085971727486E-16,
+                    "slipMm": 0,
+                    "utilization": 0.05048337500000002
+                  },
+                  {
+                    "id": "f1331307-878a-4caa-84b6-451ef641fa3c",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -4.0386700000000015,
+                    "shearN": 1.2510085971727486E-16,
+                    "slipMm": 0,
+                    "utilization": 0.05048337500000002
+                  },
+                  {
+                    "id": "f2001500-96b2-4d14-8b29-cb126e966d9c",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -4.0386700000000015,
+                    "shearN": 1.2510085971727486E-16,
+                    "slipMm": 0,
+                    "utilization": 0.05048337500000002
+                  },
+                  {
+                    "id": "5ee417ff-0176-4ecc-9c84-d97eb3739092",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -4.0386700000000015,
+                    "shearN": 1.2510085971727486E-16,
+                    "slipMm": 0,
+                    "utilization": 0.05048337500000002
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 105,
+                "normalForceN": 9.472496504377691,
+                "tangentialForceN": -1.2690738943273177,
+                "displacement": {
+                  "z": -0.04105500699124463,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.04105500699124463
+                },
+                "tangentialMm": -0.00528780789303049,
+                "residualN": 3.552713678800501E-15,
+                "contacts": [
+                  {
+                    "id": "28393693-ee77-4208-b95c-7d2f0afcdce3",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.2589449930087554,
+                    "normalN": 25.89449930087554,
+                    "shearN": -0.2115123157212196,
+                    "slipMm": 0,
+                    "utilization": 0.3236812412609442
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "5c0cfa2f-60bc-4283-8dd5-f736e2251b1e",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -4.105500699124463,
+                    "shearN": -0.26439039465152453,
+                    "slipMm": 0,
+                    "utilization": 0.051425064218627026
+                  },
+                  {
+                    "id": "f1331307-878a-4caa-84b6-451ef641fa3c",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -4.105500699124463,
+                    "shearN": -0.26439039465152453,
+                    "slipMm": 0,
+                    "utilization": 0.051425064218627026
+                  },
+                  {
+                    "id": "f2001500-96b2-4d14-8b29-cb126e966d9c",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -4.105500699124463,
+                    "shearN": -0.26439039465152453,
+                    "slipMm": 0,
+                    "utilization": 0.051425064218627026
+                  },
+                  {
+                    "id": "5ee417ff-0176-4ecc-9c84-d97eb3739092",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -4.105500699124463,
+                    "shearN": -0.26439039465152453,
+                    "slipMm": 0,
+                    "utilization": 0.051425064218627026
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 120,
+                "normalForceN": 8.492808026022665,
+                "tangentialForceN": -2.4516624999999985,
+                "displacement": {
+                  "z": -0.04301438394795469,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.04301438394795469
+                },
+                "tangentialMm": -0.01021526041666666,
+                "residualN": 7.105427357601002E-15,
+                "contacts": [
+                  {
+                    "id": "28393693-ee77-4208-b95c-7d2f0afcdce3",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.25698561605204534,
+                    "normalN": 25.698561605204535,
+                    "shearN": -0.4086104166666664,
+                    "slipMm": 0,
+                    "utilization": 0.32123202006505663
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "5c0cfa2f-60bc-4283-8dd5-f736e2251b1e",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -4.301438394795469,
+                    "shearN": -0.510763020833333,
+                    "slipMm": 0,
+                    "utilization": 0.05414571071376438
+                  },
+                  {
+                    "id": "f1331307-878a-4caa-84b6-451ef641fa3c",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -4.301438394795469,
+                    "shearN": -0.510763020833333,
+                    "slipMm": 0,
+                    "utilization": 0.05414571071376438
+                  },
+                  {
+                    "id": "f2001500-96b2-4d14-8b29-cb126e966d9c",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -4.301438394795469,
+                    "shearN": -0.510763020833333,
+                    "slipMm": 0,
+                    "utilization": 0.05414571071376438
+                  },
+                  {
+                    "id": "5ee417ff-0176-4ecc-9c84-d97eb3739092",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -4.301438394795469,
+                    "shearN": -0.510763020833333,
+                    "slipMm": 0,
+                    "utilization": 0.05414571071376438
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 135,
+                "normalForceN": 6.934348715723057,
+                "tangentialForceN": -3.4671743578615275,
+                "displacement": {
+                  "z": -0.04613130256855389,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.04613130256855389
+                },
+                "tangentialMm": -0.014446559824423031,
+                "residualN": 0,
+                "contacts": [
+                  {
+                    "id": "28393693-ee77-4208-b95c-7d2f0afcdce3",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.25386869743144613,
+                    "normalN": 25.386869743144615,
+                    "shearN": -0.5778623929769212,
+                    "slipMm": 0,
+                    "utilization": 0.31733587178930767
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "5c0cfa2f-60bc-4283-8dd5-f736e2251b1e",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -4.613130256855389,
+                    "shearN": -0.7223279912211515,
+                    "slipMm": 0,
+                    "utilization": 0.05836673990491108
+                  },
+                  {
+                    "id": "f1331307-878a-4caa-84b6-451ef641fa3c",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -4.613130256855389,
+                    "shearN": -0.7223279912211515,
+                    "slipMm": 0,
+                    "utilization": 0.05836673990491108
+                  },
+                  {
+                    "id": "f2001500-96b2-4d14-8b29-cb126e966d9c",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -4.613130256855389,
+                    "shearN": -0.7223279912211515,
+                    "slipMm": 0,
+                    "utilization": 0.05836673990491108
+                  },
+                  {
+                    "id": "5ee417ff-0176-4ecc-9c84-d97eb3739092",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -4.613130256855389,
+                    "shearN": -0.7223279912211515,
+                    "slipMm": 0,
+                    "utilization": 0.05836673990491108
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 150,
+                "normalForceN": 4.903324999999999,
+                "tangentialForceN": -4.246404013011333,
+                "displacement": {
+                  "z": -0.05019335000000001,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.05019335000000001
+                },
+                "tangentialMm": -0.017693350054213887,
+                "residualN": 8.881784197001252E-16,
+                "contacts": [
+                  {
+                    "id": "28393693-ee77-4208-b95c-7d2f0afcdce3",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.24980665000000002,
+                    "normalN": 24.980665000000002,
+                    "shearN": -0.7077340021685554,
+                    "slipMm": 0,
+                    "utilization": 0.3122583125
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "5c0cfa2f-60bc-4283-8dd5-f736e2251b1e",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -5.019335000000001,
+                    "shearN": -0.8846675027106944,
+                    "slipMm": 0,
+                    "utilization": 0.06370876170190579
+                  },
+                  {
+                    "id": "f1331307-878a-4caa-84b6-451ef641fa3c",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -5.019335000000001,
+                    "shearN": -0.8846675027106944,
+                    "slipMm": 0,
+                    "utilization": 0.06370876170190579
+                  },
+                  {
+                    "id": "f2001500-96b2-4d14-8b29-cb126e966d9c",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -5.019335000000001,
+                    "shearN": -0.8846675027106944,
+                    "slipMm": 0,
+                    "utilization": 0.06370876170190579
+                  },
+                  {
+                    "id": "5ee417ff-0176-4ecc-9c84-d97eb3739092",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -5.019335000000001,
+                    "shearN": -0.8846675027106944,
+                    "slipMm": 0,
+                    "utilization": 0.06370876170190579
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 165,
+                "normalForceN": 2.5381477886546375,
+                "tangentialForceN": -4.736248252188846,
+                "displacement": {
+                  "z": -0.05492370442269073,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.05492370442269073
+                },
+                "tangentialMm": -0.019734367717453523,
+                "residualN": 0,
+                "contacts": [
+                  {
+                    "id": "28393693-ee77-4208-b95c-7d2f0afcdce3",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.2450762955773093,
+                    "normalN": 24.50762955773093,
+                    "shearN": -0.7893747086981409,
+                    "slipMm": 0,
+                    "utilization": 0.3063453694716366
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "5c0cfa2f-60bc-4283-8dd5-f736e2251b1e",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -5.492370442269073,
+                    "shearN": -0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.06975374793708462
+                  },
+                  {
+                    "id": "f1331307-878a-4caa-84b6-451ef641fa3c",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -5.492370442269073,
+                    "shearN": -0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.06975374793708462
+                  },
+                  {
+                    "id": "f2001500-96b2-4d14-8b29-cb126e966d9c",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -5.492370442269073,
+                    "shearN": -0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.06975374793708462
+                  },
+                  {
+                    "id": "5ee417ff-0176-4ecc-9c84-d97eb3739092",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -5.492370442269073,
+                    "shearN": -0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.06975374793708462
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 180,
+                "normalForceN": 1.200968253285839E-15,
+                "tangentialForceN": -4.903325,
+                "displacement": {
+                  "z": -0.060000000000000005,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.060000000000000005
+                },
+                "tangentialMm": -0.020430520833333334,
+                "residualN": 8.881784197001252E-16,
+                "contacts": [
+                  {
+                    "id": "28393693-ee77-4208-b95c-7d2f0afcdce3",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.24000000000000005,
+                    "normalN": 24.000000000000004,
+                    "shearN": -0.8172208333333333,
+                    "slipMm": 0,
+                    "utilization": 0.30000000000000004
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "5c0cfa2f-60bc-4283-8dd5-f736e2251b1e",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -6.000000000000001,
+                    "shearN": -1.0215260416666667,
+                    "slipMm": 0,
+                    "utilization": 0.07607923034348302
+                  },
+                  {
+                    "id": "f1331307-878a-4caa-84b6-451ef641fa3c",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -6.000000000000001,
+                    "shearN": -1.0215260416666667,
+                    "slipMm": 0,
+                    "utilization": 0.07607923034348302
+                  },
+                  {
+                    "id": "f2001500-96b2-4d14-8b29-cb126e966d9c",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -6.000000000000001,
+                    "shearN": -1.0215260416666667,
+                    "slipMm": 0,
+                    "utilization": 0.07607923034348302
+                  },
+                  {
+                    "id": "5ee417ff-0176-4ecc-9c84-d97eb3739092",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -6.000000000000001,
+                    "shearN": -1.0215260416666667,
+                    "slipMm": 0,
+                    "utilization": 0.07607923034348302
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 195,
+                "normalForceN": -2.538147788654631,
+                "tangentialForceN": -4.7362482521888465,
+                "displacement": {
+                  "z": -0.06507629557730928,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.06507629557730928
+                },
+                "tangentialMm": -0.019734367717453523,
+                "residualN": 3.552713678800501E-15,
+                "contacts": [
+                  {
+                    "id": "28393693-ee77-4208-b95c-7d2f0afcdce3",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.23492370442269078,
+                    "normalN": 23.492370442269078,
+                    "shearN": -0.7893747086981409,
+                    "slipMm": 0,
+                    "utilization": 0.29365463052836344
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "5c0cfa2f-60bc-4283-8dd5-f736e2251b1e",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -6.507629557730928,
+                    "shearN": -0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.08227512499389664
+                  },
+                  {
+                    "id": "f1331307-878a-4caa-84b6-451ef641fa3c",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -6.507629557730928,
+                    "shearN": -0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.08227512499389664
+                  },
+                  {
+                    "id": "f2001500-96b2-4d14-8b29-cb126e966d9c",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -6.507629557730928,
+                    "shearN": -0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.08227512499389664
+                  },
+                  {
+                    "id": "5ee417ff-0176-4ecc-9c84-d97eb3739092",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -6.507629557730928,
+                    "shearN": -0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.08227512499389664
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 210,
+                "normalForceN": -4.903325000000001,
+                "tangentialForceN": -4.2464040130113325,
+                "displacement": {
+                  "z": -0.06980665000000003,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.06980665000000003
+                },
+                "tangentialMm": -0.017693350054213887,
+                "residualN": 1.0658141036401503E-14,
+                "contacts": [
+                  {
+                    "id": "28393693-ee77-4208-b95c-7d2f0afcdce3",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.23019335000000002,
+                    "normalN": 23.019335,
+                    "shearN": -0.7077340021685554,
+                    "slipMm": 0,
+                    "utilization": 0.2877416875
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "5c0cfa2f-60bc-4283-8dd5-f736e2251b1e",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -6.980665000000003,
+                    "shearN": -0.8846675027106944,
+                    "slipMm": 0,
+                    "utilization": 0.08795623950346115
+                  },
+                  {
+                    "id": "f1331307-878a-4caa-84b6-451ef641fa3c",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -6.980665000000003,
+                    "shearN": -0.8846675027106944,
+                    "slipMm": 0,
+                    "utilization": 0.08795623950346115
+                  },
+                  {
+                    "id": "f2001500-96b2-4d14-8b29-cb126e966d9c",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -6.980665000000003,
+                    "shearN": -0.8846675027106944,
+                    "slipMm": 0,
+                    "utilization": 0.08795623950346115
+                  },
+                  {
+                    "id": "5ee417ff-0176-4ecc-9c84-d97eb3739092",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -6.980665000000003,
+                    "shearN": -0.8846675027106944,
+                    "slipMm": 0,
+                    "utilization": 0.08795623950346115
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 225,
+                "normalForceN": -6.934348715723055,
+                "tangentialForceN": -3.467174357861529,
+                "displacement": {
+                  "z": -0.07386869743144611,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.07386869743144611
+                },
+                "tangentialMm": -0.014446559824423038,
+                "residualN": 0,
+                "contacts": [
+                  {
+                    "id": "28393693-ee77-4208-b95c-7d2f0afcdce3",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.22613130256855393,
+                    "normalN": 22.613130256855392,
+                    "shearN": -0.5778623929769215,
+                    "slipMm": 0,
+                    "utilization": 0.2826641282106924
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "5c0cfa2f-60bc-4283-8dd5-f736e2251b1e",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -7.3868697431446115,
+                    "shearN": -0.7223279912211519,
+                    "slipMm": 0,
+                    "utilization": 0.09277627856257133
+                  },
+                  {
+                    "id": "f1331307-878a-4caa-84b6-451ef641fa3c",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -7.3868697431446115,
+                    "shearN": -0.7223279912211519,
+                    "slipMm": 0,
+                    "utilization": 0.09277627856257133
+                  },
+                  {
+                    "id": "f2001500-96b2-4d14-8b29-cb126e966d9c",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -7.3868697431446115,
+                    "shearN": -0.7223279912211519,
+                    "slipMm": 0,
+                    "utilization": 0.09277627856257133
+                  },
+                  {
+                    "id": "5ee417ff-0176-4ecc-9c84-d97eb3739092",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -7.3868697431446115,
+                    "shearN": -0.7223279912211519,
+                    "slipMm": 0,
+                    "utilization": 0.09277627856257133
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 240,
+                "normalForceN": -8.492808026022661,
+                "tangentialForceN": -2.451662500000002,
+                "displacement": {
+                  "z": -0.07698561605204533,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.07698561605204533
+                },
+                "tangentialMm": -0.010215260416666674,
+                "residualN": 3.552713678800501E-15,
+                "contacts": [
+                  {
+                    "id": "28393693-ee77-4208-b95c-7d2f0afcdce3",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.2230143839479547,
+                    "normalN": 22.30143839479547,
+                    "shearN": -0.408610416666667,
+                    "slipMm": 0,
+                    "utilization": 0.27876797993494334
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "5c0cfa2f-60bc-4283-8dd5-f736e2251b1e",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -7.698561605204533,
+                    "shearN": -0.5107630208333337,
+                    "slipMm": 0,
+                    "utilization": 0.09644357940379264
+                  },
+                  {
+                    "id": "f1331307-878a-4caa-84b6-451ef641fa3c",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -7.698561605204533,
+                    "shearN": -0.5107630208333337,
+                    "slipMm": 0,
+                    "utilization": 0.09644357940379264
+                  },
+                  {
+                    "id": "f2001500-96b2-4d14-8b29-cb126e966d9c",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -7.698561605204533,
+                    "shearN": -0.5107630208333337,
+                    "slipMm": 0,
+                    "utilization": 0.09644357940379264
+                  },
+                  {
+                    "id": "5ee417ff-0176-4ecc-9c84-d97eb3739092",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -7.698561605204533,
+                    "shearN": -0.5107630208333337,
+                    "slipMm": 0,
+                    "utilization": 0.09644357940379264
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 255,
+                "normalForceN": -9.472496504377691,
+                "tangentialForceN": -1.2690738943273172,
+                "displacement": {
+                  "z": -0.07894499300875539,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.07894499300875539
+                },
+                "tangentialMm": -0.005287807893030488,
+                "residualN": 3.552713678800501E-15,
+                "contacts": [
+                  {
+                    "id": "28393693-ee77-4208-b95c-7d2f0afcdce3",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.22105500699124464,
+                    "normalN": 22.105500699124462,
+                    "shearN": -0.21151231572121953,
+                    "slipMm": 0,
+                    "utilization": 0.27631875873905576
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "5c0cfa2f-60bc-4283-8dd5-f736e2251b1e",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -7.894499300875539,
+                    "shearN": -0.2643903946515244,
+                    "slipMm": 0,
+                    "utilization": 0.09873656672263413
+                  },
+                  {
+                    "id": "f1331307-878a-4caa-84b6-451ef641fa3c",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -7.894499300875539,
+                    "shearN": -0.2643903946515244,
+                    "slipMm": 0,
+                    "utilization": 0.09873656672263413
+                  },
+                  {
+                    "id": "f2001500-96b2-4d14-8b29-cb126e966d9c",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -7.894499300875539,
+                    "shearN": -0.2643903946515244,
+                    "slipMm": 0,
+                    "utilization": 0.09873656672263413
+                  },
+                  {
+                    "id": "5ee417ff-0176-4ecc-9c84-d97eb3739092",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -7.894499300875539,
+                    "shearN": -0.2643903946515244,
+                    "slipMm": 0,
+                    "utilization": 0.09873656672263413
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 270,
+                "normalForceN": -9.80665,
+                "tangentialForceN": -1.200968253285839E-15,
+                "displacement": {
+                  "z": -0.0796133,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.0796133
+                },
+                "tangentialMm": -5.004034388690994E-18,
+                "residualN": 3.944304526105059E-31,
+                "contacts": [
+                  {
+                    "id": "28393693-ee77-4208-b95c-7d2f0afcdce3",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.22038670000000005,
+                    "normalN": 22.038670000000003,
+                    "shearN": -2.0016137554763977E-16,
+                    "slipMm": 0,
+                    "utilization": 0.27548337500000003
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "5c0cfa2f-60bc-4283-8dd5-f736e2251b1e",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -7.96133,
+                    "shearN": -2.502017194345497E-16,
+                    "slipMm": 0,
+                    "utilization": 0.099516625
+                  },
+                  {
+                    "id": "f1331307-878a-4caa-84b6-451ef641fa3c",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -7.96133,
+                    "shearN": -2.502017194345497E-16,
+                    "slipMm": 0,
+                    "utilization": 0.099516625
+                  },
+                  {
+                    "id": "f2001500-96b2-4d14-8b29-cb126e966d9c",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -7.96133,
+                    "shearN": -2.502017194345497E-16,
+                    "slipMm": 0,
+                    "utilization": 0.099516625
+                  },
+                  {
+                    "id": "5ee417ff-0176-4ecc-9c84-d97eb3739092",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -7.96133,
+                    "shearN": -2.502017194345497E-16,
+                    "slipMm": 0,
+                    "utilization": 0.099516625
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 285,
+                "normalForceN": -9.47249650437769,
+                "tangentialForceN": 1.269073894327319,
+                "displacement": {
+                  "z": -0.07894499300875538,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.07894499300875538
+                },
+                "tangentialMm": 0.005287807893030495,
+                "residualN": 3.552713678800501E-15,
+                "contacts": [
+                  {
+                    "id": "28393693-ee77-4208-b95c-7d2f0afcdce3",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.22105500699124467,
+                    "normalN": 22.105500699124466,
+                    "shearN": 0.2115123157212198,
+                    "slipMm": 0,
+                    "utilization": 0.2763187587390558
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "5c0cfa2f-60bc-4283-8dd5-f736e2251b1e",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -7.8944993008755375,
+                    "shearN": 0.26439039465152475,
+                    "slipMm": 0,
+                    "utilization": 0.09873656672263412
+                  },
+                  {
+                    "id": "f1331307-878a-4caa-84b6-451ef641fa3c",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -7.8944993008755375,
+                    "shearN": 0.26439039465152475,
+                    "slipMm": 0,
+                    "utilization": 0.09873656672263412
+                  },
+                  {
+                    "id": "f2001500-96b2-4d14-8b29-cb126e966d9c",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -7.8944993008755375,
+                    "shearN": 0.26439039465152475,
+                    "slipMm": 0,
+                    "utilization": 0.09873656672263412
+                  },
+                  {
+                    "id": "5ee417ff-0176-4ecc-9c84-d97eb3739092",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -7.8944993008755375,
+                    "shearN": 0.26439039465152475,
+                    "slipMm": 0,
+                    "utilization": 0.09873656672263412
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 300,
+                "normalForceN": -8.492808026022665,
+                "tangentialForceN": 2.4516625,
+                "displacement": {
+                  "z": -0.07698561605204535,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.07698561605204535
+                },
+                "tangentialMm": 0.010215260416666667,
+                "residualN": 7.105427357601002E-15,
+                "contacts": [
+                  {
+                    "id": "28393693-ee77-4208-b95c-7d2f0afcdce3",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.2230143839479547,
+                    "normalN": 22.30143839479547,
+                    "shearN": 0.40861041666666664,
+                    "slipMm": 0,
+                    "utilization": 0.27876797993494334
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "5c0cfa2f-60bc-4283-8dd5-f736e2251b1e",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -7.698561605204535,
+                    "shearN": 0.5107630208333334,
+                    "slipMm": 0,
+                    "utilization": 0.09644357940379265
+                  },
+                  {
+                    "id": "f1331307-878a-4caa-84b6-451ef641fa3c",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -7.698561605204535,
+                    "shearN": 0.5107630208333334,
+                    "slipMm": 0,
+                    "utilization": 0.09644357940379265
+                  },
+                  {
+                    "id": "f2001500-96b2-4d14-8b29-cb126e966d9c",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -7.698561605204535,
+                    "shearN": 0.5107630208333334,
+                    "slipMm": 0,
+                    "utilization": 0.09644357940379265
+                  },
+                  {
+                    "id": "5ee417ff-0176-4ecc-9c84-d97eb3739092",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -7.698561605204535,
+                    "shearN": 0.5107630208333334,
+                    "slipMm": 0,
+                    "utilization": 0.09644357940379265
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 315,
+                "normalForceN": -6.934348715723058,
+                "tangentialForceN": 3.467174357861527,
+                "displacement": {
+                  "z": -0.07386869743144613,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.07386869743144613
+                },
+                "tangentialMm": 0.014446559824423028,
+                "residualN": 8.881784197001252E-16,
+                "contacts": [
+                  {
+                    "id": "28393693-ee77-4208-b95c-7d2f0afcdce3",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.2261313025685539,
+                    "normalN": 22.613130256855392,
+                    "shearN": 0.5778623929769211,
+                    "slipMm": 0,
+                    "utilization": 0.28266412821069237
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "5c0cfa2f-60bc-4283-8dd5-f736e2251b1e",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -7.386869743144612,
+                    "shearN": 0.7223279912211513,
+                    "slipMm": 0,
+                    "utilization": 0.09277627856257134
+                  },
+                  {
+                    "id": "f1331307-878a-4caa-84b6-451ef641fa3c",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -7.386869743144612,
+                    "shearN": 0.7223279912211513,
+                    "slipMm": 0,
+                    "utilization": 0.09277627856257134
+                  },
+                  {
+                    "id": "f2001500-96b2-4d14-8b29-cb126e966d9c",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -7.386869743144612,
+                    "shearN": 0.7223279912211513,
+                    "slipMm": 0,
+                    "utilization": 0.09277627856257134
+                  },
+                  {
+                    "id": "5ee417ff-0176-4ecc-9c84-d97eb3739092",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -7.386869743144612,
+                    "shearN": 0.7223279912211513,
+                    "slipMm": 0,
+                    "utilization": 0.09277627856257134
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 330,
+                "normalForceN": -4.903325000000004,
+                "tangentialForceN": 4.246404013011331,
+                "displacement": {
+                  "z": -0.06980665000000001,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.06980665000000001
+                },
+                "tangentialMm": 0.017693350054213873,
+                "residualN": 3.552713678800501E-15,
+                "contacts": [
+                  {
+                    "id": "28393693-ee77-4208-b95c-7d2f0afcdce3",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.23019335000000002,
+                    "normalN": 23.019335,
+                    "shearN": 0.707734002168555,
+                    "slipMm": 0,
+                    "utilization": 0.2877416875
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "5c0cfa2f-60bc-4283-8dd5-f736e2251b1e",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -6.980665000000001,
+                    "shearN": 0.8846675027106936,
+                    "slipMm": 0,
+                    "utilization": 0.08795623950346113
+                  },
+                  {
+                    "id": "f1331307-878a-4caa-84b6-451ef641fa3c",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -6.980665000000001,
+                    "shearN": 0.8846675027106936,
+                    "slipMm": 0,
+                    "utilization": 0.08795623950346113
+                  },
+                  {
+                    "id": "f2001500-96b2-4d14-8b29-cb126e966d9c",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -6.980665000000001,
+                    "shearN": 0.8846675027106936,
+                    "slipMm": 0,
+                    "utilization": 0.08795623950346113
+                  },
+                  {
+                    "id": "5ee417ff-0176-4ecc-9c84-d97eb3739092",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -6.980665000000001,
+                    "shearN": 0.8846675027106936,
+                    "slipMm": 0,
+                    "utilization": 0.08795623950346113
+                  }
+                ]
+              },
+              {
+                "phaseDegrees": 345,
+                "normalForceN": -2.5381477886546344,
+                "tangentialForceN": 4.736248252188846,
+                "displacement": {
+                  "z": -0.06507629557730928,
+                  "x": 0,
+                  "y": 0,
+                  "norm": 0.06507629557730928
+                },
+                "tangentialMm": 0.019734367717453523,
+                "residualN": 0,
+                "contacts": [
+                  {
+                    "id": "28393693-ee77-4208-b95c-7d2f0afcdce3",
+                    "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+                    "compressionMm": 0.23492370442269078,
+                    "normalN": 23.492370442269078,
+                    "shearN": 0.7893747086981409,
+                    "slipMm": 0,
+                    "utilization": 0.29365463052836344
+                  }
+                ],
+                "clips": [
+                  {
+                    "id": "5c0cfa2f-60bc-4283-8dd5-f736e2251b1e",
+                    "name": "\u5DE6\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -6.507629557730928,
+                    "shearN": 0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.08227512499389664
+                  },
+                  {
+                    "id": "f1331307-878a-4caa-84b6-451ef641fa3c",
+                    "name": "\u53F3\u4E0B\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -6.507629557730928,
+                    "shearN": 0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.08227512499389664
+                  },
+                  {
+                    "id": "f2001500-96b2-4d14-8b29-cb126e966d9c",
+                    "name": "\u53F3\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -6.507629557730928,
+                    "shearN": 0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.08227512499389664
+                  },
+                  {
+                    "id": "5ee417ff-0176-4ecc-9c84-d97eb3739092",
+                    "name": "\u5DE6\u4E0A\u5361\u6263",
+                    "compressionMm": 0,
+                    "normalN": -6.507629557730928,
+                    "shearN": 0.9867183858726761,
+                    "slipMm": 0,
+                    "utilization": 0.08227512499389664
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "separationPoints": 0,
+        "slidingPoints": 0,
+        "overLimitPoints": 0
+      }
+    ]
+  }
+}

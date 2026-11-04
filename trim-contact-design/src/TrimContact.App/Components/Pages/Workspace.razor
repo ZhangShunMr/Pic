@@ -1,0 +1,85 @@
+@page "/"
+@inherits VmView
+@inject Microsoft.JSInterop.IJSRuntime JS
+<PageTitle>汽车内饰卡扣与防异响接触设计软件 V1.0</PageTitle>
+<header class="masthead">
+    <div><span class="eyebrow">TRIM CONTACT STUDIO · V1.0</span><h1>汽车内饰卡扣与防异响接触设计软件</h1></div>
+    <div class="project-chip"><strong>@Vm.Draft.Name</strong><span>@Vm.Draft.Origin.Label() · @(Vm.Project.Archived ? "已归档" : "工作项目")</span></div>
+</header>
+<div class="toolbar">
+    <button @onclick="Vm.NewProject" disabled="@Vm.Busy">新建项目</button>
+    <button @onclick="Vm.Demo" disabled="@Vm.Busy">载入模拟演示</button>
+    <button @onclick="Vm.CopyProject" disabled="@Vm.Busy">复制项目</button>
+    <button @onclick="() => Vm.Execute(Vm.ApplyDraft)" disabled="@(Vm.Busy || Vm.Project.Archived)">应用编辑</button>
+    <button class="primary" @onclick="Vm.Save" disabled="@Vm.Busy">保存项目</button>
+    <button @onclick="Vm.Undo" disabled="@(Vm.Busy || !Vm.Session.CanUndo)">撤销</button>
+    <button @onclick="Vm.Redo" disabled="@(Vm.Busy || !Vm.Session.CanRedo)">重做</button>
+    <button class="accent" @onclick="Vm.CalculateAsync" disabled="@Vm.Busy">计算全部方案</button>
+    @if (Vm.Busy)
+    {
+        <button @onclick="Vm.CancelCalculation">取消计算</button>
+    }
+    <span class="save-state">@(Vm.Dirty ? "有未保存内容" : "工作副本已同步")</span>
+</div>
+<div class="app-shell">
+    <nav aria-label="工作导航">
+        @foreach (var item in Tabs)
+        {
+            <button class="@(Vm.Tab == item.Name ? "nav-active" : "")" @onclick="() => Vm.Tab = item.Name">
+                <span>@item.Number</span>@item.Name
+            </button>
+        }
+        <div class="nav-note">刚性平面<br />准静态采样<br />工程筛查</div>
+    </nav>
+    <main>
+        <div class="notice">@Product.Boundary</div>
+        <div class="status @(Vm.IsError ? "error" : "")" role="status">@Vm.Status</div>
+        @if (Vm.Busy)
+        {
+            <progress max="100" value="@Vm.Progress"></progress>
+        }
+        @if (Vm.DownloadUrl is not null)
+        {
+            <p class="download"><a href="@Vm.DownloadUrl" download="@Vm.DownloadName">下载：@Vm.DownloadName</a> · 链接30分钟有效；保存位置由浏览器选择。</p>
+        }
+        <fieldset class="work-area" disabled="@Vm.Busy">
+            @switch (Vm.Tab)
+            {
+                case "项目": <ProjectPage /> break;
+                case "饰板": <PanelPage /> break;
+                case "布置": <LayoutPage /> break;
+                case "载荷": <LoadPage /> break;
+                case "批量导入": <ImportPage /> break;
+                case "工程复核": <QualityPage /> break;
+                case "平衡核查": <BalancePage /> break;
+                case "批量调整": <BatchPage /> break;
+                case "版本核对": <DifferencePage /> break;
+                case "结果": <ResultsPage /> break;
+                case "比较与扫描": <ComparePage /> break;
+                case "验证清单": <TasksPage /> break;
+                case "保存与交付": <DeliveryPage /> break;
+                case "模型说明": <HelpPage /> break;
+            }
+        </fieldset>
+    </main>
+</div>
+@if (Vm.PendingTitle.Length > 0)
+{
+    <div class="modal-backdrop"><section class="modal" role="dialog" aria-modal="true" aria-label="操作确认">
+        <h2>确认操作</h2><p>@Vm.PendingTitle</p>
+        <button class="danger" @onclick="Vm.Confirm">确认继续</button><button @onclick="Vm.CancelPending">取消</button>
+    </section></div>
+}
+<footer>输入编辑需应用；保存后再关闭窗口。模型 @Product.Method · 来源：@Vm.Draft.Source</footer>
+@code {
+    private static readonly (string Number, string Name)[] Tabs =
+    [
+        ("01", "项目"), ("02", "饰板"), ("03", "布置"), ("04", "载荷"), ("05", "结果"),
+        ("06", "比较与扫描"), ("07", "工程复核"), ("08", "批量导入"), ("09", "验证清单"), ("10", "批量调整"), ("11", "版本核对"), ("12", "保存与交付"), ("13", "平衡核查"), ("14", "模型说明")
+    ];
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try { await JS.InvokeVoidAsync("trimGuard", Vm.Dirty); }
+        catch (Microsoft.JSInterop.JSDisconnectedException) { }
+    }
+}

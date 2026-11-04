@@ -1,0 +1,46 @@
+PASS ordinary startup is blank manual project
+PASS empty calculation blocked with located reason
+PASS project metadata edits applied
+PASS rectangle contour created from blank
+PASS invalid zero mass rejected and corrected
+PASS variant created from blank
+PASS large invalid CSV reports located error without disconnect
+PASS CSV replacement preflight succeeds
+PASS modified CSV after preflight cannot apply stale preview
+PASS preflight import actually creates four clips and one contact
+PASS load created and saved in work object
+PASS calculation produces chart and nominal plus two tolerance corners
+PASS unapplied parameter edit invalidates old result view
+PASS copy variant supports independent design edits
+PASS same-condition two-variant comparison rendered
+PASS parameter scan completes and preserves current design
+PASS scan CSV actually downloaded with source
+PASS quality review shows simulation and model limitations
+PASS independent force and moment audit exported
+PASS result-derived verification tasks generated
+PASS verification generation deduplicates tasks
+PASS task completion requires evidence text
+PASS batch preview shows actual before and after values
+PASS batch apply undo redo affect real design parameters
+PASS project saved to actual disk library
+PASS project download retains two variants all inputs tasks and simulation
+PASS 导出HTML报告 actual browser download
+PASS 导出包络CSV actual browser download
+PASS 导出逐相位CSV actual browser download
+PASS 导出分析JSON actual browser download
+PASS 导出验证清单CSV actual browser download
+PASS analysis export full input and report hash agree
+PASS HTML includes source boundary and full project data
+PASS opening another project protects unsaved changes
+PASS actual disk reopen restores saved data
+PASS reopened project preserves both independently edited variants
+PASS reference file comparison finds zero differences after reopen
+PASS model formulas independent example and limitations visible
+PASS same ID import cannot silently overwrite disk project
+PASS copy project assigns new ID and can save imported object
+PASS archive yields readonly project
+PASS copy archived project allows new design
+PASS 980px layout has no document overflow
+PASS 390px layout has no document overflow
+PASS no uncaught browser page errors
+RESULT 45 checks passed

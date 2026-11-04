@@ -1,0 +1,85 @@
+PASS empty project may save but cannot calculate
+PASS fixed demonstration validates
+PASS independent symmetric static 1g displacement
+PASS independent symmetric clip force
+PASS zero load zero deflection without contacts
+PASS normal load sign reversal
+PASS mass scaling
+PASS preload equilibrium center displacement
+PASS preload equilibrium compression
+PASS preload equilibrium reaction force
+PASS preload clip reaction balance
+PASS open contact zero force
+PASS positive gap tolerance reduces compression
+PASS negative gap tolerance increases compression
+PASS contact cannot pull
+PASS independent tangential displacement for 10N
+PASS negative tangential symmetry
+PASS sticking contact shares shear force
+PASS Coulomb cap and shear closure
+PASS zero friction accepted and no contact shear
+PASS detached contact has no reported slip
+PASS asymmetric offset contact includes rotations
+PASS rotation and force independently balanced
+PASS 24 phases include 90 degrees
+PASS zero tolerances not duplicated
+PASS single nonzero tolerance gives nominal and 2 corners
+PASS six tolerances give nominal and 64 corners
+PASS all states residual bounded
+PASS cancellation honored
+PASS parameter sweep independently changes outcomes and preserves input
+PASS sweep invalid range rejected
+PASS source change invalidates results
+PASS task edits do not change input hash
+PASS unknown schema rejected
+PASS unknown field rejected
+PASS missing field rejected
+PASS duplicate JSON field rejected
+PASS null arrays rejected
+PASS truncated JSON rejected
+PASS oversize project rejected
+PASS duplicate point IDs rejected
+PASS nonfinite mass rejected
+PASS zero mass rejected
+PASS zero stiffness rejected
+PASS out of panel point rejected
+PASS self intersection rejected
+PASS collinear clips rejected
+PASS too many contacts rejected
+PASS polygon boundary accepted
+PASS completed task needs evidence
+PASS invalid task reference rejected
+PASS task generation deduplicates
+PASS delete contact retains task detached
+PASS copy variant creates fresh identities
+PASS session edit rollback on validation error
+PASS undo redo applied edit
+PASS archive blocks subsequent edit but copy allows
+PASS disk save reopen content and IDs
+PASS overwrite backs up prior file
+PASS external file change blocks overwrite
+PASS same ID import does not overwrite
+PASS portable embedded project opens in different library
+PASS corrupt library item visible as error
+PASS project Unicode round trip
+PASS CSV template preflight replace
+PASS CSV quoted multiline and escaped quote
+PASS CSV malformed quoting rejected
+PASS CSV header mismatch rejected
+PASS CSV invalid row rolls back
+PASS CSV expired preview blocked
+PASS batch preview and apply preserve original
+PASS batch out of outline rejects all changes
+PASS batch no change rejected
+PASS batch request changed after preview rejected
+PASS revision difference identifies common load change
+PASS revision difference identifies only design change
+PASS quality review source and tolerance sensitivity
+PASS HTML escapes user content
+PASS CSV formula injection neutralized
+PASS CSV negative physical numbers remain numeric
+PASS exports preserve source units method and input hash
+PASS frequency is label only
+PASS layout exchange CSV round trip preserves parameter values
+PASS randomized asymmetric contact states satisfy equilibrium and unilateral laws
+RESULT 84/84 passed

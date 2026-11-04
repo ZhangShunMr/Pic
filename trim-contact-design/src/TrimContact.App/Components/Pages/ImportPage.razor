@@ -1,0 +1,45 @@
+@inherits VmView
+<section class="page-heading"><div><span class="eyebrow">BATCH INPUT</span><h2>布置CSV批量导入</h2><p>预检后整批应用到选中方案。任何行错误均取消整个导入。</p></div></section>
+<div class="two-column">
+<section class="card">
+<h3>目标与格式</h3>
+<button @onclick="Vm.ExportLayoutCsv">导出当前布置CSV</button>
+<label>目标方案<select @bind="Vm.VariantId" @bind:after="Vm.Notify">
+@foreach (var variant in Vm.Draft.Variants)
+{
+    <option value="@variant.Id">@variant.Name</option>
+}
+</select></label>
+<label>导入模式<select @bind="Vm.CsvReplace"><option value="False">追加点位</option><option value="True">替换全部点位</option></select></label>
+<p>格式为UTF-8，逗号分隔，英文小数点，无千位符。字段含逗号或换行时用双引号包围，字段内双引号写为两个双引号。</p>
+<p>kind字段只接受Clip或Contact。卡扣仅填写坐标、双向刚度、合力限值，接触点填写坐标、刚度、间隙、公差、预紧、摩擦、允许压缩和材料。该类型不使用的列必须留空。</p>
+<button @onclick="Vm.DownloadCsvTemplate">生成布置CSV模板</button>
+@if (Vm.CsvTemplateUrl.Length > 0)
+{
+    <p><a href="@Vm.CsvTemplateUrl" download="布置导入模板-模拟.csv">下载CSV模板（模拟）</a></p>
+}
+<label>读取CSV文件（最多128KB）<InputFile OnChange="LoadFile" accept=".csv,text/csv" /></label>
+<p class="hint">最多100条数据记录；应用后仍受每方案12卡扣与6接触点限制。追加不按名称合并，重复坐标会在复核页提醒。</p>
+</section>
+<section class="card">
+<label>粘贴或编辑CSV<textarea rows="15" class="mono" @bind="Vm.CsvInput"></textarea></label>
+<div class="button-row"><button class="primary" @onclick="Vm.PreviewCsv" disabled="@Vm.Project.Archived">预检CSV</button><button @onclick="Vm.ApplyCsv" disabled="@(Vm.CsvPreview is null || Vm.Project.Archived)">应用预检导入</button></div>
+<pre class="preview-text">@Vm.CsvPreviewText</pre>
+<p class="hint">替换会解除原点位与验证任务的关联，任务本身保留。导入参数没有自动附带试验来源，须在项目页补充依据。</p>
+</section>
+</div>
+@code {
+    private async Task LoadFile(InputFileChangeEventArgs args)
+    {
+        try
+        {
+            using var stream = args.File.OpenReadStream(128 * 1024);
+            using var reader = new StreamReader(stream, new System.Text.UTF8Encoding(false, true), true);
+            Vm.LoadCsvText(await reader.ReadToEndAsync());
+        }
+        catch (Exception error) when (error is IOException or System.Text.DecoderFallbackException)
+        {
+            Vm.Message("CSV读取失败：" + error.Message, true);
+        }
+    }
+}

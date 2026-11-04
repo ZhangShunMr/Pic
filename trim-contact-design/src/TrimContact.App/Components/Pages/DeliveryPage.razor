@@ -1,0 +1,59 @@
+@inherits VmView
+<section class="page-heading"><div><span class="eyebrow">PROJECT DELIVERY</span><h2>保存、重开与成果交付</h2><p>项目文件内嵌全部几何、点位、载荷、设置和任务；结果需重算，不依赖外部路径。</p></div></section>
+<div class="two-column">
+<section class="card"><h3>当前项目</h3>
+<p class="mono">@Vm.Project.Id</p>
+<p>保存位置：@(Vm.Session.SavedPath ?? "尚未写入项目库")</p>
+<div class="button-row"><button class="primary" @onclick="Vm.Save">保存项目</button><button @onclick='() => Vm.Export("project")'>下载项目文件</button><button @onclick="Vm.Archive" disabled="@Vm.Project.Archived">归档项目</button></div>
+<p class="hint">保存会校验全部编辑；覆盖前保留.bak，检测外部文件变化后阻止覆盖。下载副本与项目库保存为两种独立操作。</p>
+<label>导入 .trimproj（UTF-8，最多2MB）<InputFile OnChange="Import" accept=".trimproj,application/json" /></label>
+<p class="hint">导入同ID不直接覆盖项目库文件。打开磁盘版继续，或“复制项目”获得新ID再保存。损坏、缺字段和未知版本文件会整体拒绝。</p>
+<h3>成果输出</h3>
+<div class="export-grid">
+    <button @onclick='() => Vm.Export("html")'>导出HTML报告</button>
+    <button @onclick='() => Vm.Export("csv")'>导出包络CSV</button>
+    <button @onclick='() => Vm.Export("trace")'>导出逐相位CSV</button>
+    <button @onclick='() => Vm.Export("json")'>导出分析JSON</button>
+    <button @onclick='() => Vm.Export("tasks")'>导出验证清单CSV</button>
+</div>
+<p>HTML报告包含全部输入、公差控制条件、版本、来源和输入SHA256；CSV采用UTF-8 BOM、逗号分隔、英文小数点、字段双引号。结果导出前须重新计算已变化的输入。</p>
+</section>
+<section class="card"><h3>本机项目库</h3><button @onclick="Vm.RefreshLibrary">刷新项目库</button>
+@if (Vm.Library.Count == 0)
+{
+    <p class="empty">项目库为空。保存一次后再从这里重开，核对实际磁盘文件。</p>
+}
+@foreach (var item in Vm.Library)
+{
+    <article class="library-item"><strong>@item.Name</strong><p>修订 @item.Revision · @item.Origin · @(item.Archived ? "已归档" : "可编辑")</p><small>@item.Modified.ToString("u")</small>
+    @if (item.Error is not null)
+    {
+        <p class="error">@item.Error</p>
+    }
+    <div class="button-row"><button @onclick="() => Vm.Open(item.Id)">打开项目</button><button @onclick="() => Vm.Open(item.Id, true)">载入备份</button></div>
+    </article>
+}
+</section>
+</div>
+<section class="card"><h3>最近操作记录 · UTC</h3><div class="table-wrap"><table><thead><tr><th>时间</th><th>操作</th></tr></thead><tbody>
+@foreach (var entry in Vm.Project.Audit.TakeLast(30).Reverse())
+{
+    <tr><td>@entry.Utc.ToString("u")</td><td>@entry.Action</td></tr>
+}
+</tbody></table></div><p class="hint">记录最多保留500条；撤销重做作用于会话中的最近20个已应用版本。文件下载后可在其他电脑重新导入，当前分析结果不会被缓存到项目中。</p></section>
+@code {
+    private async Task Import(InputFileChangeEventArgs args)
+    {
+        try
+        {
+            using var stream = args.File.OpenReadStream(TrimContact.Core.IO.ProjectCodec.MaxBytes);
+            using var reader = new StreamReader(stream, System.Text.Encoding.UTF8, true);
+            var text = await reader.ReadToEndAsync();
+            Vm.ImportProject(text);
+        }
+        catch (Exception error) when (error is IOException or InvalidOperationException)
+        {
+            Vm.Message("导入失败：" + error.Message, true);
+        }
+    }
+}

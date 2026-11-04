@@ -1,0 +1,42 @@
+@inherits VmView
+<section class="page-heading">
+    <div><span class="eyebrow">FREE BODY CHECK</span><h2>反力与力矩独立核查</h2>
+    <p>用逐点反力重新汇总，核对外力与约束反力，而不是只读取求解器残差。</p></div>
+</section>
+@if (!Vm.CurrentResults)
+{
+    <section class="card empty">先计算当前项目，再检查名义公差下的力平衡。</section>
+}
+else
+{
+    var rows = BalanceAudit.Evaluate(Vm.Project, Vm.Report!);
+    var maxNormal = rows.Select(r => Math.Abs(r.NormalErrorN)).DefaultIfEmpty().Max();
+    var maxShear = rows.Select(r => Math.Abs(r.ShearErrorN)).DefaultIfEmpty().Max();
+    var maxMoment = rows.Select(r => Math.Max(Math.Abs(r.MomentXErrorNmm), Math.Abs(r.MomentYErrorNmm))).DefaultIfEmpty().Max();
+    <section class="card">
+        <h3>当前名义采样的最大绝对差</h3>
+        <div class="metrics">
+            <article><span>法向力差 N</span><strong class="small-value">@maxNormal.ToString("G3", CultureInfo.InvariantCulture)</strong></article>
+            <article><span>切向力差 N</span><strong class="small-value">@maxShear.ToString("G3", CultureInfo.InvariantCulture)</strong></article>
+            <article><span>法向力矩差 N·mm</span><strong class="small-value">@maxMoment.ToString("G3", CultureInfo.InvariantCulture)</strong></article>
+        </div>
+        <button @onclick='() => Vm.Export("balance")'>导出平衡核查CSV</button>
+        <p>正值差表示约束反力合计大于对应惯性外力。法向力矩以质心为原点计算，X轴为ΣNy，Y轴为−ΣNx。惯性载荷作用在质心，因此外加法向力矩为0。</p>
+        <p class="hint">仅列名义公差的逐相位核查；结果页求解器残差另覆盖所有公差角点。切向模型没有扭转和高度偏心，因此不检查切向引起的力矩。</p>
+    </section>
+    <section class="card">
+    <h3>逐相位核对表</h3>
+    <div class="table-wrap trace-table"><table>
+        <thead><tr><th>方案/载荷</th><th>相位°</th><th>外加法向N</th><th>法向反力N</th><th>法向差N</th><th>切向差N</th><th>X/Y力矩差N·mm</th><th>储存弹性能N·mm</th></tr></thead>
+        <tbody>
+        @foreach (var row in rows)
+        {
+            <tr><td>@row.Variant<br />@row.Load</td><td>@F(row.PhaseDegrees)</td><td>@F(row.AppliedNormalN)</td><td>@F(row.ReactionNormalN)</td>
+            <td>@row.NormalErrorN.ToString("G3", CultureInfo.InvariantCulture)</td><td>@row.ShearErrorN.ToString("G3", CultureInfo.InvariantCulture)</td>
+            <td>@row.MomentXErrorNmm.ToString("G3", CultureInfo.InvariantCulture) / @row.MomentYErrorNmm.ToString("G3", CultureInfo.InvariantCulture)</td><td>@F(row.ElasticEnergyNmm)</td></tr>
+        }
+        </tbody>
+    </table></div>
+    <p class="hint">储存弹性能是卡扣及接触弹簧当前可恢复的弹性能合计，含装配预紧；不包含摩擦耗散，不代表异响能量或声压。</p>
+    </section>
+}

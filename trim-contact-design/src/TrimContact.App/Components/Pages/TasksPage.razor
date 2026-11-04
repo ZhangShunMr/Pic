@@ -1,0 +1,34 @@
+@inherits VmView
+<section class="page-heading"><div><span class="eyebrow">PHYSICAL VERIFICATION</span><h2>样件验证清单</h2><p>将筛查发现转化为装配、公差、材料与台架验证。完成状态是用户记录，不是软件认证。</p></div></section>
+<div class="button-row"><button @onclick="Vm.GenerateTasks" disabled="@Vm.Project.Archived">从当前结果生成任务</button><button @onclick="Vm.AddTask" disabled="@Vm.Project.Archived">新增任务</button><button @onclick='() => Vm.Export("tasks")'>导出验证清单CSV</button></div>
+<div class="two-column">
+<section class="card"><h3>任务 @Vm.Draft.Tasks.Count / 200</h3>
+@foreach (var task in Vm.Draft.Tasks)
+{
+    <button class="point-choice @(Vm.TaskId == task.Id ? "selected" : "")" @onclick="() => { Vm.TaskId = task.Id; Vm.Notify(); }"><span>@(task.Completed ? "☑" : "☐") @task.Title</span><small>@(task.PointId?.ToString() ?? "通用任务")</small></button>
+}
+@if (Vm.Draft.Tasks.Count == 0)
+{
+    <p class="empty">计算后生成清单，或添加人工验证任务。</p>
+}
+</section>
+<section class="card">
+@if (Vm.Task is not null)
+{
+    <fieldset disabled="@Vm.Project.Archived">
+        <label>任务标题<input maxlength="200" @bind="Vm.Task.Title" @bind:after="Vm.Notify" /></label>
+        <label>验证方法<textarea rows="4" maxlength="2000" @bind="Vm.Task.Method" @bind:after="Vm.Notify"></textarea></label>
+        <label>约定判据<textarea rows="3" maxlength="2000" @bind="Vm.Task.Acceptance" @bind:after="Vm.Notify"></textarea></label>
+        <label>负责人<input maxlength="100" @bind="Vm.Task.Owner" @bind:after="Vm.Notify" /></label>
+        <label>验证证据或记录编号<textarea rows="3" maxlength="2000" @bind="Vm.Task.Evidence" @bind:after="Vm.Notify"></textarea></label>
+        <label class="checkbox"><input type="checkbox" @bind="Vm.Task.Completed" @bind:after="Vm.Notify" />已完成（须填写证据）</label>
+        <div class="button-row"><button class="primary" @onclick="() => Vm.Execute(Vm.ApplyDraft)">应用编辑</button><button class="text-danger" @onclick="Vm.DeleteTask">删除选中任务</button></div>
+    </fieldset>
+}
+else
+{
+    <p class="empty">先选择或添加任务。</p>
+}
+<p class="hint">点位删除后，任务保留并标记原点位已删除。重新生成不会重复同标题与点位任务；设计变化后的旧任务须人工复核，不能自动视为继续适用。</p>
+</section>
+</div>

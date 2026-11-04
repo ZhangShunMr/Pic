@@ -1,0 +1,76 @@
+@inherits VmView
+<section class="page-heading"><div><span class="eyebrow">CONTACT LAYOUT</span><h2>卡扣与接触布置</h2><p>卡扣双向约束饰板，缓冲点只承受压缩。各方案共用饰板、来源和载荷。</p></div></section>
+<div class="button-row"><button @onclick="Vm.AddVariant" disabled="@Vm.Project.Archived">新增方案</button><button @onclick="Vm.DuplicateVariant" disabled="@(Vm.Variant is null || Vm.Project.Archived)">复制方案</button><button class="text-danger" @onclick="Vm.DeleteVariant" disabled="@(Vm.Variant is null || Vm.Project.Archived)">删除方案</button></div>
+<div class="variant-tabs">
+@foreach (var variant in Vm.Draft.Variants)
+{
+    <button class="@(Vm.VariantId == variant.Id ? "selected" : "")" @onclick="() => Vm.SelectVariant(variant.Id)">@variant.Name</button>
+}
+</div>
+@if (Vm.Variant is null)
+{
+    <section class="card empty">还没有方案。点击“新增方案”，再增加卡扣与接触点。</section>
+}
+else
+{
+    <div class="two-column layout-columns">
+    <section class="card">
+        <fieldset disabled="@Vm.Project.Archived">
+            <label>方案名称<input maxlength="100" @bind="Vm.Variant.Name" @bind:after="Vm.Notify" /></label>
+            <label>设计说明<textarea rows="2" maxlength="2000" @bind="Vm.Variant.Note" @bind:after="Vm.Notify"></textarea></label>
+        </fieldset>
+        <LayoutDiagram />
+        <div class="point-lists">
+            <div><h3>卡扣 @Vm.Variant.Clips.Count / 12</h3>
+            @foreach (var clip in Vm.Variant.Clips)
+            {
+                <button class="point-choice @(Vm.ClipId == clip.Id ? "selected" : "")" @onclick="() => { Vm.ClipId = clip.Id; Vm.Notify(); }">■ @clip.Name <small>(@F(clip.Xmm), @F(clip.Ymm)) mm</small></button>
+            }
+            <button @onclick="Vm.AddClip" disabled="@Vm.Project.Archived">增加卡扣</button></div>
+            <div><h3>接触点 @Vm.Variant.Contacts.Count / 6</h3>
+            @foreach (var contact in Vm.Variant.Contacts)
+            {
+                <button class="point-choice @(Vm.ContactId == contact.Id ? "selected" : "")" @onclick="() => { Vm.ContactId = contact.Id; Vm.Notify(); }">● @contact.Name <small>(@F(contact.Xmm), @F(contact.Ymm)) mm</small></button>
+            }
+            <button @onclick="Vm.AddContact" disabled="@Vm.Project.Archived">增加接触点</button></div>
+        </div>
+    </section>
+    <section class="card parameter-card">
+        <fieldset disabled="@Vm.Project.Archived">
+        @if (Vm.Clip is not null)
+        {
+            <h3>选中卡扣 · 双向弹簧</h3>
+            <label>卡扣名称<input maxlength="100" @bind="Vm.Clip.Name" @bind:after="Vm.Notify" /></label>
+            <div class="form-grid">
+                <label>X mm<input type="number" step="any" @bind="Vm.Clip.Xmm" @bind:after="Vm.Notify" /></label>
+                <label>Y mm<input type="number" step="any" @bind="Vm.Clip.Ymm" @bind:after="Vm.Notify" /></label>
+                <label>法向刚度 N/mm<input type="number" step="any" min="0.01" @bind="Vm.Clip.NormalStiffness" @bind:after="Vm.Notify" /></label>
+                <label>切向刚度 N/mm<input type="number" step="any" min="0.01" @bind="Vm.Clip.TangentialStiffness" @bind:after="Vm.Notify" /></label>
+                <label>合力限值 N<input type="number" step="any" min="0.01" @bind="Vm.Clip.ForceLimitN" @bind:after="Vm.Notify" /></label>
+            </div>
+            <button class="text-danger" @onclick="Vm.DeleteClip">删除选中卡扣</button>
+        }
+        @if (Vm.Contact is not null)
+        {
+            <h3>选中接触点 · 单边压缩</h3>
+            <label>接触点名称<input maxlength="100" @bind="Vm.Contact.Name" @bind:after="Vm.Notify" /></label>
+            <label>材料与标定备注<input maxlength="100" @bind="Vm.Contact.Material" @bind:after="Vm.Notify" /></label>
+            <div class="form-grid">
+                <label>X mm<input type="number" step="any" @bind="Vm.Contact.Xmm" @bind:after="Vm.Notify" /></label>
+                <label>Y mm<input type="number" step="any" @bind="Vm.Contact.Ymm" @bind:after="Vm.Notify" /></label>
+                <label>名义间隙 mm<input type="number" step="any" min="0" @bind="Vm.Contact.GapMm" @bind:after="Vm.Notify" /></label>
+                <label>间隙公差 ±mm<input type="number" step="any" min="0" @bind="Vm.Contact.ToleranceMm" @bind:after="Vm.Notify" /></label>
+                <label>预紧等效压缩量 mm<input type="number" step="any" min="0" @bind="Vm.Contact.PreloadMm" @bind:after="Vm.Notify" /></label>
+                <label>允许压缩量 mm<input type="number" step="any" min="0.0001" @bind="Vm.Contact.CompressionLimitMm" @bind:after="Vm.Notify" /></label>
+                <label>法向刚度 N/mm<input type="number" step="any" min="0.01" @bind="Vm.Contact.NormalStiffness" @bind:after="Vm.Notify" /></label>
+                <label>切向刚度 N/mm<input type="number" step="any" min="0.01" @bind="Vm.Contact.TangentialStiffness" @bind:after="Vm.Notify" /></label>
+                <label>摩擦系数 μ<input type="number" step="any" min="0" max="2" @bind="Vm.Contact.Friction" @bind:after="Vm.Notify" /></label>
+            </div>
+            <button class="text-danger" @onclick="Vm.DeleteContact">删除选中接触点</button>
+        }
+        <p class="hint">默认值是未标定工程初值。预紧量在无载时仍会产生反力，由卡扣平衡；间隙公差只作用于该点的实际间隙。</p>
+        <button class="primary" @onclick="() => Vm.Execute(Vm.ApplyDraft)">应用编辑</button>
+        </fieldset>
+    </section>
+    </div>
+}

@@ -1,0 +1,35 @@
+@inherits VmView
+<section class="page-heading"><div><span class="eyebrow">PROJECT BRIEF</span><h2>定义设计任务</h2><p>先记录对象、参数来源与工作目标，再建立饰板及接触布置。</p></div><span class="tag">schema 1 · .trimproj</span></section>
+<div class="two-column">
+<section class="card">
+    <h3>项目身份</h3>
+    <fieldset disabled="@Vm.Project.Archived">
+        <label>项目名称<input maxlength="100" @bind="Vm.Draft.Name" @bind:after="Vm.Notify" /></label>
+        <div class="form-grid">
+            <label>修订<input maxlength="30" @bind="Vm.Draft.Revision" @bind:after="Vm.Notify" /></label>
+            <label>负责人（可选）<input maxlength="100" @bind="Vm.Draft.Owner" @bind:after="Vm.Notify" /></label>
+        </div>
+        <label>设计目标<textarea rows="4" maxlength="2000" @bind="Vm.Draft.Goal" @bind:after="Vm.Notify"></textarea></label>
+        <label>参数来源类型<select @bind="Vm.Draft.Origin" @bind:after="Vm.Notify">
+            @foreach (var origin in Enum.GetValues<DataOrigin>())
+            {
+                <option value="@origin">@origin.Label()</option>
+            }
+        </select></label>
+        <label>参数依据与数据来源<textarea rows="4" maxlength="2000" @bind="Vm.Draft.Source" @bind:after="Vm.Notify"></textarea></label>
+        <button class="primary" @onclick="() => Vm.Execute(Vm.ApplyDraft)">应用编辑</button>
+    </fieldset>
+</section>
+<section class="card">
+    <h3>工作流程</h3>
+    <ol class="workflow">
+        <li><strong>定义饰板</strong><p>输入闭合多边形顶点、质量和质心，单位mm、kg。</p></li>
+        <li><strong>建立布置</strong><p>至少3个非共线卡扣；按需增加最多6个单边接触点。</p></li>
+        <li><strong>设置载荷</strong><p>各方案共用惯性载荷和采样条件，保持比较基准一致。</p></li>
+        <li><strong>计算与复核</strong><p>查看分离、滑移、受力及公差角点控制条件，生成验证任务。</p></li>
+        <li><strong>保存与交付</strong><p>保存项目后实际重开，导出带输入和来源的工程报告。</p></li>
+    </ol>
+    <div class="callout">普通启动无内置布置。顶部“载入模拟演示”会载入400×300mm饰板、四卡扣、一个缓冲点和一个周期载荷。所有值为模拟。</div>
+    <dl><dt>项目ID</dt><dd class="mono">@Vm.Project.Id</dd><dt>创建UTC</dt><dd>@Vm.Project.CreatedUtc.ToString("u")</dd><dt>本地使用</dt><dd>仅监听127.0.0.1；无远程账号与多人协同。</dd></dl>
+</section>
+</div>

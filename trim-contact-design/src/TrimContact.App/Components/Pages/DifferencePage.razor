@@ -1,0 +1,41 @@
+@inherits VmView
+<section class="page-heading"><div><span class="eyebrow">INPUT REVISION CHECK</span><h2>项目输入版本核对</h2><p>读取一份参考项目，按对象ID核对几何、载荷及设计参数；工作副本保持不变。</p></div></section>
+<section class="card">
+<label>参考项目 .trimproj（最多2MB）<InputFile OnChange="LoadReference" accept=".trimproj,application/json" /></label>
+<button @onclick="Vm.RefreshDifference">刷新输入差异</button>
+<p class="hint">复制方案会生成新点位ID，因此显示删除与新增；不按名称猜测匹配。该页只比较设计输入，不比较结果、验证证据或操作记录。</p>
+</section>
+@if (Vm.Difference is not null && Vm.DifferenceCurrent)
+{
+    <section class="card">
+    <h3>参考：@Vm.Difference.ReferenceName</h3>
+    <div class="callout">@(Vm.Difference.SameSharedConditions ? "共用计算条件字段相同；仍须核查各方案点位和参数。" : "共用条件存在差异，不能把两个项目的结果差直接归因于布置变更。")</div>
+    <p class="mono">当前输入：@Vm.Difference.CurrentHash<br />参考输入：@Vm.Difference.ReferenceHash</p>
+    <h3>差异 @Vm.Difference.Rows.Count 项</h3>
+    <div class="table-wrap"><table><thead><tr><th>参数路径（对象ID）</th><th>当前输入</th><th>参考输入</th></tr></thead><tbody>
+    @foreach (var row in Vm.Difference.Rows)
+    {
+        <tr><td class="mono">@row.Path</td><td>@row.Current</td><td>@row.Reference</td></tr>
+    }
+    </tbody></table></div>
+    </section>
+}
+else if (Vm.Difference is not null)
+{
+    <p class="callout">当前输入已变化，请点击“刷新输入差异”重新核对。</p>
+}
+@code {
+    private async Task LoadReference(InputFileChangeEventArgs args)
+    {
+        try
+        {
+            using var stream = args.File.OpenReadStream(TrimContact.Core.IO.ProjectCodec.MaxBytes);
+            using var reader = new StreamReader(stream, new System.Text.UTF8Encoding(false, true), true);
+            Vm.CompareReference(await reader.ReadToEndAsync());
+        }
+        catch (Exception error) when (error is IOException or System.Text.DecoderFallbackException)
+        {
+            Vm.Message("读取参考失败：" + error.Message, true);
+        }
+    }
+}

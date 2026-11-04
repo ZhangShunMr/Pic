@@ -1,0 +1,11 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  TrimContact.Core -> /workspace/Pic/trim-contact-design/src/TrimContact.Core/bin/Release/net10.0/TrimContact.Core.dll
+  TrimContact.Verification -> /workspace/Pic/trim-contact-design/tests/TrimContact.Verification/bin/Release/net10.0/TrimContact.Verification.dll
+  TrimContact.App -> /workspace/Pic/trim-contact-design/src/TrimContact.App/bin/Release/net10.0/TrimContact.App.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:03.38

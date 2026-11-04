@@ -1,0 +1,6 @@
+kind,name,x_mm,y_mm,kn_N_per_mm,kt_N_per_mm,gap_mm,tolerance_mm,preload_mm,mu,compression_limit_mm,force_limit_N,material
+Clip,左下卡扣,40,40,100,50,,,,,,80,
+Clip,右下卡扣,360,40,100,50,,,,,,80,
+Clip,右上卡扣,360,260,100,50,,,,,,80,
+Clip,左上卡扣,40,260,100,50,,,,,,80,
+Contact,中心缓冲块,200,150,100,40,0.1,0.15,0.2,0.3,0.8,,缓冲块（模拟）

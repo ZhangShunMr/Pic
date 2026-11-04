@@ -1,0 +1,56 @@
+@inherits VmView
+<section class="page-heading"><div><span class="eyebrow">DESIGN EXPLORATION</span><h2>方案比较与参数扫描</h2><p>所有方案使用同一饰板、质量、载荷和采样设置。比较只支持当前项目同次计算。</p></div></section>
+@if (Vm.CurrentResults)
+{
+    <section class="card"><h3>当前输入下方案比较</h3><div class="table-wrap"><table><thead><tr><th>方案</th><th>存在分离点数</th><th>滑移点数</th><th>超限点数</th><th>卡扣最大限值比</th><th>最大滑移余量mm</th></tr></thead><tbody>
+    @foreach (var row in AnalysisEngine.Compare(Vm.Report!))
+    {
+        <tr><td>@row.Name</td><td>@row.SeparationPoints</td><td>@row.SlidingPoints</td><td>@row.OverLimitPoints</td><td>@F(row.MaxClipUtilization)</td><td>@F(row.MaxSlipMm)</td></tr>
+    }
+    </tbody></table></div><p class="hint">点数受各方案接触点数量影响，不能直接作为优劣总评分；请同时查看逐点包络、控制工况和验证任务。</p></section>
+}
+else
+{
+    <p class="callout">比较前请先计算当前全部方案。添加或修改方案后旧结果失效。</p>
+}
+<section class="card">
+<h3>单个接触点参数扫描</h3>
+<p>在原设计的副本中逐值求解，不修改当前布置。公差、全部载荷和采样设置保持一致。</p>
+<div class="form-grid four">
+    <label>扫描方案<select @bind="Vm.VariantId" @bind:after="ResetContact">
+    @foreach (var variant in Vm.Draft.Variants)
+    {
+        <option value="@variant.Id">@variant.Name</option>
+    }
+    </select></label>
+    <label>扫描接触点<select @bind="Vm.ContactId">
+    @foreach (var point in Vm.Variant?.Contacts ?? [])
+    {
+        <option value="@point.Id">@point.Name</option>
+    }
+    </select></label>
+    <label>参数<select @bind="Vm.SweepParameter"><option>预紧量mm</option><option>间隙mm</option><option>法向刚度N/mm</option><option>摩擦系数</option></select></label>
+    <label>起始值<input type="number" step="any" @bind="Vm.SweepFrom" /></label>
+    <label>终止值<input type="number" step="any" @bind="Vm.SweepTo" /></label>
+    <label>等距采样点数<input type="number" min="2" max="15" @bind="Vm.SweepSteps" /></label>
+</div>
+<button class="primary" @onclick="Vm.ScanAsync">运行参数扫描</button>
+@if (Vm.CurrentSweep)
+{
+    <h3>扫描结果</h3><div class="table-wrap"><table><thead><tr><th>参数值</th><th>存在分离点数</th><th>滑移点数</th><th>超限点数</th><th>卡扣最大限值比</th><th>最大压缩mm</th><th>最大滑移余量mm</th></tr></thead><tbody>
+    @foreach (var row in Vm.SweepRows)
+    {
+        <tr><td>@F(row.Value)</td><td>@row.SeparationPoints</td><td>@row.SlidingPoints</td><td>@row.OverLimitPoints</td><td>@F(row.MaxClipUtilization)</td><td>@F(row.MaxCompressionMm)</td><td>@F(row.MaxSlipMm)</td></tr>
+    }
+    </tbody></table></div>
+    <button @onclick='() => Vm.Export("sweep")'>导出扫描CSV</button>
+    <p class="hint">增加预紧量可能改善接触保持，同时增加卡扣反力。扫描不自动推荐或替换参数。</p>
+}
+else if (Vm.SweepRows.Count > 0)
+{
+    <p class="callout">设计输入已变化，旧扫描结果失效，请重新扫描。</p>
+}
+</section>
+@code {
+    private void ResetContact() => Vm.ContactId = Vm.Variant?.Contacts.FirstOrDefault()?.Id;
+}

@@ -1,0 +1,46 @@
+@inherits VmView
+@{
+    var bounds = Geometry.BoundsOf(Vm.Draft.Panel.Outline);
+    var scale = Math.Max(1, bounds.Scale);
+    double X(double value) => 60 + 530 * (value - bounds.MinX) / scale;
+    double Y(double value) => 350 - 280 * (value - bounds.MinY) / Math.Max(1, bounds.Height);
+    string S(double v) => v.ToString("0.###", CultureInfo.InvariantCulture);
+    var polygon = string.Join(" ", Vm.Draft.Panel.Outline.Select(p => $"{S(X(p.Xmm))},{S(Y(p.Ymm))}"));
+}
+<svg class="layout-diagram" viewBox="0 0 660 420" role="img" aria-label="饰板轮廓、质心、卡扣和接触点布置示意">
+    <defs><pattern id="grid" width="25" height="25" patternUnits="userSpaceOnUse"><path d="M 25 0 L 0 0 0 25" fill="none" stroke="#dce6e5" stroke-width="0.7" /></pattern></defs>
+    <rect x="40" y="40" width="570" height="330" fill="url(#grid)" />
+    <line x1="40" y1="370" x2="615" y2="370" stroke="#6b888c" />
+    <line x1="40" y1="370" x2="40" y2="35" stroke="#6b888c" />
+    <text x="560" y="400">X / mm</text><text x="4" y="25">Y / mm</text>
+    <text x="45" y="395">@F(bounds.MinX)</text><text x="10" y="365">@F(bounds.MinY)</text>
+    <text x="550" y="30">上界 @F(bounds.MaxY)</text>
+    @if (Vm.Draft.Panel.Outline.Count > 1)
+    {
+        <polygon points="@polygon" fill="#d8ece7" fill-opacity="0.65" stroke="#457f7b" stroke-width="2" />
+    }
+    @if (Vm.Draft.Panel.Outline.Count >= 3)
+    {
+        <circle cx="@S(X(Vm.Draft.Panel.CenterXmm))" cy="@S(Y(Vm.Draft.Panel.CenterYmm))" r="5" fill="#1c3340" />
+        <g><text x="@S(X(Vm.Draft.Panel.CenterXmm) + 9)" y="@S(Y(Vm.Draft.Panel.CenterYmm) - 10)">质心</text></g>
+    }
+    @if (Vm.Variant is not null)
+    {
+        @foreach (var clip in Vm.Variant.Clips)
+        {
+            <g class="point" @onclick="() => { Vm.ClipId = clip.Id; Vm.Notify(); }">
+                <rect x="@S(X(clip.Xmm) - 6)" y="@S(Y(clip.Ymm) - 6)" width="12" height="12" fill="@(clip.Id == Vm.ClipId ? "#e49c39" : "#29516e")" />
+                <text x="@S(X(clip.Xmm) + 10)" y="@S(Y(clip.Ymm) + 5)">@clip.Name</text>
+            </g>
+        }
+        @foreach (var contact in Vm.Variant.Contacts)
+        {
+            <g class="point" @onclick="() => { Vm.ContactId = contact.Id; Vm.Notify(); }">
+                <circle cx="@S(X(contact.Xmm))" cy="@S(Y(contact.Ymm))" r="8" fill="@(contact.Id == Vm.ContactId ? "#e49c39" : "#268a7b")" stroke="#fff" stroke-width="2" />
+                <text x="@S(X(contact.Xmm) + 12)" y="@S(Y(contact.Ymm) + 15)">@contact.Name</text>
+            </g>
+        }
+    }
+</svg>
+<div class="legend"><span>■ 卡扣</span><span>● 接触点</span><span>● 深色点：质心</span><span>橙色：已选择</span></div>
+<p class="hint">X、Y独立缩放以便阅读；坐标和数值才是尺寸依据。点击点位可选中编辑，位置使用数值输入。</p>

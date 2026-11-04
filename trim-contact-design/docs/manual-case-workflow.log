@@ -1,0 +1,6 @@
+PASS manual static case renders four clip forces 2.45166N
+PASS manual static case center displacement 0.02452mm rendered
+PASS manual preload case renders 0.16mm compression and 16N reaction
+PASS manual preload case renders four clips at negative 4N
+PASS manual preload case renders negative 0.04mm center displacement
+PASS manual hand-check case saved reopened recalculated without change

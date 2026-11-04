@@ -1,0 +1,284 @@
+{
+  "scope": "handwritten production .cs and .razor nonblank lines; exclude bin/obj/tests/tools/docs/samples, CSS and JS excluded from threshold",
+  "baseline": 0,
+  "minimum": 3500,
+  "nonblank": 3526,
+  "files": [
+    {
+      "path": "src/TrimContact.App/Components/App.razor",
+      "lines": 15,
+      "nonblank": 15,
+      "sha256": "dfca429e7c16520cf548a9a60b9baa359367e5b8986e81d8b84402e969c7b110"
+    },
+    {
+      "path": "src/TrimContact.App/Components/Pages/BalancePage.razor",
+      "lines": 42,
+      "nonblank": 42,
+      "sha256": "ca8cbc1e2f42e624534717a5e496e4704b3974f315f6bd8f6a4a5144a88a14f9"
+    },
+    {
+      "path": "src/TrimContact.App/Components/Pages/BatchPage.razor",
+      "lines": 44,
+      "nonblank": 44,
+      "sha256": "d77c830ac4cb5193f072da5062ccef7183e5202832808e6152d803939c9e9381"
+    },
+    {
+      "path": "src/TrimContact.App/Components/Pages/ComparePage.razor",
+      "lines": 56,
+      "nonblank": 56,
+      "sha256": "9573463d9d7cb03a9d7d1b15aa23eea510afd06948657118b877dd729577820b"
+    },
+    {
+      "path": "src/TrimContact.App/Components/Pages/DeliveryPage.razor",
+      "lines": 59,
+      "nonblank": 59,
+      "sha256": "fba752c8b8b1a1c0aefa21b7091bcfd2b8db4b6f0e5be6f2d6e3430279c43a4e"
+    },
+    {
+      "path": "src/TrimContact.App/Components/Pages/DifferencePage.razor",
+      "lines": 41,
+      "nonblank": 41,
+      "sha256": "b75918722c974ec5e4fd6089fc18c997951dcfb127399c0125b6d51a379cc2d7"
+    },
+    {
+      "path": "src/TrimContact.App/Components/Pages/HelpPage.razor",
+      "lines": 30,
+      "nonblank": 30,
+      "sha256": "5b73b27747f4c3ff0a395ea917e55395da873e94adaf90c7bdb20284102a5d70"
+    },
+    {
+      "path": "src/TrimContact.App/Components/Pages/ImportPage.razor",
+      "lines": 45,
+      "nonblank": 45,
+      "sha256": "86729111f718b2b6c00bc6568b0aca34993083e46a70702f502d72f4dd43c293"
+    },
+    {
+      "path": "src/TrimContact.App/Components/Pages/LayoutPage.razor",
+      "lines": 76,
+      "nonblank": 76,
+      "sha256": "5d75b1c44ee3411469210f6d35524f90c2670806baa76d9324feb8ce4f0798f4"
+    },
+    {
+      "path": "src/TrimContact.App/Components/Pages/LoadPage.razor",
+      "lines": 49,
+      "nonblank": 49,
+      "sha256": "cadd8e3e70f6e54576e75154a5f1efe21efcb1274973970421c932fd6a6907f9"
+    },
+    {
+      "path": "src/TrimContact.App/Components/Pages/PanelPage.razor",
+      "lines": 29,
+      "nonblank": 29,
+      "sha256": "fdc464e0b6228e4283432be688b714a2ba0ade9a1b626c2822f968a6dfae0713"
+    },
+    {
+      "path": "src/TrimContact.App/Components/Pages/ProjectPage.razor",
+      "lines": 35,
+      "nonblank": 35,
+      "sha256": "edf331ca4ec6f3dc3b7a03754f10eedab173284d38de8e9a8696f3ae5e441356"
+    },
+    {
+      "path": "src/TrimContact.App/Components/Pages/QualityPage.razor",
+      "lines": 23,
+      "nonblank": 23,
+      "sha256": "d4ef631e73cc8bed6c19ea322bddfc16e8658309fa872b56cc5ff35a78feab37"
+    },
+    {
+      "path": "src/TrimContact.App/Components/Pages/ResultsPage.razor",
+      "lines": 74,
+      "nonblank": 74,
+      "sha256": "0f614784caeac31e65a88a6105cecef90fbd7d400b328984d2d9031a73ec9709"
+    },
+    {
+      "path": "src/TrimContact.App/Components/Pages/TasksPage.razor",
+      "lines": 34,
+      "nonblank": 34,
+      "sha256": "d64eb1e1ef5d2f593ceb228f121ee835b932eaee398b2d9c7a3b28c55f909407"
+    },
+    {
+      "path": "src/TrimContact.App/Components/Pages/Workspace.razor",
+      "lines": 85,
+      "nonblank": 85,
+      "sha256": "bda1ff1281d673166c34c4967e7cf55d4a45203b7086240ef1ad68a82f9a0b9e"
+    },
+    {
+      "path": "src/TrimContact.App/Components/Shared/LayoutDiagram.razor",
+      "lines": 46,
+      "nonblank": 46,
+      "sha256": "ab2a4b28edba317cf739e8b7075f6505210979021017fe036831f7297dce222c"
+    },
+    {
+      "path": "src/TrimContact.App/Components/Shared/PhaseChart.razor",
+      "lines": 46,
+      "nonblank": 46,
+      "sha256": "fdbb8ad3828892f350147be2318ecdbd99cb59a51e1633b50bffc1f173918a12"
+    },
+    {
+      "path": "src/TrimContact.App/Components/Shared/VmView.cs",
+      "lines": 18,
+      "nonblank": 16,
+      "sha256": "1e3383c0a23b1acf38e6bb50fe4fcd91c6c272d0dd70820538646bcd0adb1399"
+    },
+    {
+      "path": "src/TrimContact.App/Components/_Imports.razor",
+      "lines": 12,
+      "nonblank": 11,
+      "sha256": "22b23c9e45d5a971dcf6ee4bdc98cde7e942d5f69cdec6fc0cdb3cdf27b297e7"
+    },
+    {
+      "path": "src/TrimContact.App/DownloadVault.cs",
+      "lines": 29,
+      "nonblank": 24,
+      "sha256": "034a215dd306836f7aeca1566b4c8187b486b2293ba34ac13ca7a867bc92f591"
+    },
+    {
+      "path": "src/TrimContact.App/Program.cs",
+      "lines": 43,
+      "nonblank": 42,
+      "sha256": "2cb30d86452be4bc23f5720a3b242718e8d3e5cc96fd7551d34664f4c5e0aca7"
+    },
+    {
+      "path": "src/TrimContact.App/ViewModels/ImportCommands.cs",
+      "lines": 70,
+      "nonblank": 63,
+      "sha256": "0d98f6051b7911030f14c8102161228c65ae76927d0c121c5130c910d9975486"
+    },
+    {
+      "path": "src/TrimContact.App/ViewModels/LayoutCommands.cs",
+      "lines": 143,
+      "nonblank": 127,
+      "sha256": "348f2fdefe7fd463a23227dea2d5592659cb957c11f873051eb023afe3a4a594"
+    },
+    {
+      "path": "src/TrimContact.App/ViewModels/ReviewCommands.cs",
+      "lines": 53,
+      "nonblank": 46,
+      "sha256": "a0e4c5dfcb590da94baf419abd911423fd7a33d882091b58d5e235b990c0ac77"
+    },
+    {
+      "path": "src/TrimContact.App/ViewModels/WorkspaceViewModel.cs",
+      "lines": 433,
+      "nonblank": 403,
+      "sha256": "a2bf1e3bd9dce19e8d9192a67239745419a6e6cb4e5061764933b6587e4d1926"
+    },
+    {
+      "path": "src/TrimContact.Core/Analysis/AnalysisEngine.cs",
+      "lines": 133,
+      "nonblank": 127,
+      "sha256": "8de02185fee8db38af140bbc2bb82153e4347437a1fd5363d194070f38637d6a"
+    },
+    {
+      "path": "src/TrimContact.Core/Analysis/BalanceAudit.cs",
+      "lines": 64,
+      "nonblank": 61,
+      "sha256": "f063b4f9271ca43d7664f66874b2448e38ac2cbbb552683839a9ea90fcbe0835"
+    },
+    {
+      "path": "src/TrimContact.Core/Analysis/ContactSolver.cs",
+      "lines": 137,
+      "nonblank": 129,
+      "sha256": "af00e9a412b11869d85d44617be73dddad7186d1691915507a60e3bfce8b2ba2"
+    },
+    {
+      "path": "src/TrimContact.Core/Analysis/LinearAlgebra.cs",
+      "lines": 77,
+      "nonblank": 71,
+      "sha256": "9c88686a1219e8754a72a37ba188a37d7b85f184fa5b0ebdac6d5842e7496a4c"
+    },
+    {
+      "path": "src/TrimContact.Core/Analysis/ProjectDifference.cs",
+      "lines": 99,
+      "nonblank": 93,
+      "sha256": "46b16d7d25ef34277c4c0b9cdbeb4c32afbd78a4169f95dc7d91bf0b22fb8990"
+    },
+    {
+      "path": "src/TrimContact.Core/Analysis/QualityInspector.cs",
+      "lines": 104,
+      "nonblank": 99,
+      "sha256": "03c55d4ec9534b6ed59c8dd6e043abeeade1accb3239b0170eb0b505faf645a2"
+    },
+    {
+      "path": "src/TrimContact.Core/Analysis/Results.cs",
+      "lines": 94,
+      "nonblank": 87,
+      "sha256": "c304a9e2b0a24cb95a339db053452671952a6c604f443c3ceccc6e64e5997c31"
+    },
+    {
+      "path": "src/TrimContact.Core/Domain/Demonstration.cs",
+      "lines": 51,
+      "nonblank": 49,
+      "sha256": "619773166c1aa7d0f20c14a415fec1c4062afc737978d412d81be83f9c0f916a"
+    },
+    {
+      "path": "src/TrimContact.Core/Domain/Geometry.cs",
+      "lines": 105,
+      "nonblank": 96,
+      "sha256": "4e2244b10edf9af622949f7593a7c700cb188bb205a231131b3c199b11b59b86"
+    },
+    {
+      "path": "src/TrimContact.Core/Domain/Project.cs",
+      "lines": 140,
+      "nonblank": 127,
+      "sha256": "92250723ddd3a6c6e56927845fd77b4b1346a4d2d87fe41114ecf879e9b8c652"
+    },
+    {
+      "path": "src/TrimContact.Core/Domain/Validation.cs",
+      "lines": 188,
+      "nonblank": 185,
+      "sha256": "69b0a012d7fe9491b2c46cf43087445949a00f5c45e71b6eb005a41a40999497"
+    },
+    {
+      "path": "src/TrimContact.Core/IO/BalanceExport.cs",
+      "lines": 43,
+      "nonblank": 38,
+      "sha256": "b0c803ce7e0a334234e119a0a90e9f1ca99541eacba93d652ca7bae2b9bb0df0"
+    },
+    {
+      "path": "src/TrimContact.Core/IO/CsvTable.cs",
+      "lines": 99,
+      "nonblank": 96,
+      "sha256": "6f76a617ded5017a8d5f920c2464610320c019119abb6bbc44d54a4e84a9a86b"
+    },
+    {
+      "path": "src/TrimContact.Core/IO/LayoutCsv.cs",
+      "lines": 156,
+      "nonblank": 149,
+      "sha256": "376a1e4f691c60560a87dbe6f9d1a083b698837d01de3b1e5dde7f2aef765dd4"
+    },
+    {
+      "path": "src/TrimContact.Core/IO/ProjectCodec.cs",
+      "lines": 99,
+      "nonblank": 91,
+      "sha256": "ba5d255dab02a6df62b055e824ac11c9c06efc7c878ed7c4c8d7c13f01a2ad51"
+    },
+    {
+      "path": "src/TrimContact.Core/IO/ProjectStore.cs",
+      "lines": 105,
+      "nonblank": 94,
+      "sha256": "3a89e937766e37704b41283c9b4014feec916a15921d4cf1d67c1631648d379b"
+    },
+    {
+      "path": "src/TrimContact.Core/IO/ResultExport.cs",
+      "lines": 128,
+      "nonblank": 119,
+      "sha256": "1d06acd9d2d9c3719a83dcc476b1e557afd3920e46792694ae2c669be564c0f7"
+    },
+    {
+      "path": "src/TrimContact.Core/Operations/BatchLayout.cs",
+      "lines": 95,
+      "nonblank": 88,
+      "sha256": "07438c1eabf02856411d41fcb953790552e2a87b1cb3c7d06921f4cd02d59ac7"
+    },
+    {
+      "path": "src/TrimContact.Core/Operations/DesignOperations.cs",
+      "lines": 83,
+      "nonblank": 78,
+      "sha256": "6367d3e927fdccbedbf7c804e5f250ed7a90eb7977c823fc20ce5614c7c5c8ed"
+    },
+    {
+      "path": "src/TrimContact.Core/Operations/ProjectSession.cs",
+      "lines": 98,
+      "nonblank": 88,
+      "sha256": "d6d4bef412b7facbb1de3a990a335f49eb226355960b28268e65f6881904fda3"
+    }
+  ]
+}

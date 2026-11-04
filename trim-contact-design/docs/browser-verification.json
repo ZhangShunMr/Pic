@@ -1,0 +1,233 @@
+{
+  "utc": "2026-11-04T01:56:16.321592+00:00",
+  "browser": "Chromium /usr/bin/chromium, Playwright Python",
+  "checks": [
+    {
+      "name": "ordinary startup is blank manual project",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "empty calculation blocked with located reason",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "project metadata edits applied",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "rectangle contour created from blank",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "invalid zero mass rejected and corrected",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "variant created from blank",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "large invalid CSV reports located error without disconnect",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "CSV replacement preflight succeeds",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "modified CSV after preflight cannot apply stale preview",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "preflight import actually creates four clips and one contact",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "load created and saved in work object",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "calculation produces chart and nominal plus two tolerance corners",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "unapplied parameter edit invalidates old result view",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "copy variant supports independent design edits",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "same-condition two-variant comparison rendered",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "parameter scan completes and preserves current design",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "scan CSV actually downloaded with source",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "quality review shows simulation and model limitations",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "independent force and moment audit exported",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "result-derived verification tasks generated",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "verification generation deduplicates tasks",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "task completion requires evidence text",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "batch preview shows actual before and after values",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "batch apply undo redo affect real design parameters",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "project saved to actual disk library",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "project download retains two variants all inputs tasks and simulation",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "导出HTML报告 actual browser download",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "导出包络CSV actual browser download",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "导出逐相位CSV actual browser download",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "导出分析JSON actual browser download",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "导出验证清单CSV actual browser download",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "analysis export full input and report hash agree",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "HTML includes source boundary and full project data",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "opening another project protects unsaved changes",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "actual disk reopen restores saved data",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "reopened project preserves both independently edited variants",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "reference file comparison finds zero differences after reopen",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "model formulas independent example and limitations visible",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "same ID import cannot silently overwrite disk project",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "copy project assigns new ID and can save imported object",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "archive yields readonly project",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "copy archived project allows new design",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "980px layout has no document overflow",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "390px layout has no document overflow",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "no uncaught browser page errors",
+      "passed": true,
+      "detail": "[]"
+    }
+  ],
+  "count": 45,
+  "page_errors": []
+}

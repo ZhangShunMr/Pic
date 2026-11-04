@@ -1,0 +1,46 @@
+@inherits VmView
+@{
+    var trace = Vm.Trace;
+    var point = Vm.ResultPoint;
+    var samples = trace?.Samples ?? [];
+    PointState? Find(PhaseState s) => s.Contacts.Concat(s.Clips).FirstOrDefault(p => p.Id == point?.PointId);
+    double Value(PhaseState s)
+    {
+        var p = Find(s);
+        if (p is null) return 0;
+        return Metric switch { "压缩mm" => p.CompressionMm, "切向力N" => p.ShearN, "滑移余量mm" => p.SlipMm, _ => p.NormalN };
+    }
+    var values = samples.Select(Value).ToArray();
+    var min = values.DefaultIfEmpty().Min();
+    var max = values.DefaultIfEmpty().Max();
+    var span = Math.Max(1e-6, max - min);
+    min -= span * 0.1;
+    max += span * 0.1;
+    double Y(double v) => 250 - 200 * (v - min) / (max - min);
+    string S(double v) => v.ToString("0.###", CultureInfo.InvariantCulture);
+    var points = string.Join(" ", samples.Select(s => $"{S(70 + 570 * s.PhaseDegrees / 360)},{S(Y(Value(s)))}"));
+}
+<div class="button-row"><label>曲线指标<select @bind="Metric"><option>法向力N</option><option>切向力N</option><option>压缩mm</option><option>滑移余量mm</option></select></label></div>
+<svg viewBox="0 0 700 310" role="img" aria-label="名义公差下逐相位曲线" class="phase-chart">
+    <rect x="70" y="40" width="570" height="210" fill="#f5f9f8" />
+    @for (int i = 0; i <= 4; i++)
+    {
+        var v = min + (max - min) * i / 4;
+        <g><line x1="70" y1="@S(Y(v))" x2="640" y2="@S(Y(v))" stroke="#cddcd9" /><text x="5" y="@S(Y(v) + 4)">@v.ToString("0.####", CultureInfo.InvariantCulture)</text></g>
+    }
+    @for (int degrees = 0; degrees <= 360; degrees += 90)
+    {
+        <g><text x="@S(65 + 570 * degrees / 360.0)" y="276">@degrees</text></g>
+    }
+    <polyline points="@points" fill="none" stroke="#167d73" stroke-width="2.5" />
+    @foreach (var sample in samples)
+    {
+        <circle cx="@S(70 + 570 * sample.PhaseDegrees / 360)" cy="@S(Y(Value(sample)))" r="2.5" fill="#167d73"><title>@F(sample.PhaseDegrees)° / @F(Value(sample)) @Metric</title></circle>
+    }
+    <text x="70" y="25">@Metric · 名义公差 · @point?.Name</text>
+    <text x="545" y="301">相位 φ / °</text>
+</svg>
+<p class="hint">来源：@Vm.Report?.Origin。仅显示名义间隙曲线；总体包络表另包含所有已启用公差角点。折线连接离散采样，不表示动态历程或未采样极值。</p>
+@code {
+    private string Metric { get; set; } = "法向力N";
+}

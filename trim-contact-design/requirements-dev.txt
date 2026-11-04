@@ -1,0 +1,5 @@
+# Development verification and document tools, not production runtime dependencies.
+playwright==1.62.0
+python-docx==1.2.0
+PyMuPDF==1.26.6
+Pillow==12.3.0

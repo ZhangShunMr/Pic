@@ -1,0 +1,5 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  TrimContact.Core -> /workspace/Pic/trim-contact-design/src/TrimContact.Core/bin/Release/net10.0/TrimContact.Core.dll
+  TrimContact.App -> /workspace/Pic/trim-contact-design/src/TrimContact.App/bin/Release/net10.0/TrimContact.App.dll
+  TrimContact.App -> /workspace/trim-contact-publish/
