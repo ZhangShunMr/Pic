@@ -193,7 +193,7 @@
          <Slider Minimum="0" Maximum="1" Value="{Binding Slice}" TickFrequency="0.1" TickPlacement="BottomRight" Margin="0,8"/>
          <TextBlock Text="所选模态"/>
          <ComboBox ItemsSource="{Binding Result.Modes}" SelectedItem="{Binding SelectedMode}">
-          <ComboBox.ItemTemplate><DataTemplate><TextBlock><Run Text="{Binding Key}"/><Run Text="  ·  "/><Run Text="{Binding Frequency, StringFormat=F3}"/><Run Text=" Hz"/></TextBlock></DataTemplate></ComboBox.ItemTemplate>
+          <ComboBox.ItemTemplate><DataTemplate><TextBlock><Run Text="{Binding Key, Mode=OneWay}"/><Run Text="  ·  "/><Run Text="{Binding Frequency, StringFormat=F3, Mode=OneWay}"/><Run Text=" Hz"/></TextBlock></DataTemplate></ComboBox.ItemTemplate>
          </ComboBox>
          <TextBlock Text="研究频率 / Hz（响应幅值使用此频率）"/>
          <Slider Minimum="5" Maximum="500" Value="{Binding Frequency}" Margin="0,7"/>
@@ -217,10 +217,10 @@
        <controls:SpectrumChart Data="{Binding Spectrum}" SelectedX="{Binding Frequency}" Height="450"/>
        <DataGrid ItemsSource="{Binding Result.Curves}" SelectedItem="{Binding SelectedCurve}" Height="260" IsReadOnly="True">
         <DataGrid.Columns>
-         <DataGridTextColumn Header="座位" Binding="{Binding Name}" Width="140"/>
-         <DataGridTextColumn Header="采样峰值 / 相对量" Binding="{Binding Peak.Magnitude, StringFormat=G5}" Width="155"/>
-         <DataGridTextColumn Header="峰值频率 / Hz" Binding="{Binding Peak.Frequency, StringFormat=F3}" Width="125"/>
-         <DataGridTextColumn Header="采样RMS / 相对量" Binding="{Binding Rms, StringFormat=G5}" Width="160"/>
+         <DataGridTextColumn Header="座位" Binding="{Binding Name, Mode=OneWay}" Width="140"/>
+         <DataGridTextColumn Header="采样峰值 / 相对量" Binding="{Binding Peak.Magnitude, StringFormat=G5, Mode=OneWay}" Width="155"/>
+         <DataGridTextColumn Header="峰值频率 / Hz" Binding="{Binding Peak.Frequency, StringFormat=F3, Mode=OneWay}" Width="125"/>
+         <DataGridTextColumn Header="采样RMS / 相对量" Binding="{Binding Rms, StringFormat=G5, Mode=OneWay}" Width="160"/>
         </DataGrid.Columns>
        </DataGrid>
        <TextBlock Text="RMS为离散频率样点幅值的均方根，不是时间域声压有效值。峰值可能受采样步长影响；近零响应的dB显示下限为−120。" Style="{StaticResource Hint}"/>
@@ -231,22 +231,22 @@
        <TextBlock Text="轴向仅一个阶次非零，切向两个，斜向三个。000均匀压缩模态不计入。相同频率的退化模态保留各基底。选择一行后可到空间剖面显示振型。" Style="{StaticResource Hint}"/>
        <DataGrid ItemsSource="{Binding Result.Modes}" SelectedItem="{Binding SelectedMode}" Height="420" IsReadOnly="True">
         <DataGrid.Columns>
-         <DataGridTextColumn Header="阶次 nx,ny,nz" Binding="{Binding Key}" Width="130"/>
-         <DataGridTextColumn Header="固有频率 / Hz" Binding="{Binding Frequency, StringFormat=F4}" Width="140"/>
-         <DataGridTextColumn Header="类型" Binding="{Binding Kind}" Width="100"/>
-         <DataGridTextColumn Header="退化数" Binding="{Binding Degeneracy}" Width="85"/>
-         <DataGridTextColumn Header="归一化系数 2^d" Binding="{Binding NormFactor}" Width="135"/>
+         <DataGridTextColumn Header="阶次 nx,ny,nz" Binding="{Binding Key, Mode=OneWay}" Width="130"/>
+         <DataGridTextColumn Header="固有频率 / Hz" Binding="{Binding Frequency, StringFormat=F4, Mode=OneWay}" Width="140"/>
+         <DataGridTextColumn Header="类型" Binding="{Binding Kind, Mode=OneWay}" Width="100"/>
+         <DataGridTextColumn Header="退化数" Binding="{Binding Degeneracy, Mode=OneWay}" Width="85"/>
+         <DataGridTextColumn Header="归一化系数 2^d" Binding="{Binding NormFactor, Mode=OneWay}" Width="135"/>
         </DataGrid.Columns>
        </DataGrid>
        <TextBlock Text="每25Hz频带的模态数量" Style="{StaticResource Subheading}"/>
        <DataGrid ItemsSource="{Binding Density}" Height="240" IsReadOnly="True">
         <DataGrid.Columns>
-         <DataGridTextColumn Header="下限 / Hz（含）" Binding="{Binding Lower}" Width="130"/>
-         <DataGridTextColumn Header="上限 / Hz（不含）" Binding="{Binding Upper}" Width="145"/>
-         <DataGridTextColumn Header="总数" Binding="{Binding Count}" Width="70"/>
-         <DataGridTextColumn Header="轴向" Binding="{Binding Axial}" Width="70"/>
-         <DataGridTextColumn Header="切向" Binding="{Binding Tangential}" Width="70"/>
-         <DataGridTextColumn Header="斜向" Binding="{Binding Oblique}" Width="70"/>
+         <DataGridTextColumn Header="下限 / Hz（含）" Binding="{Binding Lower, Mode=OneWay}" Width="130"/>
+         <DataGridTextColumn Header="上限 / Hz（不含）" Binding="{Binding Upper, Mode=OneWay}" Width="145"/>
+         <DataGridTextColumn Header="总数" Binding="{Binding Count, Mode=OneWay}" Width="70"/>
+         <DataGridTextColumn Header="轴向" Binding="{Binding Axial, Mode=OneWay}" Width="70"/>
+         <DataGridTextColumn Header="切向" Binding="{Binding Tangential, Mode=OneWay}" Width="70"/>
+         <DataGridTextColumn Header="斜向" Binding="{Binding Oblique, Mode=OneWay}" Width="70"/>
         </DataGrid.Columns>
        </DataGrid>
        <Button Content="导出模态清单CSV…" Command="{Binding ExportModesCommand}" HorizontalAlignment="Left"/>
@@ -259,22 +259,22 @@
        <Button Content="更新剖面与贡献" Command="{Binding UpdateFieldCommand}" HorizontalAlignment="Left"/>
        <DataGrid ItemsSource="{Binding Contributions}" Height="325" IsReadOnly="True">
         <DataGrid.Columns>
-         <DataGridTextColumn Header="阶次" Binding="{Binding Key}" Width="85"/>
-         <DataGridTextColumn Header="fn / Hz" Binding="{Binding Frequency, StringFormat=F3}" Width="95"/>
-         <DataGridTextColumn Header="项幅值" Binding="{Binding Magnitude, StringFormat=G5}" Width="100"/>
-         <DataGridTextColumn Header="项相位 / °" Binding="{Binding Phase, StringFormat=F2}" Width="100"/>
-         <DataGridTextColumn Header="源耦合幅值" Binding="{Binding SourceMagnitude, StringFormat=G4}" Width="110"/>
-         <DataGridTextColumn Header="耳点振型" Binding="{Binding SeatShape, StringFormat=F4}" Width="100"/>
+         <DataGridTextColumn Header="阶次" Binding="{Binding Key, Mode=OneWay}" Width="85"/>
+         <DataGridTextColumn Header="fn / Hz" Binding="{Binding Frequency, StringFormat=F3, Mode=OneWay}" Width="95"/>
+         <DataGridTextColumn Header="项幅值" Binding="{Binding Magnitude, StringFormat=G5, Mode=OneWay}" Width="100"/>
+         <DataGridTextColumn Header="项相位 / °" Binding="{Binding Phase, StringFormat=F2, Mode=OneWay}" Width="100"/>
+         <DataGridTextColumn Header="源耦合幅值" Binding="{Binding SourceMagnitude, StringFormat=G4, Mode=OneWay}" Width="110"/>
+         <DataGridTextColumn Header="耳点振型" Binding="{Binding SeatShape, StringFormat=F4, Mode=OneWay}" Width="100"/>
         </DataGrid.Columns>
        </DataGrid>
        <TextBlock Text="分析频带内耦合观察" Style="{StaticResource Subheading}"/>
        <DataGrid ItemsSource="{Binding Coupling}" Height="280" IsReadOnly="True">
         <DataGrid.Columns>
-         <DataGridTextColumn Header="阶次" Binding="{Binding ModeKey}" Width="85"/>
-         <DataGridTextColumn Header="fn / Hz" Binding="{Binding Frequency, StringFormat=F3}" Width="90"/>
-         <DataGridTextColumn Header="源幅值" Binding="{Binding SourceMagnitude, StringFormat=G4}" Width="90"/>
-         <DataGridTextColumn Header="耳点振型" Binding="{Binding SeatShape, StringFormat=F4}" Width="95"/>
-         <DataGridTextColumn Header="数值观察" Binding="{Binding Observation}" Width="230"/>
+         <DataGridTextColumn Header="阶次" Binding="{Binding ModeKey, Mode=OneWay}" Width="85"/>
+         <DataGridTextColumn Header="fn / Hz" Binding="{Binding Frequency, StringFormat=F3, Mode=OneWay}" Width="90"/>
+         <DataGridTextColumn Header="源幅值" Binding="{Binding SourceMagnitude, StringFormat=G4, Mode=OneWay}" Width="90"/>
+         <DataGridTextColumn Header="耳点振型" Binding="{Binding SeatShape, StringFormat=F4, Mode=OneWay}" Width="95"/>
+         <DataGridTextColumn Header="数值观察" Binding="{Binding Observation, Mode=OneWay}" Width="230"/>
         </DataGrid.Columns>
        </DataGrid>
        <TextBlock Text="弱耦合阈值：源耦合低于启用幅值和的1%，或耳点振型绝对值低于0.01。仅为数值观察，不是工程合格标准。" Style="{StaticResource Hint}"/>
@@ -297,21 +297,21 @@
        </ItemsControl>
        <DataGrid ItemsSource="{Binding Comparison.Seats}" Height="270" IsReadOnly="True">
         <DataGrid.Columns>
-         <DataGridTextColumn Header="耳点" Binding="{Binding Name}" Width="110"/>
-         <DataGridTextColumn Header="基准峰值" Binding="{Binding BaselinePeak, StringFormat=G5}" Width="100"/>
-         <DataGridTextColumn Header="当前峰值" Binding="{Binding CurrentPeak, StringFormat=G5}" Width="100"/>
-         <DataGridTextColumn Header="峰值比 / dB" Binding="{Binding PeakRatioDb, StringFormat=F3}" Width="105"/>
-         <DataGridTextColumn Header="RMS比 / dB" Binding="{Binding RmsRatioDb, StringFormat=F3}" Width="105"/>
-         <DataGridTextColumn Header="当前峰频 / Hz" Binding="{Binding CurrentFrequency, StringFormat=F3}" Width="120"/>
+         <DataGridTextColumn Header="耳点" Binding="{Binding Name, Mode=OneWay}" Width="110"/>
+         <DataGridTextColumn Header="基准峰值" Binding="{Binding BaselinePeak, StringFormat=G5, Mode=OneWay}" Width="100"/>
+         <DataGridTextColumn Header="当前峰值" Binding="{Binding CurrentPeak, StringFormat=G5, Mode=OneWay}" Width="100"/>
+         <DataGridTextColumn Header="峰值比 / dB" Binding="{Binding PeakRatioDb, StringFormat=F3, Mode=OneWay}" Width="105"/>
+         <DataGridTextColumn Header="RMS比 / dB" Binding="{Binding RmsRatioDb, StringFormat=F3, Mode=OneWay}" Width="105"/>
+         <DataGridTextColumn Header="当前峰频 / Hz" Binding="{Binding CurrentFrequency, StringFormat=F3, Mode=OneWay}" Width="120"/>
         </DataGrid.Columns>
        </DataGrid>
        <TextBlock Text="同阶次固有频率变化" Style="{StaticResource Subheading}"/>
        <DataGrid ItemsSource="{Binding Comparison.Modes}" Height="225" IsReadOnly="True">
         <DataGrid.Columns>
-         <DataGridTextColumn Header="阶次" Binding="{Binding Key}" Width="100"/>
-         <DataGridTextColumn Header="基准 / Hz" Binding="{Binding BaselineFrequency, StringFormat=F3}" Width="120"/>
-         <DataGridTextColumn Header="当前 / Hz" Binding="{Binding CurrentFrequency, StringFormat=F3}" Width="120"/>
-         <DataGridTextColumn Header="变化 / %" Binding="{Binding Percent, StringFormat=F3}" Width="110"/>
+         <DataGridTextColumn Header="阶次" Binding="{Binding Key, Mode=OneWay}" Width="100"/>
+         <DataGridTextColumn Header="基准 / Hz" Binding="{Binding BaselineFrequency, StringFormat=F3, Mode=OneWay}" Width="120"/>
+         <DataGridTextColumn Header="当前 / Hz" Binding="{Binding CurrentFrequency, StringFormat=F3, Mode=OneWay}" Width="120"/>
+         <DataGridTextColumn Header="变化 / %" Binding="{Binding Percent, StringFormat=F3, Mode=OneWay}" Width="110"/>
         </DataGrid.Columns>
        </DataGrid>
        <Button Content="导出基准差异CSV…" Command="{Binding ExportComparisonCommand}" HorizontalAlignment="Left"/>
@@ -343,12 +343,12 @@
        <controls:SpectrumChart Data="{Binding ScanPlot}" Height="310"/>
        <DataGrid ItemsSource="{Binding Scan.Rows}" SelectedItem="{Binding SelectedScanRow}" Height="290" IsReadOnly="True">
         <DataGrid.Columns>
-         <DataGridTextColumn Header="参数值" Binding="{Binding Parameter, StringFormat=G5}" Width="90"/>
-         <DataGridTextColumn Header="采样峰值" Binding="{Binding PeakMagnitude, StringFormat=G5}" Width="100"/>
-         <DataGridTextColumn Header="峰频 / Hz" Binding="{Binding PeakFrequency, StringFormat=F3}" Width="100"/>
-         <DataGridTextColumn Header="采样RMS" Binding="{Binding Rms, StringFormat=G5}" Width="100"/>
-         <DataGridTextColumn Header="首模态 / Hz" Binding="{Binding FirstMode, StringFormat=F3}" Width="105"/>
-         <DataGridTextColumn Header="无效候选原因" Binding="{Binding Error}" Width="320"/>
+         <DataGridTextColumn Header="参数值" Binding="{Binding Parameter, StringFormat=G5, Mode=OneWay}" Width="90"/>
+         <DataGridTextColumn Header="采样峰值" Binding="{Binding PeakMagnitude, StringFormat=G5, Mode=OneWay}" Width="100"/>
+         <DataGridTextColumn Header="峰频 / Hz" Binding="{Binding PeakFrequency, StringFormat=F3, Mode=OneWay}" Width="100"/>
+         <DataGridTextColumn Header="采样RMS" Binding="{Binding Rms, StringFormat=G5, Mode=OneWay}" Width="100"/>
+         <DataGridTextColumn Header="首模态 / Hz" Binding="{Binding FirstMode, StringFormat=F3, Mode=OneWay}" Width="105"/>
+         <DataGridTextColumn Header="无效候选原因" Binding="{Binding Error, Mode=OneWay}" Width="320"/>
         </DataGrid.Columns>
        </DataGrid>
        <TextBlock Text="失败行的数值占位0无物理意义，以错误原因列为准；导出中失败指标为空。首个声源坐标扫描按点位表顺序，不按选中行。" Style="{StaticResource Hint}"/>
@@ -365,17 +365,17 @@
        <TextBlock Text="保持几何、源、耳点及频带不变，只增加截断频率，最高1000Hz。结果仅反映两次截断选择的差异，不证明收敛。" Style="{StaticResource Hint}"/>
        <Button Content="计算截断敏感性" Command="{Binding TruncationCommand}" HorizontalAlignment="Left"/>
        <TextBlock Margin="0,8">
-        <Run Text="原截断 / Hz："/><Run Text="{Binding Truncation.OriginalCutoff}"/>
-        <Run Text="    扩展截断 / Hz："/><Run Text="{Binding Truncation.ExtendedCutoff}"/>
+        <Run Text="原截断 / Hz："/><Run Text="{Binding Truncation.OriginalCutoff, Mode=OneWay}"/>
+        <Run Text="    扩展截断 / Hz："/><Run Text="{Binding Truncation.ExtendedCutoff, Mode=OneWay}"/>
        </TextBlock>
        <DataGrid ItemsSource="{Binding Truncation.Rows}" Height="330" IsReadOnly="True">
         <DataGrid.Columns>
-         <DataGridTextColumn Header="座位" Binding="{Binding Seat}" Width="120"/>
-         <DataGridTextColumn Header="原RMS" Binding="{Binding OriginalRms, StringFormat=G5}" Width="110"/>
-         <DataGridTextColumn Header="扩展RMS" Binding="{Binding ExtendedRms, StringFormat=G5}" Width="110"/>
-         <DataGridTextColumn Header="比值 / dB" Binding="{Binding RatioDb, StringFormat=F4}" Width="110"/>
-         <DataGridTextColumn Header="原峰值" Binding="{Binding OriginalPeak, StringFormat=G5}" Width="100"/>
-         <DataGridTextColumn Header="扩展峰值" Binding="{Binding ExtendedPeak, StringFormat=G5}" Width="110"/>
+         <DataGridTextColumn Header="座位" Binding="{Binding Seat, Mode=OneWay}" Width="120"/>
+         <DataGridTextColumn Header="原RMS" Binding="{Binding OriginalRms, StringFormat=G5, Mode=OneWay}" Width="110"/>
+         <DataGridTextColumn Header="扩展RMS" Binding="{Binding ExtendedRms, StringFormat=G5, Mode=OneWay}" Width="110"/>
+         <DataGridTextColumn Header="比值 / dB" Binding="{Binding RatioDb, StringFormat=F4, Mode=OneWay}" Width="110"/>
+         <DataGridTextColumn Header="原峰值" Binding="{Binding OriginalPeak, StringFormat=G5, Mode=OneWay}" Width="100"/>
+         <DataGridTextColumn Header="扩展峰值" Binding="{Binding ExtendedPeak, StringFormat=G5, Mode=OneWay}" Width="110"/>
         </DataGrid.Columns>
        </DataGrid>
        <TextBlock Text="近零原始RMS时比值不可稳定计算（NaN），不能解释为实际增益。完整研究报告同时包含本次敏感性结果。" Style="{StaticResource Hint}"/>
@@ -398,9 +398,9 @@
        <TextBlock Text="保存历史（随项目内嵌，最多500条）" Style="{StaticResource Subheading}"/>
        <DataGrid ItemsSource="{Binding Journal}" Height="250" IsReadOnly="True">
         <DataGrid.Columns>
-         <DataGridTextColumn Header="UTC时间" Binding="{Binding Time, StringFormat=yyyy-MM-dd HH:mm:ss}" Width="170"/>
-         <DataGridTextColumn Header="操作" Binding="{Binding Action}" Width="140"/>
-         <DataGridTextColumn Header="详情" Binding="{Binding Detail}" Width="350"/>
+         <DataGridTextColumn Header="UTC时间" Binding="{Binding Time, StringFormat=yyyy-MM-dd HH:mm:ss, Mode=OneWay}" Width="170"/>
+         <DataGridTextColumn Header="操作" Binding="{Binding Action, Mode=OneWay}" Width="140"/>
+         <DataGridTextColumn Header="详情" Binding="{Binding Detail, Mode=OneWay}" Width="350"/>
         </DataGrid.Columns>
        </DataGrid>
        <WrapPanel>

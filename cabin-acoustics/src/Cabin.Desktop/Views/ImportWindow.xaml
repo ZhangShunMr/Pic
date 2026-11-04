@@ -16,19 +16,19 @@
   </StackPanel>
   <DataGrid Grid.Row="1" ItemsSource="{Binding Rows}" IsReadOnly="True">
    <DataGrid.Columns>
-    <DataGridTextColumn Header="类型" Binding="{Binding Kind}" Width="80"/>
-    <DataGridTextColumn Header="名称" Binding="{Binding Name}" Width="150"/>
-    <DataGridTextColumn Header="x / m" Binding="{Binding Point.X}" Width="80"/>
-    <DataGridTextColumn Header="y / m" Binding="{Binding Point.Y}" Width="80"/>
-    <DataGridTextColumn Header="z / m" Binding="{Binding Point.Z}" Width="80"/>
-    <DataGridTextColumn Header="幅值" Binding="{Binding Amplitude}" Width="70"/>
-    <DataGridTextColumn Header="相位 / °" Binding="{Binding Phase}" Width="85"/>
-    <DataGridTextColumn Header="备注" Binding="{Binding Note}" Width="*"/>
+    <DataGridTextColumn Header="类型" Binding="{Binding Kind, Mode=OneWay}" Width="80"/>
+    <DataGridTextColumn Header="名称" Binding="{Binding Name, Mode=OneWay}" Width="150"/>
+    <DataGridTextColumn Header="x / m" Binding="{Binding Point.X, Mode=OneWay}" Width="80"/>
+    <DataGridTextColumn Header="y / m" Binding="{Binding Point.Y, Mode=OneWay}" Width="80"/>
+    <DataGridTextColumn Header="z / m" Binding="{Binding Point.Z, Mode=OneWay}" Width="80"/>
+    <DataGridTextColumn Header="幅值" Binding="{Binding Amplitude, Mode=OneWay}" Width="70"/>
+    <DataGridTextColumn Header="相位 / °" Binding="{Binding Phase, Mode=OneWay}" Width="85"/>
+    <DataGridTextColumn Header="备注" Binding="{Binding Note, Mode=OneWay}" Width="*"/>
    </DataGrid.Columns>
   </DataGrid>
   <GroupBox Grid.Row="2" Header="预检问题（无问题时可应用）">
    <ListBox ItemsSource="{Binding Issues}" BorderThickness="0">
-    <ListBox.ItemTemplate><DataTemplate><TextBlock><Run Text="{Binding Path}"/><Run Text="："/><Run Text="{Binding Message}"/></TextBlock></DataTemplate></ListBox.ItemTemplate>
+    <ListBox.ItemTemplate><DataTemplate><TextBlock><Run Text="{Binding Path, Mode=OneWay}"/><Run Text="："/><Run Text="{Binding Message, Mode=OneWay}"/></TextBlock></DataTemplate></ListBox.ItemTemplate>
    </ListBox>
   </GroupBox>
   <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
