@@ -26,6 +26,7 @@ jobs:
       - name: Render actual DOCX files with LibreOffice
         run: |
           mkdir -p docs/preview
+          rm -f docs/preview/*.pdf
           libreoffice -env:UserInstallation=file:///tmp/trim-lo-profile --headless --convert-to pdf --outdir docs/preview docs/操作说明书-待Windows核验.docx docs/软著信息采集表-草稿.docx
           python3 tools/pdf_preview.py
       - name: Retain previews
