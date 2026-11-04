@@ -4,6 +4,7 @@ on:
     branches: ['windows-native/trim-contact-design-20261104']
     paths:
       - 'trim-contact-design/src/**'
+      - 'trim-contact-design/.gitattributes'
       - 'trim-contact-design/tests/**'
       - 'trim-contact-design/TrimContact.sln'
       - 'trim-contact-design/Directory.Build.props'
