@@ -1,6 +1,6 @@
 {
-  "executedUtc": "2026-11-04T15:43:33.8587023+00:00",
-  "sourceCommit": "f4ec817a6deb38a643ad28410f4078007a5a224e",
+  "executedUtc": "2026-11-04T15:46:57.5246924+00:00",
+  "sourceCommit": "2c88f6c9cb270cdd2482f86b6ddf77b117f76d69",
   "platform": "Microsoft Windows NT 10.0.26100.0",
   "framework": ".NET 8.0.33",
   "screenshotMethod": "Actual production WPF MainWindow shown on Windows; native Window client content captured with RenderTargetBitmap after layout/render. No browser or mock-up. Test dialog adapter is used for confirmations and file paths.",
@@ -63,6 +63,11 @@
     },
     {
       "name": "Native command bound and available: \u8FD8\u539F\u8349\u7A3F",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Discarding invalid editor clears obsolete error notice",
       "status": "passed",
       "detail": ""
     },

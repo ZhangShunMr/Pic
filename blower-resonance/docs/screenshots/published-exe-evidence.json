@@ -1,11 +1,11 @@
 {
-  "executedUtc": "2026-11-04T15:43:49.8869709+00:00",
-  "actualProcessStarted": true,
-  "normalExitCode": 0,
-  "platform": "Microsoft Windows NT 10.0.26100.0",
   "executable": "release/win-x64/BlowerResonance.exe",
+  "normalExitCode": 0,
+  "sourceCommit": "2c88f6c9cb270cdd2482f86b6ddf77b117f76d69",
+  "executedUtc": "2026-11-04T15:47:13.9802972+00:00",
   "nativeWindowTitle": "空调鼓风机风量挡位与共振避让设计软件 V2.0 — 未命名设计项目 *",
-  "sourceCommit": "f4ec817a6deb38a643ad28410f4078007a5a224e",
-  "sha256": "B30725450029950719B7344B7F2B09150AC94BE30F026C2800E2BD146C527150",
+  "sha256": "CEC23BA607D9FA90D9448608F1EAEF767E06D91EC4B0CC0B37B97C95B9ED33B5",
+  "platform": "Microsoft Windows NT 10.0.26100.0",
+  "actualProcessStarted": true,
   "note": "Self-contained exe started directly; actual native window observed and native unsaved dialog discarded. Not Windows 10/11 hardware or high-DPI certification."
 }
