@@ -5,10 +5,11 @@ namespace AcousticSeal.Desktop;
 public partial class MainWindow : Window
 {
     private readonly Workspace workspace;
-    public MainWindow()
+    public MainWindow() : this(new NativeDialogs()) { }
+    public MainWindow(IUserDialogs dialogs)
     {
         InitializeComponent();
-        workspace = new Workspace(new NativeDialogs());
+        workspace = new Workspace(dialogs);
         DataContext = workspace;
         Closing += OnClosing;
     }

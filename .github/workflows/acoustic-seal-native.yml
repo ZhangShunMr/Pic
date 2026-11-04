@@ -1,0 +1,54 @@
+name: Acoustic seal Windows native verification
+on:
+  push:
+    branches: ['windows-native/acoustic-seal-analysis']
+    paths: ['acoustic-seal-analysis/**', '.github/workflows/acoustic-seal-native.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: acoustic-seal-analysis
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.403'
+      - name: Build and verify core, MVVM and actual native WPF controls
+        run: ./tools/verify-windows.ps1
+      - name: Publish self contained native desktop executable
+        run: |
+          dotnet publish src/AcousticSeal.Desktop -c Release -r win-x64 --self-contained true -p:PublishSingleFile=false -o artifacts/win-x64
+          if ($LASTEXITCODE -ne 0) { throw 'Publish failed' }
+      - name: Start actual self contained native executable
+        run: ./tools/smoke-published.ps1
+      - name: Check whether actual Microsoft Word pagination is available
+        run: ./tools/check-word.ps1
+      - name: Preserve actual execution evidence and Windows package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: acoustic-seal-windows-native
+          path: |
+            acoustic-seal-analysis/docs/screenshots
+            acoustic-seal-analysis/docs/verification-windows.log
+            acoustic-seal-analysis/docs/word-runtime-check.json
+            acoustic-seal-analysis/docs/*Word*.pdf
+            acoustic-seal-analysis/artifacts/win-x64
+      - name: Commit verified screenshots and runtime evidence to this software branch
+        if: success() && github.ref == 'refs/heads/windows-native/acoustic-seal-analysis'
+        run: |
+          git config user.name 'Acoustic seal Windows verification'
+          git config user.email 'codex@openai.com'
+          git add docs/screenshots docs/verification-windows.log docs/word-runtime-check.json
+          git diff --cached --quiet
+          if ($LASTEXITCODE -eq 1) {
+            git commit -m 'Record actual Windows WPF controls, native captures and executable checks [skip ci]'
+            git push origin HEAD:windows-native/acoustic-seal-analysis
+            if ($LASTEXITCODE -ne 0) { throw 'Could not preserve actual evidence on this independent branch' }
+          }
