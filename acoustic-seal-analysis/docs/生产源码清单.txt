@@ -3950,7 +3950,7 @@ public sealed class ProjectSession
 <Application x:Class="AcousticSeal.Desktop.App"
  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
- StartupUri="MainWindow.xaml">
+ >
  <Application.Resources>
   <BooleanToVisibilityConverter x:Key="Visible"/>
   <Style TargetType="TextBlock"><Setter Property="TextWrapping" Value="Wrap"/></Style>
@@ -3978,7 +3978,19 @@ public sealed class ProjectSession
 文件：src/AcousticSeal.Desktop/App.xaml.cs
 using System.Windows;
 namespace AcousticSeal.Desktop;
-public partial class App : Application { }
+public partial class App : Application
+{
+    public bool StartMainWindow { get; set; } = true;
+    protected override void OnStartup(StartupEventArgs e)
+    {
+        base.OnStartup(e);
+        if (StartMainWindow)
+        {
+            MainWindow = new MainWindow();
+            MainWindow.Show();
+        }
+    }
+}
 
 
 文件：src/AcousticSeal.Desktop/EnumTextConverter.cs
@@ -4183,10 +4195,11 @@ namespace AcousticSeal.Desktop;
 public partial class MainWindow : Window
 {
     private readonly Workspace workspace;
-    public MainWindow()
+    public MainWindow() : this(new NativeDialogs()) { }
+    public MainWindow(IUserDialogs dialogs)
     {
         InitializeComponent();
-        workspace = new Workspace(new NativeDialogs());
+        workspace = new Workspace(dialogs);
         DataContext = workspace;
         Closing += OnClosing;
     }

@@ -1,0 +1,49 @@
+{
+  "runs": [
+    {
+      "id": 41860592992,
+      "url": "https://github.com/ZhangShunMr/Pic/actions/runs/41860592992",
+      "sourceCommit": "e3253e55e918ea58b369432ea207b170fc1600cb",
+      "result": "failed_before_window_capture",
+      "platform": "Microsoft Windows Server 2025 10.0.26100",
+      "coreAndMvvm": "65 + 10 passed, 0 failed",
+      "reason": "Test entry assigned null to WPF Application.StartupUri; rejected with ArgumentNullException. Replaced with explicit native startup toggle.",
+      "permissionsDenied": false
+    },
+    {
+      "id": 41860892390,
+      "url": "https://github.com/ZhangShunMr/Pic/actions/runs/41860892390",
+      "sourceCommit": "e1e691f070d35b7e353584615228cdbadb6585e9",
+      "result": "success",
+      "platform": "Microsoft Windows Server 2025 10.0.26100",
+      "coreAndMvvm": "65 + 10 passed, 0 failed",
+      "nativeWindowChecks": 51,
+      "nativeWindowFailures": 0,
+      "nativeScreenshots": 18,
+      "publishedExeObserved": true,
+      "publishedExitCode": 0,
+      "wordAvailable": false,
+      "wordPageCount": null,
+      "wordReason": "Word COM REGDB_E_CLASSNOTREG 0x80040154",
+      "permissionsDenied": false
+    },
+    {
+      "id": 41861712287,
+      "url": "https://github.com/ZhangShunMr/Pic/actions/runs/41861712287",
+      "sourceCommit": "4d05a94c55c0a6fc9ac994bde6f0a18e1a421844",
+      "result": "success",
+      "platform": "Microsoft Windows Server 2025 10.0.26100",
+      "coreAndMvvm": "65 + 10 passed, 0 failed",
+      "nativeWindowChecks": 51,
+      "nativeWindowFailures": 0,
+      "nativeScreenshots": 18,
+      "publishedExeObserved": true,
+      "publishedExitCode": 0,
+      "archiveContainsExactTestedExe": true,
+      "wordAvailable": false,
+      "wordPageCount": null,
+      "wordReason": "Word COM REGDB_E_CLASSNOTREG 0x80040154",
+      "permissionsDenied": false
+    }
+  ]
+}

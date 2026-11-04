@@ -1,0 +1,152 @@
+{
+  "workflowRun": "https://github.com/ZhangShunMr/Pic/actions/runs/41861712287",
+  "sourceCommit": "4d05a94c55c0a6fc9ac994bde6f0a18e1a421844",
+  "method": "Model visual inspection of all 18 actual WPF PNGs; refreshed five changed captures reviewed again after final run. Other thirteen byte-identical to reviewed successful previous run.",
+  "wordPaginationReviewed": false,
+  "images": [
+    {
+      "file": "docs/screenshots/01-empty.png",
+      "width": 1164,
+      "height": 749,
+      "sha256": "799fd814ce85e73c9eaade6c2f8e2eaf83dda969f1d13aebfd0d9311c461141d",
+      "visuallyReviewed": true,
+      "review": "Chinese labels and current data readable; native controls/plots loaded; viewport clipping has scroll access; simulation/manual provenance retained."
+    },
+    {
+      "file": "docs/screenshots/02-location.png",
+      "width": 1164,
+      "height": 749,
+      "sha256": "78de42c052be68979b4aac9506fabf5884986c15391a847f6cbcb98d4f4ce561",
+      "visuallyReviewed": true,
+      "review": "Chinese labels and current data readable; native controls/plots loaded; viewport clipping has scroll access; simulation/manual provenance retained."
+    },
+    {
+      "file": "docs/screenshots/03-condition.png",
+      "width": 1164,
+      "height": 749,
+      "sha256": "bc2dd6cb169a07b1e43dfa656901342cb1d905871a9efe224b6cd114e4cc8155",
+      "visuallyReviewed": true,
+      "review": "Chinese labels and current data readable; native controls/plots loaded; viewport clipping has scroll access; simulation/manual provenance retained."
+    },
+    {
+      "file": "docs/screenshots/04-baseline.png",
+      "width": 1164,
+      "height": 749,
+      "sha256": "d653267f07232877039f3f1e80dfd9523eaead6acdb812c62598782816d0888c",
+      "visuallyReviewed": true,
+      "review": "Chinese labels and current data readable; native controls/plots loaded; viewport clipping has scroll access; simulation/manual provenance retained."
+    },
+    {
+      "file": "docs/screenshots/05-single.png",
+      "width": 1164,
+      "height": 749,
+      "sha256": "1e8355813f3dc00e22f1fec5aaca4595df54fc2f25c12089b86c8f79b45747ff",
+      "visuallyReviewed": true,
+      "review": "Chinese labels and current data readable; native controls/plots loaded; viewport clipping has scroll access; simulation/manual provenance retained."
+    },
+    {
+      "file": "docs/screenshots/06-pair.png",
+      "width": 1164,
+      "height": 749,
+      "sha256": "52956a41952c9b73a92cd0a63b5bccd7515f35cabb54f15924a8cd9790bb79ad",
+      "visuallyReviewed": true,
+      "review": "Chinese labels and current data readable; native controls/plots loaded; viewport clipping has scroll access; simulation/manual provenance retained."
+    },
+    {
+      "file": "docs/screenshots/07-manual-result.png",
+      "width": 1164,
+      "height": 749,
+      "sha256": "7a124c981475112d38993303d0fc75324bb4fe6ebe33499a21292184f3fcad7d",
+      "visuallyReviewed": true,
+      "review": "Chinese labels and current data readable; native controls/plots loaded; viewport clipping has scroll access; simulation/manual provenance retained."
+    },
+    {
+      "file": "docs/screenshots/08-example-project.png",
+      "width": 1164,
+      "height": 749,
+      "sha256": "6bf4c6c6f9dd112adc8c552163aa75a9830c6987bb0f236d1af398a7a36270b3",
+      "visuallyReviewed": true,
+      "review": "Chinese labels and current data readable; native controls/plots loaded; viewport clipping has scroll access; simulation/manual provenance retained."
+    },
+    {
+      "file": "docs/screenshots/09-combination.png",
+      "width": 1164,
+      "height": 749,
+      "sha256": "3bcaf669e1a91ff55764e7b6e25dd1355d6fd241c0ff6c68ca029035d7957b79",
+      "visuallyReviewed": true,
+      "review": "Chinese labels and current data readable; native controls/plots loaded; viewport clipping has scroll access; simulation/manual provenance retained."
+    },
+    {
+      "file": "docs/screenshots/10-import-preview.png",
+      "width": 1164,
+      "height": 749,
+      "sha256": "50f62cfc6b66440f39e2fa33227ac423e9f8eb1174a1f4a911008a61ea5e3784",
+      "visuallyReviewed": true,
+      "review": "Chinese labels and current data readable; native controls/plots loaded; viewport clipping has scroll access; simulation/manual provenance retained."
+    },
+    {
+      "file": "docs/screenshots/11-example-difference.png",
+      "width": 1164,
+      "height": 749,
+      "sha256": "91a2802d3fe3da41d7fbc09eb5952e570f7b831d2424990094657f4af71c16ac",
+      "visuallyReviewed": true,
+      "review": "Chinese labels and current data readable; native controls/plots loaded; viewport clipping has scroll access; simulation/manual provenance retained."
+    },
+    {
+      "file": "docs/screenshots/12-original-spectrum.png",
+      "width": 1164,
+      "height": 749,
+      "sha256": "20f1a79af75a981dc31309af97183523bedc7e45fbe59f1da0c26113b1f6fc95",
+      "visuallyReviewed": true,
+      "review": "Chinese labels and current data readable; native controls/plots loaded; viewport clipping has scroll access; simulation/manual provenance retained."
+    },
+    {
+      "file": "docs/screenshots/13-quality.png",
+      "width": 1164,
+      "height": 749,
+      "sha256": "ee5cfd132b37f032053fa65a0c50bcf3f1552686f78a2ca72e8f8205c177d52e",
+      "visuallyReviewed": true,
+      "review": "Chinese labels and current data readable; native controls/plots loaded; viewport clipping has scroll access; simulation/manual provenance retained."
+    },
+    {
+      "file": "docs/screenshots/14-settings.png",
+      "width": 1164,
+      "height": 749,
+      "sha256": "2c42ac169ffbe883897d13631a05766faed2653383e257609fbbe67131854644",
+      "visuallyReviewed": true,
+      "review": "Chinese labels and current data readable; native controls/plots loaded; viewport clipping has scroll access; simulation/manual provenance retained."
+    },
+    {
+      "file": "docs/screenshots/15-review.png",
+      "width": 1164,
+      "height": 749,
+      "sha256": "2442475ee152dc9183c2a26ba42eb90d8f4953b812d79917b3e471ce827b0fdc",
+      "visuallyReviewed": true,
+      "review": "Chinese labels and current data readable; native controls/plots loaded; viewport clipping has scroll access; simulation/manual provenance retained."
+    },
+    {
+      "file": "docs/screenshots/16-minimum-window.png",
+      "width": 1164,
+      "height": 681,
+      "sha256": "9fa8ca2044973c7e7aaf4922c6fd9d071e362ff71576614565dc1591709e0496",
+      "visuallyReviewed": true,
+      "review": "Chinese labels and current data readable; native controls/plots loaded; viewport clipping has scroll access; simulation/manual provenance retained."
+    },
+    {
+      "file": "docs/screenshots/17-invalid-draft.png",
+      "width": 1164,
+      "height": 749,
+      "sha256": "b8888ca37438515620a9c19c6cc3fa752d99bf408b21c67a5a6ce8b9ab7b3520",
+      "visuallyReviewed": true,
+      "review": "Chinese labels and current data readable; native controls/plots loaded; viewport clipping has scroll access; simulation/manual provenance retained."
+    },
+    {
+      "file": "docs/screenshots/18-blocked-comparison.png",
+      "width": 1164,
+      "height": 749,
+      "sha256": "2c4f67b7ea0c8414d98a4c6803d8967a2da849b5d93425a1cdb7e3513e4d9c6f",
+      "visuallyReviewed": true,
+      "review": "Chinese labels and current data readable; native controls/plots loaded; viewport clipping has scroll access; simulation/manual provenance retained."
+    }
+  ]
+}

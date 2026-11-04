@@ -111,12 +111,12 @@
     {
       "path": "src/AcousticSeal.Desktop/App.xaml",
       "nonblank_lines": 26,
-      "sha256": "5b26211b34d66bb6cb4ee5c00a4b8989e868923763ac2523ec7a750de236219b"
+      "sha256": "f637a162cd08f6d1f46469efd984ded337ccc52f6e6f114e3f46c2394d7df0c2"
     },
     {
       "path": "src/AcousticSeal.Desktop/App.xaml.cs",
-      "nonblank_lines": 3,
-      "sha256": "78369604dea059e463aedc0d25346bb0124ad2e6a6cade22936f8125f6dbd59c"
+      "nonblank_lines": 15,
+      "sha256": "905f48c8dd4b74451f25864318ec66856241db1151e52b662c736965b286b2af"
     },
     {
       "path": "src/AcousticSeal.Desktop/EnumTextConverter.cs",
@@ -135,8 +135,8 @@
     },
     {
       "path": "src/AcousticSeal.Desktop/MainWindow.xaml.cs",
-      "nonblank_lines": 26,
-      "sha256": "fd241535faa99ad52d8ad859e709f892207d4cf11e13d97719d2ba40dc4a0953"
+      "nonblank_lines": 27,
+      "sha256": "2a24d4b74de145493c618635fbc60452ee805bb3c97d2cf6029a9c51eba47389"
     },
     {
       "path": "src/AcousticSeal.Desktop/NativeDialogs.cs",
@@ -169,5 +169,5 @@
       "sha256": "07ee20894d763f79398bb7dd0cf7e08ec65b219b3f8b3a3725dc55a7e212cc15"
     }
   ],
-  "total_nonblank_lines": 4637
+  "total_nonblank_lines": 4650
 }

@@ -6,7 +6,7 @@ C# / WPF / MVVM Windows 原生桌面版，入口 `AcousticSeal.sln`，启动项�
 
 ## Windows 运行
 
-目标为 Windows 10/11 x64。推荐 Windows 11；未在本 Linux 环境验证 Windows 系统兼容性、窗口布局和文件对话框。
+目标为 Windows 10/11 x64。推荐 Windows 11；已在 GitHub Actions Windows Server 2025 验证原生窗口及限定控件流程；未验证所有 Windows 10/11 硬件、DPI 和系统文件对话框交互。
 
 1. 仓库 `releases/AcousticSeal-V3.0-win-x64.zip` 提供本次构建的自包含发布包。取得自包含发布目录时，完整解压到可写目录，双击 `AcousticSeal.Desktop.exe`。必须保留同目录全部文件。运行时无需网络、SDK、浏览器或服务器。
 2. 从源码运行时，安装 .NET SDK **10.0.403**，在本目录执行 `dotnet build AcousticSeal.sln -c Release`，然后 `dotnet run --project src/AcousticSeal.Desktop -c Release`。首次还原 Windows targeting pack 需要联网；运行不联网。
@@ -29,4 +29,6 @@ CSV 为 UTF-8 三列 `trial_id,frequency_hz,level_db`；试验 GUID 可从频带
 
 `dotnet run --project tests/AcousticSeal.Verification -c Release` 执行核心与 MVVM 逻辑验证。`python tools/source_inventory.py` 重建生产源码清单。实际日志、逐项符合性、算法说明、操作说明书草稿及信息采集表草稿位于 docs。
 
-**交付限制：** Linux 已完成跨平台编译、核心及桌面逻辑测试。Windows/WPF 窗口实际启动、绑定/交互/缩放、真实桌面截图尚未执行。没有提交浏览器图、模拟界面图或旧版截图。操作说明书 DOCX 是内容草稿；未获原始专用模板，未完成 Word 实际分页和逐页检查，不能认定为不少于10页的软著终稿。权属、申请人、开发及发表日期待申请人核实。详见 `docs/验收与限制.md`。
+**Windows 证据：** 已在 Windows Server 2025 runner 实际运行 WPF 窗口，51 项窗口检查通过、绑定错误为空，取得18张真实WPF客户端截图；自包含 `.exe` 直接启动并以0退出。源提交、时间、截图方法和测试边界见 `docs/screenshots/windows-ui-evidence.json`、`published-exe-evidence.json`；发布包由通过启动检查的同一Windows输出打包，并核对归档内exe哈希。
+
+**剩余限制：** 窗口自动化使用可控 `IUserDialogs` 路径和确认，系统文件对话框的鼠标/键盘操作、所有快捷键、多DPI、Windows10/11硬件兼容性尚未覆盖。手册已嵌入18张真实截图、图号及图注；Microsoft Word COM不可用（REGDB_E_CLASSNOTREG），Word实际不少于10页及逐页排版尚未验收，不能认定软著终稿已完成。未获专用模板；权属、申请人、开发及发表日期待核实。详见 `docs/验收与限制.md`。
