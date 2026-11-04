@@ -55,6 +55,7 @@ internal static class Program
                 File.WriteAllText(Path.Combine(directory, "windows-ui-evidence.json"), JsonSerializer.Serialize(new
                 {
                     executedUtc = DateTimeOffset.UtcNow,
+                    sourceCommit = Environment.GetEnvironmentVariable("GITHUB_SHA"),
                     platform = Environment.OSVersion.ToString(),
                     framework = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,
                     rendering = "Actual WPF MainWindow shown on Windows. PNG files captured from the rendered native Window using RenderTargetBitmap; not browser or mock-up images.",

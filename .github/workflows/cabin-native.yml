@@ -24,6 +24,9 @@ jobs:
       - name: Publish offline self contained Windows folder
         if: success()
         run: ./tools/publish-windows.ps1
+      - name: Launch published native executable directly
+        if: success()
+        run: ./tools/smoke-published.ps1
       - name: Retain actual evidence and runnable Windows package
         if: always()
         uses: actions/upload-artifact@v4
