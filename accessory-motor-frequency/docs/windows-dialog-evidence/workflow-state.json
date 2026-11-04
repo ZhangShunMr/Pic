@@ -1,0 +1,6 @@
+{
+  "outcome": "failure",
+  "limitation": "Only a successful native-dialogs.json certifies dialog verification; basic WPF success is separate.",
+  "runId": "41865185186",
+  "sourceCommit": "81041c0cbaf01268d9e9d05f9d9f48472c2281a2"
+}

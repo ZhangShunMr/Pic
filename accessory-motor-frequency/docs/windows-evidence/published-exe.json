@@ -1,8 +1,22 @@
 {
-  "executedUtc": "2026-11-04T15:43:34.7338713+00:00",
+  "executedUtc": "2026-11-04T16:16:02.9375550+00:00",
   "executable": "artifacts/win-x64/MotorFrequency.exe",
-  "sha256": "025C17EB69E0D5B2D4682E13989C1F77933EBC39053AF47263E31B2F1378E3E1",
-  "sourceCommit": "21e81e15b4c47d1b120b325e84278ef798d48fae",
+  "sha256": "3400F01A4236A3F5E62A7DA1EC605A118615669B33EA5CF957326F25FE595BCB",
+  "assemblies": [
+    {
+      "sha256": "7BA5521107D30E62F19A5D309D1A78108E826D50603A2514CE9E309FB83A6F47",
+      "file": "MotorFrequency.dll"
+    },
+    {
+      "sha256": "515B7172C9955146D86B868F2044FE6C355A54B416CFAF905A727D0D5EE6029A",
+      "file": "MotorFrequency.Application.dll"
+    },
+    {
+      "sha256": "BE96ADCE4E852CD3D4D5D8C4C2C1A4AB67A74337FC29B92A624C4E88AE003D0A",
+      "file": "MotorFrequency.Core.dll"
+    }
+  ],
+  "sourceCommit": "81041c0cbaf01268d9e9d05f9d9f48472c2281a2",
   "platform": "Microsoft Windows NT 10.0.26100.0",
   "actualProcessStarted": true,
   "nativeWindowTitle": "汽车附件电机电磁激励频率设计软件 V2.0 — 无项目",
