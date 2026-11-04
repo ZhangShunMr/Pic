@@ -37,5 +37,8 @@
     "申请人专用模板待提供核对",
     "身份权属和开发发表事实待申请人核实"
   ],
-  "permissionsBlockers": []
+  "permissionsBlockers": [],
+  "implementationCommit": "8a719525afdf70271500250f3ce955b1ac4b357f",
+  "implementationPushVerifiedAt": "2026-11-04T07:09:58.409325+00:00",
+  "mainRemoteShaUnchanged": "2bf4fc16fbca9c7ef36c4cce0a7d3034a16a2cd4"
 }
