@@ -1,6 +1,6 @@
 {
+  "sourceCommit": "4c00454d49a530ef07f2c382eb63ff49be5e6a4c",
   "outcome": "failure",
-  "limitation": "Only a successful native-dialogs.json certifies dialog verification; basic WPF success is separate.",
-  "runId": "41865185186",
-  "sourceCommit": "81041c0cbaf01268d9e9d05f9d9f48472c2281a2"
+  "runId": "41866452168",
+  "limitation": "Only a successful native-dialogs.json certifies dialog verification; basic WPF success is separate."
 }

@@ -1,22 +1,22 @@
 {
-  "executedUtc": "2026-11-04T16:16:02.9375550+00:00",
+  "executedUtc": "2026-11-04T16:22:43.9405919+00:00",
   "executable": "artifacts/win-x64/MotorFrequency.exe",
-  "sha256": "3400F01A4236A3F5E62A7DA1EC605A118615669B33EA5CF957326F25FE595BCB",
+  "sha256": "2E080F2269C5AF7447033135CD42E8E86CDA0C07FEE09FF96DE8421CFF5E2F53",
   "assemblies": [
     {
-      "sha256": "7BA5521107D30E62F19A5D309D1A78108E826D50603A2514CE9E309FB83A6F47",
-      "file": "MotorFrequency.dll"
+      "file": "MotorFrequency.dll",
+      "sha256": "4217526ED3BF6195FCB672E9172E89656B40D0CDC9912450B5B8AB10D5516C02"
     },
     {
-      "sha256": "515B7172C9955146D86B868F2044FE6C355A54B416CFAF905A727D0D5EE6029A",
-      "file": "MotorFrequency.Application.dll"
+      "file": "MotorFrequency.Application.dll",
+      "sha256": "5ADB45C7DA8F064D3CD5D8768BEA0D5473D7C176252F5F80D381C367C927DDFD"
     },
     {
-      "sha256": "BE96ADCE4E852CD3D4D5D8C4C2C1A4AB67A74337FC29B92A624C4E88AE003D0A",
-      "file": "MotorFrequency.Core.dll"
+      "file": "MotorFrequency.Core.dll",
+      "sha256": "6F4DE3190173A2F0FABD5D4D684DAC2C93CC5953BCB6C8E4240E250A38E26916"
     }
   ],
-  "sourceCommit": "81041c0cbaf01268d9e9d05f9d9f48472c2281a2",
+  "sourceCommit": "4c00454d49a530ef07f2c382eb63ff49be5e6a4c",
   "platform": "Microsoft Windows NT 10.0.26100.0",
   "actualProcessStarted": true,
   "nativeWindowTitle": "汽车附件电机电磁激励频率设计软件 V2.0 — 无项目",
