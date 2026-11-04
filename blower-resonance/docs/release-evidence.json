@@ -1,0 +1,15 @@
+{
+  "date": "2026-11-04T04:11:43Z",
+  "deployedDirectory": "/workspace/blower-relocated",
+  "port": 5179,
+  "status": "passed",
+  "deployedDllSha256": "dfea6fe36839b0bb143f9f711e328e745227ad63c867b94da523d7ee4adc42af",
+  "checks": [
+    "relocated publish blank startup",
+    "framework script served from published assets",
+    "interactive simulation calculation",
+    "project transported to independent release instance with all four verification records",
+    "save in independent release library",
+    "release HTML report downloaded and checked"
+  ]
+}

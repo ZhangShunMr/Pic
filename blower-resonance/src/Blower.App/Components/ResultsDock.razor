@@ -1,0 +1,145 @@
+<section class="results-dock" aria-label="结果与验证区">
+    <details open>
+        <summary><span class="section-number">01</span>频率接近明细 <small>按最小净距排序</small></summary>
+        <div class="dock-content">
+            <div class="result-filters">
+                <select aria-label="接近状态筛选" @bind="Vm.ResultFilter"><option value="near">仅潜在接近</option><option value="all">全部组合</option></select>
+                <input aria-label="搜索结果" placeholder="搜索挡位 / 阶次 / 模态" @bind="Vm.Search" @bind:event="oninput" />
+                <span>@Vm.VisibleContacts.Count() 条组合</span>
+            </div>
+            <div class="table-scroll result-table">
+                <table>
+                    <thead><tr><th>挡位 / rpm</th><th>阶次</th><th>频率区间 Hz</th><th>模态 / Hz</th><th>净距 Hz</th><th>状态</th></tr></thead>
+                    <tbody>
+                    @foreach (var c in Vm.VisibleContacts)
+                    {
+                        <tr class="@(Vm.SelectedId == c.GearId ? "selected-row" : "")">
+                            <td><button class="text-button" @onclick='() => Vm.Select("gear", c.GearId)'>@c.Gear</button><small>@c.Rpm.ToString("0.##")</small></td>
+                            <td>@c.Order<small>@c.OrderNumber.ToString("0.##") 阶</small></td>
+                            <td>@c.LowerHz.ToString("0.##")～@c.UpperHz.ToString("0.##")<small>中心 @c.FrequencyHz.ToString("0.##")</small></td>
+                            <td><button class="text-button" @onclick='() => Vm.Select("mode", c.ModeId)'>@c.Mode</button><small>@c.ModeHz.ToString("0.##") ±@c.HalfWidthHz.ToString("0.##")</small></td>
+                            <td>@c.ClearanceHz.ToString("0.##")</td>
+                            <td><span class="badge @(c.Near ? "warn" : "good")">@c.Status</span></td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+                @if (!Vm.VisibleContacts.Any())
+                {
+                    <p class="empty-small">当前筛选没有组合；“范围外”不等于已证实低噪声，可切换全部组合核对。</p>
+                }
+            </div>
+        </div>
+    </details>
+    <details>
+        <summary><span class="section-number">02</span>交叉与敏感转速范围 <small>含转速容差</small></summary>
+        <div class="dock-content table-scroll">
+            <table>
+                <thead><tr><th>模态</th><th>阶次</th><th>精确交叉 rpm</th><th>敏感区 rpm</th><th>范围状态</th></tr></thead>
+                <tbody>
+                @foreach (var c in Vm.Result!.Crossings)
+                {
+                    <tr><td>@c.Mode</td><td>@c.Order</td><td>@c.ExactRpm.ToString("0.##")</td><td>@c.LowerRpm.ToString("0.##")～@c.UpperRpm.ToString("0.##")</td><td>@(c.InRange ? "与分析范围相交" : "分析范围外")</td></tr>
+                }
+                </tbody>
+            </table>
+            @foreach (var band in Vm.Result.Bands)
+            {
+                <p class="formula"><strong>@band.Name</strong>：@band.Basis</p>
+            }
+        </div>
+    </details>
+    <details>
+        <summary><span class="section-number">03</span>约束扫描 <small>生成独立候选方案</small></summary>
+        <div class="dock-content">
+            <p>在当前方案每个挡位±@Vm.Project.Settings.ScanWindowRpm rpm内以@(Vm.Project.Settings.ScanStepRpm) rpm网格搜索；固定挡位保持不动，最小间距@(Vm.Project.Settings.MinimumGapRpm) rpm。代价是接近组合数加转速偏移惩罚，不评价风量或声音。</p>
+            <div class="actions">
+                <button disabled="@(Vm.Busy || Vm.ReadOnly)" class="primary" @onclick="Vm.RunScan">@(Vm.Busy ? "扫描中…" : "扫描当前方案")</button>
+                <button @onclick='() => Vm.Select("settings")'>编辑扫描约束</button>
+            </div>
+            @if (Vm.Scan is { } scan)
+            {
+                <p class="formula">@scan.Message · 评估 @scan.EvaluatedPoints 个点 · 总代价 @scan.TotalCost.ToString("0.###")</p>
+                <div class="table-scroll">
+                    <table><thead><tr><th>挡位</th><th>原转速 rpm</th><th>候选 rpm</th><th>变化 rpm</th><th>接近组合</th><th>局部代价</th></tr></thead><tbody>
+                    @foreach (var row in scan.Choices)
+                    {
+                        <tr><td>@row.Gear</td><td>@row.OriginalRpm</td><td>@row.CandidateRpm</td><td>@((row.CandidateRpm - row.OriginalRpm).ToString("+0.##;-0.##;0"))</td><td>@row.Contacts</td><td>@row.Cost.ToString("0.###")</td></tr>
+                    }
+                    </tbody></table>
+                </div>
+                <button disabled="@(!scan.Feasible || Vm.ReadOnly)" @onclick="Vm.AcceptScan">采纳为新方案</button>
+            }
+        </div>
+    </details>
+    <details>
+        <summary><span class="section-number">04</span>方案比较 <small>共用当前规则，按挡位序号</small></summary>
+        <div class="dock-content">
+            <label class="comparison-select">与当前方案比较
+                <select @bind="Vm.CompareId">
+                    <option value="">请选择另一方案</option>
+                    @foreach (var plan in Vm.Project.Plans.Where(x => x.Id != Vm.PlanId))
+                    {
+                        <option value="@plan.Id">@plan.Name</option>
+                    }
+                </select>
+            </label>
+            @if (Vm.Comparison is { } comparison)
+            {
+                <p>基准：@comparison.Baseline → 目标：@comparison.Target；接近挡位 @comparison.BaselineNear → @comparison.TargetNear；接近组合 @comparison.BaselineContacts → @comparison.TargetContacts。</p>
+                @if (!comparison.EqualGearCount)
+                {
+                    <p class="boundary">挡位数量不同；缺失位置不计算差值，总组合数量不能直接解释为改善。</p>
+                }
+                <div class="table-scroll">
+                    <table><thead><tr><th>位置</th><th>基准挡位 / rpm</th><th>目标挡位 / rpm</th><th>转速差 rpm</th><th>接近组合</th></tr></thead><tbody>
+                    @foreach (var row in comparison.Rows)
+                    {
+                        <tr><td>@row.Position</td><td>@row.BaselineGear / @row.BaselineRpm</td><td>@row.TargetGear / @row.TargetRpm</td><td>@row.DeltaRpm?.ToString("+0.##;-0.##;0")</td><td>@row.BaselineContacts → @row.TargetContacts</td></tr>
+                    }
+                    </tbody></table>
+                </div>
+            }
+            else
+            {
+                <p class="empty-small">复制当前方案或采纳扫描候选后，可进行同条件比较。</p>
+            }
+        </div>
+    </details>
+    <details>
+        <summary><span class="section-number">05</span>验证清单 <small>@Vm.Project.Checks.Count 条记录</small></summary>
+        <div class="dock-content">
+            <div class="section-title"><p>从当前方案的接近组合生成任务；点击任务，在右侧填写验证方法、负责人和证据。</p><button disabled="@Vm.ReadOnly" @onclick="Vm.GenerateChecks">生成验证清单</button></div>
+            @foreach (var task in Vm.Project.Checks)
+            {
+                <button class="check-card @(Vm.SelectedId == task.Id ? "selected" : "")" @onclick='() => Vm.Select("check", task.Id)'>
+                    <strong>@task.Title</strong><span class="badge">@Labels.State(task.State)</span><small>@(string.IsNullOrEmpty(task.Owner) ? "负责人待填写" : task.Owner) · @task.Updated.ToString("u")</small>
+                </button>
+            }
+            @if (Vm.Project.Checks.Count == 0)
+            {
+                <p class="empty-small">暂无任务。当前方案没有接近组合时不会凭空生成任务，仍需工程验证其他性能。</p>
+            }
+        </div>
+    </details>
+    <details>
+        <summary><span class="section-number">06</span>计算依据与审计 <small>修订 @Vm.Project.Revision</small></summary>
+        <div class="dock-content">
+            <p>f=q×n/60；交叉n=60fn/q。转速容差换算为频率区间，与模态敏感区间相交即潜在接近。净距=max(模态下界−激励上界,激励下界−模态上界)，非幅值。</p>
+            <code>输入SHA256：@Vm.Result!.InputHash</code>
+            <p>阻尼比已知时可使用ζfn半宽近似，仅适用于轻阻尼孤立模态。工程半宽不是标准合格线。所有输入变化后重新计算，并将完成验证改为需复核。</p>
+            <div class="table-scroll"><table><thead><tr><th>UTC</th><th>修订</th><th>操作</th><th>详情</th></tr></thead><tbody>
+            @foreach (var audit in Vm.Project.Audit.AsEnumerable().Reverse())
+            {
+                <tr><td>@audit.Time.ToString("u")</td><td>@audit.Revision</td><td>@audit.Action</td><td>@audit.Detail</td></tr>
+            }
+            </tbody></table></div>
+        </div>
+    </details>
+    <StudyPanel Vm="Vm" OnExport="OnExport" />
+</section>
+
+@code {
+    [Parameter, EditorRequired] public WorkspaceViewModel Vm { get; set; } = default!;
+    [Parameter] public EventCallback<string> OnExport { get; set; }
+}

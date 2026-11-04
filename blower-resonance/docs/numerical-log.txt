@@ -1,0 +1,56 @@
+PASS independent formula: 40 blades at 900rpm = 600Hz
+PASS zero RPM is zero frequency
+PASS fractional shaft order
+PASS blade harmonic order
+PASS band maximum: 600Hz -> max(5,18,12,0) =18Hz
+PASS crossing: 600Hz / 40X ->900rpm, sensitive [853,947]
+PASS frequency interval at900 +/-20RPM ->[586.6667,613.3333]Hz
+PASS exact boundary counts as contact
+PASS beyond boundary is outside
+PASS damping unknown stays null and adds no band
+PASS damping switches and extra band
+PASS disabled modes and orders excluded
+PASS empty project can save but cannot compute
+PASS negative speed rejected
+PASS invalid spacing rejected transactionally
+PASS NaN rejected
+PASS out of range damping rejected
+PASS zero blade count rejected
+PASS missing active order rejected
+PASS comparison direction and shared conditions
+PASS different gear count preserves missing value
+PASS stale result cannot compare/export
+PASS scan independent brute force optimum
+PASS scan fixed gear remains unchanged
+PASS scan step limit controlled
+PASS scan accept adds new plan and leaves original
+PASS stale scan rejected
+PASS rule study nonmutating with nine scenarios
+PASS rule study invalid list rejected
+PASS check generation deduplicates
+PASS check dependencies protect object deletion
+PASS completed check needs evidence
+PASS input change marks completed check for recheck
+PASS undo redo retains audit
+PASS archived project rejects changes
+PASS project exact round trip
+PASS corrupt JSON and schema rejected
+PASS missing nested field rejected
+PASS null object and unknown field rejected
+PASS duplicate property rejected
+PASS duplicate identities rejected
+PASS CSV quoted commas parsed
+PASS CSV error lists row, no mutation
+PASS CSV sorted spacing invalid
+PASS CSV unknown damping retained
+PASS CSV formula escape and negative numeric
+PASS HTML report escapes content and embeds SVG
+PASS SVG axis source and self containment
+PASS duplicate enabled effective orders rejected
+PASS disabled duplicate order preserved safely
+PASS check key mismatch rejected
+PASS source-specific CSV column preserved
+PASS save reopen backup conflict and migration
+PASS store path traversal rejected
+PASS damaged library entry visible
+55/55 passed

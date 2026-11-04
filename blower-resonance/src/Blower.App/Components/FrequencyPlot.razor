@@ -1,0 +1,57 @@
+@if (Vm.Chart is { } chart)
+{
+    <svg class="frequency-plot" viewBox="0 0 880 420" role="img" aria-label="转速频率交叉图，点击挡位标签编辑">
+        <title>@Vm.ActivePlan?.Name · @Labels.Source(Vm.Project.Origin)</title>
+        <rect x="68" y="30" width="776" height="328" fill="#fffefa" />
+        @foreach (var tick in chart.XTicks)
+        {
+            <line x1="@N(tick.Position)" x2="@N(tick.Position)" y1="30" y2="358" class="grid-line" />
+            <g><text x="@N(tick.Position)" y="380" text-anchor="middle">@tick.Label</text></g>
+        }
+        @foreach (var tick in chart.YTicks)
+        {
+            <line x1="68" x2="844" y1="@N(tick.Position)" y2="@N(tick.Position)" class="grid-line" />
+            <g><text x="60" y="@N(tick.Position + 4)" text-anchor="end">@tick.Label</text></g>
+        }
+        @foreach (var band in chart.Bands)
+        {
+            <g class="plot-object" @onclick='() => Vm.Select("mode", band.Id)' role="button" tabindex="0" @onkeydown='e => Key(e, "mode", band.Id)'>
+                <title>@band.Name；点击编辑模态</title>
+                <rect x="68" y="@N(band.Y)" width="776" height="@N(band.Height)" class="sensitive-band" />
+                <text x="838" y="@N(band.LabelY)" text-anchor="end" class="band-label">@band.Name</text>
+            </g>
+        }
+        @foreach (var line in chart.Lines)
+        {
+            <g class="plot-object" @onclick='() => Vm.Select("order", line.Id)' role="button" tabindex="0" @onkeydown='e => Key(e, "order", line.Id)'>
+                <title>@line.Name；点击编辑阶次</title>
+                <line x1="@N(line.X1)" y1="@N(line.Y1)" x2="@N(line.X2)" y2="@N(line.Y2)" stroke="@line.Color" stroke-width="2.4" />
+            </g>
+        }
+        @foreach (var gear in chart.Gears)
+        {
+            <g class="plot-object @(Vm.SelectedId == gear.Id ? "plot-selected" : "")" @onclick='() => Vm.Select("gear", gear.Id)' role="button" tabindex="0" @onkeydown='e => Key(e, "gear", gear.Id)'>
+                <title>@gear.Name @gear.Rpm.ToString("0.##")rpm · @(gear.Near ? "潜在接近" : "范围外")；点击编辑挡位</title>
+                <line x1="@N(gear.X)" x2="@N(gear.X)" y1="30" y2="358" class="gear-line @(gear.Near ? "near" : "clear")" />
+                <rect x="@N(gear.X - 20)" y="8" width="40" height="20" rx="3" class="gear-label-bg @(gear.Near ? "near" : "clear")" />
+                <text x="@N(gear.X)" y="22" text-anchor="middle" class="gear-label">@gear.Name</text>
+                <circle cx="@N(gear.X)" cy="358" r="4" class="gear-point @(gear.Near ? "near" : "clear")" />
+            </g>
+        }
+        <g><text x="68" y="408">转速 rpm →</text></g>
+        <g><text x="8" y="16">频率 Hz</text></g>
+        <g><text x="844" y="408" text-anchor="end">@Labels.Source(Vm.Project.Origin) · 非实测频谱</text></g>
+    </svg>
+}
+
+@code {
+    [Parameter, EditorRequired] public WorkspaceViewModel Vm { get; set; } = default!;
+    private static string N(double value) => ChartModel.N(value);
+    private void Key(KeyboardEventArgs e, string kind, string id)
+    {
+        if (e.Key is "Enter" or " ")
+        {
+            Vm.Select(kind, id);
+        }
+    }
+}

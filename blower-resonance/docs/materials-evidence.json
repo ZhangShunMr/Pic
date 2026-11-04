@@ -1,0 +1,144 @@
+{
+  "renderer": "LibreOffice Writer PDF export",
+  "manualPages": 18,
+  "informationPages": 3,
+  "manualFigureCount": 15,
+  "functionsHanCount": 1269,
+  "productionNonblank": 3527,
+  "sourceHashesVerified": true,
+  "pages": [
+    {
+      "page": 1,
+      "section": "软件介绍",
+      "textCharacters": 590,
+      "images": 15,
+      "contentChecked": true
+    },
+    {
+      "page": 2,
+      "section": "启动与认识工作台",
+      "textCharacters": 526,
+      "images": 15,
+      "contentChecked": true
+    },
+    {
+      "page": 3,
+      "section": "建立项目与属性草稿",
+      "textCharacters": 559,
+      "images": 15,
+      "contentChecked": true
+    },
+    {
+      "page": 4,
+      "section": "配置激励阶次",
+      "textCharacters": 440,
+      "images": 15,
+      "contentChecked": true
+    },
+    {
+      "page": 5,
+      "section": "录入结构模态",
+      "textCharacters": 435,
+      "images": 15,
+      "contentChecked": true
+    },
+    {
+      "page": 6,
+      "section": "设置计算规则和扫描约束",
+      "textCharacters": 415,
+      "images": 15,
+      "contentChecked": true
+    },
+    {
+      "page": 7,
+      "section": "建立方案与编辑挡位",
+      "textCharacters": 434,
+      "images": 15,
+      "contentChecked": true
+    },
+    {
+      "page": 8,
+      "section": "阅读设计图与交叉结果",
+      "textCharacters": 433,
+      "images": 15,
+      "contentChecked": true
+    },
+    {
+      "page": 9,
+      "section": "核对接近明细与无效输入",
+      "textCharacters": 429,
+      "images": 15,
+      "contentChecked": true
+    },
+    {
+      "page": 10,
+      "section": "扫描约束内候选转速",
+      "textCharacters": 454,
+      "images": 15,
+      "contentChecked": true
+    },
+    {
+      "page": 11,
+      "section": "比较两个挡位方案",
+      "textCharacters": 405,
+      "images": 15,
+      "contentChecked": true
+    },
+    {
+      "page": 12,
+      "section": "生成并维护验证清单",
+      "textCharacters": 444,
+      "images": 15,
+      "contentChecked": true
+    },
+    {
+      "page": 13,
+      "section": "规则敏感性与输入质量复核",
+      "textCharacters": 442,
+      "images": 15,
+      "contentChecked": true
+    },
+    {
+      "page": 14,
+      "section": "CSV批量输入与预检",
+      "textCharacters": 490,
+      "images": 15,
+      "contentChecked": true
+    },
+    {
+      "page": 15,
+      "section": "保存、重开、备份与归档",
+      "textCharacters": 469,
+      "images": 15,
+      "contentChecked": true
+    },
+    {
+      "page": 16,
+      "section": "成果导出与可搬迁项目",
+      "textCharacters": 481,
+      "images": 15,
+      "contentChecked": true
+    },
+    {
+      "page": 17,
+      "section": "完整可核对案例",
+      "textCharacters": 600,
+      "images": 15,
+      "contentChecked": true
+    },
+    {
+      "page": 18,
+      "section": "常见问题、缩放与交接",
+      "textCharacters": 507,
+      "images": 15,
+      "contentChecked": true
+    }
+  ],
+  "visualReview": "已逐页检查渲染总览，并抽查原尺寸页面；无空白页、截图重复、表格或图注截断。",
+  "wordPagination": {
+    "status": "pending",
+    "reason": "本环境无Microsoft Word；LibreOffice和浏览器页数不能代替规范要求的Word实际分页。"
+  },
+  "applicantFacts": "身份、权属、开发完成、发表信息待申请人核实",
+  "template": "没有申请人专用模板；按仓库现有A4材料版式制作可编辑稿"
+}

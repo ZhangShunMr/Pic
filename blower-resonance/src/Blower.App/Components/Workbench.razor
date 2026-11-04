@@ -1,0 +1,258 @@
+@page "/"
+@implements IDisposable
+@inject WorkspaceViewModel Vm
+@inject DownloadVault Downloads
+@inject IJSRuntime Js
+
+<header class="masthead">
+    <div class="mark" aria-hidden="true">◈</div>
+    <div class="software-title">
+        <strong>@Software.Name</strong>
+        <small>BLOWER / RESONANCE DESIGN STUDIO</small>
+    </div>
+    <span class="version">V1.0</span>
+    <button class="text-button" @onclick="Vm.ToggleHelp">使用指引</button>
+</header>
+
+<div class="workbench">
+    <aside class="project-tree" aria-label="项目对象树">
+        <div class="tree-heading">
+            <span>设计资源</span>
+            <small>PROJECT EXPLORER</small>
+        </div>
+        <details class="project-actions">
+            <summary>项目文件与成果</summary>
+            <button @onclick="Vm.NewProject">＋ 新建空白项目</button>
+            <button @onclick="Vm.ToggleLibrary">打开项目库</button>
+            <button @onclick="Vm.LoadDemo">载入模拟示例</button>
+            <button @onclick="Vm.Duplicate">复制为独立项目</button>
+            <button @onclick="Vm.ToggleArchive">@(Vm.ReadOnly ? "解除归档" : "归档项目")</button>
+            <button @onclick="Vm.ToggleExchange">导入与成果输出</button>
+        </details>
+        <button class="tree-root @(Vm.Kind == "project" ? "selected" : "")" @onclick='() => Vm.Select("project")'>
+            <span class="object-icon">▣</span>
+            <span>@Vm.Project.Name<small>修订 @Vm.Project.Revision · @(Vm.ReadOnly ? "已归档" : "编辑中")</small></span>
+        </button>
+        <button class="tree-row @(Vm.Kind == "settings" ? "selected" : "")" @onclick='() => Vm.Select("settings")'>
+            <span>⚙</span> 计算与扫描规则
+        </button>
+        <details open class="tree-group">
+            <summary>激励阶次 <span>@Vm.Project.Orders.Count</span></summary>
+            @foreach (var order in Vm.Project.Orders)
+            {
+                <button class="tree-row @(Vm.SelectedId == order.Id ? "selected" : "")" @onclick='() => Vm.Select("order", order.Id)'>
+                    <span class="dot orange"></span>
+                    <span>@order.Name<small>@order.EffectiveOrder(Vm.Project.Settings.Blades).ToString("0.##") 阶 · @(order.Enabled ? "启用" : "停用")</small></span>
+                </button>
+            }
+            <button class="add-row" disabled="@Vm.ReadOnly" @onclick='() => Vm.Add("order")'>＋ 添加阶次</button>
+        </details>
+        <details open class="tree-group">
+            <summary>结构模态 <span>@Vm.Project.Modes.Count</span></summary>
+            @foreach (var mode in Vm.Project.Modes)
+            {
+                <button class="tree-row @(Vm.SelectedId == mode.Id ? "selected" : "")" @onclick='() => Vm.Select("mode", mode.Id)'>
+                    <span class="dot purple"></span>
+                    <span>@mode.Name<small>@mode.FrequencyHz.ToString("0.##") Hz · @(mode.Enabled ? "启用" : "停用")</small></span>
+                </button>
+            }
+            <button class="add-row" disabled="@Vm.ReadOnly" @onclick='() => Vm.Add("mode")'>＋ 添加模态</button>
+        </details>
+        <details open class="tree-group">
+            <summary>挡位方案 <span>@Vm.Project.Plans.Count</span></summary>
+            @foreach (var plan in Vm.Project.Plans)
+            {
+                <button class="tree-row plan-row @(Vm.PlanId == plan.Id ? "active-plan" : "")" @onclick='() => Vm.Select("plan", plan.Id, plan.Id)'>
+                    <span>▤</span>
+                    <span>@plan.Name<small>@plan.Gears.Count 个挡位 @(plan.Locked ? "· 已锁定" : "")</small></span>
+                </button>
+                @if (Vm.PlanId == plan.Id)
+                {
+                    <div class="gear-children">
+                        @foreach (var gear in plan.Gears)
+                        {
+                            <button class="tree-row @(Vm.SelectedId == gear.Id ? "selected" : "")" @onclick='() => Vm.Select("gear", gear.Id, plan.Id)'>
+                                <span>@gear.Name</span><small>@gear.Rpm.ToString("0.#") rpm @(gear.Fixed ? "◆" : "")</small>
+                            </button>
+                        }
+                        <button class="add-row" disabled="@(Vm.ReadOnly || plan.Locked)" @onclick='() => Vm.Add("gear")'>＋ 添加挡位</button>
+                    </div>
+                }
+            }
+            <button class="add-row" disabled="@Vm.ReadOnly" @onclick='() => Vm.Add("plan")'>＋ 新建方案</button>
+        </details>
+        <div class="tree-foot">
+            <span class="source-pill">@Labels.Source(Vm.Project.Origin)</span>
+            <p>选择对象 → 编辑属性 → 应用修改<br />图形与结果自动更新</p>
+        </div>
+    </aside>
+
+    <main class="canvas">
+        <div class="canvas-heading">
+            <div>
+                <p class="eyebrow">DESIGN WORKBENCH</p>
+                <h1>转速与模态的交汇</h1>
+                <p class="subtitle">@(Vm.ActivePlan?.Name ?? "先建立挡位方案") · @Labels.Source(Vm.Project.Origin)</p>
+            </div>
+            <div class="actions">
+                <button title="撤销最近已应用操作" disabled="@(!Vm.CanUndo)" @onclick="Vm.Undo">↶</button>
+                <button title="重做" disabled="@(!Vm.CanRedo)" @onclick="Vm.Redo">↷</button>
+                <button @onclick="Vm.Calculate">重新计算</button>
+                <button class="primary" @onclick="Vm.Save">保存项目</button>
+            </div>
+        </div>
+        <div class="status-line @(Vm.Error ? "error" : "")" role="status">
+            <span>@(Vm.Error ? "!" : "●")</span> @Vm.Notice
+        </div>
+        @if (Vm.ShowLibrary)
+        {
+            <section class="floating-panel" aria-label="项目库">
+                <div class="section-title"><h2>本机项目库</h2><button @onclick="Vm.ToggleLibrary">关闭</button></div>
+                <p>保存目录为服务器本机项目库。导入副本不会覆盖原项目；备份为上次成功保存前的内容。</p>
+                @if (Vm.Library.Count == 0)
+                {
+                    <p class="empty-small">尚无已保存项目。完成输入后点击“保存项目”。</p>
+                }
+                @foreach (var item in Vm.Library)
+                {
+                    <div class="library-row">
+                        <div><strong>@item.Name</strong><small>修订@(item.Revision) · @item.Modified.ToString("u") · @item.Status</small></div>
+                        <button @onclick="() => Vm.Open(item.Id)">打开</button>
+                        <button @onclick="() => Vm.Open(item.Id, true)">上次备份</button>
+                    </div>
+                }
+            </section>
+        }
+        @if (Vm.ShowHelp)
+        {
+            <section class="floating-panel help-panel">
+                <div class="section-title"><h2>工作台使用指引</h2><button @onclick="Vm.ToggleHelp">关闭</button></div>
+                <ol>
+                    <li>左侧选择项目，在右侧填写名称、平台和数据来源，点击“应用属性”。</li>
+                    <li>添加阶次、模态和方案，再向方案添加挡位。每次编辑后先应用属性。</li>
+                    <li>点击图中的挡位标签或左侧对象，在右侧修改参数；图与底部明细保持联动。</li>
+                    <li>展开底部“约束扫描”，先查看候选，再采纳为新方案。选择另一方案进行比较。</li>
+                    <li>生成验证清单，填写负责人、证据与状态，保存后从项目库重开。</li>
+                    <li>在“项目文件与成果 → 导入与成果输出”下载项目、报告、CSV或SVG。</li>
+                </ol>
+                <p>默认规则为工程筛查：绝对半宽5Hz、百分比3%、转速容差±20rpm、最小间距100rpm。它们均可修改，未宣称符合任何法规标准。阻尼比未知留空；0表示已知为零。</p>
+                <p>模拟示例预期：40阶在900rpm为600Hz，精确交叉900rpm；600Hz模态的半宽18Hz，计入容差后的敏感转速区为853～947rpm。</p>
+            </section>
+        }
+        @if (Vm.ShowExchange)
+        {
+            <ExchangePanel Vm="Vm" OnExport="Export" />
+        }
+        @if (Vm.Result == null)
+        {
+            <section class="empty-canvas">
+                <div class="empty-diagram" aria-hidden="true">╱ <span>────</span> ╱</div>
+                <p class="eyebrow">BUILD YOUR FIRST DESIGN</p>
+                <h2>让每个挡位有据可查</h2>
+                <p>添加激励阶次、结构模态及挡位方案后，<br />这里将显示它们的交叉和敏感范围。</p>
+                <div class="actions">
+                    <button class="primary" @onclick="Vm.LoadDemo">查看模拟示例</button>
+                    <button @onclick='() => Vm.Select("settings")'>设置计算规则</button>
+                </div>
+                <div class="input-requirements">
+                    @foreach (var issue in Vm.Issues.Take(8))
+                    {
+                        <p><strong>@issue.Path</strong> · @issue.Message</p>
+                    }
+                </div>
+            </section>
+        }
+        else
+        {
+            <section class="plot-card">
+                <div class="section-title">
+                    <div><h2>转速—频率设计图</h2><small>彩线：设计阶次　紫带：模态敏感范围　虚线：挡位</small></div>
+                    <label class="inline-field">纵轴上限 Hz<input type="number" min="10" max="100000" placeholder="自动" @bind="Vm.ChartCeiling" /></label>
+                </div>
+                <FrequencyPlot Vm="Vm" />
+                <div class="plot-legend">
+                    @foreach (var line in Vm.Chart!.Lines)
+                    {
+                        <button @onclick='() => Vm.Select("order", line.Id)'><i style="background:@line.Color"></i>@line.Name</button>
+                    }
+                </div>
+                <div class="summary-strip">
+                    <div><span>当前方案</span><strong>@Vm.ActivePlan?.Name</strong></div>
+                    <div><span>潜在接近挡位</span><strong>@Vm.Summary?.NearGearCount <small>/ @Vm.Summary?.GearCount</small></strong></div>
+                    <div><span>接近组合</span><strong>@Vm.Summary?.ContactCount</strong></div>
+                    <div><span>最小净距 Hz</span><strong>@Vm.Summary?.MinimumClearanceHz?.ToString("0.##")</strong></div>
+                </div>
+                <p class="boundary">@Software.Boundary 净距≤0表示区间接触或重叠。</p>
+            </section>
+            <ResultsDock Vm="Vm" OnExport="Export" />
+        }
+        <footer>本机工程设计工具 · 全部输入内嵌保存 · @Software.Version</footer>
+    </main>
+
+    <aside class="inspector" aria-label="选中对象属性">
+        <div class="inspector-heading"><span>PROPERTIES</span><strong>@Vm.EditorTitle</strong></div>
+        <EditorPanel Vm="Vm" />
+        @if (Vm.DraftIssues.Count > 0)
+        {
+            <div class="draft-errors" role="alert">
+                <strong>属性草稿需修正</strong>
+                @foreach (var issue in Vm.DraftIssues.Take(8))
+                {
+                    <p>@issue.Path：@issue.Message</p>
+                }
+            </div>
+        }
+        <div class="inspector-actions">
+            <small>@(Vm.EditorDirty ? "有未应用修改" : "属性与当前输入一致")</small>
+            <button class="primary" disabled="@Vm.ReadOnly" @onclick="Vm.ApplyEditor">应用属性</button>
+            <button @onclick="Vm.RevertEditor">撤回修改</button>
+            @if (new[] { "mode", "order", "gear", "plan", "check" }.Contains(Vm.Kind))
+            {
+                <button class="danger" disabled="@Vm.ReadOnly" @onclick="Vm.DeleteSelected">删除当前对象</button>
+            }
+        </div>
+        <div class="inspector-note">@(Vm.Dirty ? "● 项目尚未保存" : "✓ 项目已保存")<br />@(Vm.ReadOnly ? "归档项目只读；可解除归档后继续编辑。" : "属性应用后重新计算；保存后可恢复当前工作。")</div>
+    </aside>
+</div>
+@if (!string.IsNullOrEmpty(Vm.Confirmation))
+{
+    <div class="modal-backdrop" role="dialog" aria-modal="true" aria-label="确认操作">
+        <section class="confirmation">
+            <p class="eyebrow">CONFIRM ACTION</p><h2>确认操作</h2>
+            <p>@Vm.Confirmation</p>
+            <div class="actions"><button @onclick="Vm.CancelPending">取消</button><button class="primary" @onclick="Vm.ConfirmPending">确认继续</button></div>
+        </section>
+    </div>
+}
+
+@code {
+    protected override void OnInitialized()
+    {
+        Vm.Initialize();
+        Vm.PropertyChanged += Changed;
+    }
+
+    private void Changed(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await Js.InvokeVoidAsync("blower.setDirty", Vm.Dirty || Vm.EditorDirty);
+    }
+
+    private void Export(string type)
+    {
+        Vm.Attempt(() =>
+        {
+            var file = Vm.Export(type);
+            Vm.SetDownload(Downloads.Add(file.Content, file.Mime, file.Name), file.Name);
+        });
+    }
+
+    public void Dispose()
+    {
+        Vm.PropertyChanged -= Changed;
+    }
+}

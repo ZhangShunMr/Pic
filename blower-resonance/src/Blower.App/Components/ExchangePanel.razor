@@ -1,0 +1,83 @@
+<section class="floating-panel exchange-panel" aria-label="导入与成果输出">
+    <div class="section-title"><h2>导入与成果输出</h2><button @onclick="Vm.ToggleExchange">关闭</button></div>
+    <details open>
+        <summary>项目文件与成果下载</summary>
+        <p>项目文件内嵌全部输入、验证记录与审计。下载项目可跨目录搬迁；重新导入时作为独立副本，不覆盖原文件。</p>
+        <label class="upload-field">打开 .blowerproj 项目（UTF-8，≤4MiB）<InputFile OnChange="ReadProject" accept=".blowerproj,.json" /></label>
+        <div class="export-grid">
+            <button @onclick='() => OnExport.InvokeAsync("project")'>下载项目文件</button>
+            <button disabled="@(Vm.Result == null)" @onclick='() => OnExport.InvokeAsync("report")'>生成设计报告 HTML</button>
+            <button disabled="@(Vm.Result == null)" @onclick='() => OnExport.InvokeAsync("contacts")'>导出频率接近明细 CSV</button>
+            <button disabled="@(Vm.Result == null)" @onclick='() => OnExport.InvokeAsync("crossings")'>导出交叉转速 CSV</button>
+            <button disabled="@(Vm.Result == null)" @onclick='() => OnExport.InvokeAsync("svg")'>导出设计图 SVG</button>
+            <button @onclick='() => OnExport.InvokeAsync("checks")'>导出验证清单 CSV</button>
+        </div>
+        @if (!string.IsNullOrEmpty(Vm.DownloadUrl))
+        {
+            <a class="download-link" href="@Vm.DownloadUrl" download="@Vm.DownloadName">↓ 下载 @Vm.DownloadName</a>
+            <small>链接有效20分钟。目标位置为浏览器下载目录；报告自包含，可离线打开。</small>
+        }
+    </details>
+    <details>
+        <summary>批量输入 CSV 与预检</summary>
+        <p>使用UTF-8、英文逗号和小数点；第一行为固定英文表头。允许双引号与逗号转义，不支持跨行单元格。挡位新增为独立方案，模态追加；预检失败整批不应用。</p>
+        <div class="actions"><button @onclick='() => OnExport.InvokeAsync("gears")'>下载挡位模板</button><button @onclick='() => OnExport.InvokeAsync("modes")'>下载模态模板</button></div>
+        <label>输入类型<select @bind="Vm.CsvKind"><option value="gears">挡位：name,rpm,fixed</option><option value="modes">模态：name,frequency_hz,damping_ratio,source</option></select></label>
+        <label class="upload-field">从CSV文件载入<InputFile OnChange="ReadCsv" accept=".csv,text/csv" /></label>
+        <label>CSV内容<textarea class="csv-editor" rows="7" @bind="Vm.CsvText"></textarea></label>
+        <div class="actions"><button disabled="@Vm.ReadOnly" @onclick="Vm.PreviewCsv">预检 CSV</button><button disabled="@(Vm.ReadOnly || Vm.Preview?.Valid != true)" @onclick="Vm.ApplyCsv">应用预检结果</button></div>
+        @if (Vm.Preview is { } preview)
+        {
+            <p>已解析挡位 @preview.Gears.Count 个，模态 @preview.Modes.Count 个；@(preview.Valid ? "可应用" : "有错误")。</p>
+            @foreach (var problem in preview.Problems)
+            {
+                <p class="validation-error">第@(problem.Line) 行 · @problem.Column：@problem.Message</p>
+            }
+            @foreach (var gear in preview.Gears)
+            {
+                <p class="preview-row">@gear.Name · @gear.Rpm rpm · @(gear.Fixed ? "固定" : "可调整")</p>
+            }
+            @foreach (var mode in preview.Modes)
+            {
+                <p class="preview-row">@mode.Name · @mode.FrequencyHz Hz · @mode.Source</p>
+            }
+        }
+    </details>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public WorkspaceViewModel Vm { get; set; } = default!;
+    [Parameter] public EventCallback<string> OnExport { get; set; }
+
+    private static async Task<string> Read(InputFileChangeEventArgs args)
+    {
+        using var stream = args.File.OpenReadStream(ProjectCodec.MaximumBytes);
+        using var reader = new StreamReader(stream, new System.Text.UTF8Encoding(false, true), true);
+        return await reader.ReadToEndAsync();
+    }
+
+    private async Task ReadProject(InputFileChangeEventArgs args)
+    {
+        try
+        {
+            Vm.ImportProject(await Read(args));
+        }
+        catch (Exception error) when (error is IOException or System.Text.DecoderFallbackException)
+        {
+            Vm.Message("文件读取失败：" + error.Message, true);
+        }
+    }
+
+    private async Task ReadCsv(InputFileChangeEventArgs args)
+    {
+        try
+        {
+            Vm.CsvText = await Read(args);
+            Vm.Message("CSV已载入文本区；请先预检");
+        }
+        catch (Exception error) when (error is IOException or System.Text.DecoderFallbackException)
+        {
+            Vm.Message("CSV读取失败：" + error.Message, true);
+        }
+    }
+}

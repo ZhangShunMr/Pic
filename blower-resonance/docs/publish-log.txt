@@ -1,0 +1,5 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  Blower.Core -> /workspace/Pic/blower-resonance/src/Blower.Core/bin/Release/net10.0/Blower.Core.dll
+  Blower.App -> /workspace/Pic/blower-resonance/src/Blower.App/bin/Release/net10.0/Blower.App.dll
+  Blower.App -> /workspace/blower-publish/

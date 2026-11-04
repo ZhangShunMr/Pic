@@ -1,0 +1,115 @@
+{
+  "generatedUtc": "2026-11-04T04:10:49.317744+00:00",
+  "manualSections": 18,
+  "figures": [
+    {
+      "figure": 1,
+      "file": "01-空白项目.png",
+      "caption": "图1 启动与认识工作台（真实运行界面；模拟设计数据）",
+      "widthMm": 166,
+      "heightMm": 114.1
+    },
+    {
+      "figure": 2,
+      "file": "16-阶次属性.png",
+      "caption": "图2 配置激励阶次（真实运行界面；模拟设计数据）",
+      "widthMm": 73.3,
+      "heightMm": 130.0
+    },
+    {
+      "figure": 3,
+      "file": "03-模态属性.png",
+      "caption": "图3 录入结构模态（真实运行界面；模拟设计数据）",
+      "widthMm": 55.0,
+      "heightMm": 130.0
+    },
+    {
+      "figure": 4,
+      "file": "15-计算规则.png",
+      "caption": "图4 设置计算规则和扫描约束（真实运行界面；模拟设计数据）",
+      "widthMm": 44.0,
+      "heightMm": 130.0
+    },
+    {
+      "figure": 5,
+      "file": "04-挡位联动.png",
+      "caption": "图5 建立方案与编辑挡位（真实运行界面；模拟设计数据）",
+      "widthMm": 166,
+      "heightMm": 114.1
+    },
+    {
+      "figure": 6,
+      "file": "07-交叉范围.png",
+      "caption": "图6 阅读设计图与交叉结果（真实运行界面；模拟设计数据）",
+      "widthMm": 166,
+      "heightMm": 116.8
+    },
+    {
+      "figure": 7,
+      "file": "05-无效参数.png",
+      "caption": "图7 核对接近明细与无效输入（真实运行界面；模拟设计数据）",
+      "widthMm": 38.4,
+      "heightMm": 130.0
+    },
+    {
+      "figure": 8,
+      "file": "08-约束扫描.png",
+      "caption": "图8 扫描约束内候选转速（真实运行界面；模拟设计数据）",
+      "widthMm": 166,
+      "heightMm": 81.5
+    },
+    {
+      "figure": 9,
+      "file": "09-方案比较.png",
+      "caption": "图9 比较两个挡位方案（真实运行界面；模拟设计数据）",
+      "widthMm": 166,
+      "heightMm": 71.5
+    },
+    {
+      "figure": 10,
+      "file": "10-验证记录.png",
+      "caption": "图10 生成并维护验证清单（真实运行界面；模拟设计数据）",
+      "widthMm": 59.3,
+      "heightMm": 130.0
+    },
+    {
+      "figure": 11,
+      "file": "11-规则敏感性.png",
+      "caption": "图11 规则敏感性与输入质量复核（真实运行界面；模拟设计数据）",
+      "widthMm": 160.7,
+      "heightMm": 130.0
+    },
+    {
+      "figure": 12,
+      "file": "12-CSV错误预检.png",
+      "caption": "图12 CSV批量输入与预检（真实运行界面；模拟设计数据）",
+      "widthMm": 130.8,
+      "heightMm": 130.0
+    },
+    {
+      "figure": 13,
+      "file": "06-保存重开.png",
+      "caption": "图13 保存、重开、备份与归档（真实运行界面；模拟设计数据）",
+      "widthMm": 166,
+      "heightMm": 114.1
+    },
+    {
+      "figure": 14,
+      "file": "13-成果输出.png",
+      "caption": "图14 成果导出与可搬迁项目（真实运行界面；模拟设计数据）",
+      "widthMm": 132.7,
+      "heightMm": 130.0
+    },
+    {
+      "figure": 15,
+      "file": "14-窄屏工作台.png",
+      "caption": "图15 常见问题、缩放与交接（真实运行界面；模拟设计数据）",
+      "widthMm": 78.0,
+      "heightMm": 130.0
+    }
+  ],
+  "functionsHanCount": 1269,
+  "sourceVisualLines": 3912,
+  "template": "仓库既有A4手册版式参考；无申请人专用模板",
+  "wordPagination": "pending: Microsoft Word not available; page breaks are not pagination evidence"
+}

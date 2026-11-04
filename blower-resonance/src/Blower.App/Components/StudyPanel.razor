@@ -1,0 +1,84 @@
+<details>
+    <summary><span class="section-number">07</span>规则敏感性与质量复核 <small>独立试算，不修改项目</small></summary>
+    <div class="dock-content study-panel">
+        <p>在相同挡位、阶次和模态下，改变绝对敏感半宽与转速容差，观察“接近”状态对规则的依赖。百分比、阻尼和附加半宽维持当前值。结果不建议放宽工程规则。</p>
+        <div class="field-pair">
+            <label>绝对半宽 Hz（1～5个值）<input @bind="Vm.StudyBands" placeholder="5,20,40" /></label>
+            <label>容差 ±rpm（1～5个值）<input @bind="Vm.StudyTolerances" placeholder="0,20,50" /></label>
+        </div>
+        <div class="actions">
+            <button @onclick="Vm.RunStudy">试算规则组合</button>
+            <button disabled="@(Vm.Study == null)" @onclick='() => OnExport.InvokeAsync("study")'>导出敏感性 CSV</button>
+        </div>
+        @if (Vm.Study is { } study)
+        {
+            <p class="formula">试算方案：@study.PlanName；共@(study.Cases.Count) 种组合。状态变化数量与当前原始规则比较，计数单位为挡位×阶次×模态组合。</p>
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>绝对半宽 Hz</th>
+                            <th>容差 ±rpm</th>
+                            <th>接近挡位</th>
+                            <th>接近组合</th>
+                            <th>状态变化</th>
+                            <th>最小净距 Hz</th>
+                            <th>挡位名称</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var row in study.Cases)
+                        {
+                            <tr>
+                                <td>@row.AbsoluteBandHz</td>
+                                <td>@row.SpeedToleranceRpm</td>
+                                <td>@row.NearGears</td>
+                                <td>@row.Contacts</td>
+                                <td>@row.ChangedStatuses</td>
+                                <td>@row.MinimumClearanceHz.ToString("0.##")</td>
+                                <td>@row.GearNames</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        <h3>输入质量复核</h3>
+        <p>这些条目提示来源完整性、近似适用性和证据状态；不等同于测量质量认证。</p>
+        <div class="table-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>类别</th>
+                        <th>对象</th>
+                        <th>发现</th>
+                        <th>建议操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var finding in Vm.Review)
+                    {
+                        <tr>
+                            <td><span class="badge">@finding.Severity</span></td>
+                            <td>@finding.Object</td>
+                            <td>@finding.Finding</td>
+                            <td>@finding.Action</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @if (Vm.Review.Count == 0)
+        {
+            <p class="empty-small">未发现当前规则覆盖的复核项；仍须核对数据与实际边界。</p>
+        }
+    </div>
+</details>
+
+@code {
+    [Parameter, EditorRequired]
+    public WorkspaceViewModel Vm { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<string> OnExport { get; set; }
+}

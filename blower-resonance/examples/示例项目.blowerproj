@@ -1,0 +1,396 @@
+{
+  "schema": 1,
+  "id": "5fc31433fd104c91941de5309d5107b0",
+  "name": "\u6A21\u62DF \u00B7 40\u53F6\u7247\u9F13\u98CE\u673A\u6321\u4F4D\u8BBE\u8BA1",
+  "owner": "\u6F14\u793A\u5DE5\u7A0B\u5E08",
+  "vehicle": "\u6F14\u793A\u5E73\u53F0 HVAC-A",
+  "notes": "\u7528\u4E8E\u6838\u5BF9\u516C\u5F0F\u4E0E\u64CD\u4F5C\uFF1B600Hz\u6A21\u6001\u548C40\u9636\u5728900rpm\u7CBE\u786E\u4EA4\u53C9\u3002",
+  "origin": "Simulation",
+  "source": "\u5185\u7F6E\u53EF\u91CD\u590D\u6A21\u62DF\u53C2\u6570\uFF0C\u4E0D\u662F\u8BD5\u9A8C\u91C7\u96C6",
+  "archived": false,
+  "created": "2026-11-04T04:03:48.1995225+00:00",
+  "modified": "2026-11-04T04:03:55.8829471+00:00",
+  "revision": 10,
+  "settings": {
+    "blades": 40,
+    "minRpm": 500,
+    "maxRpm": 5000,
+    "absoluteBandHz": 5,
+    "relativeBandPercent": 3,
+    "useDamping": true,
+    "speedToleranceRpm": 20,
+    "minimumGapRpm": 100,
+    "scanStepRpm": 25,
+    "scanWindowRpm": 250,
+    "shiftWeight": 0.15
+  },
+  "orders": [
+    {
+      "id": "c71a3bee3908487797bce0058b39f003",
+      "name": "\u8F74\u9891 1X",
+      "kind": "Shaft",
+      "multiplier": 1,
+      "enabled": true,
+      "evidence": "\u8BBE\u8BA1\u5019\u9009\uFF1B\u5F85\u9A8C\u8BC1\u6FC0\u52B1\u5B58\u5728\u6027"
+    },
+    {
+      "id": "162250c69b6749cfab2809c0e83424e6",
+      "name": "\u8F74\u9891 2X",
+      "kind": "Shaft",
+      "multiplier": 2,
+      "enabled": true,
+      "evidence": "\u8BBE\u8BA1\u5019\u9009\uFF1B\u5F85\u9A8C\u8BC1\u6FC0\u52B1\u5B58\u5728\u6027"
+    },
+    {
+      "id": "4b6f940781914dc29dd8745344b2cca4",
+      "name": "\u53F6\u7247\u901A\u8FC7 BPF",
+      "kind": "Blade",
+      "multiplier": 1,
+      "enabled": true,
+      "evidence": "\u8BBE\u8BA1\u5019\u9009\uFF1B\u5F85\u9A8C\u8BC1\u6FC0\u52B1\u5B58\u5728\u6027"
+    },
+    {
+      "id": "3ac0a1798c954c15b64148725692301a",
+      "name": "\u53F6\u7247\u4E8C\u500D\u9891",
+      "kind": "Blade",
+      "multiplier": 2,
+      "enabled": true,
+      "evidence": "\u8BBE\u8BA1\u5019\u9009\uFF1B\u5F85\u9A8C\u8BC1\u6FC0\u52B1\u5B58\u5728\u6027"
+    }
+  ],
+  "modes": [
+    {
+      "id": "2e15970630564db0a4f4f494c55d1399",
+      "name": "\u58F3\u4F53\u9762\u677F M1",
+      "frequencyHz": 600,
+      "dampingRatio": 0.02,
+      "extraBandHz": 0,
+      "enabled": true,
+      "origin": "Simulation",
+      "source": "\u6A21\u62DF\u6A21\u6001\u9891\u7387\uFF1B\u975E\u5B9E\u6D4B",
+      "location": "\u9F13\u98CE\u673A\u58F3\u4F53\u5916\u4FA7"
+    },
+    {
+      "id": "d9fc503c5d0e4ab0a3376e738743a04c",
+      "name": "\u98CE\u9053\u5C40\u90E8 M2",
+      "frequencyHz": 1200,
+      "dampingRatio": 0.015,
+      "extraBandHz": 0,
+      "enabled": true,
+      "origin": "Simulation",
+      "source": "\u6A21\u62DF\u6A21\u6001\u9891\u7387\uFF1B\u975E\u5B9E\u6D4B",
+      "location": "\u51FA\u53E3\u98CE\u9053\u8FDE\u63A5\u5904"
+    },
+    {
+      "id": "844aeafec0bc4e2ea81595877f722a8b",
+      "name": "\u652F\u67B6 M3",
+      "frequencyHz": 90,
+      "dampingRatio": null,
+      "extraBandHz": 0,
+      "enabled": true,
+      "origin": "Simulation",
+      "source": "\u6A21\u62DF\u6A21\u6001\u9891\u7387\uFF1B\u963B\u5C3C\u672A\u77E5",
+      "location": "\u5B89\u88C5\u652F\u67B6"
+    }
+  ],
+  "plans": [
+    {
+      "id": "430d624b36c444da8d3a2614da1ff578",
+      "name": "A \u00B7 \u521D\u59CB\u6321\u4F4D",
+      "notes": "\u6A21\u62DF\u521D\u59CB\u8BBE\u5B9A",
+      "locked": false,
+      "gears": [
+        {
+          "id": "4ace121a42ed4aec99a0a38f6c9b6c98",
+          "name": "1\u6321",
+          "rpm": 900,
+          "fixed": false,
+          "notes": ""
+        },
+        {
+          "id": "8d3090dd76cd4c6baf03220cd798dfd9",
+          "name": "2\u6321",
+          "rpm": 1400,
+          "fixed": false,
+          "notes": ""
+        },
+        {
+          "id": "c13c86166f5d4bc8a252b145a7aac2da",
+          "name": "3\u6321",
+          "rpm": 1800,
+          "fixed": false,
+          "notes": ""
+        },
+        {
+          "id": "ea22825b77b04409960e412139648ee1",
+          "name": "4\u6321",
+          "rpm": 2600,
+          "fixed": false,
+          "notes": ""
+        },
+        {
+          "id": "d8dee3222f774ac8b1f5079711b0ea50",
+          "name": "5\u6321",
+          "rpm": 3600,
+          "fixed": false,
+          "notes": ""
+        },
+        {
+          "id": "bd1005a991f648dfb690256ece6a0263",
+          "name": "6\u6321",
+          "rpm": 4500,
+          "fixed": false,
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "a33d7f8a1f3f4fc180e05011e8807550",
+      "name": "B \u00B7 \u4EBA\u5DE5\u5019\u9009",
+      "notes": "\u6A21\u62DF\u5019\u9009\uFF1B\u98CE\u91CF\u5F85\u9A8C\u8BC1",
+      "locked": false,
+      "gears": [
+        {
+          "id": "f0867ba4972b4e408413102fd02195a6",
+          "name": "1\u6321",
+          "rpm": 1000,
+          "fixed": false,
+          "notes": ""
+        },
+        {
+          "id": "719b36bc2ed44afeb71463f37f00338a",
+          "name": "2\u6321",
+          "rpm": 1500,
+          "fixed": false,
+          "notes": ""
+        },
+        {
+          "id": "fc668d90b0684daa9c78dcd692e7b9b3",
+          "name": "3\u6321",
+          "rpm": 1950,
+          "fixed": false,
+          "notes": ""
+        },
+        {
+          "id": "5d24bcc6122e467fac195b98c3a2edc3",
+          "name": "4\u6321",
+          "rpm": 2800,
+          "fixed": false,
+          "notes": ""
+        },
+        {
+          "id": "1ea0a333687d429aafb36f3a0d7290c2",
+          "name": "5\u6321",
+          "rpm": 3800,
+          "fixed": false,
+          "notes": ""
+        },
+        {
+          "id": "9dd9dab293de467885986256a65eadaf",
+          "name": "6\u6321",
+          "rpm": 4600,
+          "fixed": false,
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "dc66a949cbda4ca6b2b75b069f5f114f",
+      "name": "A \u00B7 \u521D\u59CB\u6321\u4F4D \u00B7 \u626B\u63CF\u5019\u9009",
+      "notes": "\u79BB\u6563\u626B\u63CF\u5019\u9009\uFF1B\u76EE\u6807=\u63A5\u8FD1\u7EC4\u5408\u6570\u002B\u504F\u79FB\u6743\u91CD\u00D7\u5F52\u4E00\u5316\u504F\u79FB\uFF1B\u98CE\u91CF\u53CA\u54CD\u5E94\u5F85\u9A8C\u8BC1",
+      "locked": false,
+      "gears": [
+        {
+          "id": "5e5c7bb7e8804202966af2faa72e5215",
+          "name": "1\u6321",
+          "rpm": 850,
+          "fixed": false,
+          "notes": ""
+        },
+        {
+          "id": "0ab03a093ad24e12ac5dbac0b066c4c1",
+          "name": "2\u6321",
+          "rpm": 1400,
+          "fixed": false,
+          "notes": ""
+        },
+        {
+          "id": "ebc923b5116946b587aee6798c2a08b7",
+          "name": "3\u6321",
+          "rpm": 1725,
+          "fixed": false,
+          "notes": ""
+        },
+        {
+          "id": "131ce68dc91f44ca9ef0b423981fbc0d",
+          "name": "4\u6321",
+          "rpm": 2525,
+          "fixed": false,
+          "notes": ""
+        },
+        {
+          "id": "e7d4fe7539fa4d5aa3a87bd3764298d0",
+          "name": "5\u6321",
+          "rpm": 3600,
+          "fixed": false,
+          "notes": ""
+        },
+        {
+          "id": "a275e44be8f945beb7d1b95e6c12b822",
+          "name": "6\u6321",
+          "rpm": 4500,
+          "fixed": false,
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "4ad62d3fef8845c79979a36b997cc4b8",
+      "name": "CSV\u5BFC\u5165\u65B9\u6848",
+      "notes": "",
+      "locked": true,
+      "gears": [
+        {
+          "id": "acf2434d009845de910ca7ae83cfe23e",
+          "name": "CSV\u4F4E\u6321",
+          "rpm": 1000,
+          "fixed": false,
+          "notes": ""
+        },
+        {
+          "id": "292d6b748fd14062a8bc4b5ff530f906",
+          "name": "CSV\u9AD8\u6321",
+          "rpm": 2000,
+          "fixed": true,
+          "notes": ""
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "id": "788d9c71a8474a5ea4d9ff54a1c914ac",
+      "key": "430d624b36c444da8d3a2614da1ff578/4ace121a42ed4aec99a0a38f6c9b6c98/4b6f940781914dc29dd8745344b2cca4/2e15970630564db0a4f4f494c55d1399",
+      "planId": "430d624b36c444da8d3a2614da1ff578",
+      "gearId": "4ace121a42ed4aec99a0a38f6c9b6c98",
+      "modeId": "2e15970630564db0a4f4f494c55d1399",
+      "orderId": "4b6f940781914dc29dd8745344b2cca4",
+      "title": "1\u6321 / \u53F6\u7247\u901A\u8FC7 BPF / \u58F3\u4F53\u9762\u677F M1",
+      "method": "\u5728900rpm\u9644\u8FD1\u590D\u6838\u8F6C\u901F\u4E0E\u9636\u6B21\uFF1B\u6D4B\u91CF\u58F3\u4F53/\u98CE\u9053\u54CD\u5E94\u548C\u8F66\u5185\u58F0\u97F3\uFF1B\u8BB0\u5F55\u6E29\u5EA6\u3001\u5B89\u88C5\u3001\u6D4B\u70B9\u3001\u4EEA\u5668\u3001\u9891\u7387\u5206\u8FA8\u7387\u53CA\u76F8\u5E72\u6027\u3002\u5019\u9009\u9891\u7387600Hz\u3002\u6838\u5BF9\u98CE\u91CF\u4E0E\u6548\u7387\u3002",
+      "owner": "\u6A21\u62DF\u590D\u6838\u4EBA\u5458",
+      "evidence": "\u6A21\u62DF\u64CD\u4F5C\u8BB0\u5F55\uFF0C\u4EC5\u4F9B\u6D41\u7A0B\u9A8C\u8BC1\uFF1B\u65E0\u5B9E\u6D4B\u8BC1\u636E",
+      "state": "Recheck",
+      "updated": "2026-11-04T04:03:53.4655705+00:00"
+    },
+    {
+      "id": "fb21a400ac5e4e45b80257331a2d2b50",
+      "key": "430d624b36c444da8d3a2614da1ff578/4ace121a42ed4aec99a0a38f6c9b6c98/3ac0a1798c954c15b64148725692301a/d9fc503c5d0e4ab0a3376e738743a04c",
+      "planId": "430d624b36c444da8d3a2614da1ff578",
+      "gearId": "4ace121a42ed4aec99a0a38f6c9b6c98",
+      "modeId": "d9fc503c5d0e4ab0a3376e738743a04c",
+      "orderId": "3ac0a1798c954c15b64148725692301a",
+      "title": "1\u6321 / \u53F6\u7247\u4E8C\u500D\u9891 / \u98CE\u9053\u5C40\u90E8 M2",
+      "method": "\u5728900rpm\u9644\u8FD1\u590D\u6838\u8F6C\u901F\u4E0E\u9636\u6B21\uFF1B\u6D4B\u91CF\u58F3\u4F53/\u98CE\u9053\u54CD\u5E94\u548C\u8F66\u5185\u58F0\u97F3\uFF1B\u8BB0\u5F55\u6E29\u5EA6\u3001\u5B89\u88C5\u3001\u6D4B\u70B9\u3001\u4EEA\u5668\u3001\u9891\u7387\u5206\u8FA8\u7387\u53CA\u76F8\u5E72\u6027\u3002\u5019\u9009\u9891\u73871200Hz\u3002\u6838\u5BF9\u98CE\u91CF\u4E0E\u6548\u7387\u3002",
+      "owner": "",
+      "evidence": "",
+      "state": "Pending",
+      "updated": "2026-11-04T04:03:50.7501239+00:00"
+    },
+    {
+      "id": "c82289e297334a39b55beebdfe168379",
+      "key": "430d624b36c444da8d3a2614da1ff578/c13c86166f5d4bc8a252b145a7aac2da/4b6f940781914dc29dd8745344b2cca4/d9fc503c5d0e4ab0a3376e738743a04c",
+      "planId": "430d624b36c444da8d3a2614da1ff578",
+      "gearId": "c13c86166f5d4bc8a252b145a7aac2da",
+      "modeId": "d9fc503c5d0e4ab0a3376e738743a04c",
+      "orderId": "4b6f940781914dc29dd8745344b2cca4",
+      "title": "3\u6321 / \u53F6\u7247\u901A\u8FC7 BPF / \u98CE\u9053\u5C40\u90E8 M2",
+      "method": "\u57281800rpm\u9644\u8FD1\u590D\u6838\u8F6C\u901F\u4E0E\u9636\u6B21\uFF1B\u6D4B\u91CF\u58F3\u4F53/\u98CE\u9053\u54CD\u5E94\u548C\u8F66\u5185\u58F0\u97F3\uFF1B\u8BB0\u5F55\u6E29\u5EA6\u3001\u5B89\u88C5\u3001\u6D4B\u70B9\u3001\u4EEA\u5668\u3001\u9891\u7387\u5206\u8FA8\u7387\u53CA\u76F8\u5E72\u6027\u3002\u5019\u9009\u9891\u73871200Hz\u3002\u6838\u5BF9\u98CE\u91CF\u4E0E\u6548\u7387\u3002",
+      "owner": "",
+      "evidence": "",
+      "state": "Pending",
+      "updated": "2026-11-04T04:03:50.7501277+00:00"
+    },
+    {
+      "id": "3a5576e8cf0640f9989836926aa83c39",
+      "key": "430d624b36c444da8d3a2614da1ff578/ea22825b77b04409960e412139648ee1/162250c69b6749cfab2809c0e83424e6/844aeafec0bc4e2ea81595877f722a8b",
+      "planId": "430d624b36c444da8d3a2614da1ff578",
+      "gearId": "ea22825b77b04409960e412139648ee1",
+      "modeId": "844aeafec0bc4e2ea81595877f722a8b",
+      "orderId": "162250c69b6749cfab2809c0e83424e6",
+      "title": "4\u6321 / \u8F74\u9891 2X / \u652F\u67B6 M3",
+      "method": "\u57282600rpm\u9644\u8FD1\u590D\u6838\u8F6C\u901F\u4E0E\u9636\u6B21\uFF1B\u6D4B\u91CF\u58F3\u4F53/\u98CE\u9053\u54CD\u5E94\u548C\u8F66\u5185\u58F0\u97F3\uFF1B\u8BB0\u5F55\u6E29\u5EA6\u3001\u5B89\u88C5\u3001\u6D4B\u70B9\u3001\u4EEA\u5668\u3001\u9891\u7387\u5206\u8FA8\u7387\u53CA\u76F8\u5E72\u6027\u3002\u5019\u9009\u9891\u738786.67Hz\u3002\u6838\u5BF9\u98CE\u91CF\u4E0E\u6548\u7387\u3002",
+      "owner": "",
+      "evidence": "",
+      "state": "Pending",
+      "updated": "2026-11-04T04:03:50.7501296+00:00"
+    }
+  ],
+  "audit": [
+    {
+      "time": "2026-11-04T04:03:48.1995751+00:00",
+      "action": "\u8F7D\u5165\u6A21\u62DF\u793A\u4F8B",
+      "detail": "40\u53F6\u7247\uFF0C\u4E09\u6A21\u6001\uFF0C\u53CC\u65B9\u6848",
+      "revision": 0
+    },
+    {
+      "time": "2026-11-04T04:03:49.7993819+00:00",
+      "action": "\u91C7\u7EB3\u626B\u63CF\u4E3A\u65B0\u65B9\u6848",
+      "detail": "\u5DF2\u901A\u8FC7\u5B8C\u6574\u9879\u76EE\u6821\u9A8C\uFF1B\u8BA1\u7B97\u8F93\u5165\u53D8\u5316\uFF0C\u5DF2\u5B8C\u6210\u9A8C\u8BC1\u6807\u4E3A\u9700\u590D\u6838",
+      "revision": 1
+    },
+    {
+      "time": "2026-11-04T04:03:50.7501407+00:00",
+      "action": "\u751F\u6210\u9A8C\u8BC1\u6E05\u5355",
+      "detail": "\u5DF2\u901A\u8FC7\u5B8C\u6574\u9879\u76EE\u6821\u9A8C",
+      "revision": 2
+    },
+    {
+      "time": "2026-11-04T04:03:50.9654069+00:00",
+      "action": "\u751F\u6210\u9A8C\u8BC1\u6E05\u5355",
+      "detail": "\u5DF2\u901A\u8FC7\u5B8C\u6574\u9879\u76EE\u6821\u9A8C",
+      "revision": 3
+    },
+    {
+      "time": "2026-11-04T04:03:51.8144414+00:00",
+      "action": "\u5E94\u7528\u9A8C\u8BC1\u8BB0\u5F55",
+      "detail": "\u5DF2\u901A\u8FC7\u5B8C\u6574\u9879\u76EE\u6821\u9A8C",
+      "revision": 4
+    },
+    {
+      "time": "2026-11-04T04:03:53.0644046+00:00",
+      "action": "\u5E94\u7528\u6321\u4F4D\u5C5E\u6027",
+      "detail": "\u5DF2\u901A\u8FC7\u5B8C\u6574\u9879\u76EE\u6821\u9A8C\uFF1B\u8BA1\u7B97\u8F93\u5165\u53D8\u5316\uFF0C\u5DF2\u5B8C\u6210\u9A8C\u8BC1\u6807\u4E3A\u9700\u590D\u6838",
+      "revision": 5
+    },
+    {
+      "time": "2026-11-04T04:03:53.4655673+00:00",
+      "action": "\u64A4\u9500",
+      "detail": "\u6062\u590D\u8F93\u5165\u5FEB\u7167\uFF1B\u4FDD\u7559\u7D2F\u8BA1\u5BA1\u8BA1",
+      "revision": 6
+    },
+    {
+      "time": "2026-11-04T04:03:53.664655+00:00",
+      "action": "\u91CD\u505A",
+      "detail": "\u6062\u590D\u8F93\u5165\u5FEB\u7167\uFF1B\u4FDD\u7559\u7D2F\u8BA1\u5BA1\u8BA1",
+      "revision": 7
+    },
+    {
+      "time": "2026-11-04T04:03:53.8640453+00:00",
+      "action": "\u64A4\u9500",
+      "detail": "\u6062\u590D\u8F93\u5165\u5FEB\u7167\uFF1B\u4FDD\u7559\u7D2F\u8BA1\u5BA1\u8BA1",
+      "revision": 8
+    },
+    {
+      "time": "2026-11-04T04:03:55.4539258+00:00",
+      "action": "\u5E94\u7528CSV",
+      "detail": "\u5DF2\u901A\u8FC7\u5B8C\u6574\u9879\u76EE\u6821\u9A8C\uFF1B\u8BA1\u7B97\u8F93\u5165\u53D8\u5316\uFF0C\u5DF2\u5B8C\u6210\u9A8C\u8BC1\u6807\u4E3A\u9700\u590D\u6838",
+      "revision": 9
+    },
+    {
+      "time": "2026-11-04T04:03:55.8829472+00:00",
+      "action": "\u5E94\u7528\u65B9\u6848\u5C5E\u6027",
+      "detail": "\u5DF2\u901A\u8FC7\u5B8C\u6574\u9879\u76EE\u6821\u9A8C\uFF1B\u8BA1\u7B97\u8F93\u5165\u53D8\u5316\uFF0C\u5DF2\u5B8C\u6210\u9A8C\u8BC1\u6807\u4E3A\u9700\u590D\u6838",
+      "revision": 10
+    }
+  ]
+}

@@ -1,0 +1,164 @@
+{
+  "baseline": 0,
+  "minimum": 3500,
+  "productionNonblank": 3527,
+  "byExtension": {
+    ".razor": 786,
+    ".cs": 2423,
+    ".css": 306,
+    ".js": 12
+  },
+  "rule": "src下.cs/.razor/.css/.js非空手写生产行；排除obj/bin、测试、工具、依赖、文档、示例",
+  "files": [
+    {
+      "path": "src/Blower.App/Components/App.razor",
+      "nonblank": 17,
+      "sha256": "3976c9a6a6e4b2921cbb9731a01afaac0b715bf9518fc74628ef2806769b3a2d"
+    },
+    {
+      "path": "src/Blower.App/Components/EditorPanel.razor",
+      "nonblank": 139,
+      "sha256": "b00f70a2049608a133e86f5d33e219edd24b88e1548a2e5a9dec0557da435027"
+    },
+    {
+      "path": "src/Blower.App/Components/ExchangePanel.razor",
+      "nonblank": 79,
+      "sha256": "144dcd98466d2608b25b11977b9cdab35c8bb6f8fa9029c56630919b46d194e4"
+    },
+    {
+      "path": "src/Blower.App/Components/FrequencyPlot.razor",
+      "nonblank": 56,
+      "sha256": "bcec04c99975e022019a0731d49b22c587e93926e0af71036eb18f40eecf8607"
+    },
+    {
+      "path": "src/Blower.App/Components/ResultsDock.razor",
+      "nonblank": 144,
+      "sha256": "2880535aa12e2c6890d887171346467fbf930e82032edea9eab49e494100683a"
+    },
+    {
+      "path": "src/Blower.App/Components/Routes.razor",
+      "nonblank": 8,
+      "sha256": "280a12aa08c7bf894b9403bdbc88d070e3b1246c24488c16672d951061b31846"
+    },
+    {
+      "path": "src/Blower.App/Components/StudyPanel.razor",
+      "nonblank": 82,
+      "sha256": "2ce2ab33244af2ff72df0e244b1714a38096bdb1c4e103b0db9cbd01db676184"
+    },
+    {
+      "path": "src/Blower.App/Components/Workbench.razor",
+      "nonblank": 249,
+      "sha256": "acec8a4e7971e4c4230403b24d42faceabf92bd5c79dffd99694dafa42cdf4f2"
+    },
+    {
+      "path": "src/Blower.App/Components/_Imports.razor",
+      "nonblank": 12,
+      "sha256": "e07911d7edd42b1b5c1c7296274e26c1aee87fc7f281efeb12a8c71c6ab82791"
+    },
+    {
+      "path": "src/Blower.App/DownloadVault.cs",
+      "nonblank": 33,
+      "sha256": "add868d0f32d1a4b4ec221fb360a7df93a28330046a958960aac970200e8a969"
+    },
+    {
+      "path": "src/Blower.App/Program.cs",
+      "nonblank": 31,
+      "sha256": "487a6a8a44f2cc2b946f10dd5dbf2a7197641da29b514ee57bb0fbbd0102f2b7"
+    },
+    {
+      "path": "src/Blower.App/ViewModels/WorkspaceViewModel.cs",
+      "nonblank": 564,
+      "sha256": "b8ce8da26eff6356ec41d77e5811b575e37a97117a9b1cb4933b27eb67705c34"
+    },
+    {
+      "path": "src/Blower.App/wwwroot/workbench.css",
+      "nonblank": 306,
+      "sha256": "96bd9e2309d607013ded3aad7ef5209155e271cd9965cb01d98e185300edfdd1"
+    },
+    {
+      "path": "src/Blower.App/wwwroot/workbench.js",
+      "nonblank": 12,
+      "sha256": "92f945a57a51a3400220909b52d770c368d22fea39c0147fc352bb883c668f12"
+    },
+    {
+      "path": "src/Blower.Core/Analysis/ChartModel.cs",
+      "nonblank": 115,
+      "sha256": "90f19291e114f5ff78ca3dbe45a3d97bdce5e6038aac9e57bbbe859a5d25e36f"
+    },
+    {
+      "path": "src/Blower.Core/Analysis/Engine.cs",
+      "nonblank": 149,
+      "sha256": "8fe5c6efee5fefa35256e695bfe959c4537a8564097acd00ec3f695ef102c055"
+    },
+    {
+      "path": "src/Blower.Core/Analysis/PlanComparison.cs",
+      "nonblank": 53,
+      "sha256": "43e37ef5e080de5e0c1b60c23d7988ebdba9a71047c80dc9547edc7d0f91d809"
+    },
+    {
+      "path": "src/Blower.Core/Analysis/QualityReview.cs",
+      "nonblank": 75,
+      "sha256": "be3af0535aea5aa42f6f52ef917103b656afe2a310cd066a5dc82e1efbbd4438"
+    },
+    {
+      "path": "src/Blower.Core/Analysis/RuleStudy.cs",
+      "nonblank": 103,
+      "sha256": "dfdad8826f99229674952dffb4f3c1ebb42204bd415ae456c0a02d330ef370df"
+    },
+    {
+      "path": "src/Blower.Core/Analysis/SpeedScanner.cs",
+      "nonblank": 106,
+      "sha256": "92a87b0d0b237e84150aa4d3d3b05ac432371661e8a5590c2cd6ea8328f50e1b"
+    },
+    {
+      "path": "src/Blower.Core/Domain/Demo.cs",
+      "nonblank": 59,
+      "sha256": "1dce769704e0b9562d07a89bcf0f138adedef73e1a99cf2ed7bc5c7a1568246b"
+    },
+    {
+      "path": "src/Blower.Core/Domain/Project.cs",
+      "nonblank": 145,
+      "sha256": "0818667a76c71af0e1f9c2c9ae5f1e743642fe10e306d8075683f40db20e653e"
+    },
+    {
+      "path": "src/Blower.Core/Domain/Validation.cs",
+      "nonblank": 181,
+      "sha256": "054eb9d39176eeaa96603809ac918ea09874b6bb7314befe4933ae966b427291"
+    },
+    {
+      "path": "src/Blower.Core/IO/CsvExchange.cs",
+      "nonblank": 179,
+      "sha256": "0a0fb963404d58f5ed7f6a473ebe5698b8f7370685ad96703dde38fe065a2fd6"
+    },
+    {
+      "path": "src/Blower.Core/IO/Exports.cs",
+      "nonblank": 152,
+      "sha256": "4acb6725bb45006c320a768d224df55a64fe9f5ce9cb288f19864bf0d57b6f07"
+    },
+    {
+      "path": "src/Blower.Core/IO/ProjectCodec.cs",
+      "nonblank": 81,
+      "sha256": "c4699317215357b72c6a82455dace53597df74a1d20eca6189cc90b14ecc2e97"
+    },
+    {
+      "path": "src/Blower.Core/IO/ProjectStore.cs",
+      "nonblank": 97,
+      "sha256": "e49b9f1a5158c37f28be181f5fadf623546e935a801500e63b0304bc4ee2be00"
+    },
+    {
+      "path": "src/Blower.Core/IO/SchemaGuard.cs",
+      "nonblank": 78,
+      "sha256": "5ea7099e485fb2cadb2ddf739434053e56f437f63705db5f31513867106bbb67"
+    },
+    {
+      "path": "src/Blower.Core/Operations/ProjectCommands.cs",
+      "nonblank": 129,
+      "sha256": "45ce58d4f559d2077d8da459caba89884c8fa477a260d5b5ce68363eb736147f"
+    },
+    {
+      "path": "src/Blower.Core/Operations/ProjectSession.cs",
+      "nonblank": 93,
+      "sha256": "85a719af02add659c52feb3b4d4531591a4f207c78ddf14e62925a40812b8b0d"
+    }
+  ]
+}

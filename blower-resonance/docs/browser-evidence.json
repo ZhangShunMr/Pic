@@ -1,0 +1,118 @@
+{
+  "date": "2026-11-04T04:04:00Z",
+  "browser": "Chromium / Playwright",
+  "viewport": "1600x1100; 600x1000",
+  "steps": [
+    {
+      "name": "blank startup and permanent inspector",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "blank-to-computable manual workflow",
+      "status": "passed",
+      "detail": "40 blades; BPF; 600Hz mode; 900 and 1800rpm gears"
+    },
+    {
+      "name": "invalid speed rejected without changing current data",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "unapplied draft protected on object switch",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "real save and reopen",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "simulation entry with persistent source markers",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "UI crossing interval matches independent 853-947rpm calculation",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "real constrained scan and adoption as new plan",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "live shared-condition plan comparison",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "deduplicated verification tasks and editable evidence",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "nine nonmutating rule scenarios and quality review",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "input changes force completed evidence to recheck",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "actual undo and redo",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "CSV invalid row refused, valid two-gear batch accepted",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "locked plan refuses gear edit",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "project download contains all inputs, checks and provenance",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "HTML/SVG/three CSV exports downloaded and inspected",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "downloaded project uploaded and reopened as independent copy",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "corrupt project import rejected without replacing active project",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "archive and unarchive enforce editing state",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "600px layout without page-level overflow",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "no browser script errors or Blazor error UI",
+      "status": "passed",
+      "detail": ""
+    }
+  ],
+  "scriptErrors": []
+}

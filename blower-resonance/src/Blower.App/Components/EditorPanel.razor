@@ -1,0 +1,140 @@
+<fieldset disabled="@Vm.ReadOnly" class="editor-fields">
+@if (Vm.Kind == "project")
+{
+    <label>项目名称<input @bind="Vm.Draft.Name" @bind:after="Vm.Notify" maxlength="160" /></label>
+    <label>负责人<input @bind="Vm.Draft.Owner" @bind:after="Vm.Notify" /></label>
+    <label>车辆 / 平台<input @bind="Vm.Draft.Vehicle" @bind:after="Vm.Notify" /></label>
+    <label>数据来源类别
+        <select aria-label="数据来源类别" @bind="Vm.Draft.Origin" @bind:after="Vm.Notify">
+            @foreach (var origin in Enum.GetValues<Origin>())
+            {
+                <option value="@origin">@Labels.Source(origin)</option>
+            }
+        </select>
+    </label>
+    <label>来源说明<textarea @bind="Vm.Draft.Source" @bind:after="Vm.Notify" rows="3"></textarea></label>
+    <label>设计目标 / 备注<textarea @bind="Vm.Draft.Notes" @bind:after="Vm.Notify" rows="4"></textarea></label>
+    <div class="property-info">
+        <p>项目标识 <code>@Vm.Project.Id</code></p>
+        <p>修订 @Vm.Project.Revision · 创建 @Vm.Project.Created.ToString("yyyy-MM-dd HH:mm 'UTC'")</p>
+        <p>“用户声明实测”只记录输入声明；软件不认证数据质量。</p>
+    </div>
+}
+else if (Vm.Kind == "settings")
+{
+    <p class="field-group-title">风机与分析范围</p>
+    <label>叶片数（整数，1～200）<input type="number" @bind="Vm.Draft.Settings.Blades" @bind:after="Vm.Notify" /></label>
+    <div class="field-pair">
+        <label>下限 rpm<input type="number" @bind="Vm.Draft.Settings.MinRpm" @bind:after="Vm.Notify" /></label>
+        <label>上限 rpm<input type="number" @bind="Vm.Draft.Settings.MaxRpm" @bind:after="Vm.Notify" /></label>
+    </div>
+    <p class="field-group-title">敏感范围规则</p>
+    <label>绝对半宽 Hz<input type="number" step="any" @bind="Vm.Draft.Settings.AbsoluteBandHz" @bind:after="Vm.Notify" /></label>
+    <label>相对半宽 %<input type="number" step="any" @bind="Vm.Draft.Settings.RelativeBandPercent" @bind:after="Vm.Notify" /></label>
+    <label class="check-field"><input type="checkbox" @bind="Vm.Draft.Settings.UseDamping" @bind:after="Vm.Notify" />计入阻尼近似半宽 ζfn</label>
+    <label>转速容差 ±rpm<input type="number" step="any" @bind="Vm.Draft.Settings.SpeedToleranceRpm" @bind:after="Vm.Notify" /></label>
+    <small>总半宽取绝对值、百分比、阻尼项和单模态附加半宽的最大值，属于可配置工程规则。</small>
+    <p class="field-group-title">候选扫描约束</p>
+    <label>最小挡位间距 rpm<input type="number" step="any" @bind="Vm.Draft.Settings.MinimumGapRpm" @bind:after="Vm.Notify" /></label>
+    <label>扫描窗口 ±rpm<input type="number" step="any" @bind="Vm.Draft.Settings.ScanWindowRpm" @bind:after="Vm.Notify" /></label>
+    <label>扫描步长 rpm<input type="number" step="any" @bind="Vm.Draft.Settings.ScanStepRpm" @bind:after="Vm.Notify" /></label>
+    <label>转速偏移权重（0～1）<input type="number" step="0.01" @bind="Vm.Draft.Settings.ShiftWeight" @bind:after="Vm.Notify" /></label>
+    <small>局部代价=接近组合数+权重×|候选转速−原转速|/max(1,扫描窗口)。在全部挡位最小间距约束下取网格最小总代价。</small>
+}
+else if (Vm.Kind == "order" && Vm.DraftOrder is { } order)
+{
+    <label>阶次名称<input @bind="order.Name" @bind:after="Vm.Notify" /></label>
+    <label>阶次类型
+        <select aria-label="阶次类型" @bind="order.Kind" @bind:after="Vm.Notify">
+            <option value="Shaft">轴旋转阶次</option>
+            <option value="Blade">叶片通过倍频</option>
+        </select>
+    </label>
+    <label>倍数（0.1～100）<input type="number" step="any" @bind="order.Multiplier" @bind:after="Vm.Notify" /></label>
+    <label class="check-field"><input type="checkbox" @bind="order.Enabled" @bind:after="Vm.Notify" />启用此阶次</label>
+    <label>激励依据 / 待验证事项<textarea @bind="order.Evidence" @bind:after="Vm.Notify" rows="4"></textarea></label>
+    <div class="property-info">
+        <strong>有效阶次 @order.EffectiveOrder(Vm.Draft.Settings.Blades).ToString("0.###")</strong>
+        <p>轴阶次直接使用倍数；叶片通过阶次=叶片数×倍数。频率=有效阶次×rpm÷60。</p>
+        <p>候选阶次仅表示设计关注对象，并不证明实际存在该激励幅值。</p>
+    </div>
+}
+else if (Vm.Kind == "mode" && Vm.DraftMode is { } mode)
+{
+    <label>模态名称<input @bind="mode.Name" @bind:after="Vm.Notify" /></label>
+    <label>模态频率 Hz<input type="number" step="any" @bind="mode.FrequencyHz" @bind:after="Vm.Notify" /></label>
+    <label>阻尼比 ζ（0～0.1，可留空）<input type="number" step="0.001" @bind="mode.DampingRatio" @bind:after="Vm.Notify" /></label>
+    <small>填写0.02表示2%；未知留空。ζfn仅为轻阻尼孤立模态的带宽近似，不用于幅值预测。</small>
+    <label>附加敏感半宽 Hz<input type="number" step="any" @bind="mode.ExtraBandHz" @bind:after="Vm.Notify" /></label>
+    <label>结构位置<input @bind="mode.Location" @bind:after="Vm.Notify" /></label>
+    <label class="check-field"><input type="checkbox" @bind="mode.Enabled" @bind:after="Vm.Notify" />启用此模态</label>
+    <label>模态来源类别
+        <select aria-label="模态来源类别" @bind="mode.Origin" @bind:after="Vm.Notify">
+            @foreach (var origin in Enum.GetValues<Origin>())
+            {
+                <option value="@origin">@Labels.Source(origin)</option>
+            }
+        </select>
+    </label>
+    <label>来源 / 测试或仿真边界<textarea @bind="mode.Source" @bind:after="Vm.Notify" rows="4"></textarea></label>
+    <div class="property-info">
+        @if (mode.FrequencyHz > 0)
+        {
+            var band = Engine.Band(mode, Vm.Draft.Settings);
+            <p>属性草稿范围：@band.LowerHz.ToString("0.##")～@band.UpperHz.ToString("0.##") Hz</p>
+            <small>@band.Basis</small>
+        }
+    </div>
+}
+else if (Vm.Kind == "plan" && Vm.DraftPlan is { } plan)
+{
+    <label>方案名称<input @bind="plan.Name" @bind:after="Vm.Notify" /></label>
+    <label>方案说明<textarea @bind="plan.Notes" @bind:after="Vm.Notify" rows="5"></textarea></label>
+    <label class="check-field"><input type="checkbox" @bind="plan.Locked" @bind:after="Vm.Notify" />锁定挡位，防止误改</label>
+    <div class="property-info">
+        <p>@plan.Gears.Count 个挡位。锁定后仍可复制，扫描采纳总是建立新方案。</p>
+        <p>所有方案共用当前阶次、模态和规则。若需要比较不同模态条件，请复制为独立项目，分别保留报告。</p>
+    </div>
+    <button type="button" @onclick="Vm.CopyPlan">复制当前方案</button>
+}
+else if (Vm.Kind == "gear" && Vm.DraftGear is { } gear)
+{
+    <label>挡位名称<input @bind="gear.Name" @bind:after="Vm.Notify" /></label>
+    <label>目标转速 rpm<input type="number" step="any" @bind="gear.Rpm" @bind:after="Vm.Notify" /></label>
+    <label class="check-field"><input type="checkbox" @bind="gear.Fixed" @bind:after="Vm.Notify" />扫描时固定此挡位</label>
+    <label>挡位备注<textarea @bind="gear.Notes" @bind:after="Vm.Notify" rows="4"></textarea></label>
+    <div class="property-info">
+        <p>归属方案：@Vm.ActivePlan?.Name</p>
+        <p>挡位按方案列表顺序递增。输入后须满足范围和最小间距，否则整次修改被拒绝。</p>
+        @foreach (var excitation in Vm.Draft.Orders.Where(x => x.Enabled))
+        {
+            <p>@excitation.Name <strong>@Engine.Frequency(gear.Rpm, excitation.EffectiveOrder(Vm.Draft.Settings.Blades)).ToString("0.##") Hz</strong></p>
+        }
+    </div>
+}
+else if (Vm.Kind == "check" && Vm.DraftCheck is { } task)
+{
+    <h3>@task.Title</h3>
+    <label>验证方法<textarea @bind="task.Method" @bind:after="Vm.Notify" rows="6"></textarea></label>
+    <label>负责人<input @bind="task.Owner" @bind:after="Vm.Notify" /></label>
+    <label>验证状态
+        <select aria-label="验证状态" @bind="task.State" @bind:after="Vm.Notify">
+            @foreach (var state in Enum.GetValues<CheckState>())
+            {
+                <option value="@state">@Labels.State(state)</option>
+            }
+        </select>
+    </label>
+    <label>证据位置 / 验证记录<textarea @bind="task.Evidence" @bind:after="Vm.Notify" rows="5"></textarea></label>
+    <small>“已记录证据”必须填写证据。计算输入变化后自动改为“需复核”；软件不认证证据真实性。</small>
+    <div class="property-info"><p>更新于 @task.Updated.ToString("u")</p><code>@task.Key</code></div>
+}
+else
+{
+    <p>从对象树或图中选择一个有效对象。</p>
+}
+</fieldset>
+
+@code {
+    [Parameter, EditorRequired] public WorkspaceViewModel Vm { get; set; } = default!;
+}

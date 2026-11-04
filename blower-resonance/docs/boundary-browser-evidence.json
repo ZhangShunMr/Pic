@@ -1,0 +1,10 @@
+{
+  "date": "2026-11-04T04:09:39Z",
+  "status": "passed",
+  "checks": [
+    "both CSV templates downloaded with exact import headers",
+    "nine scenario CSV export downloaded",
+    "oversized candidate grid gives actionable red failure state",
+    "oversized project refused without circuit failure or data replacement"
+  ]
+}
