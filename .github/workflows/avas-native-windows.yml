@@ -25,6 +25,8 @@ jobs:
         id: verify
         run: |
           New-Item docs/windows-ui -ItemType Directory -Force | Out-Null
+          Get-ChildItem docs/windows-ui -Filter '*.png' | Remove-Item
+          Remove-Item docs/windows-ui/desktop-evidence.json,docs/windows-ui/published-executable.json -ErrorAction SilentlyContinue
           dotnet build AvasCoverage.sln -c Release 2>&1 | Tee-Object docs/windows-ui/build-windows.log
           if ($LASTEXITCODE -ne 0) { throw 'Native build failed' }
           dotnet run --no-build -c Release --project tests/Avas.Verification -- docs/windows-ui/core-verification.json 2>&1 | Tee-Object docs/windows-ui/core-tests.log

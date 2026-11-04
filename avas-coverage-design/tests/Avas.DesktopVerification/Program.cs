@@ -131,6 +131,7 @@ internal static class Program
                 coordinate.Text = "abc";
                 coordinate.GetBindingExpression(TextBox.TextProperty)!.UpdateSource();
                 Assert(Validation.GetHasError(coordinate) && vm.BindingErrorCount > 0, "原生数值绑定拒绝文字输入");
+                Assert(vm.CurrentResult is null && vm.ResultState.Contains("待计算"), "格式错误时隐藏旧结果并显示待处理状态");
                 vm.Commands["Apply"].Execute(null);
                 Assert(vm.Errors.Count > 0 && vm.BindingErrorCount > 0 && coordinate.Text == "abc",
                     "格式错误阻止应用旧数值并保留待修正文字");

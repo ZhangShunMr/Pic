@@ -104,8 +104,8 @@ public sealed partial class WorkspaceViewModel
     public double RingRadius { get; set; } = 5;
     public int RingCount { get; set; } = 8;
     public string InputState => BindingErrorCount > 0 ? $"存在 {BindingErrorCount} 个格式错误" : HasDraft ? "字段草稿未应用" : "字段已应用";
-    public string ResultState => Stale || HasDraft ? "结果待计算 / 已过期" : "结果与当前输入一致";
-    public string SaveState => Dirty || HasDraft ? "项目尚未保存" : "项目已保存 / 空白初始状态";
+    public string ResultState => Stale || HasDraft || BindingErrorCount > 0 ? "结果待计算 / 已过期" : "结果与当前输入一致";
+    public string SaveState => Dirty || HasDraft || BindingErrorCount > 0 ? "项目尚未保存" : "项目已保存 / 空白初始状态";
     public string SourceState => ProjectCodec.SourceSummary(Project);
     public bool IsReady => !Busy;
     public string AudioAssetSummary => CurrentAudio() is { } asset
@@ -115,7 +115,7 @@ public sealed partial class WorkspaceViewModel
     public IEnumerable<DigitalBandRow> DigitalBands => AudioSpectrum is not { } spectrum ? []
         : Software.Frequencies.Select((hz, i) => new DigitalBandRow(hz, spectrum.Levels[i]));
     public string MetricLabel => Acoustics.Metric(Project.Settings);
-    public Calculation? CurrentResult => Stale || HasDraft ? null : Result;
+    public Calculation? CurrentResult => Stale || HasDraft || BindingErrorCount > 0 ? null : Result;
     public PointResult? CurrentPoint => CurrentResult?.Listeners.SingleOrDefault(x => x.ListenerId == SelectedListenerId);
     public IEnumerable<FrequencyRow> PointBands => CurrentPoint is not { } point ? []
         : Software.Frequencies.Select((hz, i) => new FrequencyRow(hz, point.Bands[i], Project.Settings.Background.Single(x => x.Hz == hz).Level));
