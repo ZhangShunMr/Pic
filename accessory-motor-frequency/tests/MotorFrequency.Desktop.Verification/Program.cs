@@ -28,7 +28,6 @@ internal static class Program
         PresentationTraceSources.DataBindingSource.Switch.Level = SourceLevels.Error;
         var app = new App();
         app.InitializeComponent();
-        app.StartupUri = null;
         var window = new MainWindow();
         var interaction = new TestInteraction();
         var vm = new WorkspaceViewModel(interaction);

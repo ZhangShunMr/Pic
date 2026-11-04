@@ -1,0 +1,11 @@
+{
+  "run": "https://github.com/ZhangShunMr/Pic/actions/runs/41860163847",
+  "sourceCommit": "ca2adab2f78de65c0322aa3b956b7309dcc44c5b",
+  "runner": "Microsoft Windows Server 2025 10.0.26100 Datacenter",
+  "build": "succeeded, 0 warnings, 0 errors",
+  "core": "57 passed, 0 failed",
+  "application": "23 passed, 0 failed",
+  "wpf": "Failed before screenshots: ArgumentNullException in Application.set_StartupUri, verification Program.cs line 31",
+  "correction": "Remove invalid StartupUri=null assignment from the test harness; startup URI is not invoked because harness does not call Application.Run. No production startup change.",
+  "actualScreenshots": 0
+}
