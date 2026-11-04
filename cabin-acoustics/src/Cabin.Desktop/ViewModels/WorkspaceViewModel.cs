@@ -53,8 +53,8 @@ public sealed class WorkspaceViewModel : ObservableObject
         this.services = services;
         plane = Planes[0];
         scanParameter = ScanParameters[0];
-        ScanStart = InputField.Number("扫描起值", 3.0, 0.002, 10, ClearScan, "尺寸/坐标单位m；阻尼无量纲");
-        ScanEnd = InputField.Number("扫描终值", 4.0, 0.002, 10, ClearScan, "大于起值，扫描时保持绝对点位");
+        ScanStart = InputField.Number("扫描起值", 3.0, 0, 10, ClearScan, "尺寸/坐标单位m；阻尼无量纲");
+        ScanEnd = InputField.Number("扫描终值", 4.0, 0, 10, ClearScan, "大于起值，扫描时保持绝对点位");
         ScanCount = InputField.Number("候选数", 7, 2, 21, ClearScan, "整数2—21");
         NewCommand = Command(NewProject, () => !Busy);
         ExampleCommand = Command(OpenExample, () => !Busy);

@@ -542,6 +542,16 @@ Test("scan cancellation interrupts candidate calculation", () =>
     throw new Exception("No scan cancellation");
 });
 
+await AsyncTest("MVVM source coordinate scan includes rigid wall zero boundary", async () =>
+{
+    var services = new TestServices(); var vm = new WorkspaceViewModel(services);
+    vm.ExampleCommand.Execute(null); vm.CalculateCommand.Execute(null); await Wait(vm);
+    vm.ScanParameter = vm.ScanParameters.First(x => x.Key == "sourceX");
+    vm.ScanStart.Text = "0"; vm.ScanEnd.Text = "1.7"; vm.ScanCount.Text = "3";
+    vm.ScanCommand.Execute(null); await Wait(vm);
+    Assert(vm.Scan is not null && vm.Scan.Rows[0].Parameter == 0 && vm.Scan.Rows.All(x => x.Error.Length == 0), string.Join("|", services.Errors));
+});
+
 var demo = Sample();
 NativeFiles.Save(Path.Combine(sampleDirectory, "four-seat-demo.cabin.json"), demo);
 NativeFiles.Save(Path.Combine(sampleDirectory, "blank.cabin.json"), new Project());
