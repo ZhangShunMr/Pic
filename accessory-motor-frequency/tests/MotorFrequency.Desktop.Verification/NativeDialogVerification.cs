@@ -35,7 +35,7 @@ internal static class NativeDialogVerification
                 at = DateTimeOffset.UtcNow,
                 sourceCommit = Environment.GetEnvironmentVariable("GITHUB_SHA"),
                 actualNativeDialogs = true,
-                scope = "Only dialogs belonging to this verifier process; UI Automation sets filename and invokes native Save/Open buttons",
+                scope = "Only dialogs belonging to this verifier process; UI Automation locates filename/accept controls and real keyboard input submits native Save/Open",
                 projectSave = File.Exists(interaction.ProjectPath),
                 projectReopenPoints = vm.Current!.Spectra[0].Points.Count,
                 reportExport = File.Exists(interaction.ReportPath),
@@ -130,16 +130,28 @@ internal static class NativeDialogVerification
                 Require(fileName is not null && fileName.TryGetCurrentPattern(ValuePattern.Pattern, out _), "Native filename edit not found");
                 fileName!.SetFocus();
                 var filenameValue = (ValuePattern)fileName.GetCurrentPattern(ValuePattern.Pattern);
-                filenameValue.SetValue(path);
+                SetForegroundWindow(handle);
+                Require(GetForegroundWindow() == handle, "Cannot focus own native dialog for keyboard input");
+                PressKey(0x11, false);
+                PressKey(0x41);
+                PressKey(0x11, true);
+                foreach (var character in path)
+                {
+                    SendKeys(new KeyboardInput { Scan = character, Flags = 4 },
+                        new KeyboardInput { Scan = character, Flags = 6 });
+                }
+                Thread.Sleep(150);
                 Require(filenameValue.Current.Value == path, "Native filename edit did not retain entered path");
                 Thread.Sleep(150);
                 CaptureDialog(handle, screenshot);
-                Console.WriteLine("Native dialog: filename set through ValuePattern");
+                Console.WriteLine("Native dialog: filename entered by real keyboard input");
                 var accept = dialog.FindFirst(TreeScope.Descendants, new AndCondition(
                     new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Button),
                     new PropertyCondition(AutomationElement.AutomationIdProperty, "1")));
                 Require(accept is not null, "Native Save/Open button not found");
-                ((InvokePattern)accept!.GetCurrentPattern(InvokePattern.Pattern)).Invoke();
+                accept!.SetFocus();
+                Require(GetForegroundWindow() == handle, "Own dialog lost foreground before submit");
+                PressKey(0x20);
             }
             catch (Exception error)
             {
@@ -164,6 +176,21 @@ internal static class NativeDialogVerification
         Require(result is not null && string.Equals(CanonicalPath(result), CanonicalPath(path),
             StringComparison.OrdinalIgnoreCase), "Native selected path differs; see selection.json");
         return result;
+    }
+
+    private static void PressKey(ushort key, bool? release = null)
+    {
+        if (release is null)
+            SendKeys(new KeyboardInput { VirtualKey = key }, new KeyboardInput { VirtualKey = key, Flags = 2 });
+        else
+            SendKeys(new KeyboardInput { VirtualKey = key, Flags = release.Value ? 2u : 0u });
+    }
+
+    private static void SendKeys(params KeyboardInput[] keys)
+    {
+        var input = keys.Select(key => new Input { Type = 1, Data = new InputData { Keyboard = key } }).ToArray();
+        Require(SendInput((uint)input.Length, input, Marshal.SizeOf<Input>()) == input.Length,
+            "Native keyboard input was not delivered");
     }
 
     private static string CanonicalPath(string path)
@@ -211,6 +238,35 @@ internal static class NativeDialogVerification
         }
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    private struct KeyboardInput
+    {
+        public ushort VirtualKey, Scan;
+        public uint Flags, Time;
+        public nuint ExtraInfo;
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    private struct MouseInput
+    {
+        public int X, Y;
+        public uint MouseData, Flags, Time;
+        public nuint ExtraInfo;
+    }
+    [StructLayout(LayoutKind.Explicit)]
+    private struct InputData
+    {
+        [FieldOffset(0)] public KeyboardInput Keyboard;
+        [FieldOffset(0)] public MouseInput Mouse;
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    private struct Input
+    {
+        public uint Type;
+        public InputData Data;
+    }
+    [DllImport("user32.dll")] private static extern uint SendInput(uint count, Input[] input, int size);
+    [DllImport("user32.dll")] private static extern bool SetForegroundWindow(nint window);
+    [DllImport("user32.dll")] private static extern nint GetForegroundWindow();
     [StructLayout(LayoutKind.Sequential)]
     private struct WindowRect { public int Left, Top, Right, Bottom; }
     [StructLayout(LayoutKind.Sequential)]
