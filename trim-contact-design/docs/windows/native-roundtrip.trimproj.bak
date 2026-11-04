@@ -1,0 +1,214 @@
+﻿{
+  "schema": 1,
+  "id": "a932bea2-f297-4103-aef9-3fcaf67ee717",
+  "name": "\u95E8\u677F\u56DB\u5361\u6263\u63A5\u89E6\u5E03\u7F6E\u6F14\u793A",
+  "revision": "A",
+  "owner": "\u6F14\u793A\u5DE5\u7A0B\u5E08",
+  "goal": "\u6BD4\u8F83\u7F13\u51B2\u5757\u9884\u7D27\u91CF\u5BF9\u63A5\u89E6\u4FDD\u6301\u548C\u5361\u6263\u53CD\u529B\u7684\u5F71\u54CD",
+  "origin": "Simulation",
+  "source": "\u5185\u7F6E\u56FA\u5B9A\u6A21\u62DF\u53C2\u6570\uFF1B\u975E\u5B9E\u6D4B\uFF0C\u4E0D\u8BC1\u660E\u5B9E\u8F66\u6548\u679C",
+  "archived": false,
+  "createdUtc": "2026-11-04T15:53:02.1426208+00:00",
+  "modifiedUtc": "2026-11-04T15:53:12.9281394+00:00",
+  "panel": {
+    "name": "400\u00D7300 mm\u521A\u6027\u9970\u677F\u793A\u4F8B",
+    "massKg": 1,
+    "centerXmm": 200,
+    "centerYmm": 150,
+    "outline": [
+      {
+        "xmm": 0,
+        "ymm": 0
+      },
+      {
+        "xmm": 400,
+        "ymm": 0
+      },
+      {
+        "xmm": 400,
+        "ymm": 300
+      },
+      {
+        "xmm": 0,
+        "ymm": 300
+      }
+    ]
+  },
+  "settings": {
+    "phases": 24,
+    "enumerateTolerance": true
+  },
+  "variants": [
+    {
+      "id": "98692572-9701-4882-8ece-18646f5dbb56",
+      "name": "A \u57FA\u51C6\u63A5\u89E6\u5E03\u7F6E",
+      "note": "",
+      "clips": [
+        {
+          "id": "2865176c-8ef0-49d2-a663-0cd351f7e6cd",
+          "name": "\u5DE6\u4E0B\u5361\u6263",
+          "xmm": 40,
+          "ymm": 40,
+          "normalStiffness": 100,
+          "tangentialStiffness": 50,
+          "forceLimitN": 80
+        },
+        {
+          "id": "fb6019dc-33dd-40cf-8742-a61febb3b90c",
+          "name": "\u53F3\u4E0B\u5361\u6263",
+          "xmm": 360,
+          "ymm": 40,
+          "normalStiffness": 100,
+          "tangentialStiffness": 50,
+          "forceLimitN": 80
+        },
+        {
+          "id": "e788173f-9489-4ee4-9341-22509a9c59b0",
+          "name": "\u53F3\u4E0A\u5361\u6263",
+          "xmm": 360,
+          "ymm": 260,
+          "normalStiffness": 100,
+          "tangentialStiffness": 50,
+          "forceLimitN": 80
+        },
+        {
+          "id": "54eddd29-70a6-401f-a975-74302a7a406c",
+          "name": "\u5DE6\u4E0A\u5361\u6263",
+          "xmm": 40,
+          "ymm": 260,
+          "normalStiffness": 100,
+          "tangentialStiffness": 50,
+          "forceLimitN": 80
+        }
+      ],
+      "contacts": [
+        {
+          "id": "cab8fce8-aea3-470b-adaf-e4e9518f765d",
+          "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+          "material": "\u7F13\u51B2\u5757\uFF08\u5F85\u6807\u5B9A\uFF09",
+          "xmm": 200,
+          "ymm": 150,
+          "gapMm": 0.1,
+          "toleranceMm": 0.15,
+          "preloadMm": 0.2,
+          "normalStiffness": 100,
+          "tangentialStiffness": 40,
+          "friction": 0.3,
+          "compressionLimitMm": 0.8
+        }
+      ]
+    },
+    {
+      "id": "8d01017e-4ed3-44a1-b54d-f650e01175e8",
+      "name": "A \u57FA\u51C6\u63A5\u89E6\u5E03\u7F6E \u526F\u672C",
+      "note": "",
+      "clips": [
+        {
+          "id": "57440ffe-879d-416c-b035-848c34cc7315",
+          "name": "\u5DE6\u4E0B\u5361\u6263",
+          "xmm": 40,
+          "ymm": 40,
+          "normalStiffness": 100,
+          "tangentialStiffness": 50,
+          "forceLimitN": 80
+        },
+        {
+          "id": "3b85661d-b666-4e57-8bba-5369ff184c41",
+          "name": "\u53F3\u4E0B\u5361\u6263",
+          "xmm": 360,
+          "ymm": 40,
+          "normalStiffness": 100,
+          "tangentialStiffness": 50,
+          "forceLimitN": 80
+        },
+        {
+          "id": "88dd01b1-a44e-4aed-9663-6e4d45cf96d8",
+          "name": "\u53F3\u4E0A\u5361\u6263",
+          "xmm": 360,
+          "ymm": 260,
+          "normalStiffness": 100,
+          "tangentialStiffness": 50,
+          "forceLimitN": 80
+        },
+        {
+          "id": "b7244f2b-f845-456f-8bbd-92875d3abcae",
+          "name": "\u5DE6\u4E0A\u5361\u6263",
+          "xmm": 40,
+          "ymm": 260,
+          "normalStiffness": 100,
+          "tangentialStiffness": 50,
+          "forceLimitN": 80
+        }
+      ],
+      "contacts": [
+        {
+          "id": "467dafd8-1901-46bc-aa95-a11f615b4f31",
+          "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+          "material": "\u7F13\u51B2\u5757\uFF08\u5F85\u6807\u5B9A\uFF09",
+          "xmm": 200,
+          "ymm": 150,
+          "gapMm": 0.1,
+          "toleranceMm": 0.15,
+          "preloadMm": 0.4,
+          "normalStiffness": 100,
+          "tangentialStiffness": 40,
+          "friction": 0.3,
+          "compressionLimitMm": 0.8
+        }
+      ]
+    }
+  ],
+  "loads": [
+    {
+      "id": "78653c00-4e50-4120-8a5e-98a6c32fe433",
+      "name": "\u4E00\u500D\u91CD\u529B\u5468\u671F\u6F14\u793A",
+      "normalBiasG": 0,
+      "normalAmplitudeG": 1,
+      "tangentialBiasG": 0,
+      "tangentialAmplitudeG": 0.5,
+      "phaseDegrees": 90,
+      "frequencyHz": 10,
+      "source": "\u6A21\u62DF\u6B63\u5F26\u60EF\u6027\u8F7D\u8377"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "74bf2ff2-0e2d-4110-9732-5481166b66b0",
+      "pointId": null,
+      "title": "\u53C2\u6570\u8BC6\u522B\u4E0E\u6A21\u578B\u590D\u6838",
+      "method": "\u6D4B\u91CF\u88C5\u914D\u95F4\u9699\u3001\u516C\u5DEE\u3001\u5361\u6263\u521A\u5EA6\u3001\u63A5\u89E6\u538B\u7F29\u66F2\u7EBF\u548C\u6750\u6599\u6469\u64E6\uFF1B\u8BB0\u5F55\u6E29\u5EA6\u4E0E\u52A0\u8F7D\u6761\u4EF6\u3002",
+      "acceptance": "\u7531\u9879\u76EE\u8D1F\u8D23\u4EBA\u586B\u5199\u7ECF\u8BD5\u9A8C\u8BA4\u53EF\u7684\u53C2\u6570\u8303\u56F4\uFF1B\u672C\u8F6F\u4EF6\u4E0D\u63D0\u4F9B\u884C\u4E1A\u5408\u683C\u9650\u503C\u3002",
+      "owner": "",
+      "completed": false,
+      "evidence": ""
+    },
+    {
+      "id": "3c0af96a-ffc9-4af8-ab33-8acb94e982a3",
+      "pointId": "cab8fce8-aea3-470b-adaf-e4e9518f765d",
+      "title": "\u4E2D\u5FC3\u7F13\u51B2\u5757\u63A5\u89E6\u4FDD\u6301\u6838\u67E5",
+      "method": "\u6309\u63A7\u5236\u5DE5\u51B5\u88C5\u914D\u4E0A\u4E0B\u9650\u6837\u4EF6\uFF0C\u6D4B\u91CF\u95F4\u9699\u548C\u5206\u79BB\uFF1B\u63A7\u5236\u5DE5\u51B5\uFF1A\u4E00\u500D\u91CD\u529B\u5468\u671F\u6F14\u793A / \u89D2\u70B92[0.15]mm / 0.0\u00B0",
+      "acceptance": "\u8BB0\u5F55\u5141\u8BB8\u5206\u79BB\u6761\u4EF6\u53CA\u5B9E\u6D4B\u8BC1\u636E\uFF0C\u7ED3\u5408\u9053\u8DEF\u6216\u53F0\u67B6\u4EBA\u5DE5\u542C\u8FA8\u786E\u8BA4\u3002",
+      "owner": "",
+      "completed": false,
+      "evidence": ""
+    }
+  ],
+  "audit": [
+    {
+      "utc": "2026-11-04T15:53:02.1442581+00:00",
+      "action": "\u8F7D\u5165\u5185\u7F6E\u6A21\u62DF\u6F14\u793A"
+    },
+    {
+      "utc": "2026-11-04T15:53:02.1688196+00:00",
+      "action": "\u5EFA\u7ACB\u72EC\u7ACB\u6A21\u62DF\u5DE5\u4F5C\u526F\u672C"
+    },
+    {
+      "utc": "2026-11-04T15:53:06.3464037+00:00",
+      "action": "\u5E94\u7528\u684C\u9762\u7F16\u8F91"
+    },
+    {
+      "utc": "2026-11-04T15:53:12.9281399+00:00",
+      "action": "\u4ECE\u6709\u6548\u7ED3\u679C\u751F\u6210\u9A8C\u8BC1\u4EFB\u52A1"
+    }
+  ]
+}

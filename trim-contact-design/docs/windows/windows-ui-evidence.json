@@ -1,13 +1,13 @@
 {
-  "executedUtc": "2026-11-04T15:53:15.6231943+00:00",
-  "sourceCommit": "e4c22a1151d394ff02a40599de58a803177f6702",
-  "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41862156723",
+  "executedUtc": "2026-11-04T16:01:16.1968113+00:00",
+  "sourceCommit": "d8a6f694d02d5627932e2b441e0d23f529d2bb82",
+  "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41863273737",
   "platform": "Microsoft Windows NT 10.0.26100.0",
   "framework": ".NET 10.0.14",
   "rendering": "Actual production WPF MainWindow shown on Windows; client visual captured with RenderTargetBitmap after layout/render. Not browser or mock-up images.",
   "interaction": "Real WPF window, visual tree, bindings, native drawing and selected command automation. File/confirmation interface uses deterministic replacements; real shell dialogs are not certified.",
   "failed": 0,
-  "screenshotCount": 19,
+  "screenshotCount": 20,
   "checks": [
     {
       "name": "01-empty rendered with opaque background",

@@ -2239,7 +2239,7 @@
 0001 <Application x:Class="TrimContact.Desktop.App"
 0002  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 0003  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-0004  StartupUri="MainWindow.xaml">
+0004 >
 0005  <Application.Resources>
 0006   <SolidColorBrush x:Key="Ink" Color="#203B43"/>
 0007   <SolidColorBrush x:Key="Accent" Color="#197C78"/>
@@ -2259,48 +2259,50 @@
 0021    <Setter Property="Margin" Value="0,3,8,7"/>
 0022    <Setter Property="MinWidth" Value="70"/>
 0023    <Setter Property="VerticalContentAlignment" Value="Center"/>
-0024    <Setter Property="ToolTip">
-0025     <Setter.Value><Binding RelativeSource="{RelativeSource Self}" Path="(Validation.Errors)[0].ErrorContent"/></Setter.Value>
-0026    </Setter>
-0027   </Style>
-0028   <Style TargetType="ComboBox">
-0029    <Setter Property="Padding" Value="6,4"/>
-0030    <Setter Property="Margin" Value="0,3,8,7"/>
-0031    <Setter Property="MinWidth" Value="100"/>
-0032   </Style>
-0033   <Style TargetType="CheckBox"><Setter Property="Margin" Value="0,8,12,8"/></Style>
-0034   <Style TargetType="GroupBox">
-0035    <Setter Property="Padding" Value="10"/>
-0036    <Setter Property="Margin" Value="0,0,10,12"/>
-0037    <Setter Property="Background" Value="White"/>
-0038    <Setter Property="BorderBrush" Value="#CBD7D8"/>
-0039   </Style>
-0040   <Style x:Key="Heading" TargetType="TextBlock">
-0041    <Setter Property="FontSize" Value="18"/>
-0042    <Setter Property="FontWeight" Value="SemiBold"/>
-0043    <Setter Property="Margin" Value="0,5,0,10"/>
-0044   </Style>
-0045   <Style x:Key="Note" TargetType="TextBlock">
-0046    <Setter Property="TextWrapping" Value="Wrap"/>
-0047    <Setter Property="Foreground" Value="#516D75"/>
-0048    <Setter Property="Margin" Value="0,5,8,10"/>
-0049   </Style>
-0050   <Style TargetType="DataGrid">
-0051    <Setter Property="AutoGenerateColumns" Value="False"/>
-0052    <Setter Property="CanUserAddRows" Value="False"/>
-0053    <Setter Property="CanUserDeleteRows" Value="False"/>
-0054    <Setter Property="AlternatingRowBackground" Value="#F2F7F6"/>
-0055    <Setter Property="GridLinesVisibility" Value="Horizontal"/>
-0056    <Setter Property="HeadersVisibility" Value="Column"/>
-0057    <Setter Property="MinHeight" Value="120"/>
-0058    <Setter Property="SelectionMode" Value="Single"/>
-0059    <Setter Property="Margin" Value="0,5,8,8"/>
-0060    <Setter Property="RowHeaderWidth" Value="0"/>
-0061    <Setter Property="EnableRowVirtualization" Value="True"/>
-0062    <Setter Property="EnableColumnVirtualization" Value="True"/>
-0063   </Style>
-0064  </Application.Resources>
-0065 </Application>
+0024    <Style.Triggers>
+0025     <Trigger Property="Validation.HasError" Value="True">
+0026      <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}"/>
+0027     </Trigger>
+0028    </Style.Triggers>
+0029   </Style>
+0030   <Style TargetType="ComboBox">
+0031    <Setter Property="Padding" Value="6,4"/>
+0032    <Setter Property="Margin" Value="0,3,8,7"/>
+0033    <Setter Property="MinWidth" Value="100"/>
+0034   </Style>
+0035   <Style TargetType="CheckBox"><Setter Property="Margin" Value="0,8,12,8"/></Style>
+0036   <Style TargetType="GroupBox">
+0037    <Setter Property="Padding" Value="10"/>
+0038    <Setter Property="Margin" Value="0,0,10,12"/>
+0039    <Setter Property="Background" Value="White"/>
+0040    <Setter Property="BorderBrush" Value="#CBD7D8"/>
+0041   </Style>
+0042   <Style x:Key="Heading" TargetType="TextBlock">
+0043    <Setter Property="FontSize" Value="18"/>
+0044    <Setter Property="FontWeight" Value="SemiBold"/>
+0045    <Setter Property="Margin" Value="0,5,0,10"/>
+0046   </Style>
+0047   <Style x:Key="Note" TargetType="TextBlock">
+0048    <Setter Property="TextWrapping" Value="Wrap"/>
+0049    <Setter Property="Foreground" Value="#516D75"/>
+0050    <Setter Property="Margin" Value="0,5,8,10"/>
+0051   </Style>
+0052   <Style TargetType="DataGrid">
+0053    <Setter Property="AutoGenerateColumns" Value="False"/>
+0054    <Setter Property="CanUserAddRows" Value="False"/>
+0055    <Setter Property="CanUserDeleteRows" Value="False"/>
+0056    <Setter Property="AlternatingRowBackground" Value="#F2F7F6"/>
+0057    <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+0058    <Setter Property="HeadersVisibility" Value="Column"/>
+0059    <Setter Property="MinHeight" Value="120"/>
+0060    <Setter Property="SelectionMode" Value="Single"/>
+0061    <Setter Property="Margin" Value="0,5,8,8"/>
+0062    <Setter Property="RowHeaderWidth" Value="0"/>
+0063    <Setter Property="EnableRowVirtualization" Value="True"/>
+0064    <Setter Property="EnableColumnVirtualization" Value="True"/>
+0065   </Style>
+0066  </Application.Resources>
+0067 </Application>
 
 ===== src/TrimContact.Desktop/App.xaml.cs =====
 
@@ -2310,17 +2312,19 @@
 0004
 0005 public partial class App : Application
 0006 {
-0007     protected override void OnStartup(StartupEventArgs e)
-0008     {
-0009         DispatcherUnhandledException += (_, args) =>
-0010         {
-0011             MessageBox.Show("发生未预期错误，请另存项目并记录以下信息：\n" + args.Exception.Message,
-0012                 "接触设计工作台", MessageBoxButton.OK, MessageBoxImage.Error);
-0013             args.Handled = true;
-0014         };
-0015         base.OnStartup(e);
-0016     }
-0017 }
+0007     public bool StartMainWindow { get; set; } = true;
+0008     protected override void OnStartup(StartupEventArgs e)
+0009     {
+0010         DispatcherUnhandledException += (_, args) =>
+0011         {
+0012             MessageBox.Show("发生未预期错误，请另存项目并记录以下信息：\n" + args.Exception.Message,
+0013                 "接触设计工作台", MessageBoxButton.OK, MessageBoxImage.Error);
+0014             args.Handled = true;
+0015         };
+0016         base.OnStartup(e);
+0017         if (StartMainWindow) new MainWindow().Show();
+0018     }
+0019 }
 
 ===== src/TrimContact.Desktop/Controls/LayoutCanvas.cs =====
 
@@ -2667,7 +2671,7 @@
 0051   </Menu>
 0052   <StatusBar DockPanel.Dock="Bottom" Background="#DFE9E8">
 0053    <StatusBarItem><TextBlock Text="{Binding Status}" TextWrapping="Wrap" MaxWidth="1000"/></StatusBarItem>
-0054    <StatusBarItem><ProgressBar Value="{Binding Progress}" Width="100" Height="12"/></StatusBarItem>
+0054    <StatusBarItem><ProgressBar Value="{Binding Progress, Mode=OneWay}" Width="100" Height="12"/></StatusBarItem>
 0055    <StatusBarItem><Button Content="取消计算" Command="{Binding CancelCommand}"/></StatusBarItem>
 0056   </StatusBar>
 0057   <Border DockPanel.Dock="Bottom" Background="#FFF1D9" Padding="12,5">
@@ -2743,60 +2747,62 @@
 0014     private readonly HashSet<ValidationError> errors = [];
 0015     private bool notifying;
 0016
-0017     public MainWindow()
-0018     {
-0019         InitializeComponent();
-0020         workspace = new WorkspaceViewModel(new DesktopInteraction());
-0021         DataContext = workspace;
-0022         workspace.DraftReplaced += (_, _) => errors.Clear();
-0023         AddHandler(Binding.SourceUpdatedEvent, new EventHandler<DataTransferEventArgs>(OnSourceUpdated));
-0024         AddHandler(Validation.ErrorEvent, new EventHandler<ValidationErrorEventArgs>(OnValidationError));
-0025         PreviewKeyDown += CommitShortcut;
-0026         Closing += OnClosing;
-0027         Closed += (_, _) => workspace.Dispose();
-0028     }
-0029
-0030     private void OnSourceUpdated(object? sender, DataTransferEventArgs e)
-0031     {
-0032         if (notifying) return;
-0033         notifying = true;
-0034         try { workspace.NotifyDraftEdited(); }
-0035         finally { notifying = false; }
-0036     }
-0037
-0038     private void OnValidationError(object? sender, ValidationErrorEventArgs e)
-0039     {
-0040         if (e.Action == ValidationErrorEventAction.Added) errors.Add(e.Error);
-0041         else errors.Remove(e.Error);
-0042         workspace.SetBindingErrors(errors.Count);
-0043     }
-0044
-0045     private void CommitShortcut(object sender, KeyEventArgs e)
-0046     {
-0047         if (e.Key == Key.F5 || (Keyboard.Modifiers == ModifierKeys.Control
-0048             && e.Key is Key.S or Key.O or Key.N or Key.Z or Key.Y)) CommitFocusedEditor();
-0049     }
-0050
-0051     private void CommitFocusedEditor()
-0052     {
-0053         if (Keyboard.FocusedElement is TextBox text)
-0054             text.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
-0055         var node = Keyboard.FocusedElement as DependencyObject;
-0056         while (node is not null && node is not DataGrid)
-0057             node = VisualTreeHelper.GetParent(node);
-0058         if (node is DataGrid grid)
-0059         {
-0060             grid.CommitEdit(DataGridEditingUnit.Cell, true);
-0061             grid.CommitEdit(DataGridEditingUnit.Row, true);
-0062         }
-0063     }
-0064
-0065     private void OnClosing(object? sender, CancelEventArgs e)
-0066     {
-0067         CommitFocusedEditor();
-0068         e.Cancel = !workspace.RequestClose();
-0069     }
-0070 }
+0017     public MainWindow() : this(new DesktopInteraction()) { }
+0018
+0019     public MainWindow(IDesktopInteraction interaction)
+0020     {
+0021         InitializeComponent();
+0022         workspace = new WorkspaceViewModel(interaction);
+0023         DataContext = workspace;
+0024         workspace.DraftReplaced += (_, _) => errors.Clear();
+0025         AddHandler(Binding.SourceUpdatedEvent, new EventHandler<DataTransferEventArgs>(OnSourceUpdated));
+0026         AddHandler(Validation.ErrorEvent, new EventHandler<ValidationErrorEventArgs>(OnValidationError));
+0027         PreviewKeyDown += CommitShortcut;
+0028         Closing += OnClosing;
+0029         Closed += (_, _) => workspace.Dispose();
+0030     }
+0031
+0032     private void OnSourceUpdated(object? sender, DataTransferEventArgs e)
+0033     {
+0034         if (notifying) return;
+0035         notifying = true;
+0036         try { workspace.NotifyDraftEdited(); }
+0037         finally { notifying = false; }
+0038     }
+0039
+0040     private void OnValidationError(object? sender, ValidationErrorEventArgs e)
+0041     {
+0042         if (e.Action == ValidationErrorEventAction.Added) errors.Add(e.Error);
+0043         else errors.Remove(e.Error);
+0044         workspace.SetBindingErrors(errors.Count);
+0045     }
+0046
+0047     private void CommitShortcut(object sender, KeyEventArgs e)
+0048     {
+0049         if (e.Key == Key.F5 || (Keyboard.Modifiers == ModifierKeys.Control
+0050             && e.Key is Key.S or Key.O or Key.N or Key.Z or Key.Y)) CommitFocusedEditor();
+0051     }
+0052
+0053     private void CommitFocusedEditor()
+0054     {
+0055         if (Keyboard.FocusedElement is TextBox text)
+0056             text.GetBindingExpression(TextBox.TextProperty)?.UpdateSource();
+0057         var node = Keyboard.FocusedElement as DependencyObject;
+0058         while (node is not null && node is not DataGrid)
+0059             node = VisualTreeHelper.GetParent(node);
+0060         if (node is DataGrid grid)
+0061         {
+0062             grid.CommitEdit(DataGridEditingUnit.Cell, true);
+0063             grid.CommitEdit(DataGridEditingUnit.Row, true);
+0064         }
+0065     }
+0066
+0067     private void OnClosing(object? sender, CancelEventArgs e)
+0068     {
+0069         CommitFocusedEditor();
+0070         e.Cancel = !workspace.RequestClose();
+0071     }
+0072 }
 
 ===== src/TrimContact.Desktop/ViewModels/AnalysisCommands.cs =====
 
@@ -3968,7 +3974,7 @@
 0002  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 0003  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 0004  xmlns:controls="clr-namespace:TrimContact.Desktop.Controls">
-0005 <ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel><GroupBox Header="软件介绍"><StackPanel><TextBlock Text="本软件面向内饰结构与NVH工程师，帮助早期设计时把饰板、卡扣和缓冲接触参数放在同一可追溯模型中，筛查接触保持、分离、滑移余量及用户限值。结果帮助安排候选方案和样件试验，不预测真实噪声。" Style="{StaticResource Note}"/></StackPanel></GroupBox><GroupBox Header="从空白开始"><StackPanel><TextBlock Text="在“项目与饰板”填写名称、来源、质量与质心，建立矩形或按顺序输入轮廓；在“点位布置”新建方案，通过图上点击和添加按钮放置至少3个非共线卡扣，再添加需要的单边接触点并编辑参数。添加点位的默认物性是工程初值，必须核实。" Style="{StaticResource Note}"/></StackPanel></GroupBox><GroupBox Header="载荷与求解"><StackPanel><TextBlock Text="在“载荷与采样”添加工况，设法向与切向偏置、幅值及相差，选24/48/72相位与公差角点。应用草稿后F5求解；红框数值格式错误须先修正，范围错误会显示具体字段。计算中输入锁定，可点击状态栏取消；取消后不保留部分结果。" Style="{StaticResource Note}"/></StackPanel></GroupBox><GroupBox Header="可核对的静态案例"><StackPanel><TextBlock Text="400×300mm、1kg、质心(200,150)；四卡扣(40,40)、(360,40)、(360,260)、(40,260)，法向刚度各100N/mm、切向各50N/mm，无接触点。载荷法向偏置1g、幅值0，切向偏置/幅值0。z=0.024516625mm，每卡扣法向2.4516625N。可导出名义相位CSV核对。" Style="{StaticResource Note}"/></StackPanel></GroupBox><GroupBox Header="预紧案例"><StackPanel><TextBlock Text="在前例中心加入接触点，间隙0、公差0、预紧0.2mm、法向100N/mm，改所有载荷为0。平衡后z=-0.04mm，实际压缩0.16mm、接触力16N，四卡扣各-4N。预紧是几何等效量，实际压缩由平衡求解。" Style="{StaticResource Note}"/></StackPanel></GroupBox><GroupBox Header="结果阅读"><StackPanel><TextBlock Text="方形为卡扣，圆形为接触点。有效结果图中红色代表超用户限值，橙色代表接触存在分离，绿色代表采样中持续接触；蓝色为无有效结果。文字状态与颜色并列。滑移余量&gt;0只说明简化摩擦弹性容许位移被超过，不意味着必然有声音。" Style="{StaticResource Note}"/></StackPanel></GroupBox><GroupBox Header="参数范围"><StackPanel><TextBlock Text="卡扣法向/切向刚度0.01–100000N/mm，合力限值0.01–100000N；接触间隙/预紧0–20mm、公差0–5mm、摩擦系数0–2、压缩限值0.0001–20mm。接触法/切刚度范围同卡扣。数值必须有限；卡扣最多12、接触最多6、方案最多8。" Style="{StaticResource Note}"/></StackPanel></GroupBox><GroupBox Header="公式与边界"><StackPanel><TextBlock Text="接触压缩=max(0,预紧-间隙-公差偏移+局部位移)；法向反力=刚度×压缩。切向反力按μN限幅。刚性平面法向3自由度，切向1平移自由度；不含板柔性、阻尼、热老化、共振、碰撞、摩擦记忆或声学辐射。" Style="{StaticResource Note}"/></StackPanel></GroupBox><GroupBox Header="比较、扫描与批量"><StackPanel><TextBlock Text="同次计算的方案共用条件，可比较采样指标；点位数量不同不应仅按计数排名。扫描在副本逐值修改一个接触参数，不自动优化。CSV和批量都先预览再确认应用，改变输入须重新预检，应用后可以撤销。" Style="{StaticResource Note}"/></StackPanel></GroupBox><GroupBox Header="保存与恢复"><StackPanel><TextBlock Text="Ctrl+S使用原生文件对话框保存.trimproj。重开包含全部模型输入、来源与任务，但需重新计算结果。覆盖前留.bak，打开同一文件期间若磁盘变化会阻止覆盖，应另存当前副本后打开磁盘版核对。归档为只读，复制项目可继续编辑。" Style="{StaticResource Note}"/></StackPanel></GroupBox><GroupBox Header="成果与常见错误"><StackPanel><TextBlock Text="成果菜单导出HTML报告、CSV包络/相位/平衡/扫描/任务和分析JSON。报告仅作为文件输出，不是软件界面。遇到点位越界先核查轮廓和坐标；卡扣共线需分散至少3个支点；完成任务缺证据需在验证与追溯补充；未知格式或损坏项目整体拒绝，不静默补值。" Style="{StaticResource Note}"/></StackPanel></GroupBox><GroupBox Header="验证状态"><StackPanel><TextBlock Text="本次交付在Linux执行核心/事务测试与Windows目标交叉编译；WPF仅支持Windows。未在本环境启动Windows窗口，未验证真实桌面布局与绑定，未提供真实截图；这些检查必须在Windows完成，不能用浏览器或绘制图代替。" Style="{StaticResource Note}"/></StackPanel></GroupBox></StackPanel></ScrollViewer>
+0005 <ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel><GroupBox Header="软件介绍"><StackPanel><TextBlock Text="本软件面向内饰结构与NVH工程师，帮助早期设计时把饰板、卡扣和缓冲接触参数放在同一可追溯模型中，筛查接触保持、分离、滑移余量及用户限值。结果帮助安排候选方案和样件试验，不预测真实噪声。" Style="{StaticResource Note}"/></StackPanel></GroupBox><GroupBox Header="从空白开始"><StackPanel><TextBlock Text="在“项目与饰板”填写名称、来源、质量与质心，建立矩形或按顺序输入轮廓；在“点位布置”新建方案，通过图上点击和添加按钮放置至少3个非共线卡扣，再添加需要的单边接触点并编辑参数。添加点位的默认物性是工程初值，必须核实。" Style="{StaticResource Note}"/></StackPanel></GroupBox><GroupBox Header="载荷与求解"><StackPanel><TextBlock Text="在“载荷与采样”添加工况，设法向与切向偏置、幅值及相差，选24/48/72相位与公差角点。应用草稿后F5求解；红框数值格式错误须先修正，范围错误会显示具体字段。计算中输入锁定，可点击状态栏取消；取消后不保留部分结果。" Style="{StaticResource Note}"/></StackPanel></GroupBox><GroupBox Header="可核对的静态案例"><StackPanel><TextBlock Text="400×300mm、1kg、质心(200,150)；四卡扣(40,40)、(360,40)、(360,260)、(40,260)，法向刚度各100N/mm、切向各50N/mm，无接触点。载荷法向偏置1g、幅值0，切向偏置/幅值0。z=0.024516625mm，每卡扣法向2.4516625N。可导出名义相位CSV核对。" Style="{StaticResource Note}"/></StackPanel></GroupBox><GroupBox Header="预紧案例"><StackPanel><TextBlock Text="在前例中心加入接触点，间隙0、公差0、预紧0.2mm、法向100N/mm，改所有载荷为0。平衡后z=-0.04mm，实际压缩0.16mm、接触力16N，四卡扣各-4N。预紧是几何等效量，实际压缩由平衡求解。" Style="{StaticResource Note}"/></StackPanel></GroupBox><GroupBox Header="结果阅读"><StackPanel><TextBlock Text="方形为卡扣，圆形为接触点。有效结果图中红色代表超用户限值，橙色代表接触存在分离，绿色代表采样中持续接触；蓝色为无有效结果。文字状态与颜色并列。滑移余量&gt;0只说明简化摩擦弹性容许位移被超过，不意味着必然有声音。" Style="{StaticResource Note}"/></StackPanel></GroupBox><GroupBox Header="参数范围"><StackPanel><TextBlock Text="卡扣法向/切向刚度0.01–100000N/mm，合力限值0.01–100000N；接触间隙/预紧0–20mm、公差0–5mm、摩擦系数0–2、压缩限值0.0001–20mm。接触法/切刚度范围同卡扣。数值必须有限；卡扣最多12、接触最多6、方案最多8。" Style="{StaticResource Note}"/></StackPanel></GroupBox><GroupBox Header="公式与边界"><StackPanel><TextBlock Text="接触压缩=max(0,预紧-间隙-公差偏移+局部位移)；法向反力=刚度×压缩。切向反力按μN限幅。刚性平面法向3自由度，切向1平移自由度；不含板柔性、阻尼、热老化、共振、碰撞、摩擦记忆或声学辐射。" Style="{StaticResource Note}"/></StackPanel></GroupBox><GroupBox Header="比较、扫描与批量"><StackPanel><TextBlock Text="同次计算的方案共用条件，可比较采样指标；点位数量不同不应仅按计数排名。扫描在副本逐值修改一个接触参数，不自动优化。CSV和批量都先预览再确认应用，改变输入须重新预检，应用后可以撤销。" Style="{StaticResource Note}"/></StackPanel></GroupBox><GroupBox Header="保存与恢复"><StackPanel><TextBlock Text="Ctrl+S使用原生文件对话框保存.trimproj。重开包含全部模型输入、来源与任务，但需重新计算结果。覆盖前留.bak，打开同一文件期间若磁盘变化会阻止覆盖，应另存当前副本后打开磁盘版核对。归档为只读，复制项目可继续编辑。" Style="{StaticResource Note}"/></StackPanel></GroupBox><GroupBox Header="成果与常见错误"><StackPanel><TextBlock Text="成果菜单导出HTML报告、CSV包络/相位/平衡/扫描/任务和分析JSON。报告仅作为文件输出，不是软件界面。遇到点位越界先核查轮廓和坐标；卡扣共线需分散至少3个支点；完成任务缺证据需在验证与追溯补充；未知格式或损坏项目整体拒绝，不静默补值。" Style="{StaticResource Note}"/></StackPanel></GroupBox><GroupBox Header="验证状态"><StackPanel><TextBlock Text="本版本已在Windows Server 2025 runner实际运行WPF窗口，检查输入绑定、命令和主要流程，并保留真实原生界面截图；自包含程序另行直接启动并正常退出。Windows10/11、高DPI和系统文件对话框仍待人工复核；Microsoft Word分页尚未验证。" Style="{StaticResource Note}"/></StackPanel></GroupBox></StackPanel></ScrollViewer>
 0006 </UserControl>
 
 ===== src/TrimContact.Desktop/Views/HelpView.xaml.cs =====

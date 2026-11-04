@@ -6,8 +6,11 @@
   "actualWordPageCount": null,
   "actualWordPdfPageCount": null,
   "wordLayoutVerified": false,
-  "wpfScreenshots": 0,
-  "status": "Draft; genuine Windows screenshots, Windows UI workflow and Microsoft Word pagination/layout verification pending",
-  "productionNonempty": 3882,
+  "wpfScreenshots": 20,
+  "windowsUIVerified": true,
+  "windowsEvidenceRun": "https://github.com/ZhangShunMr/Pic/actions/runs/41863273737",
+  "manualFigures": 14,
+  "status": "Draft; Microsoft Word pagination/layout and Windows 10/11, DPI and shell-dialog human checks pending",
+  "productionNonempty": 3887,
   "sourceFileCount": 52
 }
