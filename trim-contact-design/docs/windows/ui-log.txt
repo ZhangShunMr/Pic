@@ -1,21 +1,36 @@
-Unhandled exception. System.InvalidOperationException: A TwoWay or OneWayToSource binding cannot work on the read-only property 'Progress' of type 'TrimContact.Desktop.ViewModels.WorkspaceViewModel'.
-   at MS.Internal.Data.PropertyPathWorker.CheckReadOnly(Object item, Object info)
-   at MS.Internal.Data.PropertyPathWorker.ReplaceItem(Int32 k, Object newO, Object parent)
-   at MS.Internal.Data.PropertyPathWorker.UpdateSourceValueState(Int32 k, ICollectionView collectionView, Object newValue, Boolean isASubPropertyChange)
-   at MS.Internal.Data.ClrBindingWorker.AttachDataItem()
-   at System.Windows.Data.BindingExpression.Activate(Object item)
-   at System.Windows.Data.BindingExpression.AttachToContext(AttachAttempt attempt)
-   at System.Windows.Data.BindingExpression.MS.Internal.Data.IDataBindEngineClient.AttachToContext(Boolean lastChance)
-   at MS.Internal.Data.DataBindEngine.Task.Run(Boolean lastChance)
-   at MS.Internal.Data.DataBindEngine.Run(Object arg)
-   at MS.Internal.Data.DataBindEngine.OnLayoutUpdated(Object sender, EventArgs e)
-   at System.Windows.ContextLayoutManager.fireLayoutUpdateEvent()
-   at System.Windows.ContextLayoutManager.UpdateLayout()
-   at System.Windows.Interop.HwndSource.SetLayoutSize()
-   at System.Windows.Interop.HwndSource.set_RootVisualInternal(Visual value)
-   at System.Windows.Window.SetRootVisualAndUpdateSTC()
-   at System.Windows.Window.SetupInitialState(Double requestedTop, Double requestedLeft, Double requestedWidth, Double requestedHeight)
-   at System.Windows.Window.CreateSourceWindow(Boolean duringShow)
-   at System.Windows.Window.ShowHelper(Object booleanBox)
-   at System.Windows.Window.Show()
-   at TrimContact.WindowsChecks.Program.Main(String[] args) in D:\a\Pic\Pic\trim-contact-design\tests\TrimContact.WindowsChecks\Program.cs:line 74
+PASS 01-empty rendered with opaque background
+PASS 01-empty contains native rendered content
+PASS ordinary WPF startup empty
+PASS 02-project rendered with opaque background
+PASS 02-project contains native rendered content
+PASS 02a-project-fields rendered with opaque background
+PASS 02a-project-fields contains native rendered content
+PASS independent example is marked simulation
+PASS actual TextBox invalid number blocks calculation
+PASS 03-invalid-number rendered with opaque background
+PASS 03-invalid-number contains native rendered content
+PASS actual TextBox binding writes draft number
+PASS 04-layout rendered with opaque background
+PASS 04-layout contains native rendered content
+PASS 04a-contact-fields rendered with opaque background
+PASS 04a-contact-fields contains native rendered content
+PASS native grids list four clips and one contact
+PASS real WPF command copies independent scheme
+PASS 05-loads rendered with opaque background
+PASS 05-loads contains native rendered content
+PASS native background calculation populates two schemes
+PASS 06-envelope rendered with opaque background
+PASS 06-envelope contains native rendered content
+PASS 07-nominal-traces rendered with opaque background
+PASS 07-nominal-traces contains native rendered content
+PASS 08-force-balance rendered with opaque background
+PASS 08-force-balance contains native rendered content
+PASS native balance rows close force and moments
+PASS 09-quality-review rendered with opaque background
+PASS 09-quality-review contains native rendered content
+PASS 10-comparison rendered with opaque background
+PASS 10-comparison contains native rendered content
+PASS native scan completes without altering model
+PASS 11-scan rendered with opaque background
+PASS 11-scan contains native rendered content
+FAIL native WPF execution

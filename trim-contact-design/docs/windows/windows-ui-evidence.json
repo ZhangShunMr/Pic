@@ -1,0 +1,193 @@
+{
+  "executedUtc": "2026-11-04T15:49:53.0971633+00:00",
+  "sourceCommit": "7e76b1d19b3a212829fe9238c4b7d0c7ecc750d9",
+  "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41861622936",
+  "platform": "Microsoft Windows NT 10.0.26100.0",
+  "framework": ".NET 10.0.14",
+  "rendering": "Actual production WPF MainWindow shown on Windows; client visual captured with RenderTargetBitmap after layout/render. Not browser or mock-up images.",
+  "interaction": "Real WPF window, visual tree, bindings, native drawing and selected command automation. File/confirmation interface uses deterministic replacements; real shell dialogs are not certified.",
+  "failed": 1,
+  "screenshotCount": 13,
+  "checks": [
+    {
+      "name": "01-empty rendered with opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "01-empty contains native rendered content",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "ordinary WPF startup empty",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "02-project rendered with opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "02-project contains native rendered content",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "02a-project-fields rendered with opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "02a-project-fields contains native rendered content",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "independent example is marked simulation",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "actual TextBox invalid number blocks calculation",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "03-invalid-number rendered with opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "03-invalid-number contains native rendered content",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "actual TextBox binding writes draft number",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "04-layout rendered with opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "04-layout contains native rendered content",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "04a-contact-fields rendered with opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "04a-contact-fields contains native rendered content",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "native grids list four clips and one contact",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "real WPF command copies independent scheme",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "05-loads rendered with opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "05-loads contains native rendered content",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "native background calculation populates two schemes",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "06-envelope rendered with opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "06-envelope contains native rendered content",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "07-nominal-traces rendered with opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "07-nominal-traces contains native rendered content",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "08-force-balance rendered with opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "08-force-balance contains native rendered content",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "native balance rows close force and moments",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "09-quality-review rendered with opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "09-quality-review contains native rendered content",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "10-comparison rendered with opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "10-comparison contains native rendered content",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "native scan completes without altering model",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "11-scan rendered with opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "11-scan contains native rendered content",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "native WPF execution",
+      "passed": false,
+      "detail": "System.InvalidOperationException: Sequence contains no matching element\r\n   at System.Linq.ThrowHelper.ThrowNoMatchException()\r\n   at System.Linq.Enumerable.Single[TSource](IEnumerable\u00601 source, Func\u00602 predicate)\r\n   at TrimContact.WindowsChecks.Program.Run(MainWindow window, Interaction ui, BindingListener listener) in D:\\a\\Pic\\Pic\\trim-contact-design\\tests\\TrimContact.WindowsChecks\\Program.cs:line 135\r\n   at TrimContact.WindowsChecks.Program.\u003C\u003Ec__DisplayClass4_0.\u003C\u003CMain\u003Eb__0\u003Ed.MoveNext() in D:\\a\\Pic\\Pic\\trim-contact-design\\tests\\TrimContact.WindowsChecks\\Program.cs:line 46"
+    }
+  ]
+}
