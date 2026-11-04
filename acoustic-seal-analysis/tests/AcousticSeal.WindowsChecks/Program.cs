@@ -205,7 +205,14 @@ internal static class Program
         vm.Minimum = ""; vm.Maximum = ""; vm.FilterCommand.Execute(null);
         await Navigate("quality"); await Capture("13-quality");
         await Navigate("settings"); await Capture("14-settings");
-        await Navigate("audit"); vm.Reviewer = "Windows自动化验证"; vm.ReviewComment = "模拟输入与结果核对"; await Click("记录复核");
+        await Navigate("audit");
+        foreach (var (path, text) in new[] { ("Reviewer", "Windows自动化验证"), ("ReviewComment", "模拟输入与结果核对") })
+        {
+            var box = Visuals<TextBox>(window).Single(item => item.GetBindingExpression(TextBox.TextProperty)?.ParentBinding.Path.Path == path);
+            box.Text = text;
+            box.GetBindingExpression(TextBox.TextProperty)!.UpdateSource();
+        }
+        await Click("记录复核");
         await Capture("15-review"); Record("Native review recorded", vm.Reviews.Count > 0);
         window.Width = 1180; window.Height = 720; await Navigate("result"); await Capture("16-minimum-window");
         Record("Minimum native result plot has usable dimensions", Visuals<SpectrumPlot>(window).Single().ActualWidth > 350);

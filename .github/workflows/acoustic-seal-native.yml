@@ -27,6 +27,8 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Publish failed' }
       - name: Start actual self contained native executable
         run: ./tools/smoke-published.ps1
+      - name: Package the exact Windows executable that passed native startup
+        run: ./tools/package-verified-windows.ps1
       - name: Check whether actual Microsoft Word pagination is available
         run: ./tools/check-word.ps1
       - name: Preserve actual execution evidence and Windows package
@@ -45,7 +47,7 @@ jobs:
         run: |
           git config user.name 'Acoustic seal Windows verification'
           git config user.email 'codex@openai.com'
-          git add docs/screenshots docs/verification-windows.log docs/word-runtime-check.json
+          git add docs/screenshots docs/verification-windows.log docs/word-runtime-check.json docs/release-manifest.json releases/AcousticSeal-V3.0-win-x64.zip
           git diff --cached --quiet
           if ($LASTEXITCODE -eq 1) {
             git commit -m 'Record actual Windows WPF controls, native captures and executable checks [skip ci]'
