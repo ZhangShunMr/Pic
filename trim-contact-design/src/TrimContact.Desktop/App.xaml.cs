@@ -4,6 +4,7 @@ namespace TrimContact.Desktop;
 
 public partial class App : Application
 {
+    public bool StartMainWindow { get; set; } = true;
     protected override void OnStartup(StartupEventArgs e)
     {
         DispatcherUnhandledException += (_, args) =>
@@ -13,5 +14,6 @@ public partial class App : Application
             args.Handled = true;
         };
         base.OnStartup(e);
+        if (StartMainWindow) new MainWindow().Show();
     }
 }

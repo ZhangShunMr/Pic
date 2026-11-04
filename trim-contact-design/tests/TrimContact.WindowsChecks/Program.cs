@@ -31,7 +31,7 @@ internal static class Program
         Directory.CreateDirectory(screenshots);
         var app = new App();
         app.InitializeComponent();
-        app.StartupUri = null!;
+        app.StartMainWindow = false;
         app.ShutdownMode = ShutdownMode.OnExplicitShutdown;
         var interaction = new Interaction(directory);
         var window = new MainWindow(interaction);
@@ -83,6 +83,7 @@ internal static class Program
         Record("ordinary WPF startup empty", vm.Draft.Variants.Count == 0 && vm.Draft.Loads.Count == 0);
         vm.DemoCommand.Execute(null);
         await Capture(window, "02-project");
+        await Capture(window, "02a-project-fields", Descendants<GroupBox>(window).Single(g => g.Header as string == "项目身份与参数来源"));
         Record("independent example is marked simulation", vm.Draft.Origin == DataOrigin.Simulation);
         var mass = Descendants<TextBox>(window).Single(t => t.GetBindingExpression(TextBox.TextProperty)?.ParentBinding.Path?.Path == "Draft.Panel.MassKg");
         mass.Text = "bad";
@@ -178,10 +179,10 @@ internal static class Program
         window.UpdateLayout();
     }
 
-    private static async Task Capture(Window window, string name)
+    private static async Task Capture(Window window, string name, FrameworkElement? target = null)
     {
         await Render(window);
-        var visual = (FrameworkElement)window.Content;
+        var visual = target ?? (FrameworkElement)window.Content;
         var bitmap = new RenderTargetBitmap((int)Math.Ceiling(visual.ActualWidth), (int)Math.Ceiling(visual.ActualHeight), 96, 96, PixelFormats.Pbgra32);
         var drawing = new DrawingVisual();
         using (var context = drawing.RenderOpen())
