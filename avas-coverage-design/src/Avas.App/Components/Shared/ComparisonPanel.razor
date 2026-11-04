@@ -1,0 +1,38 @@
+@inherits VmComponent
+<div class="section-title"><div><h2>方案快照与比较</h2><p>快照冻结完整输入。差值为目标减基线；修改方案应先恢复、编辑、计算，再另存快照。</p></div><span class="section-tag">07 / COMPARE</span></div>
+<div class="card">
+    <div class="action-row"><label>新快照名称<input @bind="Vm.SnapshotName" maxlength="100" /></label><button class="primary" @onclick="Vm.CaptureSnapshot">保存当前方案快照</button></div>
+    <p class="hint">先计算有效结果才能保存快照，最多20个。项目名称、责任人与审计属于项目档案，不随恢复覆盖。</p>
+    <div class="table-scroll"><table><thead><tr><th>快照</th><th>时间 UTC</th><th>源 / 点</th><th>输入哈希</th><th>操作</th></tr></thead><tbody>
+    @foreach (var snapshot in Vm.Project.Snapshots)
+    {
+        <tr><td>@snapshot.Name</td><td>@snapshot.Created.ToString("yyyy-MM-dd HH:mm:ss")</td><td>@snapshot.Speakers.Count / @snapshot.Listeners.Count</td><td><code>@snapshot.InputHash[..Math.Min(16, snapshot.InputHash.Length)]</code></td><td><button @onclick='() => Confirm("用该快照替换当前布局、背景、频谱与观察点？", () => Vm.RestoreSnapshot(snapshot.Id))'>恢复输入</button><button class="danger" @onclick='() => Confirm("删除该方案快照？", () => Vm.DeleteSnapshot(snapshot.Id))'>删除</button></td></tr>
+    }
+    </tbody></table></div>
+    @if (Vm.Project.Snapshots.Count == 0) { <div class="empty">尚无快照。计算完成后输入名称并保存。</div> }
+</div>
+<div class="card">
+    <div class="form-grid">
+        <label>比较基线<select @bind="Vm.BaselineId"><option value="">请选择</option>@foreach (var s in Vm.Project.Snapshots) { <option value="@s.Id">@s.Name</option> }</select></label>
+        <label>比较目标<select @bind="Vm.TargetId"><option value="">请选择</option>@foreach (var s in Vm.Project.Snapshots) { <option value="@s.Id">@s.Name</option> }</select></label>
+    </div>
+    <button class="primary" @onclick="Vm.Compare">比较所选快照</button>
+    <p class="hint">区域、步长、高度、车辆轮廓、背景、工程目标、指标及观察点标识/位置须完全一致。不同来源类别也会阻断；源数量、位置、朝向和频谱允许不同。</p>
+</div>
+@if (Vm.Comparison is { } comparison)
+{
+    <div class="card">
+        <h3>@comparison.TargetName 相对 @comparison.BaselineName</h3>
+        @if (!comparison.Comparable)
+        {
+            <div class="errors"><strong>条件不一致，未计算差值</strong><ul>@foreach (var reason in comparison.Reasons) { <li>@reason</li> }</ul></div>
+        }
+        else
+        {
+            <div class="comparison-values"><span>基线覆盖 @comparison.Baseline!.Coverage.ToString("F2")%</span><span>目标覆盖 @comparison.Target!.Coverage.ToString("F2")%</span><strong>差值 @comparison.CoverageDifference!.Value.ToString("+0.00;-0.00;0.00") 个百分点</strong></div>
+            <table><thead><tr><th>观察点</th><th>基线 dB</th><th>目标 dB</th><th>目标减基线 dB</th></tr></thead><tbody>@foreach (var row in comparison.Points) { <tr><td>@row.Name</td><td>@row.Baseline.ToString("F3")</td><td>@row.Target.ToString("F3")</td><td>@row.Difference.ToString("+0.000;-0.000;0.000")</td></tr> }</tbody></table>
+            <button @onclick='() => Vm.Export("comparison")'>导出比较CSV</button>
+            <p class="hint">正差值表示目标声级更高，不自动代表设计更优。覆盖差取决于当前工程阈值，不提供实际可听性结论。</p>
+        }
+    </div>
+}

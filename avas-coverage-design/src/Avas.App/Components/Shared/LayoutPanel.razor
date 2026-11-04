@@ -1,0 +1,52 @@
+@inherits VmComponent
+<div class="section-title"><div><h2>布局与观察点</h2><p>以车辆中心为原点，通过坐标编辑定位；观察点高度统一使用接收平面。</p></div><span class="section-tag">05 / LAYOUT</span></div>
+<div class="layout-grid">
+    <div class="card map-card">@((MarkupString)Vm.MapSvg)<p class="hint">圆形源标记附短线指示朝向；移动与转向在“扬声器”页输入坐标和角度后应用。悬停有效色块可查看节点值。</p></div>
+    <div class="card">
+        <h3>观察点管理</h3>
+        <div class="action-row"><button @onclick="Vm.AddListener">添加观察点</button><button class="danger" @onclick='() => Confirm("删除当前观察点？", Vm.RemoveListener)' disabled="@(Vm.ListenerDraft is null)">删除观察点</button></div>
+        <label>当前观察点<select value="@Vm.SelectedListenerId" @onchange="Changed"><option value="">请选择</option>@foreach (var p in Vm.Project.Listeners) { <option value="@p.Id">@p.Name</option> }</select></label>
+        @if (Vm.ListenerDraft is { } draftPoint)
+        {
+            <div @oninput="Vm.MarkDraft">
+                <label>观察点名称<input @bind="draftPoint.Name" maxlength="100" /></label>
+                <div class="form-grid">
+                    <label>X / m<input type="number" @bind="draftPoint.X" step="0.1" /></label>
+                    <label>Y / m<input type="number" @bind="draftPoint.Y" step="0.1" /></label>
+                </div>
+                <label>备注<textarea @bind="draftPoint.Note" maxlength="2000" rows="2"></textarea></label>
+                <EditActions />
+            </div>
+        }
+        <h3>等角环形点集</h3>
+        <div class="form-grid">
+            <label>半径 / m<input type="number" @bind="radius" min="1" max="50" /></label>
+            <label>数量<input type="number" @bind="ringCount" min="4" max="36" /></label>
+        </div>
+        <button @onclick="() => Vm.AddRing(radius, ringCount)">追加环形观察点</button>
+        <p class="hint">半径以车辆中心计，角度从X正轴起等分；最多100点。自定义点集不代表法规布点。</p>
+    </div>
+</div>
+<div class="card table-scroll"><table><thead><tr><th>名称</th><th>X / m</th><th>Y / m</th><th>位置提示</th><th>备注</th></tr></thead><tbody>
+@foreach (var point in Vm.Project.Listeners)
+{
+    <tr><td>@point.Name</td><td>@point.X</td><td>@point.Y</td><td>@(Acoustics.InsideVehicle(Vm.Project.Settings, point.X, point.Y) ? "车内示意点，仍独立计算" : "车外")</td><td>@point.Note</td></tr>
+}
+</tbody></table></div>
+@code {
+    private double radius = 5;
+    private int ringCount = 8;
+    private async Task Changed(ChangeEventArgs e)
+    {
+        if (Vm.HasDraft)
+        {
+            if (!await Js.InvokeAsync<bool>("confirm", "切换观察点将放弃未应用字段，继续？"))
+                return;
+            Vm.DiscardDraft();
+        }
+        if (Guid.TryParse(e.Value?.ToString(), out var id))
+            Vm.SelectListener(id);
+    }
+}
+
+<ListenerImportPanel />

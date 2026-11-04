@@ -1,0 +1,12 @@
+<select value="@Value" @onchange="Changed" aria-label="@Label">
+    @foreach (var origin in Enum.GetValues<Origin>())
+    {
+        <option value="@origin">@origin.Label()</option>
+    }
+</select>
+@code {
+    [Parameter] public Origin Value { get; set; }
+    [Parameter] public EventCallback<Origin> ValueChanged { get; set; }
+    [Parameter] public string Label { get; set; } = "来源类别";
+    private Task Changed(ChangeEventArgs e) => ValueChanged.InvokeAsync(Enum.Parse<Origin>(e.Value?.ToString() ?? "Manual"));
+}

@@ -1,0 +1,11 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  Avas.Core -> /workspace/Pic/avas-coverage-design/src/Avas.Core/bin/Release/net10.0/Avas.Core.dll
+  Avas.Verification -> /workspace/Pic/avas-coverage-design/tests/Avas.Verification/bin/Release/net10.0/Avas.Verification.dll
+  Avas.App -> /workspace/Pic/avas-coverage-design/src/Avas.App/bin/Release/net10.0/Avas.App.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:01.50

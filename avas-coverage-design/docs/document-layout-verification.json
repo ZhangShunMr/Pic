@@ -1,0 +1,135 @@
+{
+  "documents": [
+    {
+      "document": "操作说明书.docx",
+      "docx_sha256": "74cc0d37d2ca8d5c2dc46f33f3ba2945a3a9dcefa943364420411e4298800997",
+      "renderer": "Bundled LibreOffice via render_docx.py",
+      "pages": 19,
+      "page_checks": [
+        {
+          "page": 1,
+          "text_characters": 773,
+          "text_outside_page": false
+        },
+        {
+          "page": 2,
+          "text_characters": 637,
+          "text_outside_page": false
+        },
+        {
+          "page": 3,
+          "text_characters": 510,
+          "text_outside_page": false
+        },
+        {
+          "page": 4,
+          "text_characters": 568,
+          "text_outside_page": false
+        },
+        {
+          "page": 5,
+          "text_characters": 538,
+          "text_outside_page": false
+        },
+        {
+          "page": 6,
+          "text_characters": 532,
+          "text_outside_page": false
+        },
+        {
+          "page": 7,
+          "text_characters": 493,
+          "text_outside_page": false
+        },
+        {
+          "page": 8,
+          "text_characters": 562,
+          "text_outside_page": false
+        },
+        {
+          "page": 9,
+          "text_characters": 500,
+          "text_outside_page": false
+        },
+        {
+          "page": 10,
+          "text_characters": 504,
+          "text_outside_page": false
+        },
+        {
+          "page": 11,
+          "text_characters": 501,
+          "text_outside_page": false
+        },
+        {
+          "page": 12,
+          "text_characters": 565,
+          "text_outside_page": false
+        },
+        {
+          "page": 13,
+          "text_characters": 535,
+          "text_outside_page": false
+        },
+        {
+          "page": 14,
+          "text_characters": 539,
+          "text_outside_page": false
+        },
+        {
+          "page": 15,
+          "text_characters": 568,
+          "text_outside_page": false
+        },
+        {
+          "page": 16,
+          "text_characters": 535,
+          "text_outside_page": false
+        },
+        {
+          "page": 17,
+          "text_characters": 587,
+          "text_outside_page": false
+        },
+        {
+          "page": 18,
+          "text_characters": 567,
+          "text_outside_page": false
+        },
+        {
+          "page": 19,
+          "text_characters": 566,
+          "text_outside_page": false
+        }
+      ],
+      "visual_review": "逐页查看PNG，检查文字、图注、截图及页眉页脚；无裁切、遮挡或空白页",
+      "word_pagination_verified": false
+    },
+    {
+      "document": "软著信息采集表.docx",
+      "docx_sha256": "354a7054f916b5f3438a4b634c3117ddbe29dd563da8db6d8e55f1f2a64132c0",
+      "renderer": "Bundled LibreOffice via render_docx.py",
+      "pages": 3,
+      "page_checks": [
+        {
+          "page": 1,
+          "text_characters": 788,
+          "text_outside_page": false
+        },
+        {
+          "page": 2,
+          "text_characters": 956,
+          "text_outside_page": false
+        },
+        {
+          "page": 3,
+          "text_characters": 563,
+          "text_outside_page": false
+        }
+      ],
+      "visual_review": "逐页查看PNG，检查文字、图注、截图及页眉页脚；无裁切、遮挡或空白页",
+      "word_pagination_verified": false
+    }
+  ],
+  "note": "LibreOffice页数用于排版检查，不能代替Microsoft Word最终分页验收。"
+}

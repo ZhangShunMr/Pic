@@ -1,0 +1,24 @@
+@inherits VmComponent
+<details class="card">
+    <summary>观察点CSV批量输入与交换</summary>
+    <p class="hint">四列UTF-8，表头Name,X_m,Y_m,Note；支持引号、引号内逗号和双引号转义，不支持字段内换行。名称不超过100字符，X/Y范围−100至100m。</p>
+    <div class="action-row"><button @onclick="() => Vm.ExportListeners(true)">下载观察点模板</button><button @onclick="() => Vm.ExportListeners(false)">导出观察点输入</button></div>
+    <label>选择观察点CSV<InputFile OnChange="CsvUpload" accept=".csv,text/csv" /></label>
+    <label>观察点CSV文本<textarea class="code" @bind="Vm.ListenerText" rows="6"></textarea></label>
+    <label class="check"><input type="checkbox" @bind="Vm.ReplaceListeners" />替换现有全部观察点（否则追加）</label>
+    <div class="action-row"><button @onclick="Vm.PreviewListeners">预检观察点</button><button @onclick='() => Confirm("按当前模式应用观察点CSV？替换会移除旧点，新导入点建立新标识。", Vm.ApplyListeners)'>应用观察点导入</button></div>
+    @if (Vm.ListenerPreview is { } preview)
+    {
+        @if (preview.Errors.Count > 0) { <ul class="error-text">@foreach (var error in preview.Errors) { <li>@error</li> }</ul> }
+        <p>有效行 @preview.Points.Count，状态 @(preview.Valid ? "可应用" : "不可应用")。</p>
+        <table><thead><tr><th>名称</th><th>X / m</th><th>Y / m</th><th>备注</th></tr></thead><tbody>@foreach (var p in preview.Points) { <tr><td>@p.Name</td><td>@p.X</td><td>@p.Y</td><td>@p.Note</td></tr> }</tbody></table>
+    }
+    <p class="hint">输入交换CSV不保留原标识，多行备注折为单行。完整项目搬迁使用.avasproj；方案比较依赖点标识，重建同名点不能冒充同一点。</p>
+</details>
+@code {
+    private Task CsvUpload(InputFileChangeEventArgs e) => Upload(e, 102400, (_, data) =>
+    {
+        try { Vm.ListenerText = new System.Text.UTF8Encoding(false, true).GetString(data); Vm.Notify(); }
+        catch (System.Text.DecoderFallbackException) { Vm.Failure("观察点CSV不是有效UTF-8。"); }
+    });
+}

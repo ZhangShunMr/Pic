@@ -1,0 +1,75 @@
+@inherits VmComponent
+<div class="section-title"><div><h2>警示声音与相对试听</h2><p>数字音频独立保存；频带声压级需要外部测量或人工声明参考。</p></div><span class="section-tag">09 / AUDITION</span></div>
+<div class="two-col">
+    <div class="card">
+        <h3>导入与分析数字音频</h3>
+        <label>音频对象<select @bind="Vm.AudioTarget"><option value="speaker">当前扬声器</option><option value="background">背景声音</option></select></label>
+        @if (Vm.AudioTarget == "speaker")
+        {
+            <label>当前扬声器<select value="@Vm.SelectedSpeakerId" @onchange="SpeakerChanged"><option value="">请选择</option>@foreach (var s in Vm.Project.Speakers) { <option value="@s.Id">@s.Name</option> }</select></label>
+        }
+        <label>选择16位PCM WAV文件<InputFile OnChange="AudioUpload" accept=".wav,audio/wav" /></label>
+        <p class="hint">最大10MiB、30秒，采样率16000至96000Hz，单/双声道；双声道分析和试听先取平均。仅支持PCM16 WAV，不支持MP3、浮点与压缩WAV。</p>
+        @if (Vm.CurrentAudio() is { } asset)
+        {
+            <div class="audio-info"><strong>@asset.Name</strong><span>@asset.Duration.ToString("F3") s / @asset.Rate Hz / @asset.Channels 声道</span><code>@asset.Sha256</code></div>
+            <div class="action-row"><button @onclick="Vm.AnalyzeAudio">分析当前音频</button><button class="danger" @onclick='() => Confirm("移除当前对象内嵌音频？已填写的频带声级仍保留。", Vm.RemoveAudio)'>移除音频</button></div>
+        }
+        else { <div class="empty compact">当前对象无音频。仍可用固定种子频带噪声进行模拟试听。</div> }
+        <h3>用相对频谱构建估算输入</h3>
+        <label>人工声明的七带合成参考声级 / dB<input type="number" @bind="Vm.AudioReference" min="0" max="120" step="0.5" /></label>
+        <button @onclick='() => Confirm("以当前音频相对谱和人工参考替换七频带，来源将改为估算。此操作不是声压标定。继续？", Vm.ApplyAudioSpectrum)'>应用音频相对频谱</button>
+        <p class="hint">根据数字频带能量占比，将人工参考分配至七个频带；来源自动标为估算，修正归零。舍弃带外能量，不建立传声器灵敏度、增益或校准器链路。</p>
+    </div>
+    <div class="card">
+        <h3>数字频谱结果</h3>
+        @if (Vm.AudioSpectrum is { } spectrum)
+        {
+            <p>@Vm.AudioAnalysisLabel</p>
+            <table><thead><tr><th>中心频率 Hz</th><th>数字频带 dBFS RMS</th></tr></thead><tbody>@for (var i = 0; i < 7; i++) { <tr><td>@Software.Frequencies[i]</td><td>@spectrum.Levels[i].ToString("F3")</td></tr> }</tbody></table>
+            <p>全记录RMS @spectrum.FullRms.ToString("G5")；七带合成RMS @spectrum.CapturedRms.ToString("G5")；采样点 @spectrum.Frames。</p>
+            <p class="hint">@spectrum.Note 静音带用−160dBFS显示下限；不能解释为仪器动态范围。</p>
+        }
+        else { <div class="empty">导入或分析当前音频后显示数字频谱。更改音频对象时，请点击“分析当前音频”以核对标签。</div> }
+    </div>
+</div>
+<div class="card">
+    <h3>观察点相对试听</h3>
+    <div class="form-grid three">
+        <label>试听观察点<select value="@Vm.SelectedListenerId" @onchange="ListenerChanged"><option value="">请选择</option>@foreach (var p in Vm.Project.Listeners) { <option value="@p.Id">@p.Name</option> }</select></label>
+        <label>长度 / s<input type="number" @bind="Vm.AuditionSeconds" min="1" max="8" step="1" /></label>
+        <label>数字播放参考 / dB<input type="number" @bind="Vm.PlaybackReference" min="60" max="140" step="1" /></label>
+        <label class="check"><input type="checkbox" @bind="Vm.IncludeBackground" />叠加背景</label>
+    </div>
+    <button class="primary" @onclick="Vm.RenderAuditionAsync" disabled="@Vm.Busy">生成当前观察点试听</button>
+    <p class="hint">相同数字参考下比较不同观察点，软件不逐文件自动归一化。数字参考越高，输出幅值越小；预估峰值过高会拒绝生成并提示提高参考。建议先将设备音量调低，再自行调整。</p>
+    @if (Vm.AudioUrl is not null && Vm.Audition is { } audition)
+    {
+        <div class="audition-output">
+            <audio controls src="@Vm.AudioUrl" preload="metadata"></audio>
+            <a href="@Vm.AudioUrl" download="相对试听.wav">下载相对试听WAV</a>
+            <p>淡入前峰值：@audition.Peak.ToString("F5") / 满幅1</p>
+            <pre>@audition.Description</pre>
+            <p class="hash">制作时输入SHA256：@audition.Hash</p>
+        </div>
+    }
+    <div class="notice">试听是七带整形后的单声道工程示意，不保留真实空间双耳效果，也不能判定行人可听性。声场使用非相干能量叠加，输出波形的瞬态相位叠加与该统计模型不等价。</div>
+</div>
+@code {
+    private async Task AudioUpload(InputFileChangeEventArgs e)
+    {
+        if (Vm.CurrentAudio() is not null && !await Js.InvokeAsync<bool>("confirm", "替换当前对象内嵌音频？"))
+            return;
+        await Upload(e, 10485760, Vm.ImportAudio);
+    }
+    private void SpeakerChanged(ChangeEventArgs e)
+    {
+        if (Guid.TryParse(e.Value?.ToString(), out var id))
+            Vm.SelectSpeaker(id);
+    }
+    private void ListenerChanged(ChangeEventArgs e)
+    {
+        if (Guid.TryParse(e.Value?.ToString(), out var id))
+            Vm.SelectListener(id);
+    }
+}

@@ -1,0 +1,6 @@
+@inherits VmComponent
+<div class="edit-actions">
+    <span>@(Vm.HasDraft ? "字段尚未应用" : "编辑区与项目一致")</span>
+    <button class="primary" @onclick="Vm.ApplyDraft" disabled="@(Vm.Project.Archived || Vm.Busy)">应用编辑</button>
+    <button @onclick="Vm.DiscardDraft" disabled="@(!Vm.HasDraft)">放弃编辑</button>
+</div>

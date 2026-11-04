@@ -1,0 +1,46 @@
+@inherits VmComponent
+<div class="section-title"><div><h2>背景与接收网格</h2><p>定义共同计算条件。改变这些条件后，请在新条件下重新保存方案。</p></div><span class="section-tag">03 / CONDITIONS</span></div>
+<div @oninput="Vm.MarkDraft">
+    <div class="two-col">
+        <div class="card">
+            <h3>接收平面与车辆轮廓</h3>
+            <div class="form-grid">
+                <label>X最小 / m<input type="number" @bind="Vm.Draft.Settings.MinX" step="1" /></label>
+                <label>X最大 / m<input type="number" @bind="Vm.Draft.Settings.MaxX" step="1" /></label>
+                <label>Y最小 / m<input type="number" @bind="Vm.Draft.Settings.MinY" step="1" /></label>
+                <label>Y最大 / m<input type="number" @bind="Vm.Draft.Settings.MaxY" step="1" /></label>
+                <label>网格步长 / m<input type="number" @bind="Vm.Draft.Settings.Step" min="0.25" max="5" step="0.25" /></label>
+                <label>接收高度 / m<input type="number" @bind="Vm.Draft.Settings.ReceiverHeight" min="0" max="10" step="0.1" /></label>
+                <label>距离截断下限 / m<input type="number" @bind="Vm.Draft.Settings.MinimumDistance" min="0.1" max="10" step="0.1" /></label>
+                <label>车辆长度 / m<input type="number" @bind="Vm.Draft.Settings.VehicleLength" min="1" max="20" step="0.1" /></label>
+                <label>车辆宽度 / m<input type="number" @bind="Vm.Draft.Settings.VehicleWidth" min="0.5" max="5" step="0.1" /></label>
+                <label class="check"><input type="checkbox" @bind="Vm.Draft.Settings.ExcludeVehicle" />排除轮廓内部网格</label>
+            </div>
+            <p class="hint">坐标范围−100至100m；最多20000节点。取最小坐标起等步长节点，不整除时不强行添加最大边界。轮廓居中，长度沿X轴；内部排除不表示遮挡。</p>
+        </div>
+        <div class="card">
+            <h3>工程判读目标</h3>
+            <label>用于覆盖判读的声级指标<select @bind="Vm.Draft.Settings.SelectedHz"><option value="0">七频带合成</option>@foreach (var hz in Software.Frequencies) { <option value="@hz">@hz Hz</option> }</select></label>
+            <label class="check"><input type="checkbox" @bind="Vm.Draft.Settings.AWeighted" />合成时使用A计权</label>
+            <label>工程声级目标 / dB<input type="number" @bind="Vm.Draft.Settings.LevelTarget" step="0.5" /></label>
+            <label>警示声高于背景的目标 / dB<input type="number" @bind="Vm.Draft.Settings.MarginTarget" step="0.5" /></label>
+            <p class="hint">需同时满足两个目标。默认45dB和3dB为工程示例，不是法规限值。单频带选择时不进行A计权。七带合成覆盖88.4至11313.7Hz范围的离散频带，不能声称为全频总值。</p>
+            <div class="notice">覆盖率=满足目标的有效网格节点数÷全部有效节点数，不是人群可听率或精确面积比例。</div>
+        </div>
+    </div>
+    <div class="card">
+        <h3>空间均匀背景声</h3>
+        <div class="band-grid">
+            @foreach (var band in Vm.Draft.Settings.Background.OrderBy(x => x.Hz))
+            {
+                <label>@band.Hz Hz / dB<input type="number" @bind="band.Level" step="0.1" /></label>
+            }
+        </div>
+        <div class="form-grid">
+            <label>背景来源类别<OriginSelect @bind-Value="Vm.Draft.Settings.BackgroundOrigin" /></label>
+            <label>背景来源说明（必填）<textarea @bind="Vm.Draft.Settings.BackgroundSource" rows="2" maxlength="2000"></textarea></label>
+        </div>
+        <p class="hint">每个频带−60至140dB re 20µPa，假设全空间相同。数字背景音频与物理频带分开维护，不会因上传录音自动更新。</p>
+        <EditActions />
+    </div>
+</div>

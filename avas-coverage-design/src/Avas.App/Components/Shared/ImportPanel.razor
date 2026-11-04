@@ -1,0 +1,41 @@
+@inherits VmComponent
+<div class="section-title"><div><h2>频谱批量导入</h2><p>先预检，再整体替换七个频带。错误不会部分覆盖原输入。</p></div><span class="section-tag">04 / IMPORT</span></div>
+<div class="card">
+    <div class="action-row">
+        <label class="check"><input type="checkbox" @bind="Vm.ImportBackground" />导入至背景</label>
+        @if (!Vm.ImportBackground)
+        {
+            <label>目标扬声器<select value="@Vm.SelectedSpeakerId" @onchange="SourceChanged"><option value="">请选择</option>@foreach (var s in Vm.Project.Speakers) { <option value="@s.Id">@s.Name</option> }</select></label>
+        }
+        <button @onclick='() => Vm.Export("template")'>下载频谱模板</button>
+        <button @onclick='() => Vm.Export("input")'>导出当前频带</button>
+    </div>
+    <label>选择UTF-8 CSV文件（最多20KiB）<InputFile OnChange="CsvUpload" accept=".csv,text/csv" /></label>
+    <label>或粘贴三列CSV<textarea class="code" @bind="Vm.CsvText" rows="11" spellcheck="false"></textarea></label>
+    <p class="hint">表头严格为 FrequencyHz,LevelDb,CorrectionDb。英文逗号分隔，小数使用点；每个频率恰好一行。背景CorrectionDb必须为0。空白行忽略，其余错误逐行提示。</p>
+    <div class="action-row"><button class="primary" @onclick="Vm.PreviewCsv">预检频谱</button><button @onclick='() => Confirm("用预检七频带整体替换所选对象的旧频谱？", Vm.ApplyCsv)'>应用频谱导入</button></div>
+</div>
+@if (Vm.Preview is { } preview)
+{
+    <div class="card">
+        <h3>@(preview.Valid ? "预检通过，尚未应用" : "预检失败")</h3>
+        @if (preview.Errors.Count > 0)
+        {
+            <ul class="error-text">@foreach (var error in preview.Errors) { <li>@error</li> }</ul>
+        }
+        <table><thead><tr><th>Hz</th><th>声级 dB</th><th>修正 dB</th></tr></thead><tbody>@foreach (var b in preview.Bands) { <tr><td>@b.Hz</td><td>@b.Level</td><td>@b.Correction</td></tr> }</tbody></table>
+        <p>预检仅验证结构与数值，来源及参考距离仍须在扬声器或背景页核对。更换对象或修改文本后必须重新预检。</p>
+    </div>
+}
+@code {
+    private void SourceChanged(ChangeEventArgs e)
+    {
+        if (Guid.TryParse(e.Value?.ToString(), out var id))
+            Vm.SelectSpeaker(id);
+    }
+    private Task CsvUpload(InputFileChangeEventArgs e) => Upload(e, 20480, (_, data) =>
+    {
+        try { Vm.CsvText = new System.Text.UTF8Encoding(false, true).GetString(data); Vm.Notify(); }
+        catch (System.Text.DecoderFallbackException) { Vm.Failure("CSV不是有效UTF-8，请转换编码后重试。"); }
+    });
+}

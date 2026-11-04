@@ -1,0 +1,113 @@
+﻿Model,Version,Metric,BaselineInputHash,TargetInputHash,BaselineSource,TargetSource,Conditions,Baseline,Target,Point,X_m,Y_m,Baseline_dB,Target_dB,TargetMinusBaseline_dB
+free-field-incoherent-1,1.0,"1000Hz频带声级 dB re 20µPa",cc9c02204423710e5329033f8b157ff1bea8dba8a15bebcaee89e27ca386e2ea,389c4fa56e8b3fef949c90225b5f4a6acbc2d7fa18bcb274d022d9e7a382b092,"新扬声器:人工输入:人工核对：1m轴向60dB;背景:人工输入:请填写背景声来源","新扬声器:人工输入:人工核对：1m轴向60dB;背景:人工输入:请填写背景声来源","{
+  ""MinX"": -10,
+  ""MaxX"": 10,
+  ""MinY"": -8,
+  ""MaxY"": 8,
+  ""Step"": 0.5,
+  ""ReceiverHeight"": 1.5,
+  ""MinimumDistance"": 0.5,
+  ""VehicleLength"": 4.6,
+  ""VehicleWidth"": 1.8,
+  ""ExcludeVehicle"": true,
+  ""SelectedHz"": 1000,
+  ""AWeighted"": false,
+  ""LevelTarget"": 45,
+  ""MarginTarget"": 3,
+  ""Background"": [
+    {
+      ""Hz"": 125,
+      ""Level"": 35,
+      ""Correction"": 0
+    },
+    {
+      ""Hz"": 250,
+      ""Level"": 35,
+      ""Correction"": 0
+    },
+    {
+      ""Hz"": 500,
+      ""Level"": 35,
+      ""Correction"": 0
+    },
+    {
+      ""Hz"": 1000,
+      ""Level"": 35,
+      ""Correction"": 0
+    },
+    {
+      ""Hz"": 2000,
+      ""Level"": 35,
+      ""Correction"": 0
+    },
+    {
+      ""Hz"": 4000,
+      ""Level"": 35,
+      ""Correction"": 0
+    },
+    {
+      ""Hz"": 8000,
+      ""Level"": 35,
+      ""Correction"": 0
+    }
+  ],
+  ""BackgroundOrigin"": ""Manual"",
+  ""BackgroundSource"": ""\u8BF7\u586B\u5199\u80CC\u666F\u58F0\u6765\u6E90"",
+  ""BackgroundAudioHash"": null
+}","基线A","增益3dB方案B","2m核对点",2,0,53.979400086720375,56.979400086720375,3
+free-field-incoherent-1,1.0,"1000Hz频带声级 dB re 20µPa",cc9c02204423710e5329033f8b157ff1bea8dba8a15bebcaee89e27ca386e2ea,389c4fa56e8b3fef949c90225b5f4a6acbc2d7fa18bcb274d022d9e7a382b092,"新扬声器:人工输入:人工核对：1m轴向60dB;背景:人工输入:请填写背景声来源","新扬声器:人工输入:人工核对：1m轴向60dB;背景:人工输入:请填写背景声来源","{
+  ""MinX"": -10,
+  ""MaxX"": 10,
+  ""MinY"": -8,
+  ""MaxY"": 8,
+  ""Step"": 0.5,
+  ""ReceiverHeight"": 1.5,
+  ""MinimumDistance"": 0.5,
+  ""VehicleLength"": 4.6,
+  ""VehicleWidth"": 1.8,
+  ""ExcludeVehicle"": true,
+  ""SelectedHz"": 1000,
+  ""AWeighted"": false,
+  ""LevelTarget"": 45,
+  ""MarginTarget"": 3,
+  ""Background"": [
+    {
+      ""Hz"": 125,
+      ""Level"": 35,
+      ""Correction"": 0
+    },
+    {
+      ""Hz"": 250,
+      ""Level"": 35,
+      ""Correction"": 0
+    },
+    {
+      ""Hz"": 500,
+      ""Level"": 35,
+      ""Correction"": 0
+    },
+    {
+      ""Hz"": 1000,
+      ""Level"": 35,
+      ""Correction"": 0
+    },
+    {
+      ""Hz"": 2000,
+      ""Level"": 35,
+      ""Correction"": 0
+    },
+    {
+      ""Hz"": 4000,
+      ""Level"": 35,
+      ""Correction"": 0
+    },
+    {
+      ""Hz"": 8000,
+      ""Level"": 35,
+      ""Correction"": 0
+    }
+  ],
+  ""BackgroundOrigin"": ""Manual"",
+  ""BackgroundSource"": ""\u8BF7\u586B\u5199\u80CC\u666F\u58F0\u6765\u6E90"",
+  ""BackgroundAudioHash"": null
+}","基线A","增益3dB方案B","额外核对点",4,0,47.95880017344075,50.95880017344075,3

@@ -1,0 +1,4 @@
+# Optional development evidence and document tooling; not production dependencies.
+playwright==1.62.0
+python-docx==1.2.0
+Pillow==12.3.0

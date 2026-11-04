@@ -1,0 +1,169 @@
+﻿Model,Version,Metric,Source,Conditions,Speaker,Parameter,InputHash,Value,CoveragePercent,Minimum_dB,Maximum_dB,WorstMargin_dB,CoveredListeners
+free-field-incoherent-1,1.0,"1000Hz频带声级 dB re 20µPa","新扬声器:人工输入:人工核对：1m轴向60dB;背景:人工输入:请填写背景声来源","{
+  ""MinX"": -10,
+  ""MaxX"": 10,
+  ""MinY"": -8,
+  ""MaxY"": 8,
+  ""Step"": 0.5,
+  ""ReceiverHeight"": 1.5,
+  ""MinimumDistance"": 0.5,
+  ""VehicleLength"": 4.6,
+  ""VehicleWidth"": 1.8,
+  ""ExcludeVehicle"": true,
+  ""SelectedHz"": 1000,
+  ""AWeighted"": false,
+  ""LevelTarget"": 45,
+  ""MarginTarget"": 3,
+  ""Background"": [
+    {
+      ""Hz"": 125,
+      ""Level"": 35,
+      ""Correction"": 0
+    },
+    {
+      ""Hz"": 250,
+      ""Level"": 35,
+      ""Correction"": 0
+    },
+    {
+      ""Hz"": 500,
+      ""Level"": 35,
+      ""Correction"": 0
+    },
+    {
+      ""Hz"": 1000,
+      ""Level"": 35,
+      ""Correction"": 0
+    },
+    {
+      ""Hz"": 2000,
+      ""Level"": 35,
+      ""Correction"": 0
+    },
+    {
+      ""Hz"": 4000,
+      ""Level"": 35,
+      ""Correction"": 0
+    },
+    {
+      ""Hz"": 8000,
+      ""Level"": 35,
+      ""Correction"": 0
+    }
+  ],
+  ""BackgroundOrigin"": ""Manual"",
+  ""BackgroundSource"": ""\u8BF7\u586B\u5199\u80CC\u666F\u58F0\u6765\u6E90"",
+  ""BackgroundAudioHash"": null
+}","新扬声器","增益 dB",389c4fa56e8b3fef949c90225b5f4a6acbc2d7fa18bcb274d022d9e7a382b092,0,28.205128205128204,37.85156151952302,60,2.851561519523017,2
+free-field-incoherent-1,1.0,"1000Hz频带声级 dB re 20µPa","新扬声器:人工输入:人工核对：1m轴向60dB;背景:人工输入:请填写背景声来源","{
+  ""MinX"": -10,
+  ""MaxX"": 10,
+  ""MinY"": -8,
+  ""MaxY"": 8,
+  ""Step"": 0.5,
+  ""ReceiverHeight"": 1.5,
+  ""MinimumDistance"": 0.5,
+  ""VehicleLength"": 4.6,
+  ""VehicleWidth"": 1.8,
+  ""ExcludeVehicle"": true,
+  ""SelectedHz"": 1000,
+  ""AWeighted"": false,
+  ""LevelTarget"": 45,
+  ""MarginTarget"": 3,
+  ""Background"": [
+    {
+      ""Hz"": 125,
+      ""Level"": 35,
+      ""Correction"": 0
+    },
+    {
+      ""Hz"": 250,
+      ""Level"": 35,
+      ""Correction"": 0
+    },
+    {
+      ""Hz"": 500,
+      ""Level"": 35,
+      ""Correction"": 0
+    },
+    {
+      ""Hz"": 1000,
+      ""Level"": 35,
+      ""Correction"": 0
+    },
+    {
+      ""Hz"": 2000,
+      ""Level"": 35,
+      ""Correction"": 0
+    },
+    {
+      ""Hz"": 4000,
+      ""Level"": 35,
+      ""Correction"": 0
+    },
+    {
+      ""Hz"": 8000,
+      ""Level"": 35,
+      ""Correction"": 0
+    }
+  ],
+  ""BackgroundOrigin"": ""Manual"",
+  ""BackgroundSource"": ""\u8BF7\u586B\u5199\u80CC\u666F\u58F0\u6765\u6E90"",
+  ""BackgroundAudioHash"": null
+}","新扬声器","增益 dB",389c4fa56e8b3fef949c90225b5f4a6acbc2d7fa18bcb274d022d9e7a382b092,2,45.70135746606335,39.85156151952302,62,4.851561519523017,2
+free-field-incoherent-1,1.0,"1000Hz频带声级 dB re 20µPa","新扬声器:人工输入:人工核对：1m轴向60dB;背景:人工输入:请填写背景声来源","{
+  ""MinX"": -10,
+  ""MaxX"": 10,
+  ""MinY"": -8,
+  ""MaxY"": 8,
+  ""Step"": 0.5,
+  ""ReceiverHeight"": 1.5,
+  ""MinimumDistance"": 0.5,
+  ""VehicleLength"": 4.6,
+  ""VehicleWidth"": 1.8,
+  ""ExcludeVehicle"": true,
+  ""SelectedHz"": 1000,
+  ""AWeighted"": false,
+  ""LevelTarget"": 45,
+  ""MarginTarget"": 3,
+  ""Background"": [
+    {
+      ""Hz"": 125,
+      ""Level"": 35,
+      ""Correction"": 0
+    },
+    {
+      ""Hz"": 250,
+      ""Level"": 35,
+      ""Correction"": 0
+    },
+    {
+      ""Hz"": 500,
+      ""Level"": 35,
+      ""Correction"": 0
+    },
+    {
+      ""Hz"": 1000,
+      ""Level"": 35,
+      ""Correction"": 0
+    },
+    {
+      ""Hz"": 2000,
+      ""Level"": 35,
+      ""Correction"": 0
+    },
+    {
+      ""Hz"": 4000,
+      ""Level"": 35,
+      ""Correction"": 0
+    },
+    {
+      ""Hz"": 8000,
+      ""Level"": 35,
+      ""Correction"": 0
+    }
+  ],
+  ""BackgroundOrigin"": ""Manual"",
+  ""BackgroundSource"": ""\u8BF7\u586B\u5199\u80CC\u666F\u58F0\u6765\u6E90"",
+  ""BackgroundAudioHash"": null
+}","新扬声器","增益 dB",389c4fa56e8b3fef949c90225b5f4a6acbc2d7fa18bcb274d022d9e7a382b092,4,71.49321266968326,41.85156151952302,64,6.851561519523017,2

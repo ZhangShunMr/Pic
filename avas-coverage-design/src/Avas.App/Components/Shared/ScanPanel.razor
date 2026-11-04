@@ -1,0 +1,29 @@
+@inherits VmComponent
+<div class="section-title"><div><h2>布置参数扫描</h2><p>对一个扬声器逐值试算，核对覆盖与声级变化，选择取值后再应用。</p></div><span class="section-tag">08 / SWEEP</span></div>
+<div class="card">
+    <div class="form-grid three">
+        <label>扫描扬声器<select @bind="Vm.ScanRequest.SpeakerId"><option value="@Guid.Empty">请选择</option>@foreach (var source in Vm.Project.Speakers) { <option value="@source.Id">@source.Name</option> }</select></label>
+        <label>参数<select @bind="Vm.ScanRequest.Parameter">@foreach (var p in Enum.GetValues<ScanParameter>()) { <option value="@p">@ScanEngine.Label(p)</option> }</select></label>
+        <label>初值<input type="number" @bind="Vm.ScanRequest.Start" step="0.5" /></label>
+        <label>终值<input type="number" @bind="Vm.ScanRequest.End" step="0.5" /></label>
+        <label>正步长<input type="number" @bind="Vm.ScanRequest.Step" step="0.5" min="0.01" /></label>
+    </div>
+    <div class="action-row"><button class="primary" @onclick="Vm.RunScanAsync" disabled="@Vm.Busy">运行参数扫描</button><button @onclick='() => Vm.Export("scan")' disabled="@(Vm.Scan is null)">导出扫描CSV</button></div>
+    <p class="hint">最多25个取值，原项目保持不变。任意取值超出参数范围时整次扫描失败，不生成部分结论。终值不能整除步长时取不超过终值的最后一个值。</p>
+</div>
+@if (Vm.Scan is { } scan)
+{
+    <div class="card">
+        <h3>@scan.SpeakerName · @ScanEngine.Label(scan.Parameter)</h3>
+        <div class="table-scroll"><table><thead><tr><th>取值</th><th>覆盖 %</th><th>最低 dB</th><th>最高 dB</th><th>最小背景差 dB</th><th>满足目标观察点</th><th>操作</th></tr></thead><tbody>
+        @foreach (var row in scan.Rows)
+        {
+            <tr><td>@row.Value.ToString("F2")</td><td><div class="coverage-cell"><span style="@($"width:{row.Coverage.ToString(CultureInfo.InvariantCulture)}%")"></span><b>@row.Coverage.ToString("F2")</b></div></td><td>@row.Minimum.ToString("F2")</td><td>@row.Maximum.ToString("F2")</td><td>@row.WorstMargin.ToString("F2")</td><td>@row.CoveredPoints</td><td><button @onclick='() => Confirm("将该扫描取值应用到项目？应用后需重新计算。", () => Vm.ApplyScan(row.Value))'>应用该值</button></td></tr>
+        }
+        </tbody></table></div>
+        <p class="hash">原始输入SHA256：@scan.InputHash</p>
+        <p class="hint">未设置综合评分或自动最优推荐；较高覆盖率可能同时带来其他方向声级增加，应结合安装空间和实测进一步选择。</p>
+    </div>
+}
+
+<TransectPanel />

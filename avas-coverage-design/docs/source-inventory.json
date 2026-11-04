@@ -1,0 +1,272 @@
+{
+  "scope": "手写生产源码 .cs/.razor/.css/.js；排除bin/obj、测试、文档、工具、依赖及生成文件",
+  "baseline": 0,
+  "minimum": 3500,
+  "total": 3680,
+  "files": [
+    {
+      "file": "src/Avas.App/Components/App.razor",
+      "purpose": "浏览器文档根与资源入口",
+      "nonempty_lines": 16,
+      "sha256": "1dc73c6320c10645a8d1d2b15cbd2a40c34398b2c888594f7ef140f28d03c978"
+    },
+    {
+      "file": "src/Avas.App/Components/Pages/Workspace.razor",
+      "purpose": "导航、项目状态与整体工作台",
+      "nonempty_lines": 82,
+      "sha256": "99b780c113b1a96d4f12512e158124cbd3703d08c2b2ea846991e1408d21b60c"
+    },
+    {
+      "file": "src/Avas.App/Components/Routes.razor",
+      "purpose": "Blazor页面路由",
+      "nonempty_lines": 6,
+      "sha256": "14137f630bd5660ee855f5b19cfe6edfd4e145a17208b1f1195d3a35e0821627"
+    },
+    {
+      "file": "src/Avas.App/Components/Shared/AudioPanel.razor",
+      "purpose": "数字音频、相对映射和试听入口",
+      "nonempty_lines": 75,
+      "sha256": "1e6c0a00929eb17fb77699c45bd5a46b2ad94ddb814d3e5871b2a82002a5ea83"
+    },
+    {
+      "file": "src/Avas.App/Components/Shared/ComparisonPanel.razor",
+      "purpose": "快照维护和条件一致的差值比较",
+      "nonempty_lines": 38,
+      "sha256": "8bf3729d04262ec592cd03e0343ae63b1c2a99db8b61220302e3d1995f57ffec"
+    },
+    {
+      "file": "src/Avas.App/Components/Shared/DeliveryPanel.razor",
+      "purpose": "成果输出与审计视图",
+      "nonempty_lines": 22,
+      "sha256": "f1787d12434a7ad7664fb6dc87929febdebb3e7489cf780b784b90020258ae41"
+    },
+    {
+      "file": "src/Avas.App/Components/Shared/EditActions.razor",
+      "purpose": "编辑应用与放弃操作",
+      "nonempty_lines": 6,
+      "sha256": "c36ca4b037c09606d3c61e6e3a9f9b41bb5c726aaff2a6fc23fbf195baaff6f5"
+    },
+    {
+      "file": "src/Avas.App/Components/Shared/HelpPanel.razor",
+      "purpose": "与当前功能一致的使用帮助",
+      "nonempty_lines": 37,
+      "sha256": "bf4db3e4498257d7c02be25c7b803c1ff4647dc420e570778695e0bf278ce693"
+    },
+    {
+      "file": "src/Avas.App/Components/Shared/ImportPanel.razor",
+      "purpose": "频谱CSV预检和应用",
+      "nonempty_lines": 41,
+      "sha256": "4dc6c1caafe7bff48c1b202d16116eaad9433ffc6e04177668f6ec50570d2009"
+    },
+    {
+      "file": "src/Avas.App/Components/Shared/LayoutPanel.razor",
+      "purpose": "布局预览与观察点编辑",
+      "nonempty_lines": 51,
+      "sha256": "a51d90b9246b9a6928223e3b7c680cb0759592ceb71af66359d2a45297abca10"
+    },
+    {
+      "file": "src/Avas.App/Components/Shared/ListenerImportPanel.razor",
+      "purpose": "观察点CSV批量交换视图",
+      "nonempty_lines": 24,
+      "sha256": "88c419474f96bb973be15301f1ee008fa6bd6544585a5a091fa46f9d019ac2cd"
+    },
+    {
+      "file": "src/Avas.App/Components/Shared/OriginSelect.razor",
+      "purpose": "来源类别选择",
+      "nonempty_lines": 12,
+      "sha256": "b21b740f713df9c8a1f111d2537ed349aac0856dd88a66ac9c68e0604bf5bfaa"
+    },
+    {
+      "file": "src/Avas.App/Components/Shared/ProjectPanel.razor",
+      "purpose": "项目档案、文件载入和项目库视图",
+      "nonempty_lines": 64,
+      "sha256": "e208bc55b6e6c36a17014f8885742c473adedad2970291e76dac1bf19b8571ca"
+    },
+    {
+      "file": "src/Avas.App/Components/Shared/ResultsPanel.razor",
+      "purpose": "声场、覆盖、频谱与贡献详情",
+      "nonempty_lines": 42,
+      "sha256": "faf856d04700a291cb7234d342ab8ff6c107fae7e56138d6698768d8d665345b"
+    },
+    {
+      "file": "src/Avas.App/Components/Shared/ReviewPanel.razor",
+      "purpose": "输入复核提示表",
+      "nonempty_lines": 11,
+      "sha256": "c8aaf99116f62f96a17d09209e0f4e77f34ffbf119bce4be6d81e8fad238a445"
+    },
+    {
+      "file": "src/Avas.App/Components/Shared/ScanPanel.razor",
+      "purpose": "单源参数扫描与取值应用",
+      "nonempty_lines": 28,
+      "sha256": "9f5f636f898a5d856261fbe52e1ede82cd9a4014693e0163ce4983c1dbe0a5a8"
+    },
+    {
+      "file": "src/Avas.App/Components/Shared/SettingsPanel.razor",
+      "purpose": "背景、接收网格和工程目标编辑",
+      "nonempty_lines": 46,
+      "sha256": "449ed61eae98b80661b20542211cd1dd65ea232202b60c24f6f16f0a196da269"
+    },
+    {
+      "file": "src/Avas.App/Components/Shared/SpeakerPanel.razor",
+      "purpose": "声源位置、指向与频谱编辑",
+      "nonempty_lines": 64,
+      "sha256": "f3e39ba045331e210d3b74230e3ac892573ba21c56727d36c45c584828ac36c5"
+    },
+    {
+      "file": "src/Avas.App/Components/Shared/TransectPanel.razor",
+      "purpose": "方向距离剖面设置与点值表",
+      "nonempty_lines": 24,
+      "sha256": "b12dec47810070aafab20906361b2543d400ce674017f7837fc94c3be476e63c"
+    },
+    {
+      "file": "src/Avas.App/Components/Shared/VmComponent.cs",
+      "purpose": "视图模型通知订阅、确认和上传边界",
+      "nonempty_lines": 48,
+      "sha256": "76ad845d20f41149f262f43c9eac764ac30bad5dd17bd582313ed868d44f5628"
+    },
+    {
+      "file": "src/Avas.App/Components/_Imports.razor",
+      "purpose": "视图命名空间约定",
+      "nonempty_lines": 13,
+      "sha256": "b981f785782027d15fdfe9d8f4e99d00a23947838d34d4956982215701da1ce9"
+    },
+    {
+      "file": "src/Avas.App/DownloadVault.cs",
+      "purpose": "有时效与容量限制的本机成果下载缓存",
+      "nonempty_lines": 31,
+      "sha256": "b20d5432284b0a6732927ac2e0da746adc526d1a91ec0bd37a52819aadca3ca5"
+    },
+    {
+      "file": "src/Avas.App/Program.cs",
+      "purpose": "本机服务注册、回环绑定与启动",
+      "nonempty_lines": 37,
+      "sha256": "06c181c215ec50dd24ff9ee1cd7f0d0e3aa6a57fef0b177d92e3f5f29aa34925"
+    },
+    {
+      "file": "src/Avas.App/ViewModels/FileCommands.cs",
+      "purpose": "保存重开、频谱/音频输入与成果导出命令",
+      "nonempty_lines": 256,
+      "sha256": "b91a7eb506e786ad14438645635feb6498361d0743fca8ac309e4182847ecf78"
+    },
+    {
+      "file": "src/Avas.App/ViewModels/ListenerImportCommands.cs",
+      "purpose": "批量观察点预检与确认应用",
+      "nonempty_lines": 54,
+      "sha256": "45162d6b7f9bf659b0891021f58b237833864efa40d4f9503a49886dde851eea"
+    },
+    {
+      "file": "src/Avas.App/ViewModels/ObjectCommands.cs",
+      "purpose": "声源/点/快照管理、比较、扫描与计算命令",
+      "nonempty_lines": 227,
+      "sha256": "104243471f1a8d38f84a28a6382c7ca7a96e699aa25283236feaa6e3a6a9d581"
+    },
+    {
+      "file": "src/Avas.App/ViewModels/ReviewCommands.cs",
+      "purpose": "输入复核与剖面操作状态",
+      "nonempty_lines": 38,
+      "sha256": "0fecccfb8c714f2b7a701b24fb271c835ef8a1248495bb4fc646be63b8458181"
+    },
+    {
+      "file": "src/Avas.App/ViewModels/WorkspaceViewModel.cs",
+      "purpose": "可观察状态、草稿、命令边界、撤销重做和结果失效",
+      "nonempty_lines": 278,
+      "sha256": "ab2d45e1c064d810eae75c3c236fcb3a125c7b71fcfecef21b85aa4e6813c3a6"
+    },
+    {
+      "file": "src/Avas.App/wwwroot/app.css",
+      "purpose": "响应布局、颜色图例与可读样式",
+      "nonempty_lines": 181,
+      "sha256": "4634512f3ffb4c48f2921c33d6aa4562fee1b5c87620c1ac1efb09f6f4da7d4f"
+    },
+    {
+      "file": "src/Avas.Core/Analysis/Acoustics.cs",
+      "purpose": "声学能量、指向与距离公式及声场计算",
+      "nonempty_lines": 162,
+      "sha256": "ab6567ba6e117983655b5caa8cbc23ad990126bd2a6c06e7dfdcc02dd8f9a285"
+    },
+    {
+      "file": "src/Avas.Core/Analysis/ChartRenderer.cs",
+      "purpose": "声场和频谱SVG输出",
+      "nonempty_lines": 113,
+      "sha256": "c4a81aee7438e42752f160530e4b94d7d11e0c028af00f840003493012972c60"
+    },
+    {
+      "file": "src/Avas.Core/Analysis/ReviewEngine.cs",
+      "purpose": "输入复核与方向剖面",
+      "nonempty_lines": 127,
+      "sha256": "df6c7b7a7919b6283680bb474d71d13ceb862716cc3dcaf30b4eeab4f0e4f98b"
+    },
+    {
+      "file": "src/Avas.Core/Analysis/Scenarios.cs",
+      "purpose": "快照比较、条件阻断与参数扫描",
+      "nonempty_lines": 185,
+      "sha256": "1b56065598b73102d3b3a38ed7034c633fd9cf6e0aa39a44a8d910d5e0c83352"
+    },
+    {
+      "file": "src/Avas.Core/Audio/AuditionEngine.cs",
+      "purpose": "观察点相对试听、背景混合与峰值保护",
+      "nonempty_lines": 94,
+      "sha256": "abcac15771e39a17f229aa4c0bbd09b020de06229bfd123ca159819eee9cc9d9"
+    },
+    {
+      "file": "src/Avas.Core/Audio/SpectralAudio.cs",
+      "purpose": "FFT、数字频谱、人工参考映射及七带整形",
+      "nonempty_lines": 138,
+      "sha256": "61521b40440d5081bf3d3523d968b3c905483c75340725440f998a46b387f70c"
+    },
+    {
+      "file": "src/Avas.Core/Audio/WaveCodec.cs",
+      "purpose": "PCM16 RIFF读写与音频元数据",
+      "nonempty_lines": 125,
+      "sha256": "015249a1d353aea7c2636d6effd574029d022a2b3ba2ee19f65af8b43d85accb"
+    },
+    {
+      "file": "src/Avas.Core/Domain/Demonstration.cs",
+      "purpose": "固定模拟输入独立入口",
+      "nonempty_lines": 50,
+      "sha256": "8282fa8faa0f30b46e68f9dabdb57317132f92c46092d8b098e8a3a9a0f69a10"
+    },
+    {
+      "file": "src/Avas.Core/Domain/Project.cs",
+      "purpose": "项目、声源、观察点、设置、音频与快照实体",
+      "nonempty_lines": 128,
+      "sha256": "b2cffc2a4a94e49e2293ccdfcdf2c35e1aa3e3785408df707b50fcc1bc3ae68e"
+    },
+    {
+      "file": "src/Avas.Core/Domain/Validation.cs",
+      "purpose": "字段、范围、集合与引用边界验证",
+      "nonempty_lines": 159,
+      "sha256": "b8ddc727bf609a7f407f59ca5d67db9451de3d64ea8c42894fa1fc5a13c2b2c7"
+    },
+    {
+      "file": "src/Avas.Core/IO/ListenerCsv.cs",
+      "purpose": "观察点CSV解析和交换",
+      "nonempty_lines": 126,
+      "sha256": "dd56cf5076990310e9361379f09d4e48235b62141272c89211500b686563f6a3"
+    },
+    {
+      "file": "src/Avas.Core/IO/ProjectCodec.cs",
+      "purpose": "完整结构验证、音频与快照核对、序列化和输入哈希",
+      "nonempty_lines": 159,
+      "sha256": "d0381133ed87deb2dd76c66ba8a34086b0d11277f7fe3c97170776d5a92dbf91"
+    },
+    {
+      "file": "src/Avas.Core/IO/ProjectStore.cs",
+      "purpose": "本机项目库、原子保存、备份及冲突检查",
+      "nonempty_lines": 79,
+      "sha256": "585c869a9ce2bce8e55595b83cc329d0ef281a2883260994dd8a186e16d0c335"
+    },
+    {
+      "file": "src/Avas.Core/IO/ResultExport.cs",
+      "purpose": "带来源与参数的工程报告及结果文件",
+      "nonempty_lines": 104,
+      "sha256": "f62752ed41c7cbe20ad4349efe6599abd22c4dec21a4adfecc16d4d3e878a2f5"
+    },
+    {
+      "file": "src/Avas.Core/IO/SpectrumCsv.cs",
+      "purpose": "频谱模板、逐行预检和CSV输出",
+      "nonempty_lines": 79,
+      "sha256": "4c052df0121c1c1ede950746938f5ffdd3b7872b96a10a1ad7e73744aed5cf0b"
+    }
+  ]
+}

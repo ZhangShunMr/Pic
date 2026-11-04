@@ -1,0 +1,3969 @@
+===== src/Avas.App/Components/App.razor =====
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <base href="/" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23166e80'/%3E%3Cpath d='M6 24L16 7L26 24M10 18H22' stroke='white' fill='none' stroke-width='3'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="app.css" />
+    <HeadOutlet />
+</head>
+<body>
+    <Routes />
+    <script src="_framework/blazor.web.js"></script>
+    <div id="blazor-error-ui">连接发生错误。请先保留已保存项目，再刷新恢复。<a href="">重新载入</a></div>
+</body>
+</html>
+
+===== src/Avas.App/Components/Pages/Workspace.razor =====
+@page "/"
+@rendermode InteractiveServer
+@inherits VmComponent
+
+<PageTitle>@Software.Name V1.0</PageTitle>
+<NavigationLock ConfirmExternalNavigation="@(Vm.Dirty || Vm.HasDraft)" />
+<div class="workspace">
+    <aside class="sidebar">
+        <div class="brand">AVAS<span>FIELD STUDIO</span></div>
+        <p class="side-caption">声源布置 · 工程估算</p>
+        <nav aria-label="工作页">
+            @foreach (var item in tabs)
+            {
+                <button class="@(Vm.Tab == item ? "active" : "")" @onclick="() => Navigate(item)">
+                    <span class="nav-index">@((Array.IndexOf(tabs, item) + 1).ToString("00"))</span>@item
+                </button>
+            }
+        </nav>
+        <div class="side-note">V1.0 / C# MVVM<br />自由声场 · 非相干叠加<br />工程阈值由用户定义</div>
+    </aside>
+    <main>
+        <header>
+            <div>
+                <div class="eyebrow">PEDESTRIAN WARNING SOUND DESIGN</div>
+                <h1>@Software.Name</h1>
+                <div class="project-line">@Vm.Project.Name <span>修订 @Vm.Project.Revision</span> <span>@(Vm.Project.Archived ? "归档只读" : "可编辑")</span></div>
+            </div>
+            <div class="toolbar">
+                <button @onclick="Vm.Undo" disabled="@(!Vm.CanUndo || Vm.Busy || Vm.Project.Archived)">撤销</button>
+                <button @onclick="Vm.Redo" disabled="@(!Vm.CanRedo || Vm.Busy || Vm.Project.Archived)">重做</button>
+                <button @onclick="Vm.Save" disabled="@Vm.Busy">保存项目</button>
+                <button class="primary" @onclick="Vm.CalculateAsync" disabled="@Vm.Busy">@(Vm.Busy ? "处理中…" : "运行计算")</button>
+            </div>
+        </header>
+        <div class="state-row">
+            <span class="pill @(Vm.Dirty || Vm.HasDraft ? "amber" : "green")">@(Vm.HasDraft ? "未应用编辑" : Vm.Dirty ? "未保存修改" : "已保存 / 初始状态")</span>
+            <span class="pill @(Vm.Stale ? "amber" : "green")">@(Vm.Stale ? "无当前有效结果" : "结果与输入一致")</span>
+            <span class="muted">来源：@string.Join("、", Vm.Project.Speakers.Select(x => x.Origin.Label()).Append(Vm.Project.Settings.BackgroundOrigin.Label()).Distinct())</span>
+        </div>
+        <div class="status" role="status">@Vm.Status</div>
+        @if (Vm.Errors.Count > 0)
+        {
+            <div class="errors" role="alert">
+                <strong>请修正以下问题</strong>
+                <ul>@foreach (var error in Vm.Errors) { <li>@error</li> }</ul>
+            </div>
+        }
+        <section class="content" aria-label="@Vm.Tab">
+            @switch (Vm.Tab)
+            {
+                case "项目": <ProjectPanel /> break;
+                case "扬声器": <SpeakerPanel /> break;
+                case "背景与网格": <SettingsPanel /> break;
+                case "频谱导入": <ImportPanel /> break;
+                case "布局与观察点": <LayoutPanel /> break;
+                case "声场结果": <ResultsPanel /> break;
+                case "方案比较": <ComparisonPanel /> break;
+                case "参数扫描": <ScanPanel /> break;
+                case "声音试听": <AudioPanel /> break;
+                case "输出与审计": <DeliveryPanel /> break;
+                case "帮助": <HelpPanel /> break;
+            }
+        </section>
+        @if (Vm.LastDownload is not null)
+        {
+            <div class="download-bar"><span>成果已生成</span><a href="@Vm.LastDownload" download="@Vm.LastFileName">下载 @Vm.LastFileName</a><small>保存位置由浏览器下载设置决定；10分钟内有效</small></div>
+        }
+        <footer>@Software.Boundary</footer>
+    </main>
+</div>
+
+@code {
+    private static readonly string[] tabs = ["项目", "扬声器", "背景与网格", "频谱导入", "布局与观察点", "声场结果", "方案比较", "参数扫描", "声音试听", "输出与审计", "帮助"];
+    private async Task Navigate(string tab)
+    {
+        if (Vm.HasDraft)
+        {
+            if (!await Js.InvokeAsync<bool>("confirm", "当前字段尚未应用。切换页面将放弃这些字段，是否继续？"))
+                return;
+            Vm.DiscardDraft();
+        }
+        Vm.Navigate(tab);
+    }
+}
+
+===== src/Avas.App/Components/Routes.razor =====
+<Router AppAssembly="typeof(Program).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="routeData" />
+        <FocusOnNavigate RouteData="routeData" Selector="h1" />
+    </Found>
+</Router>
+
+===== src/Avas.App/Components/Shared/AudioPanel.razor =====
+@inherits VmComponent
+<div class="section-title"><div><h2>警示声音与相对试听</h2><p>数字音频独立保存；频带声压级需要外部测量或人工声明参考。</p></div><span class="section-tag">09 / AUDITION</span></div>
+<div class="two-col">
+    <div class="card">
+        <h3>导入与分析数字音频</h3>
+        <label>音频对象<select @bind="Vm.AudioTarget"><option value="speaker">当前扬声器</option><option value="background">背景声音</option></select></label>
+        @if (Vm.AudioTarget == "speaker")
+        {
+            <label>当前扬声器<select value="@Vm.SelectedSpeakerId" @onchange="SpeakerChanged"><option value="">请选择</option>@foreach (var s in Vm.Project.Speakers) { <option value="@s.Id">@s.Name</option> }</select></label>
+        }
+        <label>选择16位PCM WAV文件<InputFile OnChange="AudioUpload" accept=".wav,audio/wav" /></label>
+        <p class="hint">最大10MiB、30秒，采样率16000至96000Hz，单/双声道；双声道分析和试听先取平均。仅支持PCM16 WAV，不支持MP3、浮点与压缩WAV。</p>
+        @if (Vm.CurrentAudio() is { } asset)
+        {
+            <div class="audio-info"><strong>@asset.Name</strong><span>@asset.Duration.ToString("F3") s / @asset.Rate Hz / @asset.Channels 声道</span><code>@asset.Sha256</code></div>
+            <div class="action-row"><button @onclick="Vm.AnalyzeAudio">分析当前音频</button><button class="danger" @onclick='() => Confirm("移除当前对象内嵌音频？已填写的频带声级仍保留。", Vm.RemoveAudio)'>移除音频</button></div>
+        }
+        else { <div class="empty compact">当前对象无音频。仍可用固定种子频带噪声进行模拟试听。</div> }
+        <h3>用相对频谱构建估算输入</h3>
+        <label>人工声明的七带合成参考声级 / dB<input type="number" @bind="Vm.AudioReference" min="0" max="120" step="0.5" /></label>
+        <button @onclick='() => Confirm("以当前音频相对谱和人工参考替换七频带，来源将改为估算。此操作不是声压标定。继续？", Vm.ApplyAudioSpectrum)'>应用音频相对频谱</button>
+        <p class="hint">根据数字频带能量占比，将人工参考分配至七个频带；来源自动标为估算，修正归零。舍弃带外能量，不建立传声器灵敏度、增益或校准器链路。</p>
+    </div>
+    <div class="card">
+        <h3>数字频谱结果</h3>
+        @if (Vm.AudioSpectrum is { } spectrum)
+        {
+            <p>@Vm.AudioAnalysisLabel</p>
+            <table><thead><tr><th>中心频率 Hz</th><th>数字频带 dBFS RMS</th></tr></thead><tbody>@for (var i = 0; i < 7; i++) { <tr><td>@Software.Frequencies[i]</td><td>@spectrum.Levels[i].ToString("F3")</td></tr> }</tbody></table>
+            <p>全记录RMS @spectrum.FullRms.ToString("G5")；七带合成RMS @spectrum.CapturedRms.ToString("G5")；采样点 @spectrum.Frames。</p>
+            <p class="hint">@spectrum.Note 静音带用−160dBFS显示下限；不能解释为仪器动态范围。</p>
+        }
+        else { <div class="empty">导入或分析当前音频后显示数字频谱。更改音频对象时，请点击“分析当前音频”以核对标签。</div> }
+    </div>
+</div>
+<div class="card">
+    <h3>观察点相对试听</h3>
+    <div class="form-grid three">
+        <label>试听观察点<select value="@Vm.SelectedListenerId" @onchange="ListenerChanged"><option value="">请选择</option>@foreach (var p in Vm.Project.Listeners) { <option value="@p.Id">@p.Name</option> }</select></label>
+        <label>长度 / s<input type="number" @bind="Vm.AuditionSeconds" min="1" max="8" step="1" /></label>
+        <label>数字播放参考 / dB<input type="number" @bind="Vm.PlaybackReference" min="60" max="140" step="1" /></label>
+        <label class="check"><input type="checkbox" @bind="Vm.IncludeBackground" />叠加背景</label>
+    </div>
+    <button class="primary" @onclick="Vm.RenderAuditionAsync" disabled="@Vm.Busy">生成当前观察点试听</button>
+    <p class="hint">相同数字参考下比较不同观察点，软件不逐文件自动归一化。数字参考越高，输出幅值越小；预估峰值过高会拒绝生成并提示提高参考。建议先将设备音量调低，再自行调整。</p>
+    @if (Vm.AudioUrl is not null && Vm.Audition is { } audition)
+    {
+        <div class="audition-output">
+            <audio controls src="@Vm.AudioUrl" preload="metadata"></audio>
+            <a href="@Vm.AudioUrl" download="相对试听.wav">下载相对试听WAV</a>
+            <p>淡入前峰值：@audition.Peak.ToString("F5") / 满幅1</p>
+            <pre>@audition.Description</pre>
+            <p class="hash">制作时输入SHA256：@audition.Hash</p>
+        </div>
+    }
+    <div class="notice">试听是七带整形后的单声道工程示意，不保留真实空间双耳效果，也不能判定行人可听性。声场使用非相干能量叠加，输出波形的瞬态相位叠加与该统计模型不等价。</div>
+</div>
+@code {
+    private async Task AudioUpload(InputFileChangeEventArgs e)
+    {
+        if (Vm.CurrentAudio() is not null && !await Js.InvokeAsync<bool>("confirm", "替换当前对象内嵌音频？"))
+            return;
+        await Upload(e, 10485760, Vm.ImportAudio);
+    }
+    private void SpeakerChanged(ChangeEventArgs e)
+    {
+        if (Guid.TryParse(e.Value?.ToString(), out var id))
+            Vm.SelectSpeaker(id);
+    }
+    private void ListenerChanged(ChangeEventArgs e)
+    {
+        if (Guid.TryParse(e.Value?.ToString(), out var id))
+            Vm.SelectListener(id);
+    }
+}
+
+===== src/Avas.App/Components/Shared/ComparisonPanel.razor =====
+@inherits VmComponent
+<div class="section-title"><div><h2>方案快照与比较</h2><p>快照冻结完整输入。差值为目标减基线；修改方案应先恢复、编辑、计算，再另存快照。</p></div><span class="section-tag">07 / COMPARE</span></div>
+<div class="card">
+    <div class="action-row"><label>新快照名称<input @bind="Vm.SnapshotName" maxlength="100" /></label><button class="primary" @onclick="Vm.CaptureSnapshot">保存当前方案快照</button></div>
+    <p class="hint">先计算有效结果才能保存快照，最多20个。项目名称、责任人与审计属于项目档案，不随恢复覆盖。</p>
+    <div class="table-scroll"><table><thead><tr><th>快照</th><th>时间 UTC</th><th>源 / 点</th><th>输入哈希</th><th>操作</th></tr></thead><tbody>
+    @foreach (var snapshot in Vm.Project.Snapshots)
+    {
+        <tr><td>@snapshot.Name</td><td>@snapshot.Created.ToString("yyyy-MM-dd HH:mm:ss")</td><td>@snapshot.Speakers.Count / @snapshot.Listeners.Count</td><td><code>@snapshot.InputHash[..Math.Min(16, snapshot.InputHash.Length)]</code></td><td><button @onclick='() => Confirm("用该快照替换当前布局、背景、频谱与观察点？", () => Vm.RestoreSnapshot(snapshot.Id))'>恢复输入</button><button class="danger" @onclick='() => Confirm("删除该方案快照？", () => Vm.DeleteSnapshot(snapshot.Id))'>删除</button></td></tr>
+    }
+    </tbody></table></div>
+    @if (Vm.Project.Snapshots.Count == 0) { <div class="empty">尚无快照。计算完成后输入名称并保存。</div> }
+</div>
+<div class="card">
+    <div class="form-grid">
+        <label>比较基线<select @bind="Vm.BaselineId"><option value="">请选择</option>@foreach (var s in Vm.Project.Snapshots) { <option value="@s.Id">@s.Name</option> }</select></label>
+        <label>比较目标<select @bind="Vm.TargetId"><option value="">请选择</option>@foreach (var s in Vm.Project.Snapshots) { <option value="@s.Id">@s.Name</option> }</select></label>
+    </div>
+    <button class="primary" @onclick="Vm.Compare">比较所选快照</button>
+    <p class="hint">区域、步长、高度、车辆轮廓、背景、工程目标、指标及观察点标识/位置须完全一致。不同来源类别也会阻断；源数量、位置、朝向和频谱允许不同。</p>
+</div>
+@if (Vm.Comparison is { } comparison)
+{
+    <div class="card">
+        <h3>@comparison.TargetName 相对 @comparison.BaselineName</h3>
+        @if (!comparison.Comparable)
+        {
+            <div class="errors"><strong>条件不一致，未计算差值</strong><ul>@foreach (var reason in comparison.Reasons) { <li>@reason</li> }</ul></div>
+        }
+        else
+        {
+            <div class="comparison-values"><span>基线覆盖 @comparison.Baseline!.Coverage.ToString("F2")%</span><span>目标覆盖 @comparison.Target!.Coverage.ToString("F2")%</span><strong>差值 @comparison.CoverageDifference!.Value.ToString("+0.00;-0.00;0.00") 个百分点</strong></div>
+            <table><thead><tr><th>观察点</th><th>基线 dB</th><th>目标 dB</th><th>目标减基线 dB</th></tr></thead><tbody>@foreach (var row in comparison.Points) { <tr><td>@row.Name</td><td>@row.Baseline.ToString("F3")</td><td>@row.Target.ToString("F3")</td><td>@row.Difference.ToString("+0.000;-0.000;0.000")</td></tr> }</tbody></table>
+            <button @onclick='() => Vm.Export("comparison")'>导出比较CSV</button>
+            <p class="hint">正差值表示目标声级更高，不自动代表设计更优。覆盖差取决于当前工程阈值，不提供实际可听性结论。</p>
+        }
+    </div>
+}
+
+===== src/Avas.App/Components/Shared/DeliveryPanel.razor =====
+@inherits VmComponent
+<div class="section-title"><div><h2>成果输出与审计</h2><p>成果保留项目身份、来源、计算口径及输入哈希，供独立复核。</p></div><span class="section-tag">10 / DELIVERY</span></div>
+<div class="export-grid">
+    <article class="card"><h3>可搬迁项目</h3><p>包含项目、频谱、内嵌WAV、方案快照与审计，不含临时试听；保存后可在另一数据目录上传重开。</p><button @onclick='() => Vm.Export("project")'>下载项目副本</button></article>
+    <article class="card"><h3>工程报告</h3><p>自包含HTML，包含来源、输入频带、条件、声场SVG、观察点与贡献、模型边界和最近30条审计。浏览器打开后可打印。</p><button @onclick='() => Vm.Export("report")'>导出工程报告HTML</button></article>
+    <article class="card"><h3>离散网格明细</h3><p>UTF-8 CSV逐节点输出坐标、警示声、背景、合成、差值、目标状态、截断标记与七频带，保留来源和SHA256。</p><button @onclick='() => Vm.Export("grid")'>导出网格CSV</button></article>
+    <article class="card"><h3>观察点明细</h3><p>与网格相同字段，仅输出显式观察点。车内或网格外的点仍计算，空间位置由坐标核对。</p><button @onclick='() => Vm.Export("points")'>导出观察点CSV</button></article>
+    <article class="card"><h3>矢量声场图</h3><p>导出当前连续色图或覆盖二值图。图注保留单位和布局方向，结合报告中的来源和参数使用。</p><button @onclick='() => Vm.Export("svg")'>导出声场SVG</button></article>
+    <article class="card"><h3>完整计算快照</h3><p>JSON内含软件和模型版本、输入、网格、点频谱和贡献，可供程序复核；它是成果，不作为项目打开格式。</p><button @onclick='() => Vm.Export("json")'>导出计算JSON</button></article>
+</div>
+<div class="notice">只有与当前输入一致的结果可以导出。生成后点击页面底部链接，浏览器负责最终落盘位置；服务端保存与浏览器下载分别确认。</div>
+<div class="card">
+    <h3>修订审计（最近100条）</h3>
+    <p class="hint">项目保存最多1000条累计审计；撤销重做不会删除审计。这里记录操作事实，不证明数据真实或权属。</p>
+    <div class="table-scroll"><table><thead><tr><th>时间 UTC</th><th>修订</th><th>操作</th></tr></thead><tbody>
+    @foreach (var entry in Vm.Project.Audit.TakeLast(100).Reverse())
+    {
+        <tr><td>@entry.At.ToString("yyyy-MM-dd HH:mm:ss")</td><td>@entry.Revision</td><td>@entry.Action</td></tr>
+    }
+    </tbody></table></div>
+    @if (Vm.Project.Audit.Count == 0) { <div class="empty compact">应用编辑或管理对象后产生审计。</div> }
+</div>
+
+===== src/Avas.App/Components/Shared/EditActions.razor =====
+@inherits VmComponent
+<div class="edit-actions">
+    <span>@(Vm.HasDraft ? "字段尚未应用" : "编辑区与项目一致")</span>
+    <button class="primary" @onclick="Vm.ApplyDraft" disabled="@(Vm.Project.Archived || Vm.Busy)">应用编辑</button>
+    <button @onclick="Vm.DiscardDraft" disabled="@(!Vm.HasDraft)">放弃编辑</button>
+</div>
+
+===== src/Avas.App/Components/Shared/HelpPanel.razor =====
+<div class="section-title"><div><h2>使用帮助与计算约定</h2><p>先核对输入基准，再用可重复样例检查计算。</p></div><span class="section-tag">11 / GUIDE</span></div>
+<div class="card prose">
+    <h3>软件介绍</h3>
+    <p>本软件面向汽车声学与附件设计人员，在布置前期比较车外行人警示扬声器的位置、朝向与频带输入。传统流程需要在多张图表间传递声源、背景和观察点条件，容易混淆不同方案的比较基准。本软件将布局、自由声场计算、快照与成果放在同一个项目中，使每次比较能回到原始输入复核。</p>
+    <p>建立项目后，添加扬声器，填写轴向参考距离及七个频带的声压级；再输入背景、接收网格和观察点，运行计算。用快照比较、单参数扫描检查变化，最后保存项目并输出工程报告。WAV可单独内嵌，用于数字频谱分析与观察点相对试听。</p>
+    <h3>首个可核对案例</h3>
+    <ol>
+        <li>新建空白项目。添加一个扬声器，将X、Y设为0，高度设为1.5m，参考距离1m，增益0，指向指数0；七带声级均60dB，修正0，填写来源“人工核对案例”。点击应用编辑。</li>
+        <li>在背景与网格页设置接收高度1.5m，显示频带1000Hz，背景该频带35dB，其余默认。点击应用编辑。</li>
+        <li>添加观察点，X=2m，Y=0；应用编辑并运行计算。</li>
+        <li>声场结果页此点警示声应为53.979dB，背景差18.979dB。因为60−20log10(2)=53.9794。距离未截断。</li>
+        <li>保存项目，下载项目副本；新建空白后上传副本，重新计算应得到相同数值。</li>
+    </ol>
+    <h3>数据与单位</h3>
+    <p>位置和高度为米，角度为度，声压级为dB re 20µPa。七个中心频率是125、250、500、1000、2000、4000、8000Hz。缺失频带拒绝计算，0dB有效。来源区分人工输入、模拟示例、实测（用户声明）和估算；用户声明不是软件认证。</p>
+    <p>频响修正为对参考输入的增量；不要把已含扬声器响应的谱再重复修正。数字音频dBFS以数字幅值1为RMS参考，与声压级没有自动换算关系。按音频相对谱分配人工参考的功能仅得到估算输入。</p>
+    <h3>模型公式</h3>
+    <p>三维距离r由平面坐标与高度差求出。使用max(r,距离下限)进行球面扩散，修正为−20log10(r/r0)。水平指向幅值为floor+(1−floor)max(0,cosθ)^n，然后转为20log10幅值。n=0专门定义为全向。声源轴向频带、修正、增益与传播修正相加得到接收频带。</p>
+    <p>不同源的频带能量相加，再取10log10。合成模式下可选A计权，使用各带固定修正−16.1、−8.6、−3.2、0、1.2、1、−1.1dB。此处为中心频率工程近似；频带模式不施加A计权。七带合成不能替代全频积分。</p>
+    <p>背景在空间中设为均匀值，不从声源传播。合成=警示声与背景的能量和；背景差=警示声减背景。覆盖同时要求警示声达到工程声级目标、背景差达到用户差值目标。覆盖率按有效节点等权计数，网格步长会影响结果。</p>
+    <h3>保存与恢复</h3>
+    <p>字段输入先留在编辑草稿，点击应用才改变项目。保存前须处理未应用字段。本机保存对已有同标识文件检查哈希，发现其他会话更改时阻止覆盖。重复保存保留.bak，备份可打开后复制为独立项目。下载副本不改变本机保存状态。</p>
+    <p>普通启动为空白。载入模拟示例、打开项目、新建或上传都会替换当前会话，未保存时先确认。刷新、浏览器关闭、连接过期或服务停止可能丢失工作副本；外部导航有提示，崩溃无法保证提示，需定期保存。</p>
+    <h3>常见问题与恢复</h3>
+    <ul>
+        <li>提示未应用编辑：返回当前页，点击应用编辑；若字段不需要，点击放弃编辑。不要用保存代替应用。</li>
+        <li>提示网格超过20000节点：在背景与网格页缩小X/Y范围或增大步长，应用后重新计算。</li>
+        <li>CSV预检失败：检查表头和错误行，七频带各一行，删除重复频率，英文逗号，小数使用点；背景修正填0。</li>
+        <li>方案比较阻断：恢复基线的计算条件，保留观察点标识与坐标，仅修改声源相关参数，计算后另存新快照。</li>
+        <li>WAV拒绝：在音频工具中转换为PCM16、16000至96000Hz、单/双声道，并裁剪至30秒以内。</li>
+        <li>试听峰值过高：提高数字播放参考值，按错误提示所需增量重试；保持不同方案相同参考与系统音量。</li>
+        <li>项目冲突：先下载当前副本避免丢失，再打开磁盘版核对；需要独立保存时点击复制为新项目。</li>
+        <li>下载过期：回到对应页重新生成文件。链接默认10分钟有效，也可能因内存容量回收提前失效。</li>
+    </ul>
+    <h3>适用边界</h3>
+    <p>@Software.Boundary 本软件未实现相干干涉、真实三维车身声场、法规判定、行人听觉检测、多人远程协作和测量仪器接口。没有校准证据时不得将估算、模拟或数字录音结果改称实测。</p>
+</div>
+
+===== src/Avas.App/Components/Shared/ImportPanel.razor =====
+@inherits VmComponent
+<div class="section-title"><div><h2>频谱批量导入</h2><p>先预检，再整体替换七个频带。错误不会部分覆盖原输入。</p></div><span class="section-tag">04 / IMPORT</span></div>
+<div class="card">
+    <div class="action-row">
+        <label class="check"><input type="checkbox" @bind="Vm.ImportBackground" />导入至背景</label>
+        @if (!Vm.ImportBackground)
+        {
+            <label>目标扬声器<select value="@Vm.SelectedSpeakerId" @onchange="SourceChanged"><option value="">请选择</option>@foreach (var s in Vm.Project.Speakers) { <option value="@s.Id">@s.Name</option> }</select></label>
+        }
+        <button @onclick='() => Vm.Export("template")'>下载频谱模板</button>
+        <button @onclick='() => Vm.Export("input")'>导出当前频带</button>
+    </div>
+    <label>选择UTF-8 CSV文件（最多20KiB）<InputFile OnChange="CsvUpload" accept=".csv,text/csv" /></label>
+    <label>或粘贴三列CSV<textarea class="code" @bind="Vm.CsvText" rows="11" spellcheck="false"></textarea></label>
+    <p class="hint">表头严格为 FrequencyHz,LevelDb,CorrectionDb。英文逗号分隔，小数使用点；每个频率恰好一行。背景CorrectionDb必须为0。空白行忽略，其余错误逐行提示。</p>
+    <div class="action-row"><button class="primary" @onclick="Vm.PreviewCsv">预检频谱</button><button @onclick='() => Confirm("用预检七频带整体替换所选对象的旧频谱？", Vm.ApplyCsv)'>应用频谱导入</button></div>
+</div>
+@if (Vm.Preview is { } preview)
+{
+    <div class="card">
+        <h3>@(preview.Valid ? "预检通过，尚未应用" : "预检失败")</h3>
+        @if (preview.Errors.Count > 0)
+        {
+            <ul class="error-text">@foreach (var error in preview.Errors) { <li>@error</li> }</ul>
+        }
+        <table><thead><tr><th>Hz</th><th>声级 dB</th><th>修正 dB</th></tr></thead><tbody>@foreach (var b in preview.Bands) { <tr><td>@b.Hz</td><td>@b.Level</td><td>@b.Correction</td></tr> }</tbody></table>
+        <p>预检仅验证结构与数值，来源及参考距离仍须在扬声器或背景页核对。更换对象或修改文本后必须重新预检。</p>
+    </div>
+}
+@code {
+    private void SourceChanged(ChangeEventArgs e)
+    {
+        if (Guid.TryParse(e.Value?.ToString(), out var id))
+            Vm.SelectSpeaker(id);
+    }
+    private Task CsvUpload(InputFileChangeEventArgs e) => Upload(e, 20480, (_, data) =>
+    {
+        try { Vm.CsvText = new System.Text.UTF8Encoding(false, true).GetString(data); Vm.Notify(); }
+        catch (System.Text.DecoderFallbackException) { Vm.Failure("CSV不是有效UTF-8，请转换编码后重试。"); }
+    });
+}
+
+===== src/Avas.App/Components/Shared/LayoutPanel.razor =====
+@inherits VmComponent
+<div class="section-title"><div><h2>布局与观察点</h2><p>以车辆中心为原点，通过坐标编辑定位；观察点高度统一使用接收平面。</p></div><span class="section-tag">05 / LAYOUT</span></div>
+<div class="layout-grid">
+    <div class="card map-card">@((MarkupString)Vm.MapSvg)<p class="hint">圆形源标记附短线指示朝向；移动与转向在“扬声器”页输入坐标和角度后应用。悬停有效色块可查看节点值。</p></div>
+    <div class="card">
+        <h3>观察点管理</h3>
+        <div class="action-row"><button @onclick="Vm.AddListener">添加观察点</button><button class="danger" @onclick='() => Confirm("删除当前观察点？", Vm.RemoveListener)' disabled="@(Vm.ListenerDraft is null)">删除观察点</button></div>
+        <label>当前观察点<select value="@Vm.SelectedListenerId" @onchange="Changed"><option value="">请选择</option>@foreach (var p in Vm.Project.Listeners) { <option value="@p.Id">@p.Name</option> }</select></label>
+        @if (Vm.ListenerDraft is { } draftPoint)
+        {
+            <div @oninput="Vm.MarkDraft">
+                <label>观察点名称<input @bind="draftPoint.Name" maxlength="100" /></label>
+                <div class="form-grid">
+                    <label>X / m<input type="number" @bind="draftPoint.X" step="0.1" /></label>
+                    <label>Y / m<input type="number" @bind="draftPoint.Y" step="0.1" /></label>
+                </div>
+                <label>备注<textarea @bind="draftPoint.Note" maxlength="2000" rows="2"></textarea></label>
+                <EditActions />
+            </div>
+        }
+        <h3>等角环形点集</h3>
+        <div class="form-grid">
+            <label>半径 / m<input type="number" @bind="radius" min="1" max="50" /></label>
+            <label>数量<input type="number" @bind="ringCount" min="4" max="36" /></label>
+        </div>
+        <button @onclick="() => Vm.AddRing(radius, ringCount)">追加环形观察点</button>
+        <p class="hint">半径以车辆中心计，角度从X正轴起等分；最多100点。自定义点集不代表法规布点。</p>
+    </div>
+</div>
+<div class="card table-scroll"><table><thead><tr><th>名称</th><th>X / m</th><th>Y / m</th><th>位置提示</th><th>备注</th></tr></thead><tbody>
+@foreach (var point in Vm.Project.Listeners)
+{
+    <tr><td>@point.Name</td><td>@point.X</td><td>@point.Y</td><td>@(Acoustics.InsideVehicle(Vm.Project.Settings, point.X, point.Y) ? "车内示意点，仍独立计算" : "车外")</td><td>@point.Note</td></tr>
+}
+</tbody></table></div>
+@code {
+    private double radius = 5;
+    private int ringCount = 8;
+    private async Task Changed(ChangeEventArgs e)
+    {
+        if (Vm.HasDraft)
+        {
+            if (!await Js.InvokeAsync<bool>("confirm", "切换观察点将放弃未应用字段，继续？"))
+                return;
+            Vm.DiscardDraft();
+        }
+        if (Guid.TryParse(e.Value?.ToString(), out var id))
+            Vm.SelectListener(id);
+    }
+}
+
+<ListenerImportPanel />
+
+===== src/Avas.App/Components/Shared/ListenerImportPanel.razor =====
+@inherits VmComponent
+<details class="card">
+    <summary>观察点CSV批量输入与交换</summary>
+    <p class="hint">四列UTF-8，表头Name,X_m,Y_m,Note；支持引号、引号内逗号和双引号转义，不支持字段内换行。名称不超过100字符，X/Y范围−100至100m。</p>
+    <div class="action-row"><button @onclick="() => Vm.ExportListeners(true)">下载观察点模板</button><button @onclick="() => Vm.ExportListeners(false)">导出观察点输入</button></div>
+    <label>选择观察点CSV<InputFile OnChange="CsvUpload" accept=".csv,text/csv" /></label>
+    <label>观察点CSV文本<textarea class="code" @bind="Vm.ListenerText" rows="6"></textarea></label>
+    <label class="check"><input type="checkbox" @bind="Vm.ReplaceListeners" />替换现有全部观察点（否则追加）</label>
+    <div class="action-row"><button @onclick="Vm.PreviewListeners">预检观察点</button><button @onclick='() => Confirm("按当前模式应用观察点CSV？替换会移除旧点，新导入点建立新标识。", Vm.ApplyListeners)'>应用观察点导入</button></div>
+    @if (Vm.ListenerPreview is { } preview)
+    {
+        @if (preview.Errors.Count > 0) { <ul class="error-text">@foreach (var error in preview.Errors) { <li>@error</li> }</ul> }
+        <p>有效行 @preview.Points.Count，状态 @(preview.Valid ? "可应用" : "不可应用")。</p>
+        <table><thead><tr><th>名称</th><th>X / m</th><th>Y / m</th><th>备注</th></tr></thead><tbody>@foreach (var p in preview.Points) { <tr><td>@p.Name</td><td>@p.X</td><td>@p.Y</td><td>@p.Note</td></tr> }</tbody></table>
+    }
+    <p class="hint">输入交换CSV不保留原标识，多行备注折为单行。完整项目搬迁使用.avasproj；方案比较依赖点标识，重建同名点不能冒充同一点。</p>
+</details>
+@code {
+    private Task CsvUpload(InputFileChangeEventArgs e) => Upload(e, 102400, (_, data) =>
+    {
+        try { Vm.ListenerText = new System.Text.UTF8Encoding(false, true).GetString(data); Vm.Notify(); }
+        catch (System.Text.DecoderFallbackException) { Vm.Failure("观察点CSV不是有效UTF-8。"); }
+    });
+}
+
+===== src/Avas.App/Components/Shared/OriginSelect.razor =====
+<select value="@Value" @onchange="Changed" aria-label="@Label">
+    @foreach (var origin in Enum.GetValues<Origin>())
+    {
+        <option value="@origin">@origin.Label()</option>
+    }
+</select>
+@code {
+    [Parameter] public Origin Value { get; set; }
+    [Parameter] public EventCallback<Origin> ValueChanged { get; set; }
+    [Parameter] public string Label { get; set; } = "来源类别";
+    private Task Changed(ChangeEventArgs e) => ValueChanged.InvokeAsync(Enum.Parse<Origin>(e.Value?.ToString() ?? "Manual"));
+}
+
+===== src/Avas.App/Components/Shared/ProjectPanel.razor =====
+@inherits VmComponent
+<div class="section-title"><div><h2>项目工作台</h2><p>记录设计目的与来源，保存可以搬迁、重开的工作文件。</p></div><span class="section-tag">01 / PROJECT</span></div>
+<div class="action-row">
+    <button @onclick='() => Replace("建立空白项目？", () => Vm.New(false))'>新建空白项目</button>
+    <button @onclick='() => Replace("载入前部双扬声器固定模拟示例？", () => Vm.New(true))'>载入模拟示例</button>
+    <button @onclick="Vm.CopyProject">复制为新项目</button>
+    <button @onclick='() => Confirm(Vm.Project.Archived ? "解除项目归档？" : "将项目归档为只读？", Vm.ToggleArchive)'>@(Vm.Project.Archived ? "解除归档" : "归档项目")</button>
+</div>
+<div class="card" @oninput="Vm.MarkDraft">
+    <div class="form-grid">
+        <label>项目名称（必填，最多100字）<input @bind="Vm.Draft.Name" maxlength="100" /></label>
+        <label>负责人<input @bind="Vm.Draft.Owner" maxlength="100" /></label>
+        <label>车辆代号<input @bind="Vm.Draft.Vehicle" maxlength="100" /></label>
+        <label>项目标识<input value="@Vm.Project.Id" readonly /></label>
+        <label class="wide">设计目的<textarea @bind="Vm.Draft.Purpose" maxlength="2000" rows="3"></textarea></label>
+        <label class="wide">项目备注<textarea @bind="Vm.Draft.Note" maxlength="4000" rows="3"></textarea></label>
+    </div>
+    <EditActions />
+</div>
+<div class="two-col">
+    <div class="card">
+        <h3>打开搬迁项目</h3>
+        <p>项目文件内嵌所有频带、音频与快照。上传仅载入会话，点击保存才写入本机项目库。</p>
+        <label class="file-label">选择 .avasproj 文件<InputFile OnChange="ProjectUpload" accept=".avasproj,application/json" /></label>
+        <p class="hint">UTF-8 JSON格式1，最大80MiB。不支持其他软件的项目文件。替换前提示处理未保存内容。</p>
+    </div>
+    <div class="card">
+        <h3>保存与下载</h3>
+        <p>“保存项目”写入软件所在电脑的数据目录；重复保存保留上次备份。“下载项目副本”生成可搬迁文件。</p>
+        <button @onclick="Vm.Save">保存项目</button>
+        <button @onclick='() => Vm.Export("project")'>下载项目副本</button>
+        <p class="path">本机目录：@Vm.DataDirectory</p>
+    </div>
+</div>
+<div class="card">
+    <div class="action-row"><h3>本机项目库</h3><button @onclick="Vm.RefreshLibrary">刷新项目库</button></div>
+    @if (Vm.Library.Count == 0)
+    {
+        <div class="empty">尚无保存文件。完成项目输入后点击“保存项目”。</div>
+    }
+    else
+    {
+        <div class="table-scroll"><table><thead><tr><th>项目</th><th>修改时间 UTC</th><th>大小</th><th>读取状态</th><th>操作</th></tr></thead><tbody>
+        @foreach (var item in Vm.Library)
+        {
+            <tr><td>@item.Name</td><td>@item.Modified.ToString("yyyy-MM-dd HH:mm")</td><td>@((item.Size / 1024.0).ToString("F1"))KiB</td><td>@(item.Error ?? "结构可读")</td><td>
+            @if (Guid.TryParse(item.Id, out var id))
+            {
+                <button @onclick='() => Replace("打开磁盘项目？", () => Vm.Open(id, false))'>打开</button>
+                @if (item.HasBackup) { <button @onclick='() => Replace("打开上次备份？", () => Vm.Open(id, true))'>打开备份</button> }
+            }
+            </td></tr>
+        }
+        </tbody></table></div>
+    }
+</div>
+@code {
+    private async Task ProjectUpload(InputFileChangeEventArgs e)
+    {
+        if ((Vm.Dirty || Vm.HasDraft) && !await Js.InvokeAsync<bool>("confirm", "载入文件将替换当前项目，未保存或未应用内容将丢失。是否继续？"))
+            return;
+        await Upload(e, ProjectCodec.MaximumBytes, (_, bytes) => Vm.ImportProject(bytes));
+    }
+}
+
+===== src/Avas.App/Components/Shared/ResultsPanel.razor =====
+@inherits VmComponent
+<div class="section-title"><div><h2>自由声场结果</h2><p>先核对来源、指标与计算状态，再查看覆盖与观察点频谱。</p></div><span class="section-tag">06 / FIELD</span></div>
+@if (Vm.Stale || Vm.Result is null)
+{
+    <div class="empty"><h3>当前没有可使用的结果</h3><p>输入修改后旧结果会失效。应用编辑并点击“运行计算”，成功后显示声场、频谱与声源贡献。</p><button class="primary" @onclick="Vm.CalculateAsync" disabled="@Vm.Busy">运行计算</button></div>
+}
+else
+{
+    var result = Vm.Result;
+    <div class="metric-grid">
+        <div class="metric"><span>工程目标覆盖</span><strong>@result.Coverage.ToString("F2")<small>%</small></strong><small>@result.CoveredCount / @result.Grid.Count 个节点</small></div>
+        <div class="metric"><span>最低警示声</span><strong>@result.Minimum.ToString("F1")<small>dB</small></strong><small>当前选择的频带 / 合成口径</small></div>
+        <div class="metric"><span>最高警示声</span><strong>@result.Maximum.ToString("F1")<small>dB</small></strong><small>距离截断节点 @result.ClampedCount 个</small></div>
+        <div class="metric"><span>能量平均声级</span><strong>@result.MeanEnergy.ToString("F1")<small>dB</small></strong><small>有效网格等权能量平均</small></div>
+    </div>
+    <div class="card">
+        <div class="action-row"><h3>布局色图</h3><label class="check"><input type="checkbox" @bind="Vm.CoverageOnly" />显示目标覆盖二值图</label></div>
+        <p>@result.Metric；工程目标 @Vm.Project.Settings.LevelTarget dB，背景差目标 @Vm.Project.Settings.MarginTarget dB。</p>
+        <div class="map">@((MarkupString)Vm.MapSvg)</div>
+        @if (Vm.CoverageOnly) { <p class="hint">绿色：同时满足两目标；琥珀色：至少一个目标未满足。颜色不表示法规合格或不合格。</p> }
+        <p class="hint">连续色图：蓝色为当前网格相对低值，暖色为相对高值，右下角显示范围。每次计算色阶可能变化，跨方案须比较数值。边缘单元是显示示意，覆盖率按节点计。</p>
+    </div>
+    <div class="card table-scroll">
+        <h3>观察点数值</h3>
+        <table><thead><tr><th>观察点</th><th>警示声 dB</th><th>背景 dB</th><th>合成 dB</th><th>背景差 dB</th><th>目标</th><th>查看</th></tr></thead><tbody>
+        @foreach (var p in result.Listeners)
+        {
+            <tr class="@(p.ListenerId == Vm.SelectedListenerId ? "selected-row" : "")"><td>@p.Name</td><td>@p.Signal.ToString("F3")</td><td>@p.Background.ToString("F3")</td><td>@p.Combined.ToString("F3")</td><td>@p.Margin.ToString("F3")</td><td><span class="pill @(p.Covered ? "green" : "amber")">@(p.Covered ? "满足工程目标" : "未满足工程目标")</span>@if (p.NearFieldClamped) { <small>距离截断</small> }@if (p.InVehicle) { <small>车内示意点</small> }</td><td><button @onclick="() => Vm.SelectListener(p.ListenerId!.Value)">频谱详情</button></td></tr>
+        }
+        </tbody></table>
+        @if (result.Listeners.Count == 0) { <p>尚未建立观察点，可在“布局与观察点”页添加。</p> }
+    </div>
+    @if (Vm.SelectedPoint is { } point)
+    {
+        <div class="two-col">
+            <div class="card"><h3>@point.Name 的未计权频谱</h3>@((MarkupString)ChartRenderer.Spectrum(point, Vm.Project.Settings))<table><thead><tr><th>Hz</th><th>警示声 dB</th><th>背景 dB</th></tr></thead><tbody>@for (var i = 0; i < 7; i++) { <tr><td>@Software.Frequencies[i]</td><td>@point.Bands[i].ToString("F3")</td><td>@Vm.Project.Settings.Background.Single(x => x.Hz == Software.Frequencies[i]).Level</td></tr> }</tbody></table></div>
+            <div class="card"><h3>各声源贡献核对</h3><p>几何距离使用三维高度差；传播修正含几何扩散与水平指向性。</p><table><thead><tr><th>扬声器</th><th>距离 m</th><th>传播修正 dB</th><th>当前指标 dB</th></tr></thead><tbody>@foreach (var c in point.Contributions) { <tr><td>@c.Name</td><td>@c.Distance.ToString("F3")</td><td>@c.Loss.ToString("F3")</td><td>@Acoustics.Select(c.Bands, Vm.Project.Settings).ToString("F3")</td></tr> }</tbody></table><p class="hint">源间按能量合成，分贝数值不能直接相加。相同录音经多个扬声器播放时的相位干涉未计算。</p></div>
+        </div>
+    }
+    <div class="notice"><strong>模型核对</strong><ul>@foreach (var warning in result.Warnings) { <li>@warning</li> }</ul><small class="hash">输入SHA256：@result.InputHash · @result.At.ToString("O")</small></div>
+}
+
+<ReviewPanel />
+
+===== src/Avas.App/Components/Shared/ReviewPanel.razor =====
+@inherits VmComponent
+<div class="card">
+    <h3>输入复核提示</h3>
+    <p class="hint">以下为根据当前输入生成的提醒，既不是试验结果，也不是自动诊断或合格判断。已填写的来源仍由使用者核实。</p>
+    <div class="table-scroll"><table><thead><tr><th>类型</th><th>对象</th><th>发现</th><th>后续操作</th></tr></thead><tbody>
+    @foreach (var finding in Vm.Review)
+    {
+        <tr><td>@finding.Severity</td><td>@finding.Object</td><td>@finding.Finding</td><td>@finding.Action</td></tr>
+    }
+    </tbody></table></div>
+</div>
+
+===== src/Avas.App/Components/Shared/ScanPanel.razor =====
+@inherits VmComponent
+<div class="section-title"><div><h2>布置参数扫描</h2><p>对一个扬声器逐值试算，核对覆盖与声级变化，选择取值后再应用。</p></div><span class="section-tag">08 / SWEEP</span></div>
+<div class="card">
+    <div class="form-grid three">
+        <label>扫描扬声器<select @bind="Vm.ScanRequest.SpeakerId"><option value="@Guid.Empty">请选择</option>@foreach (var source in Vm.Project.Speakers) { <option value="@source.Id">@source.Name</option> }</select></label>
+        <label>参数<select @bind="Vm.ScanRequest.Parameter">@foreach (var p in Enum.GetValues<ScanParameter>()) { <option value="@p">@ScanEngine.Label(p)</option> }</select></label>
+        <label>初值<input type="number" @bind="Vm.ScanRequest.Start" step="0.5" /></label>
+        <label>终值<input type="number" @bind="Vm.ScanRequest.End" step="0.5" /></label>
+        <label>正步长<input type="number" @bind="Vm.ScanRequest.Step" step="0.5" min="0.01" /></label>
+    </div>
+    <div class="action-row"><button class="primary" @onclick="Vm.RunScanAsync" disabled="@Vm.Busy">运行参数扫描</button><button @onclick='() => Vm.Export("scan")' disabled="@(Vm.Scan is null)">导出扫描CSV</button></div>
+    <p class="hint">最多25个取值，原项目保持不变。任意取值超出参数范围时整次扫描失败，不生成部分结论。终值不能整除步长时取不超过终值的最后一个值。</p>
+</div>
+@if (Vm.Scan is { } scan)
+{
+    <div class="card">
+        <h3>@scan.SpeakerName · @ScanEngine.Label(scan.Parameter)</h3>
+        <div class="table-scroll"><table><thead><tr><th>取值</th><th>覆盖 %</th><th>最低 dB</th><th>最高 dB</th><th>最小背景差 dB</th><th>满足目标观察点</th><th>操作</th></tr></thead><tbody>
+        @foreach (var row in scan.Rows)
+        {
+            <tr><td>@row.Value.ToString("F2")</td><td><div class="coverage-cell"><span style="@($"width:{row.Coverage.ToString(CultureInfo.InvariantCulture)}%")"></span><b>@row.Coverage.ToString("F2")</b></div></td><td>@row.Minimum.ToString("F2")</td><td>@row.Maximum.ToString("F2")</td><td>@row.WorstMargin.ToString("F2")</td><td>@row.CoveredPoints</td><td><button @onclick='() => Confirm("将该扫描取值应用到项目？应用后需重新计算。", () => Vm.ApplyScan(row.Value))'>应用该值</button></td></tr>
+        }
+        </tbody></table></div>
+        <p class="hash">原始输入SHA256：@scan.InputHash</p>
+        <p class="hint">未设置综合评分或自动最优推荐；较高覆盖率可能同时带来其他方向声级增加，应结合安装空间和实测进一步选择。</p>
+    </div>
+}
+
+<TransectPanel />
+
+===== src/Avas.App/Components/Shared/SettingsPanel.razor =====
+@inherits VmComponent
+<div class="section-title"><div><h2>背景与接收网格</h2><p>定义共同计算条件。改变这些条件后，请在新条件下重新保存方案。</p></div><span class="section-tag">03 / CONDITIONS</span></div>
+<div @oninput="Vm.MarkDraft">
+    <div class="two-col">
+        <div class="card">
+            <h3>接收平面与车辆轮廓</h3>
+            <div class="form-grid">
+                <label>X最小 / m<input type="number" @bind="Vm.Draft.Settings.MinX" step="1" /></label>
+                <label>X最大 / m<input type="number" @bind="Vm.Draft.Settings.MaxX" step="1" /></label>
+                <label>Y最小 / m<input type="number" @bind="Vm.Draft.Settings.MinY" step="1" /></label>
+                <label>Y最大 / m<input type="number" @bind="Vm.Draft.Settings.MaxY" step="1" /></label>
+                <label>网格步长 / m<input type="number" @bind="Vm.Draft.Settings.Step" min="0.25" max="5" step="0.25" /></label>
+                <label>接收高度 / m<input type="number" @bind="Vm.Draft.Settings.ReceiverHeight" min="0" max="10" step="0.1" /></label>
+                <label>距离截断下限 / m<input type="number" @bind="Vm.Draft.Settings.MinimumDistance" min="0.1" max="10" step="0.1" /></label>
+                <label>车辆长度 / m<input type="number" @bind="Vm.Draft.Settings.VehicleLength" min="1" max="20" step="0.1" /></label>
+                <label>车辆宽度 / m<input type="number" @bind="Vm.Draft.Settings.VehicleWidth" min="0.5" max="5" step="0.1" /></label>
+                <label class="check"><input type="checkbox" @bind="Vm.Draft.Settings.ExcludeVehicle" />排除轮廓内部网格</label>
+            </div>
+            <p class="hint">坐标范围−100至100m；最多20000节点。取最小坐标起等步长节点，不整除时不强行添加最大边界。轮廓居中，长度沿X轴；内部排除不表示遮挡。</p>
+        </div>
+        <div class="card">
+            <h3>工程判读目标</h3>
+            <label>用于覆盖判读的声级指标<select @bind="Vm.Draft.Settings.SelectedHz"><option value="0">七频带合成</option>@foreach (var hz in Software.Frequencies) { <option value="@hz">@hz Hz</option> }</select></label>
+            <label class="check"><input type="checkbox" @bind="Vm.Draft.Settings.AWeighted" />合成时使用A计权</label>
+            <label>工程声级目标 / dB<input type="number" @bind="Vm.Draft.Settings.LevelTarget" step="0.5" /></label>
+            <label>警示声高于背景的目标 / dB<input type="number" @bind="Vm.Draft.Settings.MarginTarget" step="0.5" /></label>
+            <p class="hint">需同时满足两个目标。默认45dB和3dB为工程示例，不是法规限值。单频带选择时不进行A计权。七带合成覆盖88.4至11313.7Hz范围的离散频带，不能声称为全频总值。</p>
+            <div class="notice">覆盖率=满足目标的有效网格节点数÷全部有效节点数，不是人群可听率或精确面积比例。</div>
+        </div>
+    </div>
+    <div class="card">
+        <h3>空间均匀背景声</h3>
+        <div class="band-grid">
+            @foreach (var band in Vm.Draft.Settings.Background.OrderBy(x => x.Hz))
+            {
+                <label>@band.Hz Hz / dB<input type="number" @bind="band.Level" step="0.1" /></label>
+            }
+        </div>
+        <div class="form-grid">
+            <label>背景来源类别<OriginSelect @bind-Value="Vm.Draft.Settings.BackgroundOrigin" /></label>
+            <label>背景来源说明（必填）<textarea @bind="Vm.Draft.Settings.BackgroundSource" rows="2" maxlength="2000"></textarea></label>
+        </div>
+        <p class="hint">每个频带−60至140dB re 20µPa，假设全空间相同。数字背景音频与物理频带分开维护，不会因上传录音自动更新。</p>
+        <EditActions />
+    </div>
+</div>
+
+===== src/Avas.App/Components/Shared/SpeakerPanel.razor =====
+@inherits VmComponent
+<div class="section-title"><div><h2>扬声器与参考频谱</h2><p>轴向参考声压级、频响修正和增益分别输入，避免重复计入。</p></div><span class="section-tag">02 / SOURCES</span></div>
+<div class="action-row">
+    <button class="primary" @onclick="Vm.AddSpeaker">添加扬声器</button>
+    <button @onclick="Vm.DuplicateSpeaker" disabled="@(Vm.SpeakerDraft is null)">复制当前扬声器</button>
+    <button class="danger" @onclick='() => Confirm("删除当前扬声器及其内嵌音频？历史快照独立保留。", Vm.RemoveSpeaker)' disabled="@(Vm.SpeakerDraft is null)">删除当前扬声器</button>
+</div>
+<div class="object-tabs">
+    @foreach (var source in Vm.Project.Speakers)
+    {
+        <button class="@(source.Id == Vm.SelectedSpeakerId ? "selected" : "")" @onclick="() => Select(source.Id)">@source.Name <small>@(source.Enabled ? "启用" : "停用")</small></button>
+    }
+</div>
+@if (Vm.SpeakerDraft is { } speaker)
+{
+    <div class="two-col">
+        <div class="card" @oninput="Vm.MarkDraft">
+            <h3>位置与传播参数</h3>
+            <div class="form-grid">
+                <label>名称<input @bind="speaker.Name" maxlength="100" /></label>
+                <label class="check"><input type="checkbox" @bind="speaker.Enabled" />启用此源</label>
+                <label>X坐标 / m（车前为正）<input type="number" @bind="speaker.X" step="0.1" /></label>
+                <label>Y坐标 / m（车左为正）<input type="number" @bind="speaker.Y" step="0.1" /></label>
+                <label>声源高度 / m<input type="number" @bind="speaker.Height" min="0" max="10" step="0.1" /></label>
+                <label>水平朝向 / °<input type="number" @bind="speaker.Heading" min="-360" max="360" step="5" /></label>
+                <label>轴向参考距离 / m<input type="number" @bind="speaker.ReferenceDistance" min="0.1" max="10" step="0.1" /></label>
+                <label>全频带增益 / dB<input type="number" @bind="speaker.Gain" min="-40" max="40" step="0.5" /></label>
+                <label>指向指数 n<input type="number" @bind="speaker.Exponent" min="0" max="8" step="0.1" /></label>
+                <label>背向幅值下限 floor<input type="number" @bind="speaker.RearFloor" min="0.01" max="1" step="0.01" /></label>
+            </div>
+            <p class="hint">0°朝车前，90°朝车左。n=0定义全向；n越大前向越集中。floor是幅值比，0.2约为−13.98dB背向修正。这些是用户定义近似参数。</p>
+            <EditActions />
+        </div>
+        <div class="card" @oninput="Vm.MarkDraft">
+            <h3>七频带轴向参考声级</h3>
+            <table><thead><tr><th>中心频率 / Hz</th><th>参考声级 / dB</th><th>频响修正 / dB</th></tr></thead><tbody>
+            @foreach (var band in speaker.Bands.OrderBy(x => x.Hz))
+            {
+                <tr><td>@band.Hz</td><td><input type="number" aria-label="@(band.Hz + "Hz参考声级")" @bind="band.Level" step="0.1" /></td><td><input type="number" aria-label="@(band.Hz + "Hz频响修正")" @bind="band.Correction" step="0.1" /></td></tr>
+            }
+            </tbody></table>
+            <p class="hint">声级单位 dB re 20µPa；范围−60至140，0dB为有效值。修正范围−40至40dB。如果参考频谱已包含扬声器响应，修正应填0。</p>
+            <label>来源类别<OriginSelect @bind-Value="speaker.Origin" /></label>
+            <label>来源与参考条件（必填）<textarea @bind="speaker.Source" maxlength="2000" rows="3"></textarea></label>
+            <label>布置备注<textarea @bind="speaker.Note" maxlength="2000" rows="2"></textarea></label>
+        </div>
+    </div>
+}
+else
+{
+    <div class="empty">尚无扬声器。点击“添加扬声器”，或在项目页载入模拟示例。</div>
+}
+@code {
+    private async Task Select(Guid id)
+    {
+        if (Vm.HasDraft)
+        {
+            if (!await Js.InvokeAsync<bool>("confirm", "切换扬声器会放弃未应用字段，继续？"))
+                return;
+            Vm.DiscardDraft();
+        }
+        Vm.SelectSpeaker(id);
+    }
+}
+
+===== src/Avas.App/Components/Shared/TransectPanel.razor =====
+@inherits VmComponent
+<div class="card">
+    <h3>指定方向距离剖面</h3>
+    <p>在固定起点与方向上采样点值，检查声级随距离变化；不会向项目追加观察点。</p>
+    <div class="form-grid three">
+        <label>起点X / m<input type="number" @bind="Vm.TransectRequest.StartX" step="0.1" /></label>
+        <label>起点Y / m<input type="number" @bind="Vm.TransectRequest.StartY" step="0.1" /></label>
+        <label>方向 / °<input type="number" @bind="Vm.TransectRequest.Heading" step="5" /></label>
+        <label>长度 / m<input type="number" @bind="Vm.TransectRequest.Length" step="0.5" /></label>
+        <label>采样步长 / m<input type="number" @bind="Vm.TransectRequest.Step" step="0.1" /></label>
+    </div>
+    <div class="action-row"><button @onclick="Vm.RunTransectAsync" disabled="@Vm.Busy">运行方向剖面</button><button @onclick="Vm.ExportTransect" disabled="@(Vm.Transect is null)">导出剖面CSV</button></div>
+    <p class="hint">方向0°沿X正向，90°沿Y正向；不跳过车辆内部点，表内单独标记。最后满足目标的采样距离不是连续覆盖半径，非单调或离散间隙不能靠最远点概括。</p>
+    @if (Vm.Transect is { } result && result.InputHash == ProjectCodec.InputHash(Vm.Project))
+    {
+        <p>@result.Metric；采样状态转换 @result.Transitions 次；最后满足目标距离 @(result.LastCovered?.ToString("F2") ?? "无") m。</p>
+        <div class="table-scroll" style="max-height:450px"><table><thead><tr><th>距离 m</th><th>X,Y / m</th><th>警示声 dB</th><th>背景差 dB</th><th>目标</th><th>提示</th></tr></thead><tbody>
+        @foreach (var row in result.Points)
+        {
+            <tr><td>@row.Distance.ToString("F2")</td><td>@row.Result.X.ToString("F2"), @row.Result.Y.ToString("F2")</td><td>@row.Result.Signal.ToString("F3")</td><td>@row.Result.Margin.ToString("F3")</td><td>@(row.Result.Covered ? "满足" : "未满足")</td><td>@(row.Result.InVehicle ? "车内示意 " : "")@(row.Result.NearFieldClamped ? "距离截断" : "")</td></tr>
+        }
+        </tbody></table></div>
+    }
+</div>
+
+===== src/Avas.App/Components/Shared/VmComponent.cs =====
+using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.JSInterop;
+using Microsoft.AspNetCore.Components;
+using Avas.App.ViewModels;
+
+namespace Avas.App.Components.Shared;
+
+public class VmComponent : ComponentBase, IDisposable
+{
+    [Inject] public WorkspaceViewModel Vm { get; set; } = default!;
+    [Inject] public IJSRuntime Js { get; set; } = default!;
+
+    protected override void OnInitialized()
+    {
+        Vm.PropertyChanged += ViewModelChanged;
+    }
+
+    private void ViewModelChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs args)
+    {
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        Vm.PropertyChanged -= ViewModelChanged;
+        GC.SuppressFinalize(this);
+    }
+
+    protected async Task Confirm(string message, Action action)
+    {
+        if (await Js.InvokeAsync<bool>("confirm", message))
+            action();
+    }
+
+    protected async Task Replace(string message, Action action)
+    {
+        if ((Vm.Dirty || Vm.HasDraft) && !await Js.InvokeAsync<bool>("confirm", message + " 当前未保存或未应用内容将丢失。"))
+            return;
+        action();
+    }
+
+    protected async Task Upload(InputFileChangeEventArgs args, long max, Action<string, byte[]> apply)
+    {
+        try
+        {
+            var file = args.File;
+            using var memory = new MemoryStream();
+            await file.OpenReadStream(max).CopyToAsync(memory);
+            apply(file.Name, memory.ToArray());
+        }
+        catch (Exception error) when (error is IOException or InvalidOperationException)
+        {
+            Vm.Failure("上传失败：" + error.Message + "；请检查文件大小与格式。");
+        }
+    }
+}
+
+===== src/Avas.App/Components/_Imports.razor =====
+@using Microsoft.AspNetCore.Components.Routing
+@using System.Globalization
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.JSInterop
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@using Avas.Core.Domain
+@using Avas.Core.Analysis
+@using Avas.Core.Audio
+@using Avas.Core.IO
+@using Avas.App.ViewModels
+@using Avas.App.Components.Shared
+
+===== src/Avas.App/DownloadVault.cs =====
+namespace Avas.App;
+
+public sealed record DownloadItem(byte[] Data, string Mime, string Name, DateTimeOffset Expires);
+
+public sealed class DownloadVault
+{
+    private readonly Dictionary<string, DownloadItem> items = new();
+    private readonly object gate = new();
+
+    public string Add(byte[] data, string mime, string name)
+    {
+        lock (gate)
+        {
+            foreach (var expiredKey in items.Where(x => x.Value.Expires < DateTimeOffset.UtcNow).Select(x => x.Key).ToArray())
+                items.Remove(expiredKey);
+            if (data.Length > 100 * 1024 * 1024)
+                throw new ArgumentException("单项输出不能超过100MiB");
+            while (items.Count > 0 && items.Values.Sum(x => (long)x.Data.Length) + data.Length > 160 * 1024 * 1024)
+                items.Remove(items.MinBy(x => x.Value.Expires).Key);
+            var key = Guid.NewGuid().ToString("N");
+            items[key] = new DownloadItem(data, mime, name, DateTimeOffset.UtcNow.AddMinutes(10));
+            return "/download/" + key;
+        }
+    }
+
+    public DownloadItem? Get(string key)
+    {
+        lock (gate)
+        {
+            if (!items.TryGetValue(key, out var item) || item.Expires < DateTimeOffset.UtcNow)
+                return null;
+            return item;
+        }
+    }
+}
+
+===== src/Avas.App/Program.cs =====
+using Avas.App;
+using Avas.App.Components;
+using Avas.App.ViewModels;
+using Avas.Core.IO;
+
+var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.UseStaticWebAssets();
+var portText = builder.Configuration["port"] ?? "8786";
+if (!int.TryParse(portText, out var port) || port is < 1024 or > 65535)
+    throw new ArgumentException("--port 必须为1024至65535的端口");
+builder.WebHost.UseUrls($"http://127.0.0.1:{port}");
+builder.Services.AddRazorComponents().AddInteractiveServerComponents(options =>
+{
+    options.DetailedErrors = builder.Environment.IsDevelopment();
+    options.DisconnectedCircuitRetentionPeriod = TimeSpan.FromMinutes(2);
+});
+builder.Services.AddSingleton(new ProjectStore(builder.Configuration["data-directory"] ?? Path.Combine(builder.Environment.ContentRootPath, "Data")));
+builder.Services.AddSingleton<DownloadVault>();
+builder.Services.AddScoped<WorkspaceViewModel>();
+var app = builder.Build();
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.XContentTypeOptions = "nosniff";
+    context.Response.Headers.XFrameOptions = "DENY";
+    context.Response.Headers.CacheControl = "no-store";
+    await next();
+});
+app.UseAntiforgery();
+app.MapStaticAssets();
+app.MapGet("/download/{key}", (string key, DownloadVault vault) =>
+{
+    var item = vault.Get(key);
+    return item is null ? Results.NotFound("输出已过期，请回到软件重新生成。")
+        : Results.File(item.Data, item.Mime, item.Name, enableRangeProcessing: true);
+});
+app.MapGet("/health", () => new { software = "AvasCoverage", version = "1.0", status = "ready" });
+app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
+app.Run();
+
+===== src/Avas.App/ViewModels/FileCommands.cs =====
+using System.Text;
+using Avas.Core.Analysis;
+using Avas.Core.Audio;
+using Avas.Core.Domain;
+using Avas.Core.IO;
+
+namespace Avas.App.ViewModels;
+
+public sealed partial class WorkspaceViewModel
+{
+    public void Save()
+    {
+        Execute(() =>
+        {
+            RequireApplied();
+            var receipt = store.Save(Project, diskHash);
+            diskHash = receipt.Hash;
+            savedFingerprint = ProjectCodec.Json(Project);
+            RefreshLibrary();
+            Status = $"已保存：{receipt.Path}。{(receipt.BackupCreated ? "上次版本保存在同路径.bak。" : "首次保存。")}";
+        });
+    }
+
+    public void RefreshLibrary()
+    {
+        Execute(() => Library = store.List());
+    }
+
+    public void Open(Guid id, bool backup)
+    {
+        Execute(() =>
+        {
+            var loaded = store.Open(id, backup);
+            LoadProject(loaded.Project);
+            diskHash = backup ? null : loaded.Hash;
+            savedFingerprint = backup ? "" : ProjectCodec.Json(Project);
+            Status = backup ? "已打开备份。请复制为独立项目保存，避免覆盖当前磁盘版。" : "已从本机项目库打开项目，输入和内嵌音频已复核。";
+        });
+    }
+
+    public void ImportProject(byte[] bytes)
+    {
+        Execute(() =>
+        {
+            var loaded = ProjectCodec.Decode(bytes);
+            LoadProject(loaded);
+            diskHash = null;
+            savedFingerprint = "";
+            Status = "已载入上传项目；音频与快照均内嵌。若本机已有同标识文件，请打开磁盘版续改或复制项目后保存。";
+        });
+    }
+
+    private void LoadProject(Project loaded)
+    {
+        Project = loaded;
+        undo.Clear();
+        redo.Clear();
+        Result = null;
+        SelectedSpeakerId = loaded.Speakers.FirstOrDefault()?.Id;
+        SelectedListenerId = loaded.Listeners.FirstOrDefault()?.Id;
+        ResetAfterMutation();
+        BaselineId = "";
+        TargetId = "";
+        Tab = "项目";
+    }
+
+    public void PreviewCsv()
+    {
+        Execute(() =>
+        {
+            RequireApplied();
+            if (!ImportBackground && SelectedSpeakerId is null)
+                throw new ArgumentException("请先建立并选择扬声器，或勾选背景导入");
+            Preview = SpectrumCsv.Parse(CsvText, ImportBackground);
+            previewTarget = ImportBackground ? "background" : SelectedSpeakerId.ToString();
+            previewText = CsvText;
+            Status = Preview.Valid ? "预检通过，尚未修改项目；确认对象后点击“应用频谱导入”。" : "预检未通过，原频带保持不变。";
+        });
+    }
+
+    public void ApplyCsv()
+    {
+        Execute(() =>
+        {
+            RequireApplied();
+            RequireEditable();
+            var target = ImportBackground ? "background" : SelectedSpeakerId.ToString();
+            if (Preview is null || !Preview.Valid || previewTarget != target || previewText != CsvText)
+                throw new ArgumentException("预检不存在、失败或对象/文本已改变，请重新预检");
+            var candidate = ProjectCodec.Clone(Project);
+            var bands = Preview.Bands.Select(x => x.Copy()).ToList();
+            if (ImportBackground)
+                candidate.Settings.Background = bands;
+            else
+                candidate.Speakers.Single(x => x.Id == SelectedSpeakerId).Bands = bands;
+            Commit(candidate, "完整替换" + (ImportBackground ? "背景" : "当前扬声器") + "七频带CSV");
+            Status = "七频带已整体导入，请核对来源说明并重新计算。";
+        });
+    }
+
+    public void ImportAudio(string name, byte[] bytes)
+    {
+        Execute(() =>
+        {
+            RequireApplied();
+            RequireEditable();
+            var asset = WaveCodec.CreateAsset(name, bytes);
+            var candidate = ProjectCodec.Clone(Project);
+            if (AudioTarget == "background")
+                candidate.Settings.BackgroundAudio = asset;
+            else
+            {
+                var source = candidate.Speakers.SingleOrDefault(x => x.Id == SelectedSpeakerId)
+                    ?? throw new ArgumentException("请先选择扬声器");
+                source.Audio = asset;
+            }
+            Commit(candidate, "内嵌导入数字音频 " + asset.Name);
+            AudioSpectrum = SpectralAudio.Analyze(WaveCodec.Read(bytes));
+            AudioAnalysisLabel = AudioTarget == "background" ? "背景 / " + asset.Name : "当前扬声器 / " + asset.Name;
+            Status = $"已导入{asset.Name}，{asset.Duration:F2}秒、{asset.Rate}Hz。未自动改变任何物理声压级。";
+        });
+    }
+
+    public void AnalyzeAudio()
+    {
+        Execute(() =>
+        {
+            RequireApplied();
+            var asset = CurrentAudio() ?? throw new ArgumentException("当前对象尚未导入音频");
+            AudioSpectrum = SpectralAudio.Analyze(WaveCodec.Read(Convert.FromBase64String(asset.Data)));
+            AudioAnalysisLabel = AudioTarget == "background" ? "背景 / " + asset.Name : "当前扬声器 / " + asset.Name;
+            Status = "数字频谱分析完成；dBFS值不能当作声压级。";
+        });
+    }
+
+    public AudioAsset? CurrentAudio()
+    {
+        return AudioTarget == "background" ? Project.Settings.BackgroundAudio
+            : Project.Speakers.SingleOrDefault(x => x.Id == SelectedSpeakerId)?.Audio;
+    }
+
+    public void ApplyAudioSpectrum()
+    {
+        Execute(() =>
+        {
+            RequireApplied();
+            RequireEditable();
+            var asset = CurrentAudio() ?? throw new ArgumentException("当前对象尚无音频");
+            var spectrum = SpectralAudio.Analyze(WaveCodec.Read(Convert.FromBase64String(asset.Data)));
+            var bands = SpectralAudio.RelativeBands(spectrum, AudioReference);
+            var candidate = ProjectCodec.Clone(Project);
+            var sourceText = $"数字WAV {asset.Name} 相对频谱 + 人工声明七带参考{AudioReference}dB；无声压标定链路；{asset.Sha256}";
+            if (AudioTarget == "background")
+            {
+                candidate.Settings.Background = bands;
+                candidate.Settings.BackgroundOrigin = Origin.Estimate;
+                candidate.Settings.BackgroundSource = sourceText;
+            }
+            else
+            {
+                var speaker = candidate.Speakers.Single(x => x.Id == SelectedSpeakerId);
+                speaker.Bands = bands;
+                speaker.Origin = Origin.Estimate;
+                speaker.Source = sourceText;
+            }
+            Commit(candidate, "以音频相对频谱和人工参考构建估算七频带");
+            Status = "已生成估算频谱并标记来源；不是音频自动标定结果。";
+        });
+    }
+
+    public void RemoveAudio()
+    {
+        Execute(() =>
+        {
+            RequireApplied();
+            RequireEditable();
+            var candidate = ProjectCodec.Clone(Project);
+            if (AudioTarget == "background")
+                candidate.Settings.BackgroundAudio = null;
+            else
+                candidate.Speakers.Single(x => x.Id == SelectedSpeakerId).Audio = null;
+            Commit(candidate, "移除当前对象内嵌音频");
+            Status = "已移除音频，频带声级仍保留。";
+        });
+    }
+
+    public async Task RenderAuditionAsync()
+    {
+        if (Busy)
+            return;
+        Busy = true;
+        Notify();
+        await Task.Yield();
+        Execute(() =>
+        {
+            RequireApplied();
+            if (Stale)
+                throw new ArgumentException("请先重新计算，再制作当前观察点试听");
+            var point = Project.Listeners.SingleOrDefault(x => x.Id == SelectedListenerId)
+                ?? throw new ArgumentException("请先建立并选择观察点");
+            Audition = AuditionEngine.Render(Project, point, AuditionSeconds, PlaybackReference, IncludeBackground);
+            AudioUrl = vault.Add(Audition.Wave, "audio/wav", "相对试听-" + SafeName(point.Name) + ".wav");
+            Status = "相对试听已生成；固定数字参考，不自动归一化；设备未标定。";
+        });
+        Busy = false;
+        Notify();
+    }
+
+    public void Export(string kind)
+    {
+        Execute(() =>
+        {
+            RequireApplied();
+            byte[] bytes;
+            string mime;
+            string suffix;
+            switch (kind)
+            {
+                case "project":
+                    bytes = ProjectCodec.Encode(Project);
+                    mime = "application/json";
+                    suffix = ".avasproj";
+                    break;
+                case "template":
+                    bytes = Encoding.UTF8.GetBytes("\uFEFF" + SpectrumCsv.Template(ImportBackground));
+                    mime = "text/csv;charset=utf-8";
+                    suffix = "-频谱模板.csv";
+                    break;
+                case "input":
+                    var bands = ImportBackground ? Project.Settings.Background
+                        : Project.Speakers.Single(x => x.Id == SelectedSpeakerId).Bands;
+                    bytes = SpectrumCsv.Write(bands);
+                    mime = "text/csv;charset=utf-8";
+                    suffix = "-当前频带.csv";
+                    break;
+                case "comparison":
+                    bytes = ResultExport.ComparisonCsv(Comparison ?? throw new ArgumentException("请先完成方案比较"));
+                    mime = "text/csv;charset=utf-8";
+                    suffix = "-方案比较.csv";
+                    break;
+                case "scan":
+                    bytes = ResultExport.ScanCsv(Scan ?? throw new ArgumentException("请先完成参数扫描"));
+                    mime = "text/csv;charset=utf-8";
+                    suffix = "-参数扫描.csv";
+                    break;
+                default:
+                    if (Result is null || Stale)
+                        throw new ArgumentException("结果不存在或已过期，请先重新计算");
+                    ResultExport.RequireCurrent(Project, Result);
+                    (bytes, mime, suffix) = kind switch
+                    {
+                        "report" => (ResultExport.Report(Project, Result), "text/html;charset=utf-8", "-工程报告.html"),
+                        "grid" => (ResultExport.Csv(Project, Result, true), "text/csv;charset=utf-8", "-网格.csv"),
+                        "points" => (ResultExport.Csv(Project, Result, false), "text/csv;charset=utf-8", "-观察点.csv"),
+                        "svg" => (Encoding.UTF8.GetBytes(ChartRenderer.Map(Project, Result, CoverageOnly)), "image/svg+xml", "-声场.svg"),
+                        "json" => (Encoding.UTF8.GetBytes(ProjectCodec.Json(new { Software.Model, Software.Version, Boundary = Software.Boundary, Input = Project, Result })), "application/json", "-计算快照.json"),
+                        _ => throw new ArgumentException("不支持的输出类型")
+                    };
+                    break;
+            }
+            LastFileName = SafeName(Project.Name) + suffix;
+            LastDownload = vault.Add(bytes, mime, LastFileName);
+            Status = $"已生成{LastFileName}，点击下载链接保存至浏览器下载目录；下载不等于本机项目库保存。链接10分钟内有效。";
+        });
+    }
+
+    private static string SafeName(string name)
+    {
+        var invalid = Path.GetInvalidFileNameChars().Concat("/\\:").ToHashSet();
+        return string.Concat(name.Take(60).Select(c => invalid.Contains(c) ? '_' : c));
+    }
+}
+
+===== src/Avas.App/ViewModels/ListenerImportCommands.cs =====
+using System.Text;
+using Avas.Core.IO;
+
+namespace Avas.App.ViewModels;
+
+public sealed partial class WorkspaceViewModel
+{
+    public string ListenerText { get; set; } = ListenerCsv.Template();
+    public ListenerPreview? ListenerPreview { get; private set; }
+    public bool ReplaceListeners { get; set; }
+    private string? listenerPreviewText;
+
+    public void PreviewListeners()
+    {
+        Execute(() =>
+        {
+            RequireApplied();
+            ListenerPreview = ListenerCsv.Parse(ListenerText);
+            listenerPreviewText = ListenerText;
+            Status = ListenerPreview.Valid ? "观察点预检通过，尚未写入；选择追加或替换后应用。" : "观察点预检失败，旧点集保留。";
+        });
+    }
+
+    public void ApplyListeners()
+    {
+        Execute(() =>
+        {
+            RequireApplied();
+            RequireEditable();
+            if (ListenerPreview is null || !ListenerPreview.Valid || listenerPreviewText != ListenerText)
+                throw new ArgumentException("观察点预检无效或文本已更改，请重新预检");
+            var candidate = ProjectCodec.Clone(Project);
+            if (ReplaceListeners)
+                candidate.Listeners.Clear();
+            foreach (var point in ListenerPreview.Points)
+            {
+                var copy = ProjectCodec.Clone(point);
+                copy.Id = Guid.NewGuid();
+                candidate.Listeners.Add(copy);
+            }
+            var importedCount = ListenerPreview.Points.Count;
+            Commit(candidate, (ReplaceListeners ? "替换" : "追加") + "观察点CSV，共" + importedCount + "点");
+            ListenerPreview = null;
+            Status = "观察点批量导入完成。新点使用独立标识，旧快照仍保留旧标识；比较时请注意对应条件。";
+        });
+    }
+
+    public void ExportListeners(bool template)
+    {
+        Execute(() =>
+        {
+            RequireApplied();
+            var bytes = template ? Encoding.UTF8.GetBytes("\uFEFF" + ListenerCsv.Template()) : ListenerCsv.Write(Project.Listeners);
+            LastFileName = template ? "观察点模板.csv" : SafeName(Project.Name) + "-观察点输入.csv";
+            LastDownload = vault.Add(bytes, "text/csv;charset=utf-8", LastFileName);
+            Status = "观察点交换文件已生成。输入交换不保留GUID与多行备注；完整保存应使用项目文件。";
+        });
+    }
+}
+
+===== src/Avas.App/ViewModels/ObjectCommands.cs =====
+using Avas.Core.Analysis;
+using Avas.Core.Domain;
+using Avas.Core.IO;
+
+namespace Avas.App.ViewModels;
+
+public sealed partial class WorkspaceViewModel
+{
+    public void AddSpeaker()
+    {
+        Execute(() =>
+        {
+            RequireApplied();
+            RequireEditable();
+            var candidate = ProjectCodec.Clone(Project);
+            if (candidate.Speakers.Count >= 8)
+                throw new ArgumentException("最多8个扬声器");
+            var source = new Speaker { Name = $"扬声器{candidate.Speakers.Count + 1}" };
+            candidate.Speakers.Add(source);
+            SelectedSpeakerId = source.Id;
+            Commit(candidate, "新增扬声器 " + source.Name);
+            Status = "已添加扬声器，请核对位置、频带及来源。";
+        });
+    }
+
+    public void DuplicateSpeaker()
+    {
+        Execute(() =>
+        {
+            RequireApplied();
+            RequireEditable();
+            var candidate = ProjectCodec.Clone(Project);
+            if (candidate.Speakers.Count >= 8)
+                throw new ArgumentException("最多8个扬声器");
+            var source = ProjectCodec.Clone(candidate.Speakers.Single(x => x.Id == SelectedSpeakerId));
+            source.Id = Guid.NewGuid();
+            source.Name = source.Name.Length < 96 ? source.Name + "副本" : "扬声器副本";
+            candidate.Speakers.Add(source);
+            SelectedSpeakerId = source.Id;
+            Commit(candidate, "复制扬声器 " + source.Name);
+            Status = "扬声器已复制，位置暂时相同；请调整后重新计算。";
+        });
+    }
+
+    public void RemoveSpeaker()
+    {
+        Execute(() =>
+        {
+            RequireApplied();
+            RequireEditable();
+            var candidate = ProjectCodec.Clone(Project);
+            var source = candidate.Speakers.Single(x => x.Id == SelectedSpeakerId);
+            candidate.Speakers.Remove(source);
+            Commit(candidate, "删除扬声器 " + source.Name);
+            Status = "已移除当前扬声器；历史快照仍保留原始输入。";
+        });
+    }
+
+    public void AddListener()
+    {
+        Execute(() =>
+        {
+            RequireApplied();
+            RequireEditable();
+            var candidate = ProjectCodec.Clone(Project);
+            if (candidate.Listeners.Count >= 100)
+                throw new ArgumentException("最多100个观察点");
+            var point = new Listener { Name = $"观察点{candidate.Listeners.Count + 1}" };
+            candidate.Listeners.Add(point);
+            SelectedListenerId = point.Id;
+            Commit(candidate, "新增观察点 " + point.Name);
+            Status = "已添加观察点。";
+        });
+    }
+
+    public void AddRing(double radius, int count)
+    {
+        Execute(() =>
+        {
+            RequireApplied();
+            RequireEditable();
+            if (!double.IsFinite(radius) || radius is < 1 or > 50 || count is < 4 or > 36)
+                throw new ArgumentException("环形观察点半径1至50m，数量4至36");
+            if (Project.Listeners.Count + count > 100)
+                throw new ArgumentException("添加后观察点数量超过100");
+            var candidate = ProjectCodec.Clone(Project);
+            for (var i = 0; i < count; i++)
+            {
+                var angle = 2 * Math.PI * i / count;
+                candidate.Listeners.Add(new Listener
+                {
+                    Name = $"环形{radius:g}m-{i + 1}",
+                    X = Math.Round(radius * Math.Cos(angle), 5),
+                    Y = Math.Round(radius * Math.Sin(angle), 5),
+                    Note = "以车辆中心为圆心等角生成；非标准测点布置"
+                });
+            }
+            Commit(candidate, $"生成{count}个半径{radius}m环形观察点");
+            Status = "环形观察点已生成；这是自定义几何点集，不是标准测点。";
+        });
+    }
+
+    public void RemoveListener()
+    {
+        Execute(() =>
+        {
+            RequireApplied();
+            RequireEditable();
+            var candidate = ProjectCodec.Clone(Project);
+            var point = candidate.Listeners.Single(x => x.Id == SelectedListenerId);
+            candidate.Listeners.Remove(point);
+            Commit(candidate, "删除观察点 " + point.Name);
+            Status = "观察点已删除；历史快照独立保留。";
+        });
+    }
+
+    public async Task CalculateAsync()
+    {
+        if (Busy)
+            return;
+        Busy = true;
+        Status = "正在计算离散网格与观察点…";
+        Notify();
+        await Task.Yield();
+        Execute(() =>
+        {
+            RequireApplied();
+            Result = FieldEngine.Calculate(Project);
+            ClearAudio();
+            ClearDownload();
+            Status = $"计算完成：{Result.Grid.Count}个有效网格，工程目标覆盖率{Result.Coverage:F2}%。";
+        });
+        Busy = false;
+        Notify();
+    }
+
+    public void CaptureSnapshot()
+    {
+        Execute(() =>
+        {
+            RequireApplied();
+            RequireEditable();
+            if (Stale)
+                throw new ArgumentException("请先计算当前输入，再保存方案快照");
+            if (Project.Snapshots.Count >= 20)
+                throw new ArgumentException("最多20个快照，请删除不需要的快照");
+            var candidate = ProjectCodec.Clone(Project);
+            var snapshot = ScenarioEngine.Capture(Project, SnapshotName);
+            candidate.Snapshots.Add(snapshot);
+            Commit(candidate, "保存方案快照 " + snapshot.Name);
+            if (string.IsNullOrEmpty(BaselineId))
+                BaselineId = snapshot.Id.ToString();
+            else
+                TargetId = snapshot.Id.ToString();
+            Status = "已保存独立方案快照；快照随项目文件内嵌保存。";
+        });
+    }
+
+    public void RestoreSnapshot(Guid id)
+    {
+        Execute(() =>
+        {
+            RequireApplied();
+            RequireEditable();
+            var snapshot = Project.Snapshots.Single(x => x.Id == id);
+            var restored = ScenarioEngine.Restore(snapshot);
+            var candidate = ProjectCodec.Clone(Project);
+            candidate.Settings = restored.Settings;
+            candidate.Speakers = restored.Speakers;
+            candidate.Listeners = restored.Listeners;
+            Commit(candidate, "恢复快照输入 " + snapshot.Name);
+            Status = "已恢复快照的布局、频谱、背景与观察点，请重新计算。";
+        });
+    }
+
+    public void DeleteSnapshot(Guid id)
+    {
+        Execute(() =>
+        {
+            RequireApplied();
+            RequireEditable();
+            var candidate = ProjectCodec.Clone(Project);
+            var snapshot = candidate.Snapshots.Single(x => x.Id == id);
+            candidate.Snapshots.Remove(snapshot);
+            Commit(candidate, "删除快照 " + snapshot.Name);
+            if (BaselineId == id.ToString())
+                BaselineId = "";
+            if (TargetId == id.ToString())
+                TargetId = "";
+            Status = "快照已删除。";
+        });
+    }
+
+    public void Compare()
+    {
+        Execute(() =>
+        {
+            RequireApplied();
+            if (!Guid.TryParse(BaselineId, out var baselineId) || !Guid.TryParse(TargetId, out var targetId))
+                throw new ArgumentException("请选择基线与目标两个快照");
+            if (baselineId == targetId)
+                throw new ArgumentException("基线与目标应为两个不同快照");
+            Comparison = ScenarioEngine.Compare(Project.Snapshots.Single(x => x.Id == baselineId), Project.Snapshots.Single(x => x.Id == targetId));
+            Status = Comparison.Comparable ? "比较完成；差值=目标减基线，覆盖差为百分点。" : "比较已阻断，请查看不一致条件。";
+        });
+    }
+
+    public async Task RunScanAsync()
+    {
+        if (Busy)
+            return;
+        Busy = true;
+        Status = "正在逐项扫描，原项目参数保持原值…";
+        Notify();
+        await Task.Yield();
+        Execute(() =>
+        {
+            RequireApplied();
+            Scan = ScanEngine.Run(Project, ScanRequest);
+            Status = $"扫描完成，共{Scan.Rows.Count}组。点击某行“应用该值”会修改项目并使结果过期。";
+        });
+        Busy = false;
+        Notify();
+    }
+
+    public void ApplyScan(double value)
+    {
+        Execute(() =>
+        {
+            RequireApplied();
+            RequireEditable();
+            if (Scan is null || Scan.InputHash != ProjectCodec.InputHash(Project))
+                throw new ArgumentException("扫描结果已过期，请重新扫描");
+            var candidate = ProjectCodec.Clone(Project);
+            var source = candidate.Speakers.Single(x => x.Id == Scan.SpeakerId);
+            ScanEngine.Apply(source, Scan.Parameter, value);
+            Commit(candidate, $"应用扫描取值 {ScanEngine.Label(Scan.Parameter)}={value}");
+            Status = "已应用扫描值，请重新计算。";
+        });
+    }
+}
+
+===== src/Avas.App/ViewModels/ReviewCommands.cs =====
+using Avas.Core.Analysis;
+using Avas.Core.IO;
+
+namespace Avas.App.ViewModels;
+
+public sealed partial class WorkspaceViewModel
+{
+    public List<ReviewFinding> Review => ReviewEngine.Inspect(Project);
+    public TransectRequest TransectRequest { get; set; } = new();
+    public TransectResult? Transect { get; private set; }
+
+    public async Task RunTransectAsync()
+    {
+        if (Busy)
+            return;
+        Busy = true;
+        Status = "正在计算指定方向剖面…";
+        Notify();
+        await Task.Yield();
+        Execute(() =>
+        {
+            RequireApplied();
+            Transect = TransectEngine.Run(Project, TransectRequest);
+            Status = $"剖面完成：{Transect.Points.Count}个采样点，不改变项目观察点。";
+        });
+        Busy = false;
+        Notify();
+    }
+
+    public void ExportTransect()
+    {
+        Execute(() =>
+        {
+            RequireApplied();
+            if (Transect is null || Transect.InputHash != ProjectCodec.InputHash(Project))
+                throw new ArgumentException("剖面不存在或已过期，请重新运行剖面");
+            LastFileName = SafeName(Project.Name) + "-方向剖面.csv";
+            LastDownload = vault.Add(TransectEngine.Csv(Transect), "text/csv;charset=utf-8", LastFileName);
+            Status = "方向剖面CSV已生成，点击底部链接下载。";
+        });
+    }
+}
+
+===== src/Avas.App/ViewModels/WorkspaceViewModel.cs =====
+using System.ComponentModel;
+using Avas.Core.Analysis;
+using Avas.Core.Audio;
+using Avas.Core.Domain;
+using Avas.Core.IO;
+
+namespace Avas.App.ViewModels;
+
+public sealed partial class WorkspaceViewModel : INotifyPropertyChanged
+{
+    private readonly ProjectStore store;
+    private readonly DownloadVault vault;
+    private readonly Stack<Project> undo = new();
+    private readonly Stack<Project> redo = new();
+    private string? diskHash;
+    private string savedFingerprint = "";
+    public event PropertyChangedEventHandler? PropertyChanged;
+    public Project Project { get; private set; } = new();
+    public Project Draft { get; private set; } = new();
+    public Calculation? Result { get; private set; }
+    public string Tab { get; private set; } = "项目";
+    public string Status { get; private set; } = "从空白新建项目，或通过独立入口载入模拟示例。";
+    public List<string> Errors { get; private set; } = [];
+    public bool HasDraft { get; private set; }
+    public bool Busy { get; private set; }
+    public bool Dirty => ProjectCodec.Json(Project) != savedFingerprint;
+    public bool Stale => Result is null || Result.InputHash != ProjectCodec.InputHash(Project);
+    public bool CanUndo => undo.Count > 0;
+    public bool CanRedo => redo.Count > 0;
+    public Guid? SelectedSpeakerId { get; private set; }
+    public Guid? SelectedListenerId { get; private set; }
+    public Speaker? SpeakerDraft => Draft.Speakers.SingleOrDefault(x => x.Id == SelectedSpeakerId);
+    public Listener? ListenerDraft => Draft.Listeners.SingleOrDefault(x => x.Id == SelectedListenerId);
+    public PointResult? SelectedPoint => Result?.Listeners.SingleOrDefault(x => x.ListenerId == SelectedListenerId);
+    public bool CoverageOnly { get; set; }
+    public string MapSvg => ChartRenderer.Map(Project, Stale ? null : Result, CoverageOnly);
+    public List<StoredProject> Library { get; private set; } = [];
+    public string DataDirectory => store.DirectoryPath;
+    public string? LastDownload { get; private set; }
+    public string? LastFileName { get; private set; }
+    public string SnapshotName { get; set; } = "方案A";
+    public string BaselineId { get; set; } = "";
+    public string TargetId { get; set; } = "";
+    public Comparison? Comparison { get; private set; }
+    public ScanRequest ScanRequest { get; set; } = new();
+    public ScanResult? Scan { get; private set; }
+    public string CsvText { get; set; } = SpectrumCsv.Template();
+    public bool ImportBackground { get; set; }
+    public SpectrumPreview? Preview { get; private set; }
+    private string? previewTarget;
+    private string? previewText;
+    public double AudioReference { get; set; } = 70;
+    public double AuditionSeconds { get; set; } = 3;
+    public double PlaybackReference { get; set; } = 100;
+    public bool IncludeBackground { get; set; } = true;
+    public string AudioTarget { get; set; } = "speaker";
+    public DigitalSpectrum? AudioSpectrum { get; private set; }
+    public string AudioAnalysisLabel { get; private set; } = "";
+    public Audition? Audition { get; private set; }
+    public string? AudioUrl { get; private set; }
+
+    public WorkspaceViewModel(ProjectStore store, DownloadVault vault)
+    {
+        this.store = store;
+        this.vault = vault;
+        ResetDraft();
+        savedFingerprint = ProjectCodec.Json(Project);
+        RefreshLibrary();
+    }
+
+    public void Notify() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
+
+    public void MarkDraft()
+    {
+        HasDraft = true;
+        Notify();
+    }
+
+    public void ResetDraft()
+    {
+        Draft = ProjectCodec.Clone(Project);
+        HasDraft = false;
+    }
+
+    public void DiscardDraft()
+    {
+        ResetDraft();
+        Errors = [];
+        Status = "已放弃未应用字段，项目保存状态未改变。";
+        Notify();
+    }
+
+    public void Navigate(string tab)
+    {
+        Tab = tab;
+        Notify();
+    }
+
+    public void SelectSpeaker(Guid id)
+    {
+        SelectedSpeakerId = id;
+        ScanRequest.SpeakerId = id;
+        AudioSpectrum = null;
+        Preview = null;
+        Notify();
+    }
+
+    public void SelectListener(Guid id)
+    {
+        SelectedListenerId = id;
+        ClearAudio();
+        Notify();
+    }
+
+    public void ApplyDraft()
+    {
+        Execute(() =>
+        {
+            RequireEditable();
+            var candidate = ProjectCodec.Clone(Draft);
+            var issues = Validation.Check(candidate);
+            if (issues.Count > 0)
+                throw new ArgumentException(string.Join("\n", issues));
+            Commit(candidate, $"应用{Tab}编辑");
+            Status = "字段已应用；涉及计算的输入更改后，请重新计算。";
+        });
+    }
+
+    public void New(bool demo)
+    {
+        Execute(() =>
+        {
+            Project = demo ? Demonstration.Create() : new Project();
+            diskHash = null;
+            savedFingerprint = demo ? "" : ProjectCodec.Json(Project);
+            undo.Clear();
+            redo.Clear();
+            Result = null;
+            Comparison = null;
+            Scan = null;
+            SelectedSpeakerId = Project.Speakers.FirstOrDefault()?.Id;
+            SelectedListenerId = Project.Listeners.FirstOrDefault()?.Id;
+            ScanRequest.SpeakerId = SelectedSpeakerId ?? Guid.Empty;
+            ResetAfterMutation();
+            BaselineId = "";
+            TargetId = "";
+            Tab = "项目";
+            Status = demo ? "已载入固定模拟示例；所有结果均为示例工程估算。" : "已建立空白项目。";
+        });
+    }
+
+    public void CopyProject()
+    {
+        Execute(() =>
+        {
+            RequireApplied();
+            var copy = ProjectCodec.Clone(Project);
+            copy.Id = Guid.NewGuid();
+            copy.Name = Project.Name.Length < 95 ? Project.Name + " 副本" : "项目副本";
+            copy.Archived = false;
+            copy.Created = DateTimeOffset.UtcNow;
+            Commit(copy, "复制为独立项目标识");
+            diskHash = null;
+            Status = "已复制项目，请保存为独立文件。";
+        });
+    }
+
+    public void ToggleArchive()
+    {
+        Execute(() =>
+        {
+            RequireApplied();
+            var candidate = ProjectCodec.Clone(Project);
+            candidate.Archived = !candidate.Archived;
+            Commit(candidate, candidate.Archived ? "归档为只读" : "解除归档");
+            Status = Project.Archived ? "项目已归档，编辑入口拒绝修改；仍可计算与导出。" : "已解除归档。";
+        });
+    }
+
+    public void Undo()
+    {
+        Execute(() =>
+        {
+            RequireApplied();
+            RequireEditable();
+            if (undo.Count == 0)
+                return;
+            redo.Push(ProjectCodec.Clone(Project));
+            var prior = undo.Pop();
+            PreserveAudit(prior, "撤销上一步");
+            Project = prior;
+            ResetAfterMutation();
+            Status = "已撤销；审计保留，结果需重新核对。";
+        });
+    }
+
+    public void Redo()
+    {
+        Execute(() =>
+        {
+            RequireApplied();
+            RequireEditable();
+            if (redo.Count == 0)
+                return;
+            undo.Push(ProjectCodec.Clone(Project));
+            var next = redo.Pop();
+            PreserveAudit(next, "重做上一步");
+            Project = next;
+            ResetAfterMutation();
+            Status = "已重做。";
+        });
+    }
+
+    private void PreserveAudit(Project candidate, string action)
+    {
+        candidate.Revision = Project.Revision + 1;
+        candidate.Audit = Project.Audit.TakeLast(999).ToList();
+        candidate.Audit.Add(new AuditEntry { Revision = candidate.Revision, Action = action });
+    }
+
+    private void Commit(Project candidate, string action)
+    {
+        var issues = Validation.Check(candidate);
+        if (issues.Count > 0)
+            throw new ArgumentException(string.Join("\n", issues));
+        undo.Push(ProjectCodec.Clone(Project));
+        if (undo.Count > 10)
+        {
+            var keep = undo.Take(10).Reverse().ToArray();
+            undo.Clear();
+            foreach (var item in keep)
+                undo.Push(item);
+        }
+        redo.Clear();
+        PreserveAudit(candidate, action);
+        Project = candidate;
+        ResetAfterMutation();
+    }
+
+    private void ResetAfterMutation()
+    {
+        ResetDraft();
+        if (!Project.Speakers.Any(x => x.Id == SelectedSpeakerId))
+            SelectedSpeakerId = Project.Speakers.FirstOrDefault()?.Id;
+        if (!Project.Listeners.Any(x => x.Id == SelectedListenerId))
+            SelectedListenerId = Project.Listeners.FirstOrDefault()?.Id;
+        ScanRequest.SpeakerId = SelectedSpeakerId ?? Guid.Empty;
+        Preview = null;
+        AudioSpectrum = null;
+        Comparison = null;
+        Scan = null;
+        Transect = null;
+        ListenerPreview = null;
+        ClearAudio();
+        ClearDownload();
+    }
+
+    private void RequireEditable()
+    {
+        if (Project.Archived)
+            throw new ArgumentException("当前项目为归档只读，请先在项目页解除归档");
+    }
+
+    private void RequireApplied()
+    {
+        if (HasDraft)
+            throw new ArgumentException("存在未应用字段，请点击“应用编辑”或“放弃编辑”后继续");
+    }
+
+    public void Execute(Action action)
+    {
+        Errors = [];
+        try
+        {
+            action();
+        }
+        catch (Exception error) when (error is ArgumentException or IOException or InvalidOperationException or FormatException or OverflowException)
+        {
+            Errors = error.Message.Split('\n').ToList();
+            Status = "操作未完成，原有输入保留；请按提示修正。";
+        }
+        Notify();
+    }
+
+    public void Failure(string message)
+    {
+        Errors = [message];
+        Status = "操作未完成，原有输入保留。";
+        Notify();
+    }
+
+    private void ClearAudio()
+    {
+        Audition = null;
+        AudioUrl = null;
+    }
+
+    private void ClearDownload()
+    {
+        LastDownload = null;
+        LastFileName = null;
+    }
+}
+
+===== src/Avas.App/wwwroot/app.css =====
+:root {
+    font-family: Inter, "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+    color: #24344d;
+    background: #f3f5f8;
+    font-size: 14px;
+    line-height: 1.65;
+    font-synthesis: none;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+button, input, textarea, select { font: inherit; }
+button, a { -webkit-tap-highlight-color: transparent; }
+button {
+    border: 1px solid #c9d3df;
+    background: #fff;
+    color: #273c55;
+    padding: 8px 13px;
+    border-radius: 7px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+button:hover { border-color: #166e80; background: #f1f8f9; }
+button:focus-visible, a:focus-visible { outline: 3px solid #e2b558; outline-offset: 3px; }
+button:disabled { opacity: .45; cursor: default; }
+button.primary { background: #166e80; border-color: #166e80; color: #fff; }
+button.primary:hover { background: #0d5b6b; }
+button.danger { color: #a6453e; }
+a { color: #166e80; }
+input, textarea, select {
+    display: block;
+    background: #fff;
+    border: 1px solid #cbd5df;
+    border-radius: 6px;
+    width: 100%;
+    min-width: 0;
+    padding: 8px 10px;
+    color: #24344d;
+}
+input:focus, textarea:focus, select:focus { outline: 2px solid #a8d7df; border-color: #166e80; }
+input[readonly] { color: #6a7789; background: #f5f7fa; }
+textarea { resize: vertical; }
+label { display: block; margin: 9px 0; font-size: 13px; color: #4b5e73; }
+label input, label select, label textarea { margin-top: 5px; }
+label.check { display: flex; align-items: center; gap: 8px; }
+label.check input { width: 16px; height: 16px; margin: 0; }
+h1, h2, h3, p { margin-top: 0; }
+h1 { font-size: clamp(19px, 1.65vw, 25px); line-height: 1.4; margin-bottom: 7px; letter-spacing: .015em; }
+h2 { font-size: 21px; margin-bottom: 5px; }
+h3 { font-size: 16px; margin-bottom: 12px; }
+p { margin-bottom: 12px; }
+small { font-size: 11px; }
+.workspace { display: grid; grid-template-columns: 205px minmax(0,1fr); min-height: 100vh; }
+.sidebar { background: #162b43; color: #e8f0f7; padding: 28px 18px; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+.brand { color: #fff; font-weight: 800; font-size: 31px; letter-spacing: .15em; }
+.brand span { display: block; font-size: 10px; letter-spacing: .2em; font-weight: 500; color: #7bb9c6; }
+.side-caption { font-size: 12px; color: #91a8be; margin: 15px 0 28px; }
+nav { display: grid; gap: 7px; }
+nav button { border: 0; background: transparent; color: #b9c9d8; text-align: left; padding: 11px 9px; font-size: 13px; }
+nav button.active { color: #fff; background: #28465d; box-shadow: inset 3px 0 #77c2cf; }
+nav button:hover { background: #233c53; }
+.nav-index { display: inline-block; width: 30px; opacity: .6; font-size: 11px; }
+.side-note { color: #8ca4bb; font-size: 11px; margin-top: 35px; line-height: 1.9; }
+main { min-width: 0; padding: 30px 34px 20px; }
+header { display: flex; justify-content: space-between; gap: 20px; align-items: center; margin-bottom: 20px; }
+.eyebrow { color: #6e8a9c; font-size: 10px; letter-spacing: .16em; margin-bottom: 9px; }
+.project-line { font-size: 13px; color: #4b6076; }
+.project-line span { margin-left: 14px; color: #7d8b9c; }
+.toolbar { display: flex; gap: 7px; flex-wrap: wrap; justify-content: flex-end; }
+.state-row { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; margin-bottom: 14px; }
+.pill { font-size: 11px; display: inline-block; border-radius: 20px; padding: 3px 9px; white-space: nowrap; }
+.pill.green { color: #226947; background: #e0f1e7; }
+.pill.amber { color: #805522; background: #fff0d6; }
+.muted { color: #7d8998; font-size: 12px; }
+.status { background: #e9f1f5; border-left: 3px solid #72a6b5; padding: 11px 15px; font-size: 13px; overflow-wrap: anywhere; margin-bottom: 24px; }
+.section-title { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 21px; }
+.section-title p { color: #7a8797; font-size: 13px; margin: 0; }
+.section-tag { font-size: 10px; color: #74939f; letter-spacing: .12em; white-space: nowrap; }
+.card { background: #fff; border: 1px solid #e0e6ec; border-radius: 10px; padding: 22px; margin-bottom: 20px; min-width: 0; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.two-col .card { height: calc(100% - 20px); }
+.form-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 0 18px; }
+.form-grid.three { grid-template-columns: repeat(3,minmax(0,1fr)); }
+.form-grid .wide { grid-column: 1/-1; }
+.band-grid { display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); gap: 12px; }
+.action-row { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; margin-bottom: 17px; }
+.action-row h3 { margin: 0 auto 0 0; }
+.action-row label { margin: 0; min-width: 160px; }
+.action-row label.check { min-width: auto; }
+.edit-actions { margin-top: 21px; padding-top: 15px; border-top: 1px solid #e5eaf0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.edit-actions span { font-size: 12px; color: #7c8898; margin-right: auto; }
+.hint { color: #7a8797; font-size: 12px; line-height: 1.8; }
+.path, .hash { overflow-wrap: anywhere; color: #718397; font-size: 11px; }
+.path { margin-top: 15px; }
+.empty { text-align: center; border: 1px dashed #cbd6e0; background: #f9fbfc; padding: 45px 24px; color: #7b8b9c; border-radius: 9px; margin-bottom: 18px; }
+.empty h3 { color: #3b5268; }
+.empty.compact { padding: 18px; font-size: 12px; margin-top: 12px; }
+.notice { background: #fff5df; border: 1px solid #f0dcaf; padding: 18px 20px; color: #765a31; border-radius: 8px; margin-bottom: 20px; font-size: 12px; }
+.notice ul { padding-left: 21px; }
+.errors { border: 1px solid #e3b5af; background: #fff1ef; color: #9c3d35; padding: 17px 22px; border-radius: 8px; margin-bottom: 20px; }
+.errors ul { padding-left: 20px; margin-bottom: 0; }
+.error-text { color: #9c3d35; }
+.object-tabs { display: flex; gap: 9px; flex-wrap: wrap; margin-bottom: 20px; }
+.object-tabs button.selected { border: 1px solid #166e80; background: #e8f3f5; }
+.object-tabs small { margin-left: 10px; color: #78909d; }
+.table-scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 12px; }
+th, td { border-bottom: 1px solid #e4e9ef; text-align: left; padding: 11px 9px; vertical-align: middle; }
+th { color: #6e7d8e; font-weight: 500; background: #f6f8fa; white-space: nowrap; }
+td { overflow-wrap: anywhere; }
+td input { min-width: 80px; padding: 6px; }
+td button { font-size: 11px; padding: 5px 9px; margin: 2px; }
+td small { display: block; }
+.selected-row { background: #edf6f7; }
+.code { font-family: "DejaVu Sans Mono", monospace; font-size: 13px; line-height: 1.8; }
+.layout-grid { display: grid; grid-template-columns: minmax(0,1.7fr) minmax(290px,1fr); gap: 20px; }
+svg { display: block; width: 100%; height: auto; }
+.map-card { align-self: start; }
+.map { max-width: 1150px; margin: auto; }
+.metric-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 16px; margin-bottom: 20px; }
+.metric { background: #fff; border: 1px solid #e0e6ec; padding: 20px; border-radius: 10px; }
+.metric span { display: block; font-size: 12px; color: #7a8797; }
+.metric strong { display: block; font-size: 31px; color: #246477; font-weight: 500; margin: 9px 0; }
+.metric strong small { font-size: 12px; margin-left: 7px; }
+.metric > small { color: #7a8797; }
+.comparison-values { display: flex; flex-wrap: wrap; gap: 24px; margin: 22px 0; color: #507b8a; }
+.coverage-cell { position: relative; min-width: 100px; background: #eef5f5; height: 25px; border-radius: 4px; overflow: hidden; }
+.coverage-cell span { display: block; position: absolute; background: #c0e1df; height: 100%; }
+.coverage-cell b { position: relative; font-weight: 500; padding-left: 9px; }
+.export-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 20px; }
+.export-grid .card { display: flex; flex-direction: column; margin: 0; }
+.export-grid p { font-size: 12px; color: #728298; flex: 1; }
+.export-grid button { align-self: flex-start; }
+.export-grid + .notice { margin-top: 20px; }
+.audio-info { padding: 15px; border-radius: 7px; background: #f0f6f8; margin: 15px 0; }
+.audio-info span, .audio-info code { display: block; font-size: 11px; overflow-wrap: anywhere; }
+.audition-output { margin-top: 20px; background: #f1f6f7; padding: 20px; border-radius: 8px; }
+audio { width: min(100%,500px); display: block; margin-bottom: 13px; }
+pre { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; font-size: 12px; }
+.download-bar { position: sticky; bottom: 12px; border: 1px solid #9ec1ca; background: #e9f5f7; padding: 15px 20px; border-radius: 8px; box-shadow: 0 5px 20px #19344314; display: flex; gap: 15px; flex-wrap: wrap; align-items: center; margin: 16px 0; }
+.download-bar span { color: #337184; font-size: 12px; }
+.download-bar small { color: #708a96; }
+.prose { max-width: 1050px; line-height: 1.95; }
+.prose h3:not(:first-child) { margin-top: 28px; }
+.prose li { margin-bottom: 8px; }
+footer { color: #8b97a5; font-size: 10px; margin-top: 25px; }
+#blazor-error-ui { display: none; background: #ffe8dd; position: fixed; bottom: 0; width: 100%; padding: 15px; z-index: 200; }
+@media (max-width: 1150px) {
+    .workspace { grid-template-columns: 170px minmax(0,1fr); }
+    .sidebar { padding: 22px 12px; }
+    main { padding: 24px 20px; }
+    header { align-items: flex-start; flex-direction: column; }
+    .toolbar { justify-content: flex-start; }
+    .two-col, .layout-grid { grid-template-columns: 1fr; }
+    .export-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    .metric-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    .band-grid { grid-template-columns: repeat(4,minmax(0,1fr)); }
+}
+@media (max-width: 680px) {
+    .workspace { display: block; }
+    .sidebar { position: relative; height: auto; padding: 15px; }
+    .brand { font-size: 23px; }
+    .side-caption, .side-note { display: none; }
+    nav { display: flex; overflow-x: auto; margin-top: 15px; padding-bottom: 3px; }
+    nav button { font-size: 12px; padding: 8px; }
+    .nav-index { display: none; }
+    main { padding: 20px 13px; }
+    .section-title { display: block; }
+    .section-tag { display: none; }
+    .form-grid, .form-grid.three, .export-grid { grid-template-columns: 1fr; }
+    .band-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    .card { padding: 17px; }
+    .metric { padding: 13px; }
+    .metric strong { font-size: 26px; }
+    .action-row { gap: 7px; }
+}
+@media print {
+    .sidebar, .toolbar, .download-bar { display: none; }
+    .workspace { display: block; }
+    main { padding: 0; }
+    .card { break-inside: avoid; }
+}
+
+===== src/Avas.Core/Analysis/Acoustics.cs =====
+using Avas.Core.Domain;
+
+namespace Avas.Core.Analysis;
+
+public static class Acoustics
+{
+    public static double Sum(IEnumerable<double> levels)
+    {
+        var values = levels.ToArray();
+        if (values.Length == 0)
+            return double.NegativeInfinity;
+        var max = values.Max();
+        if (double.IsNegativeInfinity(max))
+            return max;
+        return max + 10 * Math.Log10(values.Sum(x => Math.Pow(10, (x - max) / 10)));
+    }
+
+    public static double DirectionalLoss(Speaker speaker, double x, double y)
+    {
+        if (speaker.Exponent == 0)
+            return 0;
+        var angle = Math.Atan2(y - speaker.Y, x - speaker.X) - speaker.Heading * Math.PI / 180;
+        var forward = Math.Max(0, Math.Cos(angle));
+        var amplitude = speaker.RearFloor + (1 - speaker.RearFloor) * Math.Pow(forward, speaker.Exponent);
+        return 20 * Math.Log10(amplitude);
+    }
+
+    public static double Distance(Speaker speaker, double x, double y, double height)
+    {
+        return Math.Sqrt(Math.Pow(x - speaker.X, 2) + Math.Pow(y - speaker.Y, 2)
+            + Math.Pow(height - speaker.Height, 2));
+    }
+
+    public static double Propagation(Speaker speaker, Settings settings, double x, double y)
+    {
+        var distance = Math.Max(settings.MinimumDistance, Distance(speaker, x, y, settings.ReceiverHeight));
+        return -20 * Math.Log10(distance / speaker.ReferenceDistance) + DirectionalLoss(speaker, x, y);
+    }
+
+    public static double Select(IReadOnlyList<double> bands, Settings settings)
+    {
+        if (settings.SelectedHz != 0)
+            return bands[Array.IndexOf(Software.Frequencies, settings.SelectedHz)];
+        return Sum(bands.Select((level, index) => level + (settings.AWeighted ? Software.AWeights[index] : 0)));
+    }
+
+    public static bool InsideVehicle(Settings settings, double x, double y)
+    {
+        return Math.Abs(x) <= settings.VehicleLength / 2 && Math.Abs(y) <= settings.VehicleWidth / 2;
+    }
+
+    public static string Metric(Settings settings)
+    {
+        if (settings.SelectedHz != 0)
+            return $"{settings.SelectedHz}Hz频带声级 dB re 20µPa";
+        return settings.AWeighted ? "七带A计权合成 dB(A)" : "七带非计权合成 dB re 20µPa";
+    }
+}
+
+public sealed record SourceContribution(Guid Id, string Name, double Distance, double Loss, double[] Bands, string Origin);
+
+public sealed class PointResult
+{
+    public Guid? ListenerId { get; init; }
+    public string Name { get; init; } = "";
+    public double X { get; init; }
+    public double Y { get; init; }
+    public double[] Bands { get; init; } = [];
+    public double Signal { get; init; }
+    public double Background { get; init; }
+    public double Combined { get; init; }
+    public double Margin => Signal - Background;
+    public bool Covered { get; init; }
+    public bool NearFieldClamped { get; init; }
+    public bool InVehicle { get; init; }
+    public List<SourceContribution> Contributions { get; init; } = [];
+}
+
+public sealed class Calculation
+{
+    public DateTimeOffset At { get; init; } = DateTimeOffset.UtcNow;
+    public string InputHash { get; init; } = "";
+    public string Metric { get; init; } = "";
+    public List<PointResult> Grid { get; init; } = [];
+    public List<PointResult> Listeners { get; init; } = [];
+    public int CoveredCount => Grid.Count(x => x.Covered);
+    public double Coverage => Grid.Count == 0 ? 0 : 100.0 * CoveredCount / Grid.Count;
+    public int ClampedCount => Grid.Count(x => x.NearFieldClamped);
+    public double Minimum => Grid.Count == 0 ? 0 : Grid.Min(x => x.Signal);
+    public double Maximum => Grid.Count == 0 ? 0 : Grid.Max(x => x.Signal);
+    public double MeanEnergy => Acoustics.Sum(Grid.Select(x => x.Signal)) - 10 * Math.Log10(Grid.Count);
+    public List<string> Warnings { get; init; } = [];
+}
+
+public static class FieldEngine
+{
+    public static Calculation Calculate(Project project)
+    {
+        var issues = Validation.Check(project, true);
+        if (issues.Count > 0)
+            throw new ArgumentException(string.Join("\n", issues));
+        var settings = project.Settings;
+        var nx = (int)Math.Floor((settings.MaxX - settings.MinX) / settings.Step + 1e-9);
+        var ny = (int)Math.Floor((settings.MaxY - settings.MinY) / settings.Step + 1e-9);
+        var grid = new List<PointResult>();
+        for (var ix = 0; ix <= nx; ix++)
+        {
+            for (var iy = 0; iy <= ny; iy++)
+            {
+                var x = settings.MinX + ix * settings.Step;
+                var y = settings.MinY + iy * settings.Step;
+                if (settings.ExcludeVehicle && Acoustics.InsideVehicle(settings, x, y))
+                    continue;
+                grid.Add(Evaluate(project, x, y));
+            }
+        }
+        if (grid.Count == 0)
+            throw new ArgumentException("所有网格均位于排除的车辆内部；请扩大区域或关闭内部排除");
+        var warnings = new List<string> { Software.Boundary };
+        if (grid.Any(x => x.NearFieldClamped))
+            warnings.Add("部分节点距离小于距离下限，使用截断距离；近源值不具备近场物理意义。");
+        if (project.Speakers.Any(x => x.Origin == Origin.Simulation) || settings.BackgroundOrigin == Origin.Simulation)
+            warnings.Add("包含模拟数据，不能证明真实应用效果。");
+        if (project.Speakers.Count(x => x.Enabled) > 1)
+            warnings.Add("多声源采用非相干能量叠加；相同信号的相位干涉未计算。");
+        if (project.Listeners.Any(x => x.X < settings.MinX || x.X > settings.MaxX || x.Y < settings.MinY || x.Y > settings.MaxY))
+            warnings.Add("部分观察点位于网格范围外，点值仍独立计算，不计入网格覆盖率。");
+        return new Calculation
+        {
+            InputHash = IO.ProjectCodec.InputHash(project),
+            Metric = Acoustics.Metric(settings),
+            Grid = grid,
+            Listeners = project.Listeners.Select(x => Evaluate(project, x.X, x.Y, x.Name, x.Id)).ToList(),
+            Warnings = warnings
+        };
+    }
+
+    public static PointResult Evaluate(Project project, double x, double y, string name = "网格节点", Guid? id = null)
+    {
+        var settings = project.Settings;
+        var sources = new List<SourceContribution>();
+        var clamped = false;
+        foreach (var speaker in project.Speakers.Where(s => s.Enabled))
+        {
+            var distance = Acoustics.Distance(speaker, x, y, settings.ReceiverHeight);
+            clamped |= distance < settings.MinimumDistance;
+            var loss = Acoustics.Propagation(speaker, settings, x, y);
+            var bands = Software.Frequencies.Select(hz =>
+            {
+                var band = speaker.Bands.Single(b => b.Hz == hz);
+                return band.Level + band.Correction + speaker.Gain + loss;
+            }).ToArray();
+            sources.Add(new(speaker.Id, speaker.Name, distance, loss, bands, speaker.Origin.Label() + " / " + speaker.Source));
+        }
+        var combinedBands = Software.Frequencies.Select((_, i) => Acoustics.Sum(sources.Select(s => s.Bands[i]))).ToArray();
+        var backgroundBands = Software.Frequencies.Select(hz => settings.Background.Single(b => b.Hz == hz).Level).ToArray();
+        var signal = Acoustics.Select(combinedBands, settings);
+        var background = Acoustics.Select(backgroundBands, settings);
+        return new PointResult
+        {
+            ListenerId = id,
+            Name = name,
+            X = x,
+            Y = y,
+            Bands = combinedBands,
+            Signal = signal,
+            Background = background,
+            Combined = Acoustics.Sum([signal, background]),
+            Covered = signal >= settings.LevelTarget && signal - background >= settings.MarginTarget,
+            NearFieldClamped = clamped,
+            InVehicle = Acoustics.InsideVehicle(settings, x, y),
+            Contributions = sources
+        };
+    }
+}
+
+===== src/Avas.Core/Analysis/ChartRenderer.cs =====
+using System.Globalization;
+using System.Net;
+using System.Text;
+using Avas.Core.Domain;
+
+namespace Avas.Core.Analysis;
+
+public static class ChartRenderer
+{
+    public static string Number(double value) => value.ToString("0.###", CultureInfo.InvariantCulture);
+    public static string Escape(string value) => WebUtility.HtmlEncode(value);
+
+    public static string Color(double value, double min, double max)
+    {
+        var ratio = Math.Clamp((value - min) / Math.Max(1, max - min), 0, 1);
+        var stops = new (int R, int G, int B)[] { (31, 61, 115), (28, 127, 150), (83, 183, 140), (235, 208, 100), (220, 93, 71) };
+        var position = ratio * (stops.Length - 1);
+        var left = Math.Min(stops.Length - 2, (int)position);
+        var fraction = position - left;
+        var a = stops[left];
+        var b = stops[left + 1];
+        return $"#{(int)(a.R + (b.R - a.R) * fraction):x2}{(int)(a.G + (b.G - a.G) * fraction):x2}{(int)(a.B + (b.B - a.B) * fraction):x2}";
+    }
+
+    public static string Map(Project project, Calculation? result, bool coverageOnly = false)
+    {
+        var settings = project.Settings;
+        if (settings.MaxX <= settings.MinX || settings.MaxY <= settings.MinY)
+            return "<svg viewBox='0 0 900 620'><text x='30' y='40'>请修正网格坐标范围</text></svg>";
+        const double width = 900;
+        const double height = 620;
+        const double margin = 65;
+        var scale = Math.Min((width - margin * 2) / (settings.MaxX - settings.MinX), (height - margin * 2) / (settings.MaxY - settings.MinY));
+        double X(double x) => margin + (x - settings.MinX) * scale;
+        double Y(double y) => height - margin - (y - settings.MinY) * scale;
+        var svg = new StringBuilder("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 900 620' role='img' aria-label='车辆周围声场布局，X正向为车前，Y正向为车左'>");
+        svg.Append("<rect width='900' height='620' fill='#f5f7fa'/>");
+        svg.Append($"<metadata>{Escape(IO.ProjectCodec.Json(new { Software.Model, Software.Version, Boundary = Software.Boundary, project.Name, Source = IO.ProjectCodec.SourceSummary(project), Conditions = IO.ProjectCodec.Conditions(project.Settings), InputHash = IO.ProjectCodec.InputHash(project) }))}</metadata>");
+        svg.Append($"<text x='25' y='27' font-size='15' fill='#24344d'>{Escape(result?.Metric ?? "布局预览，尚无有效计算结果")}</text>");
+        if (result is not null)
+        {
+            var min = Math.Floor(result.Minimum / 5) * 5;
+            var max = Math.Max(min + 5, Math.Ceiling(result.Maximum / 5) * 5);
+            var half = settings.Step * scale / 2;
+            foreach (var point in result.Grid)
+            {
+                var color = coverageOnly ? point.Covered ? "#4aa47b" : "#e7b66a" : Color(point.Signal, min, max);
+                svg.Append($"<rect x='{Number(X(point.X) - half)}' y='{Number(Y(point.Y) - half)}' width='{Number(half * 2 + 0.2)}' height='{Number(half * 2 + 0.2)}' fill='{color}'><title>{Number(point.X)},{Number(point.Y)}m：{Number(point.Signal)}dB；背景差{Number(point.Margin)}dB；{(point.Covered ? "满足工程目标" : "未满足工程目标")}</title></rect>");
+            }
+            if (!coverageOnly)
+            {
+                for (var i = 0; i < 100; i++)
+                    svg.Append($"<rect x='{730 + i}' y='580' width='1.5' height='12' fill='{Color(min + (max - min) * i / 99, min, max)}'/>");
+                svg.Append($"<text x='730' y='610' font-size='11'>{Number(min)}—{Number(max)}dB</text>");
+            }
+        }
+        for (var x = Math.Ceiling(settings.MinX / 2) * 2; x <= settings.MaxX; x += 2)
+        {
+            svg.Append($"<line x1='{Number(X(x))}' y1='{Number(Y(settings.MinY))}' x2='{Number(X(x))}' y2='{Number(Y(settings.MaxY))}' stroke='#ffffff' stroke-opacity='.35'/>");
+            svg.Append($"<text x='{Number(X(x))}' y='{Number(Y(settings.MinY) + 24)}' text-anchor='middle' font-size='12'>{Number(x)}</text>");
+        }
+        for (var y = Math.Ceiling(settings.MinY / 2) * 2; y <= settings.MaxY; y += 2)
+        {
+            svg.Append($"<line x1='{Number(X(settings.MinX))}' y1='{Number(Y(y))}' x2='{Number(X(settings.MaxX))}' y2='{Number(Y(y))}' stroke='#ffffff' stroke-opacity='.35'/>");
+            svg.Append($"<text x='{Number(X(settings.MinX) - 14)}' y='{Number(Y(y) + 4)}' text-anchor='end' font-size='12'>{Number(y)}</text>");
+        }
+        svg.Append($"<rect x='{Number(X(-settings.VehicleLength / 2))}' y='{Number(Y(settings.VehicleWidth / 2))}' width='{Number(settings.VehicleLength * scale)}' height='{Number(settings.VehicleWidth * scale)}' rx='12' fill='#e9edf4' stroke='#33465e' stroke-width='2'/>");
+        svg.Append($"<text x='{Number(X(0))}' y='{Number(Y(0) + 5)}' text-anchor='middle' font-size='13' fill='#253b56'>车辆 →</text>");
+        foreach (var speaker in project.Speakers)
+        {
+            var x = X(speaker.X);
+            var y = Y(speaker.Y);
+            var angle = speaker.Heading * Math.PI / 180;
+            var x2 = x + Math.Cos(angle) * 27;
+            var y2 = y - Math.Sin(angle) * 27;
+            svg.Append($"<line x1='{Number(x)}' y1='{Number(y)}' x2='{Number(x2)}' y2='{Number(y2)}' stroke='#172e4d' stroke-width='3'/>");
+            svg.Append($"<circle cx='{Number(x)}' cy='{Number(y)}' r='7' fill='{(speaker.Enabled ? "#fdfdfd" : "#aaa")}' stroke='#172e4d' stroke-width='3'><title>{Escape(speaker.Name)}，朝向{Number(speaker.Heading)}°</title></circle>");
+        }
+        foreach (var point in project.Listeners)
+        {
+            svg.Append($"<circle cx='{Number(X(point.X))}' cy='{Number(Y(point.Y))}' r='5' fill='#fff' stroke='#111' stroke-width='2'/>");
+            svg.Append($"<text x='{Number(X(point.X) + 9)}' y='{Number(Y(point.Y) - 8)}' font-size='12' fill='#16273f' paint-order='stroke' stroke='#fff' stroke-width='3'>{Escape(point.Name)}</text>");
+        }
+        svg.Append("<text x='65' y='607' font-size='12' fill='#24344d'>X / m →车前　Y / m ↑车左　圆圈为扬声器与观察点；轮廓不参与遮挡计算</text>");
+        svg.Append("</svg>");
+        return svg.ToString();
+    }
+
+    public static string Spectrum(PointResult point, Settings settings)
+    {
+        var background = Software.Frequencies.Select(hz => settings.Background.Single(x => x.Hz == hz).Level).ToArray();
+        var all = point.Bands.Concat(background).ToArray();
+        var min = Math.Floor(all.Min() / 10) * 10 - 10;
+        var max = Math.Ceiling(all.Max() / 10) * 10 + 10;
+        double Y(double value) => 240 - (value - min) / (max - min) * 200;
+        var svg = new StringBuilder("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 760 300' role='img' aria-label='观察点七频带声压级与背景声对比'>");
+        svg.Append("<rect width='760' height='300' fill='#fff'/>");
+        for (var value = min; value <= max; value += 10)
+        {
+            svg.Append($"<line x1='55' y1='{Number(Y(value))}' x2='730' y2='{Number(Y(value))}' stroke='#e1e6ed'/>");
+            svg.Append($"<text x='46' y='{Number(Y(value) + 4)}' text-anchor='end' font-size='12'>{Number(value)}</text>");
+        }
+        var signalPoints = new List<string>();
+        var backgroundPoints = new List<string>();
+        for (var i = 0; i < 7; i++)
+        {
+            var x = 85 + i * 100;
+            signalPoints.Add($"{x},{Number(Y(point.Bands[i]))}");
+            backgroundPoints.Add($"{x},{Number(Y(background[i]))}");
+            svg.Append($"<circle cx='{x}' cy='{Number(Y(point.Bands[i]))}' r='4' fill='#146d81'/>");
+            svg.Append($"<text x='{x}' y='263' text-anchor='middle' font-size='12'>{Software.Frequencies[i]}</text>");
+        }
+        svg.Append($"<polyline points='{string.Join(" ", signalPoints)}' fill='none' stroke='#146d81' stroke-width='3'/>");
+        svg.Append($"<polyline points='{string.Join(" ", backgroundPoints)}' fill='none' stroke='#b47936' stroke-width='2' stroke-dasharray='6 4'/>");
+        svg.Append("<text x='55' y='20' font-size='12'>未计权频带声压级 / dB re 20µPa</text><text x='400' y='290' font-size='12'>中心频率 / Hz　蓝实线：警示声　棕虚线：背景</text></svg>");
+        return svg.ToString();
+    }
+}
+
+===== src/Avas.Core/Analysis/ReviewEngine.cs =====
+using System.Text;
+using Avas.Core.Domain;
+
+namespace Avas.Core.Analysis;
+
+public sealed record ReviewFinding(string Severity, string Object, string Finding, string Action);
+
+public static class ReviewEngine
+{
+    public static List<ReviewFinding> Inspect(Project project)
+    {
+        var findings = new List<ReviewFinding>();
+        var settings = project.Settings;
+        foreach (var source in project.Speakers)
+        {
+            if (!source.Enabled)
+            {
+                findings.Add(new("信息", source.Name, "当前源未启用，不参与声场和试听", "需要参与时到扬声器页启用并应用"));
+                continue;
+            }
+            if (source.X < settings.MinX || source.X > settings.MaxX || source.Y < settings.MinY || source.Y > settings.MaxY)
+                findings.Add(new("提示", source.Name, "声源位于显示网格外，仍参与计算", "核对坐标，或在背景与网格页扩大显示范围"));
+            if (Acoustics.InsideVehicle(settings, source.X, source.Y))
+                findings.Add(new("边界", source.Name, "声源位于车辆轮廓内，本模型仍向外自由传播", "不要将该结果解释为已包含车身遮挡；用实测修正设计"));
+            if (source.Origin == Origin.Simulation)
+                findings.Add(new("来源", source.Name, "使用模拟输入", "正式设计时替换为有来源的输入，保留模拟标识直至替换完成"));
+            if (source.Origin == Origin.MeasurementDeclared)
+                findings.Add(new("来源", source.Name, "实测来源仅为用户声明，软件未认证校准", "核对轴向参考距离、仪器和测量记录是否与频带一致"));
+            if (source.Source.Contains("请填写", StringComparison.Ordinal))
+                findings.Add(new("待补", source.Name, "来源仍是默认占位说明", "到扬声器页填写实际来源与轴向参考条件"));
+            if (source.ReferenceDistance < settings.MinimumDistance)
+                findings.Add(new("提示", source.Name, "参考距离小于传播距离下限", "核对近源截断设置，参考距离仍用于声级换算"));
+            if (source.Bands.Any(x => Math.Abs(x.Correction) > 15))
+                findings.Add(new("复核", source.Name, "至少一个频带修正幅度超过15dB", "核查是否重复叠加频响；15dB只是工程复核提示，不是判定限值"));
+            if (source.Audio is not null)
+                findings.Add(new("音频", source.Name, "已内嵌数字音频，物理频带仍独立维护", "核查录音内容与参考频谱是否对应；试听不证明标定关系"));
+        }
+        foreach (var group in project.Speakers.Where(x => x.Enabled).GroupBy(x => (x.X, x.Y, x.Height)).Where(x => x.Count() > 1))
+            findings.Add(new("复核", string.Join("、", group.Select(x => x.Name)), "多个启用源位置完全相同", "确认是否有意叠加；复制源后常需调整坐标，相干效应未计算"));
+        foreach (var point in project.Listeners)
+        {
+            if (Acoustics.InsideVehicle(settings, point.X, point.Y))
+                findings.Add(new("边界", point.Name, "观察点位于车辆轮廓内", "本工具只给自由场点值，不能解释为车内声级"));
+            if (point.X < settings.MinX || point.X > settings.MaxX || point.Y < settings.MinY || point.Y > settings.MaxY)
+                findings.Add(new("信息", point.Name, "点位于网格外，点值仍计算但不计入网格覆盖", "需要计入区域时扩大网格，或保持其为独立观察点"));
+            if (project.Speakers.Any(x => x.Enabled && Acoustics.Distance(x, point.X, point.Y, settings.ReceiverHeight) < settings.MinimumDistance))
+                findings.Add(new("边界", point.Name, "接近至少一个声源，距离将被截断", "增大接收距离；不能将截断值视为近场解"));
+        }
+        if (settings.BackgroundSource.Contains("请填写", StringComparison.Ordinal))
+            findings.Add(new("待补", "背景", "背景来源仍为默认占位说明", "在背景与网格页填写环境及频谱来源"));
+        if (settings.SelectedHz == 0 && settings.AWeighted)
+            findings.Add(new("口径", "合成", "使用中心频率A计权近似", "仅解释七个输入频带范围，不称全频积分声级"));
+        if (project.Listeners.Count == 0)
+            findings.Add(new("流程", "观察点", "没有独立观察点，无法查看点频谱或制作点试听", "在布局页添加点或追加等角点集"));
+        findings.Add(new("固定假设", "背景", "背景在整个网格中均匀，多源按非相干能量叠加", "有空间非均匀、相干或真实车身影响时须使用其他模型或试验"));
+        return findings;
+    }
+}
+
+public sealed class TransectRequest
+{
+    public double StartX { get; set; }
+    public double StartY { get; set; }
+    public double Heading { get; set; }
+    public double Length { get; set; } = 10;
+    public double Step { get; set; } = 0.5;
+}
+
+public sealed record TransectPoint(double Distance, PointResult Result);
+
+public sealed class TransectResult
+{
+    public string InputHash { get; init; } = "";
+    public string Metric { get; init; } = "";
+    public string Source { get; init; } = "";
+    public string Conditions { get; init; } = "";
+    public List<TransectPoint> Points { get; init; } = [];
+    public double? LastCovered => Points.Where(x => x.Result.Covered).Select(x => (double?)x.Distance).LastOrDefault();
+    public int Transitions => Points.Zip(Points.Skip(1)).Count(x => x.First.Result.Covered != x.Second.Result.Covered);
+}
+
+public static class TransectEngine
+{
+    public static TransectResult Run(Project project, TransectRequest request)
+    {
+        var issues = Validation.Check(project, true);
+        if (issues.Count > 0)
+            throw new ArgumentException(string.Join("\n", issues));
+        if (!double.IsFinite(request.StartX) || !double.IsFinite(request.StartY)
+            || Math.Abs(request.StartX) > 100 || Math.Abs(request.StartY) > 100)
+            throw new ArgumentException("剖面起点坐标必须在-100至100m范围");
+        if (!double.IsFinite(request.Heading) || request.Heading is < -360 or > 360)
+            throw new ArgumentException("剖面角度范围-360至360°");
+        if (!double.IsFinite(request.Length) || request.Length is <= 0 or > 100)
+            throw new ArgumentException("剖面长度必须大于0且不超过100m");
+        if (!double.IsFinite(request.Step) || request.Step is < 0.1 or > 10)
+            throw new ArgumentException("剖面步长范围0.1至10m");
+        var count = (int)Math.Floor(request.Length / request.Step + 1e-9) + 1;
+        if (count > 501)
+            throw new ArgumentException("剖面最多501点，请增大步长");
+        var angle = request.Heading * Math.PI / 180;
+        var points = new List<TransectPoint>();
+        for (var i = 0; i < count; i++)
+        {
+            var distance = i * request.Step;
+            var x = request.StartX + distance * Math.Cos(angle);
+            var y = request.StartY + distance * Math.Sin(angle);
+            if (Math.Abs(x) > 100 || Math.Abs(y) > 100)
+                throw new ArgumentException("剖面终点超出坐标范围，请缩短长度或调整起点");
+            var point = FieldEngine.Evaluate(project, x, y, $"剖面{i + 1}");
+            points.Add(new TransectPoint(distance, point));
+        }
+        return new TransectResult
+        {
+            InputHash = IO.ProjectCodec.InputHash(project),
+            Metric = Acoustics.Metric(project.Settings),
+            Source = IO.ProjectCodec.SourceSummary(project),
+            Conditions = IO.ProjectCodec.Conditions(project.Settings),
+            Points = points
+        };
+    }
+
+    public static byte[] Csv(TransectResult result)
+    {
+        var text = new StringBuilder("\uFEFFModel,Version,Source,Conditions,InputHash,Metric,Distance_m,X_m,Y_m,Signal_dB,Margin_dB,EngineeringTargetMet,DistanceClamped,InVehicle\r\n");
+        foreach (var point in result.Points)
+        {
+            var p = point.Result;
+            text.AppendLine(string.Join(",", Software.Model, Software.Version, IO.SpectrumCsv.Cell(result.Source), IO.SpectrumCsv.Cell(result.Conditions), result.InputHash, IO.SpectrumCsv.Cell(result.Metric),
+                ChartRenderer.Number(point.Distance), ChartRenderer.Number(p.X), ChartRenderer.Number(p.Y),
+                ChartRenderer.Number(p.Signal), ChartRenderer.Number(p.Margin), p.Covered, p.NearFieldClamped, p.InVehicle));
+        }
+        return Encoding.UTF8.GetBytes(text.ToString());
+    }
+}
+
+===== src/Avas.Core/Analysis/Scenarios.cs =====
+using Avas.Core.Domain;
+using Avas.Core.IO;
+
+namespace Avas.Core.Analysis;
+
+public sealed record PointDelta(string Name, double X, double Y, double Baseline, double Target, double Difference);
+
+public sealed class Comparison
+{
+    public bool Comparable => Reasons.Count == 0;
+    public string BaselineName { get; init; } = "";
+    public string TargetName { get; init; } = "";
+    public List<string> Reasons { get; init; } = [];
+    public Calculation? Baseline { get; init; }
+    public Calculation? Target { get; init; }
+    public List<PointDelta> Points { get; init; } = [];
+    public string BaselineSource { get; init; } = "";
+    public string TargetSource { get; init; } = "";
+    public string Conditions { get; init; } = "";
+    public double? CoverageDifference => Comparable && Baseline is not null && Target is not null
+        ? Target.Coverage - Baseline.Coverage : null;
+}
+
+public static class ScenarioEngine
+{
+    public static Snapshot Capture(Project project, string name)
+    {
+        if (string.IsNullOrWhiteSpace(name) || name.Length > 100)
+            throw new ArgumentException("方案名称必填，最多100字符");
+        var copy = ProjectCodec.Clone(project);
+        return new Snapshot
+        {
+            Name = name.Trim(),
+            InputHash = ProjectCodec.InputHash(project),
+            Settings = copy.Settings,
+            Speakers = copy.Speakers,
+            Listeners = copy.Listeners
+        };
+    }
+
+    public static Project Restore(Snapshot snapshot)
+    {
+        return ProjectCodec.Clone(new Project
+        {
+            Name = snapshot.Name,
+            Settings = snapshot.Settings,
+            Speakers = snapshot.Speakers,
+            Listeners = snapshot.Listeners
+        });
+    }
+
+    public static Comparison Compare(Snapshot baseline, Snapshot target)
+    {
+        var a = Restore(baseline);
+        var b = Restore(target);
+        var reasons = Conditions(a, b);
+        if (reasons.Count > 0)
+            return new Comparison { BaselineName = baseline.Name, TargetName = target.Name, Reasons = reasons };
+        var resultA = FieldEngine.Calculate(a);
+        var resultB = FieldEngine.Calculate(b);
+        var points = resultA.Listeners.Select(p =>
+        {
+            var q = resultB.Listeners.Single(x => x.ListenerId == p.ListenerId);
+            return new PointDelta(p.Name, p.X, p.Y, p.Signal, q.Signal, q.Signal - p.Signal);
+        }).ToList();
+        return new Comparison
+        {
+            BaselineName = baseline.Name,
+            TargetName = target.Name,
+            Baseline = resultA,
+            Target = resultB,
+            BaselineSource = ProjectCodec.SourceSummary(a),
+            TargetSource = ProjectCodec.SourceSummary(b),
+            Conditions = ProjectCodec.Conditions(a.Settings),
+            Points = points
+        };
+    }
+
+    public static List<string> Conditions(Project a, Project b)
+    {
+        var reasons = new List<string>();
+        var settingsA = ProjectCodec.Json(a.Settings);
+        var settingsB = ProjectCodec.Json(b.Settings);
+        if (settingsA != settingsB)
+            reasons.Add("计算区域、步长、接收高度、车辆轮廓、背景、计权、频带或工程目标不同；请在相同设置下重存快照。");
+        var pointsA = a.Listeners.OrderBy(x => x.Id).Select(x => new { x.Id, x.X, x.Y });
+        var pointsB = b.Listeners.OrderBy(x => x.Id).Select(x => new { x.Id, x.X, x.Y });
+        if (ProjectCodec.Json(pointsA) != ProjectCodec.Json(pointsB))
+            reasons.Add("观察点标识或坐标不同；不能按相似名称猜测对应关系。");
+        var originsA = a.Speakers.Where(x => x.Enabled).Select(x => x.Origin).Distinct().Order().ToArray();
+        var originsB = b.Speakers.Where(x => x.Enabled).Select(x => x.Origin).Distinct().Order().ToArray();
+        if (!originsA.SequenceEqual(originsB))
+            reasons.Add("两方案的数据来源类别不同，禁止形成无标记差值。");
+        if (!a.Speakers.Any(x => x.Enabled) || !b.Speakers.Any(x => x.Enabled))
+            reasons.Add("至少一个方案没有启用的扬声器。");
+        return reasons;
+    }
+}
+
+public enum ScanParameter
+{
+    Heading,
+    Gain,
+    PositionX,
+    PositionY
+}
+
+public sealed class ScanRequest
+{
+    public Guid SpeakerId { get; set; }
+    public ScanParameter Parameter { get; set; }
+    public double Start { get; set; } = -45;
+    public double End { get; set; } = 45;
+    public double Step { get; set; } = 15;
+}
+
+public sealed record ScanRow(double Value, double Coverage, double Minimum, double Maximum, double WorstMargin, int CoveredPoints);
+
+public sealed class ScanResult
+{
+    public string InputHash { get; init; } = "";
+    public Guid SpeakerId { get; init; }
+    public string SpeakerName { get; init; } = "";
+    public ScanParameter Parameter { get; init; }
+    public string Metric { get; init; } = "";
+    public string Source { get; init; } = "";
+    public string Conditions { get; init; } = "";
+    public List<ScanRow> Rows { get; init; } = [];
+}
+
+public static class ScanEngine
+{
+    public static ScanResult Run(Project original, ScanRequest request)
+    {
+        if (!double.IsFinite(request.Start) || !double.IsFinite(request.End) || !double.IsFinite(request.Step)
+            || request.Step <= 0 || request.End < request.Start)
+            throw new ArgumentException("扫描起止必须为有限数，终值不小于初值，步长必须为正");
+        var count = (int)Math.Min(1000, Math.Floor((request.End - request.Start) / request.Step) + 1);
+        if (count is < 1 or > 25)
+            throw new ArgumentException("每次扫描最多25个取值，请增大步长");
+        if (!Enum.IsDefined(request.Parameter))
+            throw new ArgumentException("扫描参数无效");
+        var project = ProjectCodec.Clone(original);
+        var speaker = project.Speakers.SingleOrDefault(x => x.Id == request.SpeakerId)
+            ?? throw new ArgumentException("请先选择需要扫描的扬声器");
+        if (!speaker.Enabled)
+            throw new ArgumentException("扫描对象必须启用");
+        var rows = new List<ScanRow>();
+        for (var i = 0; i < count; i++)
+        {
+            var value = request.Start + i * request.Step;
+            Apply(speaker, request.Parameter, value);
+            var result = FieldEngine.Calculate(project);
+            rows.Add(new ScanRow(value, result.Coverage, result.Minimum, result.Maximum,
+                result.Grid.Min(x => x.Margin), result.Listeners.Count(x => x.Covered)));
+        }
+        return new ScanResult
+        {
+            InputHash = ProjectCodec.InputHash(original),
+            SpeakerId = speaker.Id,
+            SpeakerName = speaker.Name,
+            Parameter = request.Parameter,
+            Metric = Acoustics.Metric(original.Settings),
+            Source = ProjectCodec.SourceSummary(original),
+            Conditions = ProjectCodec.Conditions(original.Settings),
+            Rows = rows
+        };
+    }
+
+    public static void Apply(Speaker speaker, ScanParameter parameter, double value)
+    {
+        switch (parameter)
+        {
+            case ScanParameter.Heading:
+                speaker.Heading = value;
+                break;
+            case ScanParameter.Gain:
+                speaker.Gain = value;
+                break;
+            case ScanParameter.PositionX:
+                speaker.X = value;
+                break;
+            case ScanParameter.PositionY:
+                speaker.Y = value;
+                break;
+            default:
+                throw new ArgumentException("不支持的扫描参数");
+        }
+    }
+
+    public static string Label(ScanParameter parameter) => parameter switch
+    {
+        ScanParameter.Heading => "朝向 °",
+        ScanParameter.Gain => "增益 dB",
+        ScanParameter.PositionX => "X坐标 m",
+        ScanParameter.PositionY => "Y坐标 m",
+        _ => "未知"
+    };
+}
+
+===== src/Avas.Core/Audio/AuditionEngine.cs =====
+using Avas.Core.Analysis;
+using Avas.Core.Domain;
+
+namespace Avas.Core.Audio;
+
+public sealed record Audition(byte[] Wave, string Description, double Peak, bool Overloaded, string Hash);
+
+public static class AuditionEngine
+{
+    public static Audition Render(Project project, Listener point, double seconds, double playbackReference, bool includeBackground)
+    {
+        var errors = Validation.Check(project, true);
+        if (errors.Count > 0)
+            throw new ArgumentException(string.Join("\n", errors));
+        if (!double.IsFinite(seconds) || seconds is < 1 or > 8)
+            throw new ArgumentException("试听长度范围1至8秒");
+        if (!double.IsFinite(playbackReference) || playbackReference is < 60 or > 140)
+            throw new ArgumentException("数字播放参考范围60至140dB；不是设备声压标定");
+        const int rate = 24000;
+        var count = (int)(seconds * rate);
+        var mix = new double[count];
+        var notes = new List<string>();
+        var sourceIndex = 0;
+        foreach (var speaker in project.Speakers.Where(x => x.Enabled))
+        {
+            double[] input;
+            if (speaker.Audio is not null)
+            {
+                var wave = WaveCodec.Read(Convert.FromBase64String(speaker.Audio.Data));
+                input = SpectralAudio.Resample(wave, rate, count);
+                notes.Add($"{speaker.Name}：导入音频{speaker.Audio.Name}，短记录尾部补静音");
+            }
+            else
+            {
+                input = Noise(count, 420 + sourceIndex);
+                notes.Add($"{speaker.Name}：无音频，使用固定种子模拟频带噪声");
+            }
+            var propagation = Acoustics.Propagation(speaker, project.Settings, point.X, point.Y);
+            var target = Software.Frequencies.Select(hz =>
+            {
+                var band = speaker.Bands.Single(x => x.Hz == hz);
+                return Math.Pow(10, (band.Level + band.Correction + speaker.Gain + propagation - playbackReference) / 20);
+            }).ToArray();
+            var shaped = SpectralAudio.Shape(input, rate, target);
+            for (var i = 0; i < count; i++)
+                mix[i] += shaped[i];
+            sourceIndex++;
+        }
+        if (includeBackground)
+        {
+            var asset = project.Settings.BackgroundAudio;
+            var input = asset is null ? Noise(count, 802) : SpectralAudio.Resample(WaveCodec.Read(Convert.FromBase64String(asset.Data)), rate, count);
+            var target = Software.Frequencies.Select(hz =>
+                Math.Pow(10, (project.Settings.Background.Single(x => x.Hz == hz).Level - playbackReference) / 20)).ToArray();
+            var background = SpectralAudio.Shape(input, rate, target);
+            for (var i = 0; i < count; i++)
+                mix[i] += background[i];
+            notes.Add(asset is null ? "背景为固定种子频带噪声模拟" : "背景采用导入音频的频谱整形");
+        }
+        var peak = mix.Max(x => Math.Abs(x));
+        if (peak > 0.98)
+            throw new ArgumentException($"预计峰值{peak:F3}超过0.98，请将数字播放参考提高至少{Math.Ceiling(20 * Math.Log10(peak / 0.98))}dB后重试；不自动归一化");
+        var fade = Math.Min(1200, count / 2);
+        for (var i = 0; i < fade; i++)
+        {
+            var factor = 0.5 - 0.5 * Math.Cos(Math.PI * i / fade);
+            mix[i] *= factor;
+            mix[count - 1 - i] *= factor;
+        }
+        notes.Add($"24kHz单声道、七频带整形，50ms淡入淡出；数字幅值1对应参数{playbackReference}dB，仅定义相对音量。");
+        notes.Add("未模拟到达时延、双耳线索和车身；混合波形相位与非相干能量模型不等价；不得据此判定真实可听性。");
+        notes.Add("设备音量、声卡及耳机未校准，改变系统音量会改变实际听感。");
+        var metadata = IO.ProjectCodec.Json(new
+        {
+            Software.Name,
+            Software.Version,
+            Software.Model,
+            Boundary = Software.Boundary,
+            Project = project.Name,
+            Source = IO.ProjectCodec.SourceSummary(project),
+            Conditions = IO.ProjectCodec.Conditions(project.Settings),
+            Point = new { point.Id, point.Name, point.X, point.Y },
+            Seconds = seconds,
+            DigitalReferenceDb = playbackReference,
+            IncludeBackground = includeBackground,
+            Description = notes,
+            InputHash = IO.ProjectCodec.InputHash(project)
+        });
+        var waveBytes = WaveCodec.Write(mix, rate, metadata);
+        return new Audition(waveBytes, string.Join("\n", notes), peak, false, IO.ProjectCodec.InputHash(project));
+    }
+
+    private static double[] Noise(int count, int seed)
+    {
+        var random = new Random(seed);
+        return Enumerable.Range(0, count).Select(_ => random.NextDouble() * 2 - 1).ToArray();
+    }
+}
+
+===== src/Avas.Core/Audio/SpectralAudio.cs =====
+using System.Numerics;
+using Avas.Core.Domain;
+
+namespace Avas.Core.Audio;
+
+public static class Fourier
+{
+    public static void Transform(Complex[] data, bool inverse = false)
+    {
+        var count = data.Length;
+        if (count == 0 || (count & (count - 1)) != 0)
+            throw new ArgumentException("FFT长度必须是2的幂");
+        for (int i = 1, j = 0; i < count; i++)
+        {
+            var bit = count >> 1;
+            for (; (j & bit) != 0; bit >>= 1)
+                j ^= bit;
+            j ^= bit;
+            if (i < j)
+                (data[i], data[j]) = (data[j], data[i]);
+        }
+        for (var length = 2; length <= count; length <<= 1)
+        {
+            var angle = (inverse ? 2 : -2) * Math.PI / length;
+            var root = new Complex(Math.Cos(angle), Math.Sin(angle));
+            for (var offset = 0; offset < count; offset += length)
+            {
+                var factor = Complex.One;
+                for (var i = 0; i < length / 2; i++)
+                {
+                    var a = data[offset + i];
+                    var b = data[offset + i + length / 2] * factor;
+                    data[offset + i] = a + b;
+                    data[offset + i + length / 2] = a - b;
+                    factor *= root;
+                }
+            }
+        }
+        if (inverse)
+            for (var i = 0; i < count; i++)
+                data[i] /= count;
+    }
+
+    public static int BandIndex(double frequency)
+    {
+        for (var i = 0; i < Software.Frequencies.Length; i++)
+            if (frequency >= Software.Frequencies[i] / Math.Sqrt(2) && frequency < Software.Frequencies[i] * Math.Sqrt(2))
+                return i;
+        return -1;
+    }
+}
+
+public sealed record DigitalSpectrum(double[] Levels, double CapturedRms, double FullRms, int Frames, string Note);
+
+public static class SpectralAudio
+{
+    public static DigitalSpectrum Analyze(WaveData audio)
+    {
+        const int blockSize = 4096;
+        var energy = new double[7];
+        var frames = 0;
+        var fullEnergy = audio.Samples.Sum(x => x * x) / audio.Samples.Length;
+        for (var start = 0; start < audio.Samples.Length; start += blockSize)
+        {
+            var count = Math.Min(blockSize, audio.Samples.Length - start);
+            var block = new Complex[blockSize];
+            for (var i = 0; i < count; i++)
+                block[i] = audio.Samples[start + i];
+            Fourier.Transform(block);
+            for (var bin = 1; bin <= blockSize / 2; bin++)
+            {
+                var index = Fourier.BandIndex((double)bin * audio.Rate / blockSize);
+                if (index < 0)
+                    continue;
+                var factor = bin == blockSize / 2 ? 1 : 2;
+                energy[index] += factor * block[bin].Magnitude * block[bin].Magnitude / blockSize;
+            }
+            frames += count;
+        }
+        for (var i = 0; i < 7; i++)
+            energy[i] /= frames;
+        var levels = energy.Select(x => x > 1e-16 ? 10 * Math.Log10(x) : -160).ToArray();
+        return new DigitalSpectrum(levels, Math.Sqrt(energy.Sum()), Math.Sqrt(fullEnergy), frames,
+            "矩形窗4096点FFT能量分带；双声道先取平均；dBFS(RMS)参考幅值1，非声压级；有限记录会有频谱泄漏。");
+    }
+
+    public static List<BandInput> RelativeBands(DigitalSpectrum spectrum, double declaredTotal)
+    {
+        if (!double.IsFinite(declaredTotal) || declaredTotal is < 0 or > 120)
+            throw new ArgumentException("用户声明的七带合成参考声级必须为0至120dB");
+        if (spectrum.CapturedRms < 1e-7)
+            throw new ArgumentException("七频带内音频能量过低，不能推导相对频谱");
+        var total = Analysis.Acoustics.Sum(spectrum.Levels);
+        var levels = spectrum.Levels.Select(x => declaredTotal + x - total).ToArray();
+        if (levels.Any(x => x < -60 || x > 140))
+            throw new ArgumentException("按相对谱分配后存在超出-60至140dB的频带；请手工填写有依据的七频带，不自动截断或补底噪");
+        return levels.Select((x, i) => new BandInput
+        {
+            Hz = Software.Frequencies[i],
+            Level = x
+        }).ToList();
+    }
+
+    public static double[] Resample(WaveData wave, int rate, int count)
+    {
+        var output = new double[count];
+        for (var i = 0; i < count; i++)
+        {
+            var position = (double)i * wave.Rate / rate;
+            if (position >= wave.Samples.Length - 1)
+                break;
+            var left = (int)position;
+            var fraction = position - left;
+            output[i] = wave.Samples[left] * (1 - fraction) + wave.Samples[left + 1] * fraction;
+        }
+        return output;
+    }
+
+    public static double[] Shape(double[] input, int rate, double[] targetRms)
+    {
+        var size = 1;
+        while (size < input.Length)
+            size <<= 1;
+        var spectrum = new Complex[size];
+        for (var i = 0; i < input.Length; i++)
+            spectrum[i] = input[i];
+        Fourier.Transform(spectrum);
+        var energy = new double[7];
+        for (var bin = 0; bin < size; bin++)
+        {
+            var hz = (double)Math.Min(bin, size - bin) * rate / size;
+            var index = Fourier.BandIndex(hz);
+            if (index >= 0)
+                energy[index] += spectrum[bin].Magnitude * spectrum[bin].Magnitude / size / input.Length;
+        }
+        for (var bin = 0; bin < size; bin++)
+        {
+            var hz = (double)Math.Min(bin, size - bin) * rate / size;
+            var index = Fourier.BandIndex(hz);
+            var gain = index >= 0 && energy[index] > 1e-14 ? targetRms[index] / Math.Sqrt(energy[index]) : 0;
+            spectrum[bin] *= gain;
+        }
+        Fourier.Transform(spectrum, true);
+        return spectrum.Take(input.Length).Select(x => x.Real).ToArray();
+    }
+}
+
+===== src/Avas.Core/Audio/WaveCodec.cs =====
+using System.Buffers.Binary;
+using System.Text;
+using Avas.Core.Domain;
+using Avas.Core.IO;
+
+namespace Avas.Core.Audio;
+
+public sealed record WaveData(int Rate, int Channels, double[] Samples)
+{
+    public double Duration => (double)Samples.Length / Rate;
+}
+
+public static class WaveCodec
+{
+    public static WaveData Read(byte[] bytes)
+    {
+        if (bytes.Length is < 44 or > 10485760)
+            throw new ArgumentException("WAV文件必须在44字节至10MiB之间");
+        if (Encoding.ASCII.GetString(bytes, 0, 4) != "RIFF" || Encoding.ASCII.GetString(bytes, 8, 4) != "WAVE")
+            throw new ArgumentException("只支持RIFF WAVE；请先转换为16位PCM WAV");
+        var declared = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(4, 4));
+        if (declared + 8L != bytes.Length)
+            throw new ArgumentException("WAV RIFF声明长度与文件长度不一致");
+        var format = 0;
+        var channels = 0;
+        var rate = 0;
+        var bits = 0;
+        var align = 0;
+        var byteRate = 0;
+        byte[]? data = null;
+        var position = 12;
+        var seenFormat = false;
+        while (position + 8 <= bytes.Length)
+        {
+            var name = Encoding.ASCII.GetString(bytes, position, 4);
+            var size = BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(position + 4, 4));
+            position += 8;
+            if (size > int.MaxValue || position + (long)size > bytes.Length)
+                throw new ArgumentException("WAV数据块截断");
+            if (name == "fmt ")
+            {
+                if (seenFormat || size < 16)
+                    throw new ArgumentException("WAV格式块重复或不完整");
+                seenFormat = true;
+                format = BinaryPrimitives.ReadUInt16LittleEndian(bytes.AsSpan(position, 2));
+                channels = BinaryPrimitives.ReadUInt16LittleEndian(bytes.AsSpan(position + 2, 2));
+                rate = BinaryPrimitives.ReadInt32LittleEndian(bytes.AsSpan(position + 4, 4));
+                byteRate = BinaryPrimitives.ReadInt32LittleEndian(bytes.AsSpan(position + 8, 4));
+                align = BinaryPrimitives.ReadUInt16LittleEndian(bytes.AsSpan(position + 12, 2));
+                bits = BinaryPrimitives.ReadUInt16LittleEndian(bytes.AsSpan(position + 14, 2));
+            }
+            if (name == "data")
+            {
+                if (data is not null)
+                    throw new ArgumentException("WAV存在多个data块，请转换后重试");
+                data = bytes.AsSpan(position, (int)size).ToArray();
+            }
+            position += checked((int)size + (int)(size % 2));
+        }
+        if (format != 1 || bits != 16 || channels is < 1 or > 2 || rate is < 16000 or > 96000)
+            throw new ArgumentException("仅支持16位PCM、单/双声道、16000至96000Hz WAV");
+        if (align != channels * 2 || byteRate != rate * align || data is null || data.Length == 0 || data.Length % align != 0)
+            throw new ArgumentException("WAV块对齐、字节率或采样长度无效");
+        var frames = data.Length / align;
+        if ((double)frames / rate > 30)
+            throw new ArgumentException("音频最多30秒，请先裁剪");
+        var samples = new double[frames];
+        for (var frame = 0; frame < frames; frame++)
+        {
+            double sum = 0;
+            for (var channel = 0; channel < channels; channel++)
+            {
+                var sample = BinaryPrimitives.ReadInt16LittleEndian(data.AsSpan(frame * align + channel * 2, 2));
+                sum += sample / 32768.0;
+            }
+            samples[frame] = sum / channels;
+        }
+        return new WaveData(rate, channels, samples);
+    }
+
+    public static AudioAsset CreateAsset(string fileName, byte[] bytes)
+    {
+        var data = Read(bytes);
+        return new AudioAsset
+        {
+            Name = Path.GetFileName(fileName),
+            Sha256 = ProjectCodec.Hash(bytes),
+            Data = Convert.ToBase64String(bytes),
+            Rate = data.Rate,
+            Channels = data.Channels,
+            Duration = data.Duration
+        };
+    }
+
+    public static byte[] Write(double[] samples, int rate = 24000, string? metadata = null)
+    {
+        using var stream = new MemoryStream();
+        using var writer = new BinaryWriter(stream);
+        writer.Write(Encoding.ASCII.GetBytes("RIFF"));
+        writer.Write(36 + samples.Length * 2);
+        writer.Write(Encoding.ASCII.GetBytes("WAVEfmt "));
+        writer.Write(16);
+        writer.Write((short)1);
+        writer.Write((short)1);
+        writer.Write(rate);
+        writer.Write(rate * 2);
+        writer.Write((short)2);
+        writer.Write((short)16);
+        writer.Write(Encoding.ASCII.GetBytes("data"));
+        writer.Write(samples.Length * 2);
+        foreach (var sample in samples)
+            writer.Write((short)Math.Round(Math.Clamp(sample, -1, 0.999969) * 32768));
+        if (metadata is not null)
+        {
+            var comment = Encoding.UTF8.GetBytes(metadata + "\0");
+            writer.Write(Encoding.ASCII.GetBytes("LIST"));
+            writer.Write(12 + comment.Length + comment.Length % 2);
+            writer.Write(Encoding.ASCII.GetBytes("INFOICMT"));
+            writer.Write(comment.Length);
+            writer.Write(comment);
+            if (comment.Length % 2 != 0)
+                writer.Write((byte)0);
+            var end = stream.Position;
+            stream.Position = 4;
+            writer.Write(checked((int)end - 8));
+            stream.Position = end;
+        }
+        return stream.ToArray();
+    }
+}
+
+===== src/Avas.Core/Domain/Demonstration.cs =====
+namespace Avas.Core.Domain;
+
+public static class Demonstration
+{
+    public static Project Create()
+    {
+        var project = new Project
+        {
+            Name = "前部双扬声器布置示例",
+            Owner = "演示操作员",
+            Vehicle = "模拟车辆 EV-01",
+            Purpose = "比较前部扬声器朝向对车前及侧前区域工程覆盖的影响",
+            Note = "固定人工模拟频谱；不代表真实车辆，不用于合规结论"
+        };
+        project.Settings.BackgroundOrigin = Origin.Simulation;
+        project.Settings.BackgroundSource = "软件固定模拟背景，各频带35dB";
+        project.Speakers.Add(new Speaker
+        {
+            Name = "前左扬声器",
+            X = 2.4,
+            Y = 0.65,
+            Heading = 25,
+            Source = "固定模拟轴向1m声压级；不含车身作用",
+            Origin = Origin.Simulation,
+            Bands = Software.Frequencies.Select((hz, i) => new BandInput
+            {
+                Hz = hz,
+                Level = new double[] { 49, 54, 60, 63, 61, 55, 47 }[i]
+            }).ToList()
+        });
+        project.Speakers.Add(new Speaker
+        {
+            Name = "前右扬声器",
+            X = 2.4,
+            Y = -0.65,
+            Heading = -25,
+            Source = "固定模拟轴向1m声压级；不含车身作用",
+            Origin = Origin.Simulation,
+            Bands = project.Speakers[0].Bands.Select(x => x.Copy()).ToList()
+        });
+        project.Listeners =
+        [
+            new() { Name = "车前5m", X = 7.3, Y = 0 },
+            new() { Name = "左前观察点", X = 5, Y = 4 },
+            new() { Name = "右前观察点", X = 5, Y = -4 },
+            new() { Name = "车后观察点", X = -5, Y = 0 }
+        ];
+        project.Audit.Add(new AuditEntry { Action = "载入固定模拟示例" });
+        return project;
+    }
+}
+
+===== src/Avas.Core/Domain/Project.cs =====
+namespace Avas.Core.Domain;
+
+public static class Software
+{
+    public const string Name = "车外行人警示声音传播与覆盖设计软件";
+    public const string Version = "1.0";
+    public const string Model = "free-field-incoherent-1";
+    public const string Boundary = "自由声场工程估算；未模拟车身遮挡、反射、衍射、地面与气象；非可听性或法规判定。";
+    public static readonly int[] Frequencies = [125, 250, 500, 1000, 2000, 4000, 8000];
+    public static readonly double[] AWeights = [-16.1, -8.6, -3.2, 0, 1.2, 1, -1.1];
+}
+
+public enum Origin
+{
+    Manual,
+    Simulation,
+    MeasurementDeclared,
+    Estimate
+}
+
+public static class OriginNames
+{
+    public static string Label(this Origin origin) => origin switch
+    {
+        Origin.Manual => "人工输入",
+        Origin.Simulation => "模拟示例",
+        Origin.MeasurementDeclared => "实测（用户声明）",
+        Origin.Estimate => "估算",
+        _ => "未知"
+    };
+}
+
+public sealed class BandInput
+{
+    public int Hz { get; set; }
+    public double Level { get; set; } = 60;
+    public double Correction { get; set; }
+    public BandInput Copy() => new() { Hz = Hz, Level = Level, Correction = Correction };
+}
+
+public sealed class Speaker
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public string Name { get; set; } = "新扬声器";
+    public bool Enabled { get; set; } = true;
+    public double X { get; set; } = 2.3;
+    public double Y { get; set; }
+    public double Height { get; set; } = 0.5;
+    public double Heading { get; set; }
+    public double ReferenceDistance { get; set; } = 1;
+    public double Gain { get; set; }
+    public double Exponent { get; set; } = 1;
+    public double RearFloor { get; set; } = 0.2;
+    public Origin Origin { get; set; } = Origin.Manual;
+    public string Source { get; set; } = "请填写轴向声压级来源与参考条件";
+    public string Note { get; set; } = "";
+    public List<BandInput> Bands { get; set; } = Software.Frequencies.Select(hz => new BandInput { Hz = hz }).ToList();
+    public AudioAsset? Audio { get; set; }
+}
+
+public sealed class Listener
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public string Name { get; set; } = "观察点";
+    public double X { get; set; } = 5;
+    public double Y { get; set; }
+    public string Note { get; set; } = "";
+}
+
+public sealed class Settings
+{
+    public double MinX { get; set; } = -10;
+    public double MaxX { get; set; } = 10;
+    public double MinY { get; set; } = -8;
+    public double MaxY { get; set; } = 8;
+    public double Step { get; set; } = 0.5;
+    public double ReceiverHeight { get; set; } = 1.5;
+    public double MinimumDistance { get; set; } = 0.5;
+    public double VehicleLength { get; set; } = 4.6;
+    public double VehicleWidth { get; set; } = 1.8;
+    public bool ExcludeVehicle { get; set; } = true;
+    public int SelectedHz { get; set; }
+    public bool AWeighted { get; set; }
+    public double LevelTarget { get; set; } = 45;
+    public double MarginTarget { get; set; } = 3;
+    public string BackgroundSource { get; set; } = "请填写背景声来源";
+    public Origin BackgroundOrigin { get; set; } = Origin.Manual;
+    public List<BandInput> Background { get; set; } = Software.Frequencies.Select(hz => new BandInput { Hz = hz, Level = 35 }).ToList();
+    public AudioAsset? BackgroundAudio { get; set; }
+}
+
+public sealed class AudioAsset
+{
+    public string Name { get; set; } = "";
+    public string Sha256 { get; set; } = "";
+    public string Data { get; set; } = "";
+    public int Rate { get; set; }
+    public int Channels { get; set; }
+    public double Duration { get; set; }
+    public string Source { get; set; } = "用户导入数字音频，未标定";
+}
+
+public sealed class Snapshot
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public string Name { get; set; } = "";
+    public DateTimeOffset Created { get; set; } = DateTimeOffset.UtcNow;
+    public string InputHash { get; set; } = "";
+    public Settings Settings { get; set; } = new();
+    public List<Speaker> Speakers { get; set; } = [];
+    public List<Listener> Listeners { get; set; } = [];
+}
+
+public sealed class AuditEntry
+{
+    public DateTimeOffset At { get; set; } = DateTimeOffset.UtcNow;
+    public string Action { get; set; } = "";
+    public int Revision { get; set; }
+}
+
+public sealed class Project
+{
+    public int Schema { get; set; } = 1;
+    public string SoftwareVersion { get; set; } = Software.Version;
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public string Name { get; set; } = "未命名项目";
+    public string Owner { get; set; } = "";
+    public string Vehicle { get; set; } = "";
+    public string Purpose { get; set; } = "";
+    public string Note { get; set; } = "";
+    public bool Archived { get; set; }
+    public int Revision { get; set; }
+    public DateTimeOffset Created { get; set; } = DateTimeOffset.UtcNow;
+    public Settings Settings { get; set; } = new();
+    public List<Speaker> Speakers { get; set; } = [];
+    public List<Listener> Listeners { get; set; } = [];
+    public List<Snapshot> Snapshots { get; set; } = [];
+    public List<AuditEntry> Audit { get; set; } = [];
+}
+
+===== src/Avas.Core/Domain/Validation.cs =====
+namespace Avas.Core.Domain;
+
+public sealed record Issue(string Path, string Message)
+{
+    public override string ToString() => $"{Path}：{Message}";
+}
+
+public static class Validation
+{
+    public static List<Issue> Check(Project project, bool forCalculation = false)
+    {
+        var issues = new List<Issue>();
+        if (project.Schema != 1)
+            issues.Add(new("Schema", "仅支持项目格式版本1，不能静默迁移"));
+        Text(issues, "项目名称", project.Name, 100, true);
+        Text(issues, "负责人", project.Owner, 100);
+        Text(issues, "车辆", project.Vehicle, 100);
+        Text(issues, "目的", project.Purpose, 2000);
+        Text(issues, "备注", project.Note, 4000);
+        if (project.Id == Guid.Empty)
+            issues.Add(new("项目标识", "不能是空GUID"));
+        if (project.Speakers is null || project.Listeners is null || project.Settings is null || project.Snapshots is null || project.Audit is null)
+        {
+            issues.Add(new("项目结构", "集合与设置不能为null"));
+            return issues;
+        }
+        if (project.Speakers.Count > 8)
+            issues.Add(new("扬声器", "最多8个"));
+        if (project.Listeners.Count > 100)
+            issues.Add(new("观察点", "最多100个"));
+        if (project.Snapshots.Count > 20)
+            issues.Add(new("方案快照", "最多20个"));
+        if (project.Audit.Count > 1000)
+            issues.Add(new("审计", "最多1000条"));
+        Unique(issues, "扬声器", project.Speakers.Select(x => x.Id));
+        Unique(issues, "观察点", project.Listeners.Select(x => x.Id));
+        Unique(issues, "方案", project.Snapshots.Select(x => x.Id));
+        foreach (var source in project.Speakers)
+            CheckSpeaker(issues, source);
+        foreach (var point in project.Listeners)
+        {
+            Text(issues, $"观察点 {point.Id} 名称", point.Name, 100, true);
+            Range(issues, $"{point.Name}.X", point.X, -100, 100);
+            Range(issues, $"{point.Name}.Y", point.Y, -100, 100);
+            Text(issues, $"{point.Name}.备注", point.Note, 2000);
+        }
+        CheckSettings(issues, project.Settings);
+        foreach (var snapshot in project.Snapshots)
+        {
+            Text(issues, "快照名称", snapshot.Name, 100, true);
+            if (snapshot.Settings is null || snapshot.Speakers is null || snapshot.Listeners is null)
+            {
+                issues.Add(new("快照", "缺少设置、扬声器或观察点"));
+                continue;
+            }
+            var nested = new Project
+            {
+                Name = snapshot.Name,
+                Settings = snapshot.Settings,
+                Speakers = snapshot.Speakers,
+                Listeners = snapshot.Listeners
+            };
+            issues.AddRange(Check(nested).Select(x => new Issue("快照/" + x.Path, x.Message)));
+        }
+        if (forCalculation && !project.Speakers.Any(x => x.Enabled))
+            issues.Add(new("扬声器", "请添加并启用至少一个扬声器"));
+        return issues;
+    }
+
+    public static void CheckSpeaker(List<Issue> issues, Speaker speaker)
+    {
+        var prefix = $"扬声器 {speaker.Name}";
+        Text(issues, prefix + ".名称", speaker.Name, 100, true);
+        Text(issues, prefix + ".来源", speaker.Source, 2000, true);
+        Text(issues, prefix + ".备注", speaker.Note, 2000);
+        Range(issues, prefix + ".X", speaker.X, -100, 100);
+        Range(issues, prefix + ".Y", speaker.Y, -100, 100);
+        Range(issues, prefix + ".高度", speaker.Height, 0, 10);
+        Range(issues, prefix + ".朝向", speaker.Heading, -360, 360);
+        Range(issues, prefix + ".参考距离", speaker.ReferenceDistance, 0.1, 10);
+        Range(issues, prefix + ".增益", speaker.Gain, -40, 40);
+        Range(issues, prefix + ".指向指数", speaker.Exponent, 0, 8);
+        Range(issues, prefix + ".背向幅值下限", speaker.RearFloor, 0.01, 1);
+        Bands(issues, prefix + ".频带", speaker.Bands, true);
+        if (!Enum.IsDefined(speaker.Origin))
+            issues.Add(new(prefix + ".来源类别", "无效枚举"));
+        Asset(issues, prefix + ".音频", speaker.Audio);
+    }
+
+    public static void CheckSettings(List<Issue> issues, Settings settings)
+    {
+        Range(issues, "网格.MinX", settings.MinX, -100, 100);
+        Range(issues, "网格.MaxX", settings.MaxX, -100, 100);
+        Range(issues, "网格.MinY", settings.MinY, -100, 100);
+        Range(issues, "网格.MaxY", settings.MaxY, -100, 100);
+        Range(issues, "网格步长", settings.Step, 0.25, 5);
+        Range(issues, "接收高度", settings.ReceiverHeight, 0, 10);
+        Range(issues, "距离下限", settings.MinimumDistance, 0.1, 10);
+        Range(issues, "车辆长度", settings.VehicleLength, 1, 20);
+        Range(issues, "车辆宽度", settings.VehicleWidth, 0.5, 5);
+        Range(issues, "工程声级目标", settings.LevelTarget, -60, 140);
+        Range(issues, "工程背景差目标", settings.MarginTarget, -40, 60);
+        if (settings.MaxX <= settings.MinX || settings.MaxY <= settings.MinY)
+            issues.Add(new("网格", "最大坐标必须大于最小坐标"));
+        if (settings.Step > 0 && double.IsFinite(settings.Step))
+        {
+            var count = (Math.Floor((settings.MaxX - settings.MinX) / settings.Step) + 1)
+                * (Math.Floor((settings.MaxY - settings.MinY) / settings.Step) + 1);
+            if (!double.IsFinite(count) || count > 20000)
+                issues.Add(new("网格", "节点上限20000，请增大步长或缩小范围"));
+        }
+        if (settings.SelectedHz != 0 && !Software.Frequencies.Contains(settings.SelectedHz))
+            issues.Add(new("显示频带", "请选择0（合成）或七个支持频带"));
+        Text(issues, "背景来源", settings.BackgroundSource, 2000, true);
+        if (!Enum.IsDefined(settings.BackgroundOrigin))
+            issues.Add(new("背景来源类别", "无效枚举"));
+        Bands(issues, "背景频带", settings.Background, false);
+        Asset(issues, "背景音频", settings.BackgroundAudio);
+    }
+
+    public static void Bands(List<Issue> issues, string path, List<BandInput>? bands, bool correction)
+    {
+        if (bands is null || bands.Count != Software.Frequencies.Length)
+        {
+            issues.Add(new(path, "必须完整提供七个频带，缺失不能补零"));
+            return;
+        }
+        if (!bands.Select(x => x.Hz).Order().SequenceEqual(Software.Frequencies))
+            issues.Add(new(path, "频率必须各出现一次：125,250,500,1000,2000,4000,8000"));
+        foreach (var band in bands)
+        {
+            Range(issues, $"{path}.{band.Hz}Hz声级", band.Level, -60, 140);
+            Range(issues, $"{path}.{band.Hz}Hz修正", band.Correction, correction ? -40 : 0, correction ? 40 : 0);
+        }
+    }
+
+    private static void Asset(List<Issue> issues, string path, AudioAsset? asset)
+    {
+        if (asset is null)
+            return;
+        Text(issues, path + ".名称", asset.Name, 200, true);
+        Text(issues, path + ".来源", asset.Source, 2000, true);
+        if (asset.Data is null || asset.Data.Length > 14000000)
+            issues.Add(new(path, "单音频最大10MiB"));
+        Range(issues, path + ".时长", asset.Duration, 0.001, 30);
+        if (asset.Rate is < 16000 or > 96000 || asset.Channels is < 1 or > 2)
+            issues.Add(new(path, "采样率16000至96000Hz，单声道或双声道"));
+    }
+
+    private static void Unique(List<Issue> issues, string path, IEnumerable<Guid> ids)
+    {
+        var list = ids.ToList();
+        if (list.Contains(Guid.Empty) || list.Distinct().Count() != list.Count)
+            issues.Add(new(path, "对象标识为空或重复"));
+    }
+
+    private static void Text(List<Issue> issues, string path, string? value, int max, bool required = false)
+    {
+        if (value is null || value.Length > max || (required && string.IsNullOrWhiteSpace(value)))
+            issues.Add(new(path, $"{(required ? "必填；" : "")}最多{max}字符"));
+    }
+
+    private static void Range(List<Issue> issues, string path, double value, double min, double max)
+    {
+        if (!double.IsFinite(value) || value < min || value > max)
+            issues.Add(new(path, $"必须为{min}至{max}的有限数值"));
+    }
+}
+
+===== src/Avas.Core/IO/ListenerCsv.cs =====
+using System.Globalization;
+using System.Text;
+using Avas.Core.Domain;
+
+namespace Avas.Core.IO;
+
+public sealed record ListenerPreview(List<Listener> Points, List<string> Errors)
+{
+    public bool Valid => Errors.Count == 0 && Points.Count > 0;
+}
+
+public static class ListenerCsv
+{
+    public const string Header = "Name,X_m,Y_m,Note";
+
+    public static string Template() => Header + "\n车前5m,7.3,0,人工定义观察点\n左前点,5,4,人工定义观察点";
+
+    public static ListenerPreview Parse(string text)
+    {
+        var points = new List<Listener>();
+        var errors = new List<string>();
+        if (text.Length > 100000)
+            return new(points, ["观察点CSV最多100000字符"]);
+        var lines = text.TrimStart('\uFEFF').Replace("\r", "").Split('\n');
+        if (lines.Length == 0 || lines[0] != Header)
+            errors.Add("第1行表头必须为 " + Header);
+        for (var i = 1; i < lines.Length; i++)
+        {
+            if (string.IsNullOrWhiteSpace(lines[i]))
+                continue;
+            List<string> fields;
+            try
+            {
+                fields = SplitLine(lines[i]);
+            }
+            catch (ArgumentException error)
+            {
+                errors.Add($"第{i + 1}行：{error.Message}");
+                continue;
+            }
+            if (fields.Count != 4)
+            {
+                errors.Add($"第{i + 1}行：应有名称、X、Y、备注四列");
+                continue;
+            }
+            if (string.IsNullOrWhiteSpace(fields[0]) || fields[0].Length > 100 || fields[3].Length > 2000)
+            {
+                errors.Add($"第{i + 1}行：名称必填且不超过100字符，备注不超过2000字符");
+                continue;
+            }
+            if (!double.TryParse(fields[1], NumberStyles.Float, CultureInfo.InvariantCulture, out var x)
+                || !double.TryParse(fields[2], NumberStyles.Float, CultureInfo.InvariantCulture, out var y)
+                || !double.IsFinite(x) || !double.IsFinite(y) || Math.Abs(x) > 100 || Math.Abs(y) > 100)
+            {
+                errors.Add($"第{i + 1}行：X/Y必须是-100至100m的有限数值");
+                continue;
+            }
+            if (points.Any(p => p.Name == fields[0]))
+            {
+                errors.Add($"第{i + 1}行：名称与前行重复，无法清楚区分观察点");
+                continue;
+            }
+            points.Add(new Listener { Name = fields[0], X = x, Y = y, Note = fields[3] });
+        }
+        if (points.Count is < 1 or > 100)
+            errors.Add("有效观察点必须为1至100个");
+        return new(points, errors);
+    }
+
+    public static List<string> SplitLine(string line)
+    {
+        var fields = new List<string>();
+        var current = new StringBuilder();
+        var quoted = false;
+        var closed = false;
+        for (var i = 0; i < line.Length; i++)
+        {
+            var c = line[i];
+            if (quoted)
+            {
+                if (c == '"')
+                {
+                    if (i + 1 < line.Length && line[i + 1] == '"')
+                    {
+                        current.Append('"');
+                        i++;
+                    }
+                    else
+                    {
+                        quoted = false;
+                        closed = true;
+                    }
+                }
+                else
+                    current.Append(c);
+            }
+            else if (c == ',')
+            {
+                fields.Add(current.ToString());
+                current.Clear();
+                closed = false;
+            }
+            else if (closed)
+                throw new ArgumentException("结束引号之后只能接逗号或行尾");
+            else if (c == '"')
+            {
+                if (current.Length != 0)
+                    throw new ArgumentException("引号只能出现在字段开头");
+                quoted = true;
+            }
+            else
+                current.Append(c);
+        }
+        if (quoted)
+            throw new ArgumentException("引号未闭合；不支持字段内换行");
+        fields.Add(current.ToString());
+        return fields;
+    }
+
+    public static byte[] Write(IEnumerable<Listener> points)
+    {
+        var text = new StringBuilder("\uFEFF" + Header + "\r\n");
+        foreach (var point in points)
+        {
+            var name = point.Name.Replace("\r", " ").Replace("\n", " ");
+            var note = point.Note.Replace("\r", " ").Replace("\n", " ");
+            text.AppendLine(string.Join(",", Quote(name), point.X.ToString("R", CultureInfo.InvariantCulture),
+                point.Y.ToString("R", CultureInfo.InvariantCulture), Quote(note)));
+        }
+        return Encoding.UTF8.GetBytes(text.ToString());
+    }
+
+    private static string Quote(string text) => "\"" + text.Replace("\"", "\"\"") + "\"";
+}
+
+===== src/Avas.Core/IO/ProjectCodec.cs =====
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Avas.Core.Audio;
+using Avas.Core.Domain;
+
+namespace Avas.Core.IO;
+
+public static class ProjectCodec
+{
+    public const int MaximumBytes = 80 * 1024 * 1024;
+    private static readonly JsonSerializerOptions Options = new()
+    {
+        WriteIndented = true,
+        PropertyNameCaseInsensitive = false,
+        UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
+        MaxDepth = 32,
+        Converters = { new JsonStringEnumConverter() }
+    };
+
+    public static string Json<T>(T value) => JsonSerializer.Serialize(value, Options);
+
+    public static T Clone<T>(T value)
+    {
+        return JsonSerializer.Deserialize<T>(Json(value), Options)
+            ?? throw new ArgumentException("不能复制空对象");
+    }
+
+    public static byte[] Encode(Project project)
+    {
+        var issues = Validation.Check(project);
+        if (issues.Count > 0)
+            throw new ArgumentException(string.Join("\n", issues));
+        var bytes = Encoding.UTF8.GetBytes(Json(project));
+        if (bytes.Length > MaximumBytes)
+            throw new ArgumentException("项目超过80MiB，请移除不需要的音频或快照");
+        return bytes;
+    }
+
+    public static Project Decode(byte[] bytes)
+    {
+        if (bytes.Length > MaximumBytes)
+            throw new ArgumentException("项目超过80MiB限制");
+        Project project;
+        try
+        {
+            using var document = JsonDocument.Parse(bytes);
+            if (!document.RootElement.TryGetProperty("Schema", out var schema) || schema.GetInt32() != 1)
+                throw new ArgumentException("缺少Schema或版本不受支持；本软件仅支持格式1");
+            ValidateShape(document.RootElement, typeof(Project), "项目");
+            project = JsonSerializer.Deserialize<Project>(bytes, Options)
+                ?? throw new ArgumentException("项目为空");
+        }
+        catch (JsonException error)
+        {
+            throw new ArgumentException($"项目JSON损坏，位置{error.Path}：{error.Message}");
+        }
+        var issues = Validation.Check(project);
+        if (issues.Count > 0)
+            throw new ArgumentException(string.Join("\n", issues));
+        ValidateAssets(project);
+        foreach (var snapshot in project.Snapshots)
+        {
+            var captured = new Project { Settings = snapshot.Settings, Speakers = snapshot.Speakers, Listeners = snapshot.Listeners };
+            if (InputHash(captured) != snapshot.InputHash)
+                throw new ArgumentException($"快照 {snapshot.Name} 的输入哈希不一致，不能作为可追溯方案打开");
+        }
+        return project;
+    }
+
+    public static string InputHash(Project project)
+    {
+        var input = new
+        {
+            Model = Software.Model,
+            project.Settings,
+            Speakers = project.Speakers.OrderBy(x => x.Id).ToArray(),
+            Listeners = project.Listeners.OrderBy(x => x.Id).ToArray()
+        };
+        return Hash(Encoding.UTF8.GetBytes(Json(input)));
+    }
+
+    public static string Hash(byte[] bytes) => Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant();
+
+    public static string SourceSummary(Project project)
+    {
+        var sources = project.Speakers.Where(x => x.Enabled)
+            .Select(x => $"{x.Name}:{x.Origin.Label()}:{x.Source}");
+        return string.Join(";", sources) + ";背景:" + project.Settings.BackgroundOrigin.Label() + ":" + project.Settings.BackgroundSource;
+    }
+
+    public static string Conditions(Settings settings)
+    {
+        return Json(new
+        {
+            settings.MinX,
+            settings.MaxX,
+            settings.MinY,
+            settings.MaxY,
+            settings.Step,
+            settings.ReceiverHeight,
+            settings.MinimumDistance,
+            settings.VehicleLength,
+            settings.VehicleWidth,
+            settings.ExcludeVehicle,
+            settings.SelectedHz,
+            settings.AWeighted,
+            settings.LevelTarget,
+            settings.MarginTarget,
+            settings.Background,
+            settings.BackgroundOrigin,
+            settings.BackgroundSource,
+            BackgroundAudioHash = settings.BackgroundAudio?.Sha256
+        });
+    }
+
+    private static void ValidateShape(JsonElement element, Type type, string path)
+    {
+        if (element.ValueKind != JsonValueKind.Object)
+            throw new ArgumentException(path + "必须为对象，不能为null");
+        foreach (var property in type.GetProperties().Where(x => x.CanWrite))
+        {
+            var fieldPath = path + "." + property.Name;
+            if (!element.TryGetProperty(property.Name, out var value))
+                throw new ArgumentException(fieldPath + "缺失；格式1不自动补默认值");
+            if (value.ValueKind == JsonValueKind.Null)
+            {
+                if (property.PropertyType == typeof(AudioAsset))
+                    continue;
+                throw new ArgumentException(fieldPath + "不能为null");
+            }
+            var fieldType = property.PropertyType;
+            if (fieldType.IsGenericType && fieldType.GetGenericTypeDefinition() == typeof(List<>))
+            {
+                if (value.ValueKind != JsonValueKind.Array)
+                    throw new ArgumentException(fieldPath + "必须为数组");
+                var itemType = fieldType.GetGenericArguments()[0];
+                var index = 0;
+                foreach (var item in value.EnumerateArray())
+                    ValidateShape(item, itemType, fieldPath + "[" + index++ + "]");
+            }
+            else if (fieldType == typeof(Settings) || fieldType == typeof(AudioAsset))
+                ValidateShape(value, fieldType, fieldPath);
+        }
+    }
+
+    private static void ValidateAssets(Project project)
+    {
+        var assets = project.Speakers.Select(x => x.Audio).Append(project.Settings.BackgroundAudio)
+            .Concat(project.Snapshots.SelectMany(x => x.Speakers.Select(s => s.Audio).Append(x.Settings.BackgroundAudio)));
+        foreach (var asset in assets.Where(x => x is not null).Cast<AudioAsset>())
+        {
+            byte[] data;
+            try
+            {
+                data = Convert.FromBase64String(asset.Data);
+            }
+            catch (FormatException)
+            {
+                throw new ArgumentException($"音频 {asset.Name} 的内嵌数据不是有效Base64");
+            }
+            if (Hash(data) != asset.Sha256)
+                throw new ArgumentException($"音频 {asset.Name} 校验和不一致，文件可能损坏");
+            var decoded = WaveCodec.Read(data);
+            if (decoded.Rate != asset.Rate || decoded.Channels != asset.Channels
+                || Math.Abs(decoded.Duration - asset.Duration) > 0.001)
+                throw new ArgumentException($"音频 {asset.Name} 的采样信息与数据不一致");
+        }
+    }
+}
+
+===== src/Avas.Core/IO/ProjectStore.cs =====
+using Avas.Core.Domain;
+
+namespace Avas.Core.IO;
+
+public sealed record StoredProject(string Id, string Name, string FileName, DateTimeOffset Modified, long Size, string Hash, bool HasBackup, string? Error);
+public sealed record SaveReceipt(string Path, string Hash, bool BackupCreated);
+
+public sealed class ProjectStore
+{
+    private static readonly object Gate = new();
+    public string DirectoryPath { get; }
+
+    public ProjectStore(string path)
+    {
+        DirectoryPath = Path.GetFullPath(path);
+        Directory.CreateDirectory(DirectoryPath);
+    }
+
+    public List<StoredProject> List()
+    {
+        lock (Gate)
+        {
+            return Directory.EnumerateFiles(DirectoryPath, "*.avasproj").Select(path =>
+            {
+                var info = new FileInfo(path);
+                try
+                {
+                    var data = File.ReadAllBytes(path);
+                    var project = ProjectCodec.Decode(data);
+                    return new StoredProject(project.Id.ToString(), project.Name, info.Name,
+                        info.LastWriteTimeUtc, info.Length, ProjectCodec.Hash(data), File.Exists(path + ".bak"), null);
+                }
+                catch (Exception error) when (error is ArgumentException or IOException or FormatException)
+                {
+                    return new StoredProject(Path.GetFileNameWithoutExtension(path), info.Name, info.Name,
+                        info.LastWriteTimeUtc, info.Length, "", File.Exists(path + ".bak"), error.Message);
+                }
+            }).OrderByDescending(x => x.Modified).ToList();
+        }
+    }
+
+    public (Project Project, string Hash) Open(Guid id, bool backup = false)
+    {
+        lock (Gate)
+        {
+            var path = FilePath(id) + (backup ? ".bak" : "");
+            var data = File.ReadAllBytes(path);
+            return (ProjectCodec.Decode(data), ProjectCodec.Hash(data));
+        }
+    }
+
+    public SaveReceipt Save(Project project, string? expectedHash)
+    {
+        var bytes = ProjectCodec.Encode(project);
+        lock (Gate)
+        {
+            var path = FilePath(project.Id);
+            var exists = File.Exists(path);
+            if (exists)
+            {
+                var currentHash = ProjectCodec.Hash(File.ReadAllBytes(path));
+                if (expectedHash is null || currentHash != expectedHash)
+                    throw new IOException("同标识项目已存在或被其他会话修改；请先打开磁盘版，或复制为独立项目后保存。");
+            }
+            var temporary = path + ".tmp-" + Guid.NewGuid().ToString("N");
+            try
+            {
+                using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+                {
+                    stream.Write(bytes);
+                    stream.Flush(true);
+                }
+                if (exists)
+                    File.Copy(path, path + ".bak", true);
+                File.Move(temporary, path, true);
+            }
+            finally
+            {
+                if (File.Exists(temporary))
+                    File.Delete(temporary);
+            }
+            return new SaveReceipt(path, ProjectCodec.Hash(bytes), exists);
+        }
+    }
+
+    private string FilePath(Guid id) => Path.Combine(DirectoryPath, id.ToString("N") + ".avasproj");
+}
+
+===== src/Avas.Core/IO/ResultExport.cs =====
+using System.Text;
+using Avas.Core.Analysis;
+using Avas.Core.Domain;
+
+namespace Avas.Core.IO;
+
+public static class ResultExport
+{
+    private static string N(double value) => value.ToString("R", System.Globalization.CultureInfo.InvariantCulture);
+    private static string H(string value) => ChartRenderer.Escape(value);
+
+    public static void RequireCurrent(Project project, Calculation result)
+    {
+        if (ProjectCodec.InputHash(project) != result.InputHash)
+            throw new ArgumentException("结果已过期，请重新计算后导出");
+    }
+
+    public static byte[] Csv(Project project, Calculation result, bool grid)
+    {
+        RequireCurrent(project, result);
+        var csv = new StringBuilder("\uFEFFSoftware,Version,Model,Project,Revision,InputHash,Metric,Origin,Name,X_m,Y_m,Signal_dB,Background_dB,Combined_dB,Margin_dB,EngineeringTargetMet,DistanceClamped,InVehicle,125Hz_dB,250Hz_dB,500Hz_dB,1000Hz_dB,2000Hz_dB,4000Hz_dB,8000Hz_dB\r\n");
+        var origin = string.Join(";", project.Speakers.Where(x => x.Enabled).Select(x => $"{x.Name}:{x.Origin.Label()}:{x.Source}"))
+            + ";背景:" + project.Settings.BackgroundOrigin.Label() + ":" + project.Settings.BackgroundSource;
+        foreach (var point in grid ? result.Grid : result.Listeners)
+        {
+            var fields = new[]
+            {
+                SpectrumCsv.Cell(Software.Name), Software.Version, Software.Model, SpectrumCsv.Cell(project.Name),
+                project.Revision.ToString(), result.InputHash, SpectrumCsv.Cell(result.Metric), SpectrumCsv.Cell(origin),
+                SpectrumCsv.Cell(point.Name), N(point.X), N(point.Y), N(point.Signal), N(point.Background), N(point.Combined),
+                N(point.Margin), point.Covered.ToString(), point.NearFieldClamped.ToString(), point.InVehicle.ToString()
+            }.Concat(point.Bands.Select(N));
+            csv.AppendLine(string.Join(",", fields));
+        }
+        return Encoding.UTF8.GetBytes(csv.ToString());
+    }
+
+    public static byte[] Report(Project project, Calculation result)
+    {
+        RequireCurrent(project, result);
+        var text = new StringBuilder("<!doctype html><html lang='zh-CN'><meta charset='utf-8'><title>声场工程估算报告</title><style>body{font:15px sans-serif;max-width:1100px;margin:40px auto;color:#24344d;padding:20px}h1{font-size:25px}h2{font-size:20px;margin-top:32px}table{border-collapse:collapse;width:100%;margin:15px 0}th,td{border:1px solid #ccd5df;padding:8px;text-align:left}th{background:#edf3f6}svg{width:100%}.note{padding:15px;background:#fff3d7}pre{white-space:pre-wrap;overflow-wrap:anywhere}@media print{h2{break-after:avoid}tr{break-inside:avoid}}</style><body>");
+        text.Append($"<h1>{H(Software.Name)} V{Software.Version}</h1><p>工程估算报告 · {H(project.Name)}</p>");
+        text.Append($"<p class='note'>{H(Software.Boundary)} 覆盖仅为用户阈值下的离散网格节点比例，不能解释为人群可听率。</p>");
+        text.Append($"<p>项目标识 {project.Id}；修订 {project.Revision}；负责人 {H(project.Owner)}；车辆 {H(project.Vehicle)}；计算时间 {result.At:O}</p>");
+        text.Append($"<p>目的：{H(project.Purpose)}</p><p>备注：{H(project.Note)}</p>");
+        text.Append($"<p>模型 {Software.Model}；输入SHA256 {result.InputHash}</p>");
+        text.Append("<h2>计算口径与来源</h2>");
+        var s = project.Settings;
+        text.Append($"<p>范围X={N(s.MinX)}至{N(s.MaxX)}m，Y={N(s.MinY)}至{N(s.MaxY)}m；步长{N(s.Step)}m；接收高度{N(s.ReceiverHeight)}m；距离下限{N(s.MinimumDistance)}m。X正向车前，Y正向车左。</p>");
+        text.Append($"<p>轮廓{N(s.VehicleLength)}×{N(s.VehicleWidth)}m；内部节点排除={s.ExcludeVehicle}。指标：{H(result.Metric)}；声级目标{N(s.LevelTarget)}dB，信号背景差目标{N(s.MarginTarget)}dB，须同时满足。</p>");
+        text.Append($"<p>背景来源：{H(s.BackgroundOrigin.Label())} / {H(s.BackgroundSource)}</p>");
+        text.Append("<table><tr><th>扬声器与来源</th><th>位置与朝向</th><th>参考与指向性</th><th>音频</th></tr>");
+        foreach (var speaker in project.Speakers)
+        {
+            text.Append($"<tr><td>{H(speaker.Name)}；启用={speaker.Enabled}<br>{H(speaker.Origin.Label())} / {H(speaker.Source)}</td><td>({N(speaker.X)},{N(speaker.Y)},{N(speaker.Height)})m；{N(speaker.Heading)}°</td><td>r0={N(speaker.ReferenceDistance)}m；增益{N(speaker.Gain)}dB；n={N(speaker.Exponent)}；floor={N(speaker.RearFloor)}</td><td>{H(speaker.Audio?.Name ?? "无，试听使用模拟噪声")}</td></tr>");
+        }
+        text.Append("</table><h2>输入频带</h2><table><tr><th>对象</th><th>Hz</th><th>输入声级 dB</th><th>频响修正 dB</th></tr>");
+        foreach (var speaker in project.Speakers)
+            foreach (var band in speaker.Bands.OrderBy(x => x.Hz))
+                text.Append($"<tr><td>{H(speaker.Name)}</td><td>{band.Hz}</td><td>{N(band.Level)}</td><td>{N(band.Correction)}</td></tr>");
+        foreach (var band in s.Background.OrderBy(x => x.Hz))
+            text.Append($"<tr><td>背景</td><td>{band.Hz}</td><td>{N(band.Level)}</td><td>0</td></tr>");
+        text.Append("</table><h2>布局与声场</h2>");
+        text.Append(ChartRenderer.Map(project, result));
+        text.Append($"<p>有效网格{result.Grid.Count}，满足{result.CoveredCount}；覆盖{result.Coverage:F2}%；声级范围{result.Minimum:F2}至{result.Maximum:F2}dB；能量平均{result.MeanEnergy:F2}dB；截断距离节点{result.ClampedCount}个。</p>");
+        text.Append("<h2>观察点</h2><table><tr><th>观察点</th><th>坐标 m</th><th>警示声 dB</th><th>背景 dB</th><th>合成 dB</th><th>背景差 dB</th><th>工程目标</th></tr>");
+        foreach (var point in result.Listeners)
+            text.Append($"<tr><td>{H(point.Name)}</td><td>{N(point.X)},{N(point.Y)}</td><td>{point.Signal:F3}</td><td>{point.Background:F3}</td><td>{point.Combined:F3}</td><td>{point.Margin:F3}</td><td>{(point.Covered ? "满足" : "未满足")}{(point.NearFieldClamped ? "；距离截断" : "")}{(point.InVehicle ? "；车内示意点" : "")}</td></tr>");
+        text.Append("</table>");
+        foreach (var point in result.Listeners)
+        {
+            text.Append($"<h2>{H(point.Name)}频谱及贡献</h2>");
+            text.Append(ChartRenderer.Spectrum(point, s));
+            text.Append("<table><tr><th>源</th><th>几何距离 m</th><th>传播与指向修正 dB</th><th>当前指标声级 dB</th></tr>");
+            foreach (var source in point.Contributions)
+                text.Append($"<tr><td>{H(source.Name)}</td><td>{source.Distance:F3}</td><td>{source.Loss:F3}</td><td>{Acoustics.Select(source.Bands, s):F3}</td></tr>");
+            text.Append("</table>");
+        }
+        text.Append("<h2>方法与限制</h2><p>每带 L=Lref+频响修正+增益−20log10(max(r,rmin)/r0)+20log10(floor+(1−floor)max(0,cosθ)^n)。n=0定义为全向。多个启用源按10log10(Σ10^(L/10))叠加。A计权仅作用于七带合成，有限带合成不等于全频总值。背景差=警示声−背景声；合成声级为两者能量叠加。色图为离散网格展示，边缘单元为示意，未作连续面积积分。</p>");
+        text.Append("<ul>");
+        foreach (var warning in result.Warnings)
+            text.Append($"<li>{H(warning)}</li>");
+        text.Append("</ul><p>下一步应以本报告记录的方案制作样件，并在真实安装与环境条件下独立测量。报告本身不提供实际效果保证。</p>");
+        text.Append("<h2>修订审计</h2><table><tr><th>时间 UTC</th><th>修订</th><th>操作</th></tr>");
+        foreach (var entry in project.Audit.TakeLast(30))
+            text.Append($"<tr><td>{entry.At:O}</td><td>{entry.Revision}</td><td>{H(entry.Action)}</td></tr>");
+        text.Append("</table></body></html>");
+        return Encoding.UTF8.GetBytes(text.ToString());
+    }
+
+    public static byte[] ComparisonCsv(Comparison comparison)
+    {
+        if (!comparison.Comparable)
+            throw new ArgumentException("条件不一致，无法导出比较差值");
+        var text = new StringBuilder("\uFEFFModel,Version,Metric,BaselineInputHash,TargetInputHash,BaselineSource,TargetSource,Conditions,Baseline,Target,Point,X_m,Y_m,Baseline_dB,Target_dB,TargetMinusBaseline_dB\r\n");
+        foreach (var point in comparison.Points)
+            text.AppendLine(string.Join(",", Software.Model, Software.Version, SpectrumCsv.Cell(comparison.Baseline!.Metric), comparison.Baseline.InputHash, comparison.Target!.InputHash,
+                SpectrumCsv.Cell(comparison.BaselineSource), SpectrumCsv.Cell(comparison.TargetSource), SpectrumCsv.Cell(comparison.Conditions), SpectrumCsv.Cell(comparison.BaselineName), SpectrumCsv.Cell(comparison.TargetName),
+                SpectrumCsv.Cell(point.Name), N(point.X), N(point.Y), N(point.Baseline), N(point.Target), N(point.Difference)));
+        return Encoding.UTF8.GetBytes(text.ToString());
+    }
+
+    public static byte[] ScanCsv(ScanResult scan)
+    {
+        var text = new StringBuilder("\uFEFFModel,Version,Metric,Source,Conditions,Speaker,Parameter,InputHash,Value,CoveragePercent,Minimum_dB,Maximum_dB,WorstMargin_dB,CoveredListeners\r\n");
+        foreach (var row in scan.Rows)
+            text.AppendLine(string.Join(",", Software.Model, Software.Version, SpectrumCsv.Cell(scan.Metric), SpectrumCsv.Cell(scan.Source), SpectrumCsv.Cell(scan.Conditions), SpectrumCsv.Cell(scan.SpeakerName), SpectrumCsv.Cell(ScanEngine.Label(scan.Parameter)), scan.InputHash,
+                N(row.Value), N(row.Coverage), N(row.Minimum), N(row.Maximum), N(row.WorstMargin), row.CoveredPoints));
+        return Encoding.UTF8.GetBytes(text.ToString());
+    }
+}
+
+===== src/Avas.Core/IO/SpectrumCsv.cs =====
+using System.Globalization;
+using System.Text;
+using Avas.Core.Domain;
+
+namespace Avas.Core.IO;
+
+public sealed class SpectrumPreview
+{
+    public List<BandInput> Bands { get; init; } = [];
+    public List<string> Errors { get; init; } = [];
+    public bool Valid => Errors.Count == 0 && Bands.Count == 7;
+}
+
+public static class SpectrumCsv
+{
+    public const string Header = "FrequencyHz,LevelDb,CorrectionDb";
+
+    public static string Template(bool background = false)
+    {
+        return Header + "\n" + string.Join("\n", Software.Frequencies.Select(hz => $"{hz},{(background ? 35 : 60)},0"));
+    }
+
+    public static SpectrumPreview Parse(string text, bool background = false)
+    {
+        var errors = new List<string>();
+        var bands = new List<BandInput>();
+        if (text.Length > 20000)
+            return new SpectrumPreview { Errors = ["文件超过20000字符限制"] };
+        var lines = text.TrimStart('\uFEFF').Replace("\r", "").Split('\n');
+        if (lines.Length == 0 || lines[0] != Header)
+            errors.Add("第1行表头必须为 " + Header + "；使用UTF-8与英文逗号");
+        for (var i = 1; i < lines.Length; i++)
+        {
+            if (string.IsNullOrWhiteSpace(lines[i]))
+                continue;
+            var fields = lines[i].Split(',');
+            if (fields.Length != 3)
+            {
+                errors.Add($"第{i + 1}行必须恰好三列，不支持千分位或引号");
+                continue;
+            }
+            if (!int.TryParse(fields[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out var hz)
+                || !Software.Frequencies.Contains(hz))
+            {
+                errors.Add($"第{i + 1}行频率无效，仅支持七个倍频程中心频率");
+                continue;
+            }
+            if (!double.TryParse(fields[1], NumberStyles.Float, CultureInfo.InvariantCulture, out var level)
+                || !double.IsFinite(level) || level is < -60 or > 140)
+            {
+                errors.Add($"第{i + 1}行LevelDb必须为-60至140的有限数值");
+                continue;
+            }
+            if (!double.TryParse(fields[2], NumberStyles.Float, CultureInfo.InvariantCulture, out var correction)
+                || !double.IsFinite(correction) || correction is < -40 or > 40 || (background && correction != 0))
+            {
+                errors.Add($"第{i + 1}行CorrectionDb无效；声源范围-40至40，背景必须为0");
+                continue;
+            }
+            if (bands.Any(x => x.Hz == hz))
+            {
+                errors.Add($"第{i + 1}行频率{hz}重复");
+                continue;
+            }
+            bands.Add(new BandInput { Hz = hz, Level = level, Correction = correction });
+        }
+        foreach (var hz in Software.Frequencies.Except(bands.Select(x => x.Hz)))
+            errors.Add($"缺少{hz}Hz，不能自动补零");
+        return new SpectrumPreview { Bands = bands.OrderBy(x => x.Hz).ToList(), Errors = errors };
+    }
+
+    public static byte[] Write(IEnumerable<BandInput> bands)
+    {
+        var rows = bands.OrderBy(x => x.Hz).Select(x =>
+            FormattableString.Invariant($"{x.Hz},{x.Level:R},{x.Correction:R}"));
+        return Encoding.UTF8.GetBytes("\uFEFF" + Header + "\r\n" + string.Join("\r\n", rows));
+    }
+
+    public static string Cell(string? value)
+    {
+        var safe = value ?? "";
+        if (safe.Length > 0 && "=+-@\t\r".Contains(safe[0]))
+            safe = "'" + safe;
+        return "\"" + safe.Replace("\"", "\"\"") + "\"";
+    }
+}

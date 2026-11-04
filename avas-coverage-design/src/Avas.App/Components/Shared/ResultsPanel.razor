@@ -1,0 +1,43 @@
+@inherits VmComponent
+<div class="section-title"><div><h2>自由声场结果</h2><p>先核对来源、指标与计算状态，再查看覆盖与观察点频谱。</p></div><span class="section-tag">06 / FIELD</span></div>
+@if (Vm.Stale || Vm.Result is null)
+{
+    <div class="empty"><h3>当前没有可使用的结果</h3><p>输入修改后旧结果会失效。应用编辑并点击“运行计算”，成功后显示声场、频谱与声源贡献。</p><button class="primary" @onclick="Vm.CalculateAsync" disabled="@Vm.Busy">运行计算</button></div>
+}
+else
+{
+    var result = Vm.Result;
+    <div class="metric-grid">
+        <div class="metric"><span>工程目标覆盖</span><strong>@result.Coverage.ToString("F2")<small>%</small></strong><small>@result.CoveredCount / @result.Grid.Count 个节点</small></div>
+        <div class="metric"><span>最低警示声</span><strong>@result.Minimum.ToString("F1")<small>dB</small></strong><small>当前选择的频带 / 合成口径</small></div>
+        <div class="metric"><span>最高警示声</span><strong>@result.Maximum.ToString("F1")<small>dB</small></strong><small>距离截断节点 @result.ClampedCount 个</small></div>
+        <div class="metric"><span>能量平均声级</span><strong>@result.MeanEnergy.ToString("F1")<small>dB</small></strong><small>有效网格等权能量平均</small></div>
+    </div>
+    <div class="card">
+        <div class="action-row"><h3>布局色图</h3><label class="check"><input type="checkbox" @bind="Vm.CoverageOnly" />显示目标覆盖二值图</label></div>
+        <p>@result.Metric；工程目标 @Vm.Project.Settings.LevelTarget dB，背景差目标 @Vm.Project.Settings.MarginTarget dB。</p>
+        <div class="map">@((MarkupString)Vm.MapSvg)</div>
+        @if (Vm.CoverageOnly) { <p class="hint">绿色：同时满足两目标；琥珀色：至少一个目标未满足。颜色不表示法规合格或不合格。</p> }
+        <p class="hint">连续色图：蓝色为当前网格相对低值，暖色为相对高值，右下角显示范围。每次计算色阶可能变化，跨方案须比较数值。边缘单元是显示示意，覆盖率按节点计。</p>
+    </div>
+    <div class="card table-scroll">
+        <h3>观察点数值</h3>
+        <table><thead><tr><th>观察点</th><th>警示声 dB</th><th>背景 dB</th><th>合成 dB</th><th>背景差 dB</th><th>目标</th><th>查看</th></tr></thead><tbody>
+        @foreach (var p in result.Listeners)
+        {
+            <tr class="@(p.ListenerId == Vm.SelectedListenerId ? "selected-row" : "")"><td>@p.Name</td><td>@p.Signal.ToString("F3")</td><td>@p.Background.ToString("F3")</td><td>@p.Combined.ToString("F3")</td><td>@p.Margin.ToString("F3")</td><td><span class="pill @(p.Covered ? "green" : "amber")">@(p.Covered ? "满足工程目标" : "未满足工程目标")</span>@if (p.NearFieldClamped) { <small>距离截断</small> }@if (p.InVehicle) { <small>车内示意点</small> }</td><td><button @onclick="() => Vm.SelectListener(p.ListenerId!.Value)">频谱详情</button></td></tr>
+        }
+        </tbody></table>
+        @if (result.Listeners.Count == 0) { <p>尚未建立观察点，可在“布局与观察点”页添加。</p> }
+    </div>
+    @if (Vm.SelectedPoint is { } point)
+    {
+        <div class="two-col">
+            <div class="card"><h3>@point.Name 的未计权频谱</h3>@((MarkupString)ChartRenderer.Spectrum(point, Vm.Project.Settings))<table><thead><tr><th>Hz</th><th>警示声 dB</th><th>背景 dB</th></tr></thead><tbody>@for (var i = 0; i < 7; i++) { <tr><td>@Software.Frequencies[i]</td><td>@point.Bands[i].ToString("F3")</td><td>@Vm.Project.Settings.Background.Single(x => x.Hz == Software.Frequencies[i]).Level</td></tr> }</tbody></table></div>
+            <div class="card"><h3>各声源贡献核对</h3><p>几何距离使用三维高度差；传播修正含几何扩散与水平指向性。</p><table><thead><tr><th>扬声器</th><th>距离 m</th><th>传播修正 dB</th><th>当前指标 dB</th></tr></thead><tbody>@foreach (var c in point.Contributions) { <tr><td>@c.Name</td><td>@c.Distance.ToString("F3")</td><td>@c.Loss.ToString("F3")</td><td>@Acoustics.Select(c.Bands, Vm.Project.Settings).ToString("F3")</td></tr> }</tbody></table><p class="hint">源间按能量合成，分贝数值不能直接相加。相同录音经多个扬声器播放时的相位干涉未计算。</p></div>
+        </div>
+    }
+    <div class="notice"><strong>模型核对</strong><ul>@foreach (var warning in result.Warnings) { <li>@warning</li> }</ul><small class="hash">输入SHA256：@result.InputHash · @result.At.ToString("O")</small></div>
+}
+
+<ReviewPanel />

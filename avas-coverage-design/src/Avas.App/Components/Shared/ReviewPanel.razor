@@ -1,0 +1,11 @@
+@inherits VmComponent
+<div class="card">
+    <h3>输入复核提示</h3>
+    <p class="hint">以下为根据当前输入生成的提醒，既不是试验结果，也不是自动诊断或合格判断。已填写的来源仍由使用者核实。</p>
+    <div class="table-scroll"><table><thead><tr><th>类型</th><th>对象</th><th>发现</th><th>后续操作</th></tr></thead><tbody>
+    @foreach (var finding in Vm.Review)
+    {
+        <tr><td>@finding.Severity</td><td>@finding.Object</td><td>@finding.Finding</td><td>@finding.Action</td></tr>
+    }
+    </tbody></table></div>
+</div>

@@ -1,0 +1,190 @@
+{
+  "date": "2026-11-04T01:01:17.286861+00:00",
+  "browser": "Chromium /usr/bin/chromium headless",
+  "viewport": "1600x1100 and 390x844",
+  "checks": [
+    {
+      "name": "普通启动空白",
+      "status": "passed"
+    },
+    {
+      "name": "实际界面独立解析案例53.979dB",
+      "status": "passed"
+    },
+    {
+      "name": "无效声级被阻断",
+      "status": "passed"
+    },
+    {
+      "name": "CSV逐行错误可见",
+      "status": "passed"
+    },
+    {
+      "name": "频谱整体导入",
+      "status": "passed"
+    },
+    {
+      "name": "批量观察点真实追加",
+      "status": "passed"
+    },
+    {
+      "name": "过期结果UI导出阻断",
+      "status": "passed"
+    },
+    {
+      "name": "真实快照比较差值3dB",
+      "status": "passed"
+    },
+    {
+      "name": "真实下载 comparison.csv",
+      "status": "passed"
+    },
+    {
+      "name": "扫描得到三组取值",
+      "status": "passed"
+    },
+    {
+      "name": "真实下载 scan.csv",
+      "status": "passed"
+    },
+    {
+      "name": "真实下载 transect.csv",
+      "status": "passed"
+    },
+    {
+      "name": "音频导入不改变参考频谱",
+      "status": "passed"
+    },
+    {
+      "name": "纯音整形过高峰值被阻止",
+      "status": "passed"
+    },
+    {
+      "name": "真实WAV可解码播放",
+      "status": "passed"
+    },
+    {
+      "name": "本机保存成功",
+      "status": "passed"
+    },
+    {
+      "name": "实际本机项目库重开",
+      "status": "passed"
+    },
+    {
+      "name": "重复保存产生备份",
+      "status": "passed"
+    },
+    {
+      "name": "真实下载 complete-project.avasproj",
+      "status": "passed"
+    },
+    {
+      "name": "真实下载 report.html",
+      "status": "passed"
+    },
+    {
+      "name": "真实下载 grid.csv",
+      "status": "passed"
+    },
+    {
+      "name": "真实下载 points.csv",
+      "status": "passed"
+    },
+    {
+      "name": "真实下载 field.svg",
+      "status": "passed"
+    },
+    {
+      "name": "真实下载 calculation.json",
+      "status": "passed"
+    },
+    {
+      "name": "WAV内嵌制作参数与来源",
+      "status": "passed"
+    },
+    {
+      "name": "SVG携带模型与来源",
+      "status": "passed"
+    },
+    {
+      "name": "项目内嵌音频与两快照",
+      "status": "passed"
+    },
+    {
+      "name": "导出观察点解析值56.9794dB",
+      "status": "passed"
+    },
+    {
+      "name": "下载搬迁后重开可重算",
+      "status": "passed"
+    },
+    {
+      "name": "归档项目拒绝编辑",
+      "status": "passed"
+    },
+    {
+      "name": "窄屏页面无水平溢出",
+      "status": "passed"
+    },
+    {
+      "name": "无浏览器脚本异常",
+      "status": "passed"
+    },
+    {
+      "name": "无控制台资源或连接错误",
+      "status": "passed"
+    }
+  ],
+  "page_errors": [],
+  "console_errors": [],
+  "screenshots": [
+    "01-空白项目-viewport.png",
+    "01-空白项目.png",
+    "02-解析案例结果-viewport.png",
+    "02-解析案例结果.png",
+    "03-项目档案-viewport.png",
+    "03-项目档案.png",
+    "04-扬声器输入-viewport.png",
+    "04-扬声器输入.png",
+    "05-输入错误阻断-viewport.png",
+    "05-输入错误阻断.png",
+    "06-背景网格与目标-viewport.png",
+    "06-背景网格与目标.png",
+    "07-频谱预检错误-viewport.png",
+    "07-频谱预检错误.png",
+    "08-布局与观察点-viewport.png",
+    "08-布局与观察点.png",
+    "09-方案比较-viewport.png",
+    "09-方案比较.png",
+    "10-参数扫描-viewport.png",
+    "10-参数扫描.png",
+    "11-方向剖面-viewport.png",
+    "11-方向剖面.png",
+    "12-音频数字频谱-viewport.png",
+    "12-音频数字频谱.png",
+    "13-相对试听-viewport.png",
+    "13-相对试听.png",
+    "14-保存与项目库-viewport.png",
+    "14-保存与项目库.png",
+    "15-成果与审计-viewport.png",
+    "15-成果与审计.png",
+    "16-搬迁重开结果-viewport.png",
+    "16-搬迁重开结果.png",
+    "17-模拟双源声场-viewport.png",
+    "17-模拟双源声场.png",
+    "18-窄屏布局-viewport.png",
+    "18-窄屏布局.png",
+    "19-帮助与模型边界-viewport.png",
+    "19-帮助与模型边界.png",
+    "20-频谱与来源.png",
+    "21-工程指标与目标.png",
+    "22-观察点批量输入.png",
+    "23-归档编辑阻断-viewport.png",
+    "23-归档编辑阻断.png",
+    "24-解析观察点频谱.png",
+    "25-比较差值详情.png",
+    "26-相对试听播放器.png",
+    "27-本机保存与备份.png"
+  ]
+}

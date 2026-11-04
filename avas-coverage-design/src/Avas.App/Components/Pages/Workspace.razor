@@ -1,0 +1,84 @@
+@page "/"
+@rendermode InteractiveServer
+@inherits VmComponent
+
+<PageTitle>@Software.Name V1.0</PageTitle>
+<NavigationLock ConfirmExternalNavigation="@(Vm.Dirty || Vm.HasDraft)" />
+<div class="workspace">
+    <aside class="sidebar">
+        <div class="brand">AVAS<span>FIELD STUDIO</span></div>
+        <p class="side-caption">声源布置 · 工程估算</p>
+        <nav aria-label="工作页">
+            @foreach (var item in tabs)
+            {
+                <button class="@(Vm.Tab == item ? "active" : "")" @onclick="() => Navigate(item)">
+                    <span class="nav-index">@((Array.IndexOf(tabs, item) + 1).ToString("00"))</span>@item
+                </button>
+            }
+        </nav>
+        <div class="side-note">V1.0 / C# MVVM<br />自由声场 · 非相干叠加<br />工程阈值由用户定义</div>
+    </aside>
+    <main>
+        <header>
+            <div>
+                <div class="eyebrow">PEDESTRIAN WARNING SOUND DESIGN</div>
+                <h1>@Software.Name</h1>
+                <div class="project-line">@Vm.Project.Name <span>修订 @Vm.Project.Revision</span> <span>@(Vm.Project.Archived ? "归档只读" : "可编辑")</span></div>
+            </div>
+            <div class="toolbar">
+                <button @onclick="Vm.Undo" disabled="@(!Vm.CanUndo || Vm.Busy || Vm.Project.Archived)">撤销</button>
+                <button @onclick="Vm.Redo" disabled="@(!Vm.CanRedo || Vm.Busy || Vm.Project.Archived)">重做</button>
+                <button @onclick="Vm.Save" disabled="@Vm.Busy">保存项目</button>
+                <button class="primary" @onclick="Vm.CalculateAsync" disabled="@Vm.Busy">@(Vm.Busy ? "处理中…" : "运行计算")</button>
+            </div>
+        </header>
+        <div class="state-row">
+            <span class="pill @(Vm.Dirty || Vm.HasDraft ? "amber" : "green")">@(Vm.HasDraft ? "未应用编辑" : Vm.Dirty ? "未保存修改" : "已保存 / 初始状态")</span>
+            <span class="pill @(Vm.Stale ? "amber" : "green")">@(Vm.Stale ? "无当前有效结果" : "结果与输入一致")</span>
+            <span class="muted">来源：@string.Join("、", Vm.Project.Speakers.Select(x => x.Origin.Label()).Append(Vm.Project.Settings.BackgroundOrigin.Label()).Distinct())</span>
+        </div>
+        <div class="status" role="status">@Vm.Status</div>
+        @if (Vm.Errors.Count > 0)
+        {
+            <div class="errors" role="alert">
+                <strong>请修正以下问题</strong>
+                <ul>@foreach (var error in Vm.Errors) { <li>@error</li> }</ul>
+            </div>
+        }
+        <section class="content" aria-label="@Vm.Tab">
+            @switch (Vm.Tab)
+            {
+                case "项目": <ProjectPanel /> break;
+                case "扬声器": <SpeakerPanel /> break;
+                case "背景与网格": <SettingsPanel /> break;
+                case "频谱导入": <ImportPanel /> break;
+                case "布局与观察点": <LayoutPanel /> break;
+                case "声场结果": <ResultsPanel /> break;
+                case "方案比较": <ComparisonPanel /> break;
+                case "参数扫描": <ScanPanel /> break;
+                case "声音试听": <AudioPanel /> break;
+                case "输出与审计": <DeliveryPanel /> break;
+                case "帮助": <HelpPanel /> break;
+            }
+        </section>
+        @if (Vm.LastDownload is not null)
+        {
+            <div class="download-bar"><span>成果已生成</span><a href="@Vm.LastDownload" download="@Vm.LastFileName">下载 @Vm.LastFileName</a><small>保存位置由浏览器下载设置决定；10分钟内有效</small></div>
+        }
+        <footer>@Software.Boundary</footer>
+    </main>
+</div>
+
+@code {
+    private static readonly string[] tabs = ["项目", "扬声器", "背景与网格", "频谱导入", "布局与观察点", "声场结果", "方案比较", "参数扫描", "声音试听", "输出与审计", "帮助"];
+    private async Task Navigate(string tab)
+    {
+        if (Vm.HasDraft)
+        {
+            if (!await Js.InvokeAsync<bool>("confirm", "当前字段尚未应用。切换页面将放弃这些字段，是否继续？"))
+                return;
+            Vm.DiscardDraft();
+        }
+        Vm.Navigate(tab);
+    }
+}

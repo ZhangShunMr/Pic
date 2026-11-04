@@ -1,0 +1,22 @@
+@inherits VmComponent
+<div class="section-title"><div><h2>成果输出与审计</h2><p>成果保留项目身份、来源、计算口径及输入哈希，供独立复核。</p></div><span class="section-tag">10 / DELIVERY</span></div>
+<div class="export-grid">
+    <article class="card"><h3>可搬迁项目</h3><p>包含项目、频谱、内嵌WAV、方案快照与审计，不含临时试听；保存后可在另一数据目录上传重开。</p><button @onclick='() => Vm.Export("project")'>下载项目副本</button></article>
+    <article class="card"><h3>工程报告</h3><p>自包含HTML，包含来源、输入频带、条件、声场SVG、观察点与贡献、模型边界和最近30条审计。浏览器打开后可打印。</p><button @onclick='() => Vm.Export("report")'>导出工程报告HTML</button></article>
+    <article class="card"><h3>离散网格明细</h3><p>UTF-8 CSV逐节点输出坐标、警示声、背景、合成、差值、目标状态、截断标记与七频带，保留来源和SHA256。</p><button @onclick='() => Vm.Export("grid")'>导出网格CSV</button></article>
+    <article class="card"><h3>观察点明细</h3><p>与网格相同字段，仅输出显式观察点。车内或网格外的点仍计算，空间位置由坐标核对。</p><button @onclick='() => Vm.Export("points")'>导出观察点CSV</button></article>
+    <article class="card"><h3>矢量声场图</h3><p>导出当前连续色图或覆盖二值图。图注保留单位和布局方向，结合报告中的来源和参数使用。</p><button @onclick='() => Vm.Export("svg")'>导出声场SVG</button></article>
+    <article class="card"><h3>完整计算快照</h3><p>JSON内含软件和模型版本、输入、网格、点频谱和贡献，可供程序复核；它是成果，不作为项目打开格式。</p><button @onclick='() => Vm.Export("json")'>导出计算JSON</button></article>
+</div>
+<div class="notice">只有与当前输入一致的结果可以导出。生成后点击页面底部链接，浏览器负责最终落盘位置；服务端保存与浏览器下载分别确认。</div>
+<div class="card">
+    <h3>修订审计（最近100条）</h3>
+    <p class="hint">项目保存最多1000条累计审计；撤销重做不会删除审计。这里记录操作事实，不证明数据真实或权属。</p>
+    <div class="table-scroll"><table><thead><tr><th>时间 UTC</th><th>修订</th><th>操作</th></tr></thead><tbody>
+    @foreach (var entry in Vm.Project.Audit.TakeLast(100).Reverse())
+    {
+        <tr><td>@entry.At.ToString("yyyy-MM-dd HH:mm:ss")</td><td>@entry.Revision</td><td>@entry.Action</td></tr>
+    }
+    </tbody></table></div>
+    @if (Vm.Project.Audit.Count == 0) { <div class="empty compact">应用编辑或管理对象后产生审计。</div> }
+</div>

@@ -1,0 +1,24 @@
+@inherits VmComponent
+<div class="card">
+    <h3>指定方向距离剖面</h3>
+    <p>在固定起点与方向上采样点值，检查声级随距离变化；不会向项目追加观察点。</p>
+    <div class="form-grid three">
+        <label>起点X / m<input type="number" @bind="Vm.TransectRequest.StartX" step="0.1" /></label>
+        <label>起点Y / m<input type="number" @bind="Vm.TransectRequest.StartY" step="0.1" /></label>
+        <label>方向 / °<input type="number" @bind="Vm.TransectRequest.Heading" step="5" /></label>
+        <label>长度 / m<input type="number" @bind="Vm.TransectRequest.Length" step="0.5" /></label>
+        <label>采样步长 / m<input type="number" @bind="Vm.TransectRequest.Step" step="0.1" /></label>
+    </div>
+    <div class="action-row"><button @onclick="Vm.RunTransectAsync" disabled="@Vm.Busy">运行方向剖面</button><button @onclick="Vm.ExportTransect" disabled="@(Vm.Transect is null)">导出剖面CSV</button></div>
+    <p class="hint">方向0°沿X正向，90°沿Y正向；不跳过车辆内部点，表内单独标记。最后满足目标的采样距离不是连续覆盖半径，非单调或离散间隙不能靠最远点概括。</p>
+    @if (Vm.Transect is { } result && result.InputHash == ProjectCodec.InputHash(Vm.Project))
+    {
+        <p>@result.Metric；采样状态转换 @result.Transitions 次；最后满足目标距离 @(result.LastCovered?.ToString("F2") ?? "无") m。</p>
+        <div class="table-scroll" style="max-height:450px"><table><thead><tr><th>距离 m</th><th>X,Y / m</th><th>警示声 dB</th><th>背景差 dB</th><th>目标</th><th>提示</th></tr></thead><tbody>
+        @foreach (var row in result.Points)
+        {
+            <tr><td>@row.Distance.ToString("F2")</td><td>@row.Result.X.ToString("F2"), @row.Result.Y.ToString("F2")</td><td>@row.Result.Signal.ToString("F3")</td><td>@row.Result.Margin.ToString("F3")</td><td>@(row.Result.Covered ? "满足" : "未满足")</td><td>@(row.Result.InVehicle ? "车内示意 " : "")@(row.Result.NearFieldClamped ? "距离截断" : "")</td></tr>
+        }
+        </tbody></table></div>
+    }
+</div>

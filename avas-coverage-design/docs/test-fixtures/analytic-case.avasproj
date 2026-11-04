@@ -1,0 +1,136 @@
+{
+  "Schema": 1,
+  "SoftwareVersion": "1.0",
+  "Id": "88ddf05b-14c4-47eb-845e-a73de9e19079",
+  "Name": "\u72EC\u7ACB\u89E3\u6790\u6838\u5BF9",
+  "Owner": "\u81EA\u52A8\u9A8C\u8BC1",
+  "Vehicle": "",
+  "Purpose": "\u89E3\u6790\u516C\u5F0F\u6838\u5BF9",
+  "Note": "",
+  "Archived": false,
+  "Revision": 0,
+  "Created": "2026-11-04T00:57:31.221887+00:00",
+  "Settings": {
+    "MinX": -10,
+    "MaxX": 10,
+    "MinY": -8,
+    "MaxY": 8,
+    "Step": 0.5,
+    "ReceiverHeight": 1.5,
+    "MinimumDistance": 0.5,
+    "VehicleLength": 4.6,
+    "VehicleWidth": 1.8,
+    "ExcludeVehicle": true,
+    "SelectedHz": 1000,
+    "AWeighted": false,
+    "LevelTarget": 45,
+    "MarginTarget": 3,
+    "BackgroundSource": "\u8BF7\u586B\u5199\u80CC\u666F\u58F0\u6765\u6E90",
+    "BackgroundOrigin": "Manual",
+    "Background": [
+      {
+        "Hz": 125,
+        "Level": 35,
+        "Correction": 0
+      },
+      {
+        "Hz": 250,
+        "Level": 35,
+        "Correction": 0
+      },
+      {
+        "Hz": 500,
+        "Level": 35,
+        "Correction": 0
+      },
+      {
+        "Hz": 1000,
+        "Level": 35,
+        "Correction": 0
+      },
+      {
+        "Hz": 2000,
+        "Level": 35,
+        "Correction": 0
+      },
+      {
+        "Hz": 4000,
+        "Level": 35,
+        "Correction": 0
+      },
+      {
+        "Hz": 8000,
+        "Level": 35,
+        "Correction": 0
+      }
+    ],
+    "BackgroundAudio": null
+  },
+  "Speakers": [
+    {
+      "Id": "c3c71b4c-dd8a-49f8-be62-12afdbc6b34c",
+      "Name": "\u65B0\u626C\u58F0\u5668",
+      "Enabled": true,
+      "X": 0,
+      "Y": 0,
+      "Height": 1.5,
+      "Heading": 0,
+      "ReferenceDistance": 1,
+      "Gain": 0,
+      "Exponent": 0,
+      "RearFloor": 0.2,
+      "Origin": "Manual",
+      "Source": "\u4EBA\u5DE5\u6838\u5BF9\uFF1A1m\u8F74\u541160dB",
+      "Note": "",
+      "Bands": [
+        {
+          "Hz": 125,
+          "Level": 60,
+          "Correction": 0
+        },
+        {
+          "Hz": 250,
+          "Level": 60,
+          "Correction": 0
+        },
+        {
+          "Hz": 500,
+          "Level": 60,
+          "Correction": 0
+        },
+        {
+          "Hz": 1000,
+          "Level": 60,
+          "Correction": 0
+        },
+        {
+          "Hz": 2000,
+          "Level": 60,
+          "Correction": 0
+        },
+        {
+          "Hz": 4000,
+          "Level": 60,
+          "Correction": 0
+        },
+        {
+          "Hz": 8000,
+          "Level": 60,
+          "Correction": 0
+        }
+      ],
+      "Audio": null
+    }
+  ],
+  "Listeners": [
+    {
+      "Id": "68c717fb-5bec-4e46-978e-640d774c7690",
+      "Name": "2m\u6838\u5BF9\u70B9",
+      "X": 2,
+      "Y": 0,
+      "Note": ""
+    }
+  ],
+  "Snapshots": [],
+  "Audit": []
+}

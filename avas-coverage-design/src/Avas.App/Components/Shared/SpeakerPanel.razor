@@ -1,0 +1,64 @@
+@inherits VmComponent
+<div class="section-title"><div><h2>扬声器与参考频谱</h2><p>轴向参考声压级、频响修正和增益分别输入，避免重复计入。</p></div><span class="section-tag">02 / SOURCES</span></div>
+<div class="action-row">
+    <button class="primary" @onclick="Vm.AddSpeaker">添加扬声器</button>
+    <button @onclick="Vm.DuplicateSpeaker" disabled="@(Vm.SpeakerDraft is null)">复制当前扬声器</button>
+    <button class="danger" @onclick='() => Confirm("删除当前扬声器及其内嵌音频？历史快照独立保留。", Vm.RemoveSpeaker)' disabled="@(Vm.SpeakerDraft is null)">删除当前扬声器</button>
+</div>
+<div class="object-tabs">
+    @foreach (var source in Vm.Project.Speakers)
+    {
+        <button class="@(source.Id == Vm.SelectedSpeakerId ? "selected" : "")" @onclick="() => Select(source.Id)">@source.Name <small>@(source.Enabled ? "启用" : "停用")</small></button>
+    }
+</div>
+@if (Vm.SpeakerDraft is { } speaker)
+{
+    <div class="two-col">
+        <div class="card" @oninput="Vm.MarkDraft">
+            <h3>位置与传播参数</h3>
+            <div class="form-grid">
+                <label>名称<input @bind="speaker.Name" maxlength="100" /></label>
+                <label class="check"><input type="checkbox" @bind="speaker.Enabled" />启用此源</label>
+                <label>X坐标 / m（车前为正）<input type="number" @bind="speaker.X" step="0.1" /></label>
+                <label>Y坐标 / m（车左为正）<input type="number" @bind="speaker.Y" step="0.1" /></label>
+                <label>声源高度 / m<input type="number" @bind="speaker.Height" min="0" max="10" step="0.1" /></label>
+                <label>水平朝向 / °<input type="number" @bind="speaker.Heading" min="-360" max="360" step="5" /></label>
+                <label>轴向参考距离 / m<input type="number" @bind="speaker.ReferenceDistance" min="0.1" max="10" step="0.1" /></label>
+                <label>全频带增益 / dB<input type="number" @bind="speaker.Gain" min="-40" max="40" step="0.5" /></label>
+                <label>指向指数 n<input type="number" @bind="speaker.Exponent" min="0" max="8" step="0.1" /></label>
+                <label>背向幅值下限 floor<input type="number" @bind="speaker.RearFloor" min="0.01" max="1" step="0.01" /></label>
+            </div>
+            <p class="hint">0°朝车前，90°朝车左。n=0定义全向；n越大前向越集中。floor是幅值比，0.2约为−13.98dB背向修正。这些是用户定义近似参数。</p>
+            <EditActions />
+        </div>
+        <div class="card" @oninput="Vm.MarkDraft">
+            <h3>七频带轴向参考声级</h3>
+            <table><thead><tr><th>中心频率 / Hz</th><th>参考声级 / dB</th><th>频响修正 / dB</th></tr></thead><tbody>
+            @foreach (var band in speaker.Bands.OrderBy(x => x.Hz))
+            {
+                <tr><td>@band.Hz</td><td><input type="number" aria-label="@(band.Hz + "Hz参考声级")" @bind="band.Level" step="0.1" /></td><td><input type="number" aria-label="@(band.Hz + "Hz频响修正")" @bind="band.Correction" step="0.1" /></td></tr>
+            }
+            </tbody></table>
+            <p class="hint">声级单位 dB re 20µPa；范围−60至140，0dB为有效值。修正范围−40至40dB。如果参考频谱已包含扬声器响应，修正应填0。</p>
+            <label>来源类别<OriginSelect @bind-Value="speaker.Origin" /></label>
+            <label>来源与参考条件（必填）<textarea @bind="speaker.Source" maxlength="2000" rows="3"></textarea></label>
+            <label>布置备注<textarea @bind="speaker.Note" maxlength="2000" rows="2"></textarea></label>
+        </div>
+    </div>
+}
+else
+{
+    <div class="empty">尚无扬声器。点击“添加扬声器”，或在项目页载入模拟示例。</div>
+}
+@code {
+    private async Task Select(Guid id)
+    {
+        if (Vm.HasDraft)
+        {
+            if (!await Js.InvokeAsync<bool>("confirm", "切换扬声器会放弃未应用字段，继续？"))
+                return;
+            Vm.DiscardDraft();
+        }
+        Vm.SelectSpeaker(id);
+    }
+}

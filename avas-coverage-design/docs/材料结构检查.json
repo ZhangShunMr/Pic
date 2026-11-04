@@ -1,0 +1,15 @@
+{
+  "manual_first_section": "软件介绍",
+  "manual_sections": 19,
+  "manual_unique_images": 18,
+  "major_function_han_count": 1288,
+  "production_nonempty_lines": 3680,
+  "core_passed": 63,
+  "browser_passed": 33,
+  "word_pagination_verified": false,
+  "dedicated_template_provided": false,
+  "requirements_sha256": {
+    "软件设计准则.md": "b2d4eb3e0922c46effdc049d41665c3e53b6dfe635e18b2d6cd0fdb9285ac1a5",
+    "软著编写要求.md": "4fdf5f834030b942be52e329499a36bfb0af60e1f7aca8d6065915fc9c70543f"
+  }
+}

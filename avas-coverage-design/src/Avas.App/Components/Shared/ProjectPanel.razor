@@ -1,0 +1,64 @@
+@inherits VmComponent
+<div class="section-title"><div><h2>项目工作台</h2><p>记录设计目的与来源，保存可以搬迁、重开的工作文件。</p></div><span class="section-tag">01 / PROJECT</span></div>
+<div class="action-row">
+    <button @onclick='() => Replace("建立空白项目？", () => Vm.New(false))'>新建空白项目</button>
+    <button @onclick='() => Replace("载入前部双扬声器固定模拟示例？", () => Vm.New(true))'>载入模拟示例</button>
+    <button @onclick="Vm.CopyProject">复制为新项目</button>
+    <button @onclick='() => Confirm(Vm.Project.Archived ? "解除项目归档？" : "将项目归档为只读？", Vm.ToggleArchive)'>@(Vm.Project.Archived ? "解除归档" : "归档项目")</button>
+</div>
+<div class="card" @oninput="Vm.MarkDraft">
+    <div class="form-grid">
+        <label>项目名称（必填，最多100字）<input @bind="Vm.Draft.Name" maxlength="100" /></label>
+        <label>负责人<input @bind="Vm.Draft.Owner" maxlength="100" /></label>
+        <label>车辆代号<input @bind="Vm.Draft.Vehicle" maxlength="100" /></label>
+        <label>项目标识<input value="@Vm.Project.Id" readonly /></label>
+        <label class="wide">设计目的<textarea @bind="Vm.Draft.Purpose" maxlength="2000" rows="3"></textarea></label>
+        <label class="wide">项目备注<textarea @bind="Vm.Draft.Note" maxlength="4000" rows="3"></textarea></label>
+    </div>
+    <EditActions />
+</div>
+<div class="two-col">
+    <div class="card">
+        <h3>打开搬迁项目</h3>
+        <p>项目文件内嵌所有频带、音频与快照。上传仅载入会话，点击保存才写入本机项目库。</p>
+        <label class="file-label">选择 .avasproj 文件<InputFile OnChange="ProjectUpload" accept=".avasproj,application/json" /></label>
+        <p class="hint">UTF-8 JSON格式1，最大80MiB。不支持其他软件的项目文件。替换前提示处理未保存内容。</p>
+    </div>
+    <div class="card">
+        <h3>保存与下载</h3>
+        <p>“保存项目”写入软件所在电脑的数据目录；重复保存保留上次备份。“下载项目副本”生成可搬迁文件。</p>
+        <button @onclick="Vm.Save">保存项目</button>
+        <button @onclick='() => Vm.Export("project")'>下载项目副本</button>
+        <p class="path">本机目录：@Vm.DataDirectory</p>
+    </div>
+</div>
+<div class="card">
+    <div class="action-row"><h3>本机项目库</h3><button @onclick="Vm.RefreshLibrary">刷新项目库</button></div>
+    @if (Vm.Library.Count == 0)
+    {
+        <div class="empty">尚无保存文件。完成项目输入后点击“保存项目”。</div>
+    }
+    else
+    {
+        <div class="table-scroll"><table><thead><tr><th>项目</th><th>修改时间 UTC</th><th>大小</th><th>读取状态</th><th>操作</th></tr></thead><tbody>
+        @foreach (var item in Vm.Library)
+        {
+            <tr><td>@item.Name</td><td>@item.Modified.ToString("yyyy-MM-dd HH:mm")</td><td>@((item.Size / 1024.0).ToString("F1"))KiB</td><td>@(item.Error ?? "结构可读")</td><td>
+            @if (Guid.TryParse(item.Id, out var id))
+            {
+                <button @onclick='() => Replace("打开磁盘项目？", () => Vm.Open(id, false))'>打开</button>
+                @if (item.HasBackup) { <button @onclick='() => Replace("打开上次备份？", () => Vm.Open(id, true))'>打开备份</button> }
+            }
+            </td></tr>
+        }
+        </tbody></table></div>
+    }
+</div>
+@code {
+    private async Task ProjectUpload(InputFileChangeEventArgs e)
+    {
+        if ((Vm.Dirty || Vm.HasDraft) && !await Js.InvokeAsync<bool>("confirm", "载入文件将替换当前项目，未保存或未应用内容将丢失。是否继续？"))
+            return;
+        await Upload(e, ProjectCodec.MaximumBytes, (_, bytes) => Vm.ImportProject(bytes));
+    }
+}
