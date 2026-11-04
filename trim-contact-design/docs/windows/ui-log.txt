@@ -33,4 +33,23 @@ PASS 10-comparison contains native rendered content
 PASS native scan completes without altering model
 PASS 11-scan rendered with opaque background
 PASS 11-scan contains native rendered content
-FAIL native WPF execution
+PASS 12a-csv-preview rendered with opaque background
+PASS 12a-csv-preview contains native rendered content
+PASS native batch preview lists proposed edits
+PASS 12-batch rendered with opaque background
+PASS 12-batch contains native rendered content
+PASS native task generation populated
+PASS 13-verification-tasks rendered with opaque background
+PASS 13-verification-tasks contains native rendered content
+PASS native project save contains source and both schemes
+PASS 13a-project-library rendered with opaque background
+PASS 13a-project-library contains native rendered content
+PASS native report export contains source hash
+PASS native saved project reopens
+PASS 14-help rendered with opaque background
+PASS 14-help contains native rendered content
+PASS 15-minimum-window rendered with opaque background
+PASS 15-minimum-window contains native rendered content
+PASS minimum window has visible layout controls
+PASS no desktop interaction errors
+PASS normal-scenario WPF binding errors absent

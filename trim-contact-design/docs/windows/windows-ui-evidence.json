@@ -1,13 +1,13 @@
 {
-  "executedUtc": "2026-11-04T15:49:53.0971633+00:00",
-  "sourceCommit": "7e76b1d19b3a212829fe9238c4b7d0c7ecc750d9",
-  "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41861622936",
+  "executedUtc": "2026-11-04T15:53:15.6231943+00:00",
+  "sourceCommit": "e4c22a1151d394ff02a40599de58a803177f6702",
+  "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41862156723",
   "platform": "Microsoft Windows NT 10.0.26100.0",
   "framework": ".NET 10.0.14",
   "rendering": "Actual production WPF MainWindow shown on Windows; client visual captured with RenderTargetBitmap after layout/render. Not browser or mock-up images.",
   "interaction": "Real WPF window, visual tree, bindings, native drawing and selected command automation. File/confirmation interface uses deterministic replacements; real shell dialogs are not certified.",
-  "failed": 1,
-  "screenshotCount": 13,
+  "failed": 0,
+  "screenshotCount": 19,
   "checks": [
     {
       "name": "01-empty rendered with opaque background",
@@ -185,9 +185,104 @@
       "detail": ""
     },
     {
-      "name": "native WPF execution",
-      "passed": false,
-      "detail": "System.InvalidOperationException: Sequence contains no matching element\r\n   at System.Linq.ThrowHelper.ThrowNoMatchException()\r\n   at System.Linq.Enumerable.Single[TSource](IEnumerable\u00601 source, Func\u00602 predicate)\r\n   at TrimContact.WindowsChecks.Program.Run(MainWindow window, Interaction ui, BindingListener listener) in D:\\a\\Pic\\Pic\\trim-contact-design\\tests\\TrimContact.WindowsChecks\\Program.cs:line 135\r\n   at TrimContact.WindowsChecks.Program.\u003C\u003Ec__DisplayClass4_0.\u003C\u003CMain\u003Eb__0\u003Ed.MoveNext() in D:\\a\\Pic\\Pic\\trim-contact-design\\tests\\TrimContact.WindowsChecks\\Program.cs:line 46"
+      "name": "12a-csv-preview rendered with opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "12a-csv-preview contains native rendered content",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "native batch preview lists proposed edits",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "12-batch rendered with opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "12-batch contains native rendered content",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "native task generation populated",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "13-verification-tasks rendered with opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "13-verification-tasks contains native rendered content",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "native project save contains source and both schemes",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "13a-project-library rendered with opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "13a-project-library contains native rendered content",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "native report export contains source hash",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "native saved project reopens",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "14-help rendered with opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "14-help contains native rendered content",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "15-minimum-window rendered with opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "15-minimum-window contains native rendered content",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "minimum window has visible layout controls",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "no desktop interaction errors",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "normal-scenario WPF binding errors absent",
+      "passed": true,
+      "detail": ""
     }
   ]
 }

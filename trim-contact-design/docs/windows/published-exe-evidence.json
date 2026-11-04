@@ -1,0 +1,13 @@
+{
+  "executedUtc": "2026-11-04T15:53:40.4211671+00:00",
+  "sourceCommit": "e4c22a1151d394ff02a40599de58a803177f6702",
+  "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41862156723",
+  "executable": "artifacts/win-x64/TrimContact.Desktop.exe",
+  "sha256": "E47065F6A032E587E8DA00750B6C2A208232F71E29475058BC6382C7C82D8EF4",
+  "platform": "Microsoft Windows NT 10.0.26100.0",
+  "actualProcessStarted": true,
+  "nativeWindowTitle": "汽车内饰卡扣与防异响接触设计软件 V2.0 — 未命名接触设计",
+  "frameworkDependentRuntimeRequired": false,
+  "note": "Actual self-contained executable started and its native window observed. Not a certification of Windows 10/11, DPI, shell-dialog, installer or antivirus compatibility.",
+  "normalExitCode": 0
+}
