@@ -1,0 +1,310 @@
+{
+  "executedUtc": "2026-11-04T15:43:33.8587023+00:00",
+  "sourceCommit": "f4ec817a6deb38a643ad28410f4078007a5a224e",
+  "platform": "Microsoft Windows NT 10.0.26100.0",
+  "framework": ".NET 8.0.33",
+  "screenshotMethod": "Actual production WPF MainWindow shown on Windows; native Window client content captured with RenderTargetBitmap after layout/render. No browser or mock-up. Test dialog adapter is used for confirmations and file paths.",
+  "failed": 0,
+  "checks": [
+    {
+      "name": "01-empty is rendered native content",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Ordinary WPF startup is empty",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Native menu Save is bound",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Blank native save reopens",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "02-project is rendered native content",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Explicit demo retains simulation marker",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Native navigation binding: settings",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "03-settings is rendered native content",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Native command bound and available: \u5E94\u7528\u5C5E\u6027",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Real TextBox binding and bound Apply reject zero blades",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "16-invalid-input is rendered native content",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Native command bound and available: \u8FD8\u539F\u8349\u7A3F",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Native navigation binding: orders",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "04-orders is rendered native content",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Native navigation binding: modes",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "05-modes is rendered native content",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Native DataGrid selection populates modal editor",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Native navigation binding: plans",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "06-plans is rendered native content",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Native command bound and available: \u8BA1\u7B97\u4EA4\u53C9\u4E0E\u63A5\u8FD1  F5",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Bound native Calculate populates contact results",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Native navigation binding: plot",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "07-frequency-plot is rendered native content",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Native drawing has chart data",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Native navigation binding: crossings",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "08-crossings is rendered native content",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Native navigation binding: contacts",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "09-contacts is rendered native content",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Native navigation binding: scan",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Native command bound and available: \u8FD0\u884C\u7EA6\u675F\u626B\u63CF",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Bound scan completed",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "10-scan is rendered native content",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Native command bound and available: \u63A5\u7EB3\u4E3A\u65B0\u65B9\u6848",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Scan acceptance creates separate plan",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Native navigation binding: compare",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Native command bound and available: \u6BD4\u8F83",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Native comparison populated",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "11-comparison is rendered native content",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Native navigation binding: study",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Native command bound and available: \u8BD5\u7B97\u89C4\u5219\u7EC4\u5408",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Rule sensitivity has nine cases",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "12-rule-study is rendered native content",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Native navigation binding: checks",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Native command bound and available: \u4E3A\u5F53\u524D\u65B9\u6848\u751F\u6210\u9A8C\u8BC1\u4EFB\u52A1",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Native verification task generation",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "13-checks is rendered native content",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Native navigation binding: review",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "14-review is rendered native content",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Native navigation binding: exchange",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Native command bound and available: \u9884\u68C0",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "CSV error has actual row",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "15-csv-error is rendered native content",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Actual native VM save/reopen retains plans and checks",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Native export writes real CSV with source",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Native navigation binding: plot",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "17-minimum-window is rendered native content",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Minimum native window lays out nonzero chart",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "Native navigation binding: help",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "18-help is rendered native content",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "No actual WPF binding errors",
+      "status": "passed",
+      "detail": ""
+    }
+  ]
+}
