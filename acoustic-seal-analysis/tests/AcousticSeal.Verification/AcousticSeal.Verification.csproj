@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType></PropertyGroup>
+  <ItemGroup><ProjectReference Include="../../src/AcousticSeal.Core/AcousticSeal.Core.csproj" /></ItemGroup>
+<ItemGroup><None Include="Fixtures/legacy-v1.json" CopyToOutputDirectory="PreserveNewest" /></ItemGroup>
+<ItemGroup><ProjectReference Include="../../src/AcousticSeal.DesktopLogic/AcousticSeal.DesktopLogic.csproj" /></ItemGroup>
+</Project>

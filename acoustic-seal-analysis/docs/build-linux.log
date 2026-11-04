@@ -1,0 +1,12 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  AcousticSeal.Core -> /workspace/acoustic-native/acoustic-seal-analysis/src/AcousticSeal.Core/bin/Release/net10.0/AcousticSeal.Core.dll
+  AcousticSeal.DesktopLogic -> /workspace/acoustic-native/acoustic-seal-analysis/src/AcousticSeal.DesktopLogic/bin/Release/net10.0/AcousticSeal.DesktopLogic.dll
+  AcousticSeal.Verification -> /workspace/acoustic-native/acoustic-seal-analysis/tests/AcousticSeal.Verification/bin/Release/net10.0/AcousticSeal.Verification.dll
+  AcousticSeal.Desktop -> /workspace/acoustic-native/acoustic-seal-analysis/src/AcousticSeal.Desktop/bin/Release/net10.0-windows/AcousticSeal.Desktop.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:03.98

@@ -1,0 +1,8 @@
+  Determining projects to restore...
+  Restored /workspace/acoustic-native/acoustic-seal-analysis/src/AcousticSeal.Core/AcousticSeal.Core.csproj (in 141 ms).
+  Restored /workspace/acoustic-native/acoustic-seal-analysis/src/AcousticSeal.DesktopLogic/AcousticSeal.DesktopLogic.csproj (in 147 ms).
+  Restored /workspace/acoustic-native/acoustic-seal-analysis/src/AcousticSeal.Desktop/AcousticSeal.Desktop.csproj (in 147 ms).
+  AcousticSeal.Core -> /workspace/acoustic-native/acoustic-seal-analysis/src/AcousticSeal.Core/bin/Release/net10.0/AcousticSeal.Core.dll
+  AcousticSeal.DesktopLogic -> /workspace/acoustic-native/acoustic-seal-analysis/src/AcousticSeal.DesktopLogic/bin/Release/net10.0/AcousticSeal.DesktopLogic.dll
+  AcousticSeal.Desktop -> /workspace/acoustic-native/acoustic-seal-analysis/src/AcousticSeal.Desktop/bin/Release/net10.0-windows/win-x64/AcousticSeal.Desktop.dll
+  AcousticSeal.Desktop -> /workspace/acoustic-native/acoustic-seal-analysis/artifacts/win-x64/

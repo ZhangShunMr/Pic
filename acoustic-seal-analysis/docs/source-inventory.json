@@ -1,0 +1,173 @@
+{
+  "scope": "Handwritten production C# and WPF XAML; excludes tests, generated outputs, tools, docs, examples, dependencies",
+  "previous_web_baseline": 7140,
+  "minimum_target": 3500,
+  "files": [
+    {
+      "path": "src/AcousticSeal.Core/Analysis/AcousticMath.cs",
+      "nonblank_lines": 132,
+      "sha256": "ff0a48e301995d2bca13339edbab63158c8997e9f2679d2fd9cc5755003b7583"
+    },
+    {
+      "path": "src/AcousticSeal.Core/Analysis/AnalysisEngine.cs",
+      "nonblank_lines": 284,
+      "sha256": "5dc67bedd334d6b198cfc7d92c0aa7cd04771f92ecaa97cb0af75bf5f0948e03"
+    },
+    {
+      "path": "src/AcousticSeal.Core/Analysis/Comparability.cs",
+      "nonblank_lines": 60,
+      "sha256": "aead7711053fca11742aa647e1e29f7e95dcdca67c6cebab99c3196f3ac6098c"
+    },
+    {
+      "path": "src/AcousticSeal.Core/Analysis/InputWorkbook.cs",
+      "nonblank_lines": 112,
+      "sha256": "27ae8f7d72c888d63573a304773aaddcd790edfd60e1923d64139e795bc57a15"
+    },
+    {
+      "path": "src/AcousticSeal.Core/Analysis/QualityInspector.cs",
+      "nonblank_lines": 70,
+      "sha256": "08876b42bc5ba594f6e5c250259264126dae1cce5802878ba97dea6197c29ca9"
+    },
+    {
+      "path": "src/AcousticSeal.Core/Analysis/Results.cs",
+      "nonblank_lines": 131,
+      "sha256": "26c8db0f76b7be50bb8c97c915724f3ef7a40f91ffe340ad048cf5dc7612764c"
+    },
+    {
+      "path": "src/AcousticSeal.Core/Analysis/RevisionComparison.cs",
+      "nonblank_lines": 186,
+      "sha256": "c462bce3578e7164f8d3b3751a1ed751a8735ce3aa43e3b7e2b305a822539595"
+    },
+    {
+      "path": "src/AcousticSeal.Core/Analysis/SettingsScenarios.cs",
+      "nonblank_lines": 81,
+      "sha256": "00b058f003262340f783e31de152c968fe94c4afcc48ca3bc4a3cbcf829a76c6"
+    },
+    {
+      "path": "src/AcousticSeal.Core/Analysis/SpectrumChart.cs",
+      "nonblank_lines": 92,
+      "sha256": "3da6dfde24ea0252661d2f855e6961142d8c869fa7ab6bd48f445209fd21e7bb"
+    },
+    {
+      "path": "src/AcousticSeal.Core/Domain/Demonstration.cs",
+      "nonblank_lines": 121,
+      "sha256": "4033a0db31675771bb5b67b7540f219a38dcae182b5c910bd5c996a8e71a30f5"
+    },
+    {
+      "path": "src/AcousticSeal.Core/Domain/Identity.cs",
+      "nonblank_lines": 140,
+      "sha256": "89a8d2ee18cd1a97607c26686e5a78870866c6800cdfbe4224be964b8745d122"
+    },
+    {
+      "path": "src/AcousticSeal.Core/Domain/Project.cs",
+      "nonblank_lines": 196,
+      "sha256": "c3d57fa30046e50dc1697be9316c3d667c81cb6c34195d0d7f676059e6785f3e"
+    },
+    {
+      "path": "src/AcousticSeal.Core/Domain/Validation.cs",
+      "nonblank_lines": 352,
+      "sha256": "680913a2ef26e0d7844884c914eef32ed756c8ceae077cdfa0730fb7c768e479"
+    },
+    {
+      "path": "src/AcousticSeal.Core/IO/CsvImport.cs",
+      "nonblank_lines": 240,
+      "sha256": "691feb2cee4a1379019a903c95ca5d68477721c2ec648f01ddcd6cda0e6374c4"
+    },
+    {
+      "path": "src/AcousticSeal.Core/IO/LegacyMigration.cs",
+      "nonblank_lines": 194,
+      "sha256": "7fcf0d9ca5810f9e9d2b308e20ed54072dc47c8ad4b22172d2e5f504820d6ff2"
+    },
+    {
+      "path": "src/AcousticSeal.Core/IO/ProjectCodec.cs",
+      "nonblank_lines": 187,
+      "sha256": "5da065ac46744cfb10c810a145e03d23a0898e9d190c99ab1fec7df95f746589"
+    },
+    {
+      "path": "src/AcousticSeal.Core/IO/ProjectStore.cs",
+      "nonblank_lines": 159,
+      "sha256": "96b8da3e71d755e0664d42fb71c849b1571d1bbcec906f6d40d3ed07ceee982b"
+    },
+    {
+      "path": "src/AcousticSeal.Core/IO/ResultExport.cs",
+      "nonblank_lines": 395,
+      "sha256": "2f24d60f63226b0226176b3c62b5e7ea880a84ef43642e42badef27a09d27107"
+    },
+    {
+      "path": "src/AcousticSeal.Core/Operations/BatchPairing.cs",
+      "nonblank_lines": 62,
+      "sha256": "9e111bba4a07aead57ed1468ed5b54ab94b84b6ea5d23cd459dfd79c1b705028"
+    },
+    {
+      "path": "src/AcousticSeal.Core/Operations/ProjectCommands.cs",
+      "nonblank_lines": 108,
+      "sha256": "4f04799a55800e85e05805d851823d3e012de5a0fcc26f81544262c20ad7fe12"
+    },
+    {
+      "path": "src/AcousticSeal.Core/Operations/ProjectSession.cs",
+      "nonblank_lines": 168,
+      "sha256": "469b35f7d85744de98bdbcc3c8b71cb1e00528e53c58f5baf9681ea000e64570"
+    },
+    {
+      "path": "src/AcousticSeal.Desktop/App.xaml",
+      "nonblank_lines": 26,
+      "sha256": "5b26211b34d66bb6cb4ee5c00a4b8989e868923763ac2523ec7a750de236219b"
+    },
+    {
+      "path": "src/AcousticSeal.Desktop/App.xaml.cs",
+      "nonblank_lines": 3,
+      "sha256": "78369604dea059e463aedc0d25346bb0124ad2e6a6cade22936f8125f6dbd59c"
+    },
+    {
+      "path": "src/AcousticSeal.Desktop/EnumTextConverter.cs",
+      "nonblank_lines": 13,
+      "sha256": "f29ef5cd89ba9ae7e02bc67f1fde7c22e09cd0fcc4f7ff9fc396cafe859446f3"
+    },
+    {
+      "path": "src/AcousticSeal.Desktop/ImportModes.cs",
+      "nonblank_lines": 7,
+      "sha256": "16dd1e0bfb07059794c969e54a33babbfc51880eab59228675978465cb116e86"
+    },
+    {
+      "path": "src/AcousticSeal.Desktop/MainWindow.xaml",
+      "nonblank_lines": 165,
+      "sha256": "a215d39df1c5da4b6be996f1cc412e9af1d46adc30220869801b1e6f3cc2f058"
+    },
+    {
+      "path": "src/AcousticSeal.Desktop/MainWindow.xaml.cs",
+      "nonblank_lines": 26,
+      "sha256": "fd241535faa99ad52d8ad859e709f892207d4cf11e13d97719d2ba40dc4a0953"
+    },
+    {
+      "path": "src/AcousticSeal.Desktop/NativeDialogs.cs",
+      "nonblank_lines": 25,
+      "sha256": "1398c43edb8e3b78baebfa217789c3e14593cb1883cef41249342706cee3feb6"
+    },
+    {
+      "path": "src/AcousticSeal.Desktop/SpectrumPlot.cs",
+      "nonblank_lines": 80,
+      "sha256": "6f450ae747dfe39a8b17d8dc4645a82bff6812c98be8a1a4b69fa2d41fba492a"
+    },
+    {
+      "path": "src/AcousticSeal.DesktopLogic/Binding.cs",
+      "nonblank_lines": 57,
+      "sha256": "e769d50623c91a901b863452f19d23631c60aa4f9dda4cc01dbc73e3e7b61996"
+    },
+    {
+      "path": "src/AcousticSeal.DesktopLogic/DesktopFiles.cs",
+      "nonblank_lines": 76,
+      "sha256": "64445074197acaad6023e0b46ecf765803ace34989d7bde9ada1ea9ff715e08f"
+    },
+    {
+      "path": "src/AcousticSeal.DesktopLogic/Editor.cs",
+      "nonblank_lines": 231,
+      "sha256": "f0ef11d44e348522fea36a697047d2fd2cf247deed05ce69ed34c3ec19f4762c"
+    },
+    {
+      "path": "src/AcousticSeal.DesktopLogic/Workspace.cs",
+      "nonblank_lines": 458,
+      "sha256": "07ee20894d763f79398bb7dd0cf7e08ec65b219b3f8b3a3725dc55a7e212cc15"
+    }
+  ],
+  "total_nonblank_lines": 4637
+}

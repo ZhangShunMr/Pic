@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <AssemblyName>AcousticSeal.Desktop</AssemblyName>
+    <Version>3.0.0</Version>
+    <Product>车身声学泄漏路径与封堵试验分析软件</Product>
+  </PropertyGroup>
+  <ItemGroup><ProjectReference Include="../AcousticSeal.DesktopLogic/AcousticSeal.DesktopLogic.csproj" /></ItemGroup>
+</Project>

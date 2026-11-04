@@ -1,0 +1,17 @@
+You must install or update .NET to run this application.
+
+App: /workspace/acoustic-native/acoustic-seal-analysis/src/AcousticSeal.Desktop/bin/Release/net10.0-windows/AcousticSeal.Desktop.dll
+Architecture: x64
+Framework: 'Microsoft.WindowsDesktop.App', version '10.0.0' (x64)
+.NET location: /workspace/dotnet/
+
+No frameworks were found.
+
+Learn more:
+https://aka.ms/dotnet/app-launch-failed
+
+To install missing framework, download:
+https://aka.ms/dotnet-core-applaunch?framework=Microsoft.WindowsDesktop.App&framework_version=10.0.0&arch=x64&rid=linux-x64&os=debian.13
+
+Observed exit code: 150
+This is an expected Linux runtime limitation, not a Windows UI test pass.

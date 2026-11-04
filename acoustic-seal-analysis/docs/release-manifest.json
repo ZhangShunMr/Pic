@@ -1,0 +1,11 @@
+{
+  "file": "releases/AcousticSeal-V3.0-win-x64.zip",
+  "sha256": "16d62b3fed2430f4de76a47b3f71053442865baf631a9b45d10f8b58e3734262",
+  "bytes": 63327025,
+  "rid": "win-x64",
+  "self_contained": true,
+  "built_on": "Linux x64 .NET SDK 10.0.403",
+  "windows_runtime_executed": false,
+  "zip_integrity_test": "passed",
+  "contains_exe": true
+}
