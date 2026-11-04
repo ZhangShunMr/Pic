@@ -1,0 +1,35 @@
+{
+  "verifiedAt": "2026-11-04T16:21:41.780076+00:00",
+  "producer_run": "https://github.com/ZhangShunMr/Pic/actions/runs/41865185186",
+  "producer_source_commit": "81041c0cbaf01268d9e9d05f9d9f48472c2281a2",
+  "archive": "MotorFrequency-V2.0-win-x64.zip",
+  "archive_bytes": 72268479,
+  "archive_sha256": "432b95038e4f0d3a23b0006c58ecfea76e68ff6fdf4c2fb20ee282d2a3a3bf9d",
+  "zip_integrity": "passed",
+  "all_manifest_file_hashes_verified": 500,
+  "executed_windows_binaries": [
+    {
+      "file": "MotorFrequency.exe",
+      "sha256": "3400f01a4236a3f5e62a7da1ec605a118615669b33ea5cf957326f25fe595bcb",
+      "matches_windows_execution_record": true
+    },
+    {
+      "file": "MotorFrequency.dll",
+      "sha256": "7ba5521107d30e62f19a5d309d1a78108e826d50603a2514ce9e309fb83a6f47",
+      "matches_windows_execution_record": true
+    },
+    {
+      "file": "MotorFrequency.Application.dll",
+      "sha256": "515b7172c9955146d86b868f2044fe6c355a54b416cfaf905a727d0d5ee6029a",
+      "matches_windows_execution_record": true
+    },
+    {
+      "file": "MotorFrequency.Core.dll",
+      "sha256": "be96adce4e852cd3d4d5d8c4c2c1a4ab67a74337fc29b92a624c4e88ae003d0a",
+      "matches_windows_execution_record": true
+    }
+  ],
+  "scope": "Exact Windows-produced self-contained EXE and three application assemblies; runner Server 2025 native startup/normal exit. No claim for Windows10/11 devices, high DPI or network isolation.",
+  "native_file_dialog_test": "failed separately, not included in passed basic WPF checks",
+  "word_pagination": "not available; COM not registered"
+}

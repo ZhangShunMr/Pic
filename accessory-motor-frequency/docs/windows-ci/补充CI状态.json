@@ -1,10 +1,13 @@
 {
-  "observedAt": "2026-11-04T16:12:23.932570+00:00",
+  "observedAt": "2026-11-04T16:21:41.780521+00:00",
   "basic_success_run": "https://github.com/ZhangShunMr/Pic/actions/runs/41860507345",
   "supplementary_native_dialog_run": "https://github.com/ZhangShunMr/Pic/actions/runs/41861404665",
-  "supplementary_observed_state": "in_progress; no completed native-dialog verification result",
+  "supplementary_observed_state": "completed/cancelled; execution step timed out at16:02:36 and cleanup completed; terminal confirmed from completed-run listing and GitHub page",
   "bounded_revision_run": "https://github.com/ZhangShunMr/Pic/actions/runs/41862034713",
-  "bounded_revision_observed_state": "queued",
+  "bounded_revision_observed_state": "completed/failure",
   "action_denied": false,
-  "conclusion": "Supplementary native file dialog test is pending/uncertain; it is not included in successful basic WPF checks. Future workflow separates its outcome and bounds execution."
+  "conclusion": "Package and basic WPF verified; supplemental native dialog automation is a failed test, not a passed item. Summary state remains inconsistent with completed worker logs.",
+  "latest_run": "https://github.com/ZhangShunMr/Pic/actions/runs/41865185186",
+  "latest_worker": "all required steps completed; exact Windows package preserved in remote commit7327989; run-summary API still reports queued at observation",
+  "latest_native_dialog_outcome": "failure at Native save automation; base WPF checks passed separately"
 }

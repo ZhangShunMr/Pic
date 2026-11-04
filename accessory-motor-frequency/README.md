@@ -4,7 +4,7 @@ Windows 原生 C# WPF 桌面软件，采用 MVVM，真实解决方案入口 [Mot
 
 ## 直接运行（离线）
 
-下载本分支 `release/MotorFrequency-V2.0-win-x64.zip`，将整个压缩包解压到可读写的本机文件夹，双击 `MotorFrequency.exe`。不要只复制单个 EXE；运行时及WPF依赖都在同一目录。目标 Windows 10/11 x64，无需预装.NET、Node或Python，运行不需联网。Windows可能对下载文件显示来源提示；先核对本分支发布清单和SHA-256。Windows Server 2025 CI已实际启动自包含程序并正常关闭，记录见[Windows运行证据](docs/windows-evidence/published-exe.json)。发布清单中`windows_execution_verified`只有在CI核对该包EXE与三个程序集字节哈希后才为true；不能把源代码级验证混同为不同二进制包的验证。Windows10/11实机、网络隔离和高DPI仍待补验。
+下载本分支 `release/MotorFrequency-V2.0-win-x64.zip`，将整个压缩包解压到可读写的本机文件夹，双击 `MotorFrequency.exe`。不要只复制单个 EXE；运行时及WPF依赖都在同一目录。目标 Windows 10/11 x64，无需预装.NET、Node或Python，运行不需联网。Windows可能对下载文件显示来源提示；先核对本分支发布清单和SHA-256。本分支离线ZIP已替换为运行41865185186实际产生并启动的Windows自包含构建，EXE及三个程序集字节哈希已核对一致，详见release/本地复核记录.json。Windows Server 2025 CI已实际启动自包含程序并正常关闭，记录见[Windows运行证据](docs/windows-evidence/published-exe.json)。发布清单中`windows_execution_verified`只有在CI核对该包EXE与三个程序集字节哈希后才为true；不能把源代码级验证混同为不同二进制包的验证。Windows10/11实机、网络隔离和高DPI仍待补验。
 
 ## 构建与调试
 

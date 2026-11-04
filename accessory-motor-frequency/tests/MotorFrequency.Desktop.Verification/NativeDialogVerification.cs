@@ -106,12 +106,26 @@ internal static class NativeDialogVerification
                 Require(handle != 0, "Native dialog not found: " + title);
                 var dialog = AutomationElement.FromHandle(handle);
                 Console.WriteLine("Native dialog: found owned window");
-                var edits = dialog.FindAll(TreeScope.Descendants, new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Edit));
+                CaptureDialog(handle, screenshot);
+                var edits = dialog.FindAll(TreeScope.Descendants, new OrCondition(
+                    new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Edit),
+                    new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.ComboBox)));
+                var controls = new List<object>();
+                foreach (AutomationElement element in edits)
+                {
+                    controls.Add(new { element.Current.Name, element.Current.AutomationId,
+                        type = element.Current.ControlType.ProgrammaticName,
+                        valuePattern = element.TryGetCurrentPattern(ValuePattern.Pattern, out _) });
+                }
+                File.WriteAllText(screenshot + ".controls.json", System.Text.Json.JsonSerializer.Serialize(controls,
+                    new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
                 AutomationElement? fileName = null;
                 foreach (AutomationElement edit in edits)
                 {
-                    if (edit.Current.AutomationId == "1001" || edit.Current.Name.Contains("File name", StringComparison.OrdinalIgnoreCase)
+                    if ((edit.Current.AutomationId is "1001" or "FileNameControlHost"
+                        || edit.Current.Name.Contains("File name", StringComparison.OrdinalIgnoreCase)
                         || edit.Current.Name.Contains("文件名"))
+                        && edit.TryGetCurrentPattern(ValuePattern.Pattern, out _))
                     {
                         fileName = edit;
                         break;
@@ -119,7 +133,7 @@ internal static class NativeDialogVerification
                 }
                 Require(fileName is not null && fileName.TryGetCurrentPattern(ValuePattern.Pattern, out _), "Native filename edit not found");
                 ((ValuePattern)fileName!.GetCurrentPattern(ValuePattern.Pattern)).SetValue(path);
-                CaptureDialog(handle, screenshot);
+                Console.WriteLine("Native dialog: filename set through ValuePattern");
                 var accept = dialog.FindFirst(TreeScope.Descendants, new AndCondition(
                     new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Button),
                     new PropertyCondition(AutomationElement.AutomationIdProperty, "1")));
@@ -129,6 +143,8 @@ internal static class NativeDialogVerification
             catch (Exception error)
             {
                 failure = error;
+                File.WriteAllText(screenshot + ".failure.txt", error.ToString());
+                Console.Error.WriteLine(error);
                 if (handle != 0) PostMessage(handle, 0x0010, 0, 0);
             }
         }) { IsBackground = true };
