@@ -90,6 +90,16 @@ public sealed partial class WorkspaceViewModel
     }
     public StoredProject? SelectedStored { get; set; }
     public Snapshot? SelectedSnapshot { get; set; }
+    public Guid? BaselineKey
+    {
+        get => Guid.TryParse(BaselineId, out var id) ? id : null;
+        set { if (value is { } id) BaselineId = id.ToString(); }
+    }
+    public Guid? TargetKey
+    {
+        get => Guid.TryParse(TargetId, out var id) ? id : null;
+        set { if (value is { } id) TargetId = id.ToString(); }
+    }
     public ScanRow? SelectedScan { get; set; }
     public double RingRadius { get; set; } = 5;
     public int RingCount { get; set; } = 8;

@@ -18,9 +18,9 @@
         <GroupBox Header="同条件比较 · 目标减基线">
             <StackPanel>
                 <TextBlock Text="基线方案"/>
-                <ComboBox ItemsSource="{Binding Project.Snapshots}" DisplayMemberPath="Name" SelectedValuePath="Id" SelectedValue="{Binding BaselineId, Mode=TwoWay}"/>
+                <ComboBox ItemsSource="{Binding Project.Snapshots}" DisplayMemberPath="Name" SelectedValuePath="Id" SelectedValue="{Binding BaselineKey, Mode=TwoWay}"/>
                 <TextBlock Text="目标方案"/>
-                <ComboBox ItemsSource="{Binding Project.Snapshots}" DisplayMemberPath="Name" SelectedValuePath="Id" SelectedValue="{Binding TargetId, Mode=TwoWay}"/>
+                <ComboBox ItemsSource="{Binding Project.Snapshots}" DisplayMemberPath="Name" SelectedValuePath="Id" SelectedValue="{Binding TargetKey, Mode=TwoWay}"/>
                 <Button Content="比较两方案" Command="{Binding Commands[Compare]}"/>
                 <TextBlock Text="计算区域、步长、背景、计权、工程目标、接收高度、观察点GUID和坐标以及数据来源类别须一致。不同条件会阻断比较；可以变化声源布局、朝向和增益。" Style="{StaticResource Hint}"/>
                 <TextBlock Text="{Binding Comparison.Comparable, StringFormat=可比较：{0}}" FontWeight="SemiBold"/>

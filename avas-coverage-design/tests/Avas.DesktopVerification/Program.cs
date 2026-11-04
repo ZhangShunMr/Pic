@@ -71,7 +71,16 @@ internal static class Program
             images.Add(new { file = Path.GetFileName(path), sha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(path))).ToLowerInvariant(), width = bitmap.PixelWidth, height = bitmap.PixelHeight, provenance = "live Windows WPF client visual, shown MainWindow" });
             var inspector = (FrameworkElement)window.FindName("Inspector");
             var detail = new RenderTargetBitmap((int)Math.Ceiling(inspector.ActualWidth), (int)Math.Ceiling(inspector.ActualHeight), 96, 96, PixelFormats.Pbgra32);
-            detail.Render(inspector);
+            var detailVisual = new DrawingVisual();
+            using (var drawing = detailVisual.RenderOpen())
+            {
+                drawing.DrawRectangle(Brushes.White, null, new Rect(0, 0, detail.PixelWidth, detail.PixelHeight));
+                drawing.DrawRectangle(new VisualBrush(inspector), null, new Rect(0, 0, inspector.ActualWidth, inspector.ActualHeight));
+            }
+            detail.Render(detailVisual);
+            var detailPixels = new byte[detail.PixelWidth * detail.PixelHeight * 4];
+            detail.CopyPixels(detailPixels, detail.PixelWidth * 4, 0);
+            Assert(detailPixels.Where((_, i) => i % 4 != 3).Distinct().Count() > 20, name + "：局部图包含实际可见控件");
             var detailPath = Path.Combine(output, name + "-editor.png");
             using (var stream = File.Create(detailPath))
             {
@@ -80,6 +89,16 @@ internal static class Program
                 encoder.Save(stream);
             }
             images.Add(new { file = Path.GetFileName(detailPath), sha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(detailPath))).ToLowerInvariant(), width = detail.PixelWidth, height = detail.PixelHeight, provenance = "live, visible WPF Inspector panel from the same shown MainWindow; original pixels" });
+        }
+        async Task ScrollCapture(string name, double offset = double.PositiveInfinity)
+        {
+            var inspector = (FrameworkElement)window.FindName("Inspector");
+            var scroll = Descendants<ScrollViewer>(inspector).First();
+            if (double.IsPositiveInfinity(offset)) scroll.ScrollToEnd();
+            else scroll.ScrollToVerticalOffset(offset);
+            await Capture(name);
+            scroll.ScrollToTop();
+            await Layout();
         }
         async Task Page(string page)
         {
@@ -106,6 +125,7 @@ internal static class Program
                 await Capture("02-模拟声场");
                 await Page("扬声器");
                 await Capture("03-扬声器频带");
+                await ScrollCapture("03b-七带与来源", 510);
                 var coordinate = Descendants<TextBox>(window).First(x => x.Name == "SpeakerX");
                 Assert(errors.Errors.Count == 0, "正常输入阶段没有WPF绑定错误");
                 coordinate.Text = "abc";
@@ -121,21 +141,26 @@ internal static class Program
                 expectedValidationTrace.AddRange(errors.Errors);
                 errors.Errors.Clear();
                 await Page("背景与网格"); await Capture("05-背景网格");
+                await ScrollCapture("05b-工程目标");
                 await Page("观察点"); await Capture("06-观察点频谱");
+                await ScrollCapture("06b-点频谱贡献");
                 await Page("方案比较");
                 vm.SnapshotName = "基线"; vm.CaptureSnapshot();
                 vm.SpeakerDraft!.Gain += 3; vm.ApplyDraft(); await vm.CalculateAsync();
                 vm.SnapshotName = "增益方案"; vm.CaptureSnapshot(); vm.Compare();
                 Assert(vm.Comparison is { Comparable: true }, "真实窗口方案比较");
                 await Capture("07-方案比较");
+                await ScrollCapture("07b-方案差值");
                 await Page("扫描与剖面");
                 vm.ScanRequest = new ScanRequest { SpeakerId = vm.SelectedSpeakerId!.Value, Parameter = ScanParameter.Gain, Start = 0, End = 2, Step = 1 };
                 await vm.RunScanAsync(); await vm.RunTransectAsync();
                 Assert(vm.Scan?.Rows.Count == 3 && vm.Transect?.Points.Count > 0, "真实窗口扫描与剖面");
                 await Capture("08-扫描剖面");
+                await ScrollCapture("08b-方向剖面");
                 await Page("音频试听"); vm.AuditionSeconds = 1; await vm.RenderAuditionAsync();
                 Assert(vm.Audition is { Peak: < .98 }, "试听波形制作完成；不验证听感");
                 await Capture("09-相对试听");
+                await ScrollCapture("09b-相对试听结果");
                 await Page("成果与复核"); vm.Save(); vm.Export("report");
                 Assert(vm.Errors.Count == 0 && File.Exists(vm.LastDownload), "真实命令保存并输出报告；文件选择器由测试宿主替代");
                 await Capture("10-成果复核");
