@@ -1,4 +1,4 @@
-System.InvalidOperationException: Native save: Native selected path differs
-   at MotorFrequency.Desktop.Verification.NativeDialogVerification.Require(Boolean condition, String message) in D:\a\Pic\Pic\accessory-motor-frequency\tests\MotorFrequency.Desktop.Verification\NativeDialogVerification.cs:line 53
-   at MotorFrequency.Desktop.Verification.NativeDialogVerification.Run(Window window, String output) in D:\a\Pic\Pic\accessory-motor-frequency\tests\MotorFrequency.Desktop.Verification\NativeDialogVerification.cs:line 25
-   at MotorFrequency.Desktop.Verification.Program.Main(String[] args) in D:\a\Pic\Pic\accessory-motor-frequency\tests\MotorFrequency.Desktop.Verification\Program.cs:line 72
+System.InvalidOperationException: Native save: Native selected path differs; see selection.json
+   at MotorFrequency.Desktop.Verification.NativeDialogVerification.Require(Boolean condition, String message) in D:\a\Pic\Pic\accessory-motor-frequency\tests\MotorFrequency.Desktop.Verification\NativeDialogVerification.cs:line 54
+   at MotorFrequency.Desktop.Verification.NativeDialogVerification.Run(Window window, String output) in D:\a\Pic\Pic\accessory-motor-frequency\tests\MotorFrequency.Desktop.Verification\NativeDialogVerification.cs:line 26
+   at MotorFrequency.Desktop.Verification.Program.Main(String[] args) in D:\a\Pic\Pic\accessory-motor-frequency\tests\MotorFrequency.Desktop.Verification\Program.cs:line 78
