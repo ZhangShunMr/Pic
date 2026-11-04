@@ -14,10 +14,12 @@ public partial class MainWindow : Window
     private readonly HashSet<ValidationError> errors = [];
     private bool notifying;
 
-    public MainWindow()
+    public MainWindow() : this(new DesktopInteraction()) { }
+
+    public MainWindow(IDesktopInteraction interaction)
     {
         InitializeComponent();
-        workspace = new WorkspaceViewModel(new DesktopInteraction());
+        workspace = new WorkspaceViewModel(interaction);
         DataContext = workspace;
         workspace.DraftReplaced += (_, _) => errors.Clear();
         AddHandler(Binding.SourceUpdatedEvent, new EventHandler<DataTransferEventArgs>(OnSourceUpdated));

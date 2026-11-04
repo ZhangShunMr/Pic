@@ -1,0 +1,49 @@
+name: Trim contact Windows native verification
+on:
+  push:
+    branches: ['windows-native/trim-contact-design-20261104']
+    paths: ['trim-contact-design/**', '.github/workflows/trim-windows.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  windows:
+    runs-on: windows-2025
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: pwsh
+        working-directory: trim-contact-design
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.403'
+      - name: Build and actual production WPF window checks
+        run: ./tools/verify-windows.ps1
+      - name: Publish and launch self-contained executable
+        if: success()
+        run: ./tools/smoke-published.ps1
+      - name: Check actual Microsoft Word availability
+        if: always()
+        run: ./tools/check-word.ps1
+      - name: Retain actual evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trim-windows-native
+          path: |
+            trim-contact-design/docs/windows
+            trim-contact-design/artifacts/win-x64
+      - name: Preserve evidence on the existing independent branch
+        if: always() && github.ref == 'refs/heads/windows-native/trim-contact-design-20261104'
+        run: |
+          git config user.name 'Trim Windows verification'
+          git config user.email 'codex@openai.com'
+          git add docs/windows
+          git diff --cached --quiet
+          if ($LASTEXITCODE -eq 1) {
+            git commit -m 'Record actual Windows verification evidence [skip ci]'
+            git push origin HEAD:windows-native/trim-contact-design-20261104
+            if ($LASTEXITCODE -ne 0) { throw 'Could not preserve evidence on the independent branch' }
+          }
