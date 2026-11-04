@@ -1,0 +1,86 @@
+@inherits VmComponent
+@inject IJSRuntime Js
+@if (Vm.Current is not null)
+{
+    <section id="sweep" class="section">
+        <div class="section-heading">
+            <div><span class="index">06a</span><h2>参数扫查与反算转速</h2></div>
+            <p>探索不同结构整数的频率关系，不改当前电机</p>
+        </div>
+        <details class="editor-fold">
+            <summary>展开参数扫查工具</summary>
+            <p>在当前拓扑及启用假设下枚举输入整数。每组最多 12 个值，用英文逗号分隔。扫查不进行绕组可行性、电磁力或声压预测；相近不表示优选。</p>
+            <div class="form-grid three">
+                @if (Vm.Current.Motor.Topology == MotorTopology.BrushlessPermanentMagnet)
+                {
+                    <label>极对数组 p<input @bind="Tool.PolePairs" /></label>
+                    <label>槽数组 Q<input @bind="Tool.Slots" /></label>
+                }
+                else
+                {
+                    <label>换向片数组 K<input @bind="Tool.Segments" /></label>
+                }
+                <label>参考转速 r/min<input @bind="Tool.ReferenceRpm" /></label>
+                <label>观察频率 Hz<input @bind="Tool.ObservedHz" /></label>
+                <label>绝对容差 Hz<input @bind="Tool.ToleranceHz" /></label>
+            </div>
+            <div class="inline-actions">
+                <button @onclick="Run">运行参数扫查与反算</button>
+                <button @onclick="Tool.Clear">清除扫查结果</button>
+            </div>
+            <p class="@(Tool.Error ? "warning" : "success-note")">@Tool.Summary</p>
+            @if (Tool.Stale(Vm.Current))
+            {
+                <p class="warning">当前电机或候选已变化，下方为历史扫查结果。请重新运行后再导出或使用。</p>
+            }
+            @if (Tool.Rows.Count > 0)
+            {
+                <label class="check"><input type="checkbox" @bind="Tool.OnlyNearby" />仅显示容差内候选</label>
+                <div class="table-scroll sweep-table">
+                    <table>
+                        <thead><tr><th>p / Q / K</th><th>候选</th><th>阶次</th><th>频率 Hz</th><th>计算−观察 Hz</th><th>容差内</th></tr></thead>
+                        <tbody>
+                            @foreach (var row in Tool.DisplayRows)
+                            {
+                                <tr><td>@row.PolePairs / @row.Slots / @row.Segments</td><td>@row.Candidate</td><td>@Labels.Number(row.Order)</td><td>@Labels.Number(row.FrequencyHz)</td><td>@Labels.Number(row.DifferenceHz)</td><td>@(row.WithinTolerance ? "是" : "否")</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <button disabled="@Tool.Stale(Vm.Current)" @onclick="Download">导出全部参数扫查 CSV</button>
+                <h3>当前方案的观察频率反算</h3>
+                <p>中心转速 n=60×观察频率/k；容差转速区间不裁切到扫描范围，仅另外标记中心是否位于范围内。不是测得的实际转速。</p>
+                <div class="table-scroll">
+                    <table>
+                        <thead><tr><th>当前候选</th><th>中心 r/min</th><th>容差区间 r/min</th><th>中心在扫描范围内</th></tr></thead>
+                        <tbody>
+                            @foreach (var row in Tool.ReverseRows)
+                            {
+                                <tr><td>@row.Candidate</td><td>@Labels.Number(row.CenterRpm)</td><td>@Labels.Number(row.LowerRpm)–@Labels.Number(row.UpperRpm)</td><td>@(row.WithinScan ? "是" : "否")</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <p class="small muted">扫查为会话工具，不随项目保存；需要留存时导出 CSV。结果对应已运行时输入，编辑工具草稿后请重新运行。</p>
+            }
+        </details>
+    </section>
+}
+
+@code {
+    private SweepViewModel Tool { get; } = new();
+
+    private void Run()
+    {
+        if (Vm.Current is not null)
+        {
+            Tool.Run(Vm.Current);
+        }
+    }
+
+    private async Task Download()
+    {
+        if (Vm.Current is null || Tool.Stale(Vm.Current)) return;
+        await Js.InvokeVoidAsync("motorFiles.download", "电机参数扫查.csv", "text/csv;charset=utf-8", "\uFEFF" + ParameterSweep.Csv(Vm.Current, Tool.Rows));
+    }
+}

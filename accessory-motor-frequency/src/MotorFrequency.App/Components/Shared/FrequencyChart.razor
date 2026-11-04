@@ -1,0 +1,63 @@
+@inherits VmComponent
+@if (Vm.Current is not null)
+{
+    var project = Vm.Current;
+    var motor = project.Motor;
+    var chart = new ChartGeometry(motor);
+    var candidates = Vm.Candidates.Where(x => x.Visible).ToList();
+    <div class="chart-toolbar"><div class="metric"><span>观察转速</span><strong>@Labels.Number(motor.InspectRpm)<small>r/min</small></strong></div><div class="metric"><span>机械转频</span><strong>@Labels.Number(motor.InspectRpm / 60)<small>Hz</small></strong></div><div class="metric"><span>@(motor.Topology == MotorTopology.BrushlessPermanentMagnet ? "电气基频" : "单刷片通过")</span><strong>@Labels.Number(FrequencyEngine.At(motor.Topology == MotorTopology.BrushlessPermanentMagnet ? motor.PolePairs : motor.CommutatorSegments, motor.InspectRpm))<small>Hz</small></strong></div><div class="metric"><span>交叠区间</span><strong>@Vm.Crossings.Count<small>条</small></strong></div></div>
+    <svg class="campbell-chart" viewBox="0 0 900 370" role="img" aria-label="候选频率随转速变化图">
+        @foreach (var tick in chart.SpeedTicks())
+        {
+            <line x1="@N(tick.Position)" x2="@N(tick.Position)" y1="24" y2="316" stroke="#e4e6dc" />
+            <g><text x="@N(tick.Position)" y="338" text-anchor="middle" class="axis-label">@Labels.Number(tick.Value)</text></g>
+        }
+        @foreach (var tick in chart.FrequencyTicks())
+        {
+            <line x1="68" x2="860" y1="@N(tick.Position)" y2="@N(tick.Position)" stroke="#e4e6dc" />
+            <g><text x="58" y="@N(tick.Position + 4)" text-anchor="end" class="axis-label">@Labels.Number(tick.Value)</text></g>
+        }
+        @foreach (var band in project.Bands.Where(x => x.Enabled && x.LowerHz <= motor.MaximumHz))
+        {
+            var upper = Math.Min(band.UpperHz, motor.MaximumHz);
+            <rect x="68" y="@N(chart.Y(upper))" width="792" height="@N(Math.Max(1, chart.Y(band.LowerHz) - chart.Y(upper)))" fill="#b19136" opacity=".15"><title>@band.Name · @Labels.Number(band.LowerHz)–@Labels.Number(band.UpperHz) Hz · @Labels.Origin(band.Origin)</title></rect>
+        }
+        @if (Vm.SelectedScenario is not null)
+        {
+            @foreach (var item in FrequencyEngine.Candidates(Vm.SelectedScenario.Motor, Vm.SelectedScenario.CustomOrders).Where(x => x.Visible))
+            {
+                <path d="@chart.CandidateLine(item)" fill="none" stroke="#737e75" stroke-dasharray="5 6" opacity=".45"><title>快照 @Vm.SelectedScenario.Name：@item.Name，@Labels.Number(item.Order) 阶</title></path>
+            }
+        }
+        @for (var i = 0; i < candidates.Count; i++)
+        {
+            var candidate = candidates[i];
+            var index = i;
+            <path class="candidate-line" d="@chart.CandidateLine(candidate)" fill="none" stroke="@ChartGeometry.Color(index)" stroke-width="@(candidate.Id == Vm.SelectedCandidateId ? "4" : "2")" @onclick="() => Vm.SelectCandidate(candidate.Id)"><title>@candidate.Name · @Labels.Number(candidate.Order) 阶 · @candidate.Basis</title></path>
+        }
+        @foreach (var spectrum in project.Spectra.Where(x => x.Visible && x.Rpm >= motor.MinimumRpm && x.Rpm <= motor.MaximumRpm))
+        {
+            <line x1="@N(chart.X(spectrum.Rpm))" x2="@N(chart.X(spectrum.Rpm))" y1="24" y2="316" stroke="#9c8a6c" opacity=".3" />
+            @foreach (var peak in FrequencyEngine.MatchPeaks(project, spectrum).DistinctBy(x => x.ObservedHz).Where(x => x.ObservedHz <= motor.MaximumHz))
+            {
+                <circle cx="@N(chart.X(spectrum.Rpm))" cy="@N(chart.Y(peak.ObservedHz))" r="4" fill="#2c4038" opacity=".65" @onclick="() => Vm.SelectSpectrum(spectrum.Id)"><title>@spectrum.Name · @Labels.Origin(spectrum.Origin) · @Labels.Number(peak.ObservedHz) Hz · @Labels.Number(peak.Amplitude) @spectrum.Unit</title></circle>
+            }
+        }
+        <line x1="@N(chart.X(motor.InspectRpm))" x2="@N(chart.X(motor.InspectRpm))" y1="24" y2="316" stroke="#233e35" stroke-dasharray="4 4" />
+        <g><text x="12" y="18" class="axis-label">Hz</text></g><g><text x="797" y="361" class="axis-label">转速 r/min</text></g>
+    </svg>
+    <div class="speed-scrubber"><span>@Labels.Number(motor.MinimumRpm)</span><input aria-label="观察转速滑杆" type="range" min="@N(motor.MinimumRpm)" max="@N(motor.MaximumRpm)" step="1" value="@N(motor.InspectRpm)" @onchange="e => Vm.SetInspect(e.Value?.ToString() ?? string.Empty)" /><span>@Labels.Number(motor.MaximumRpm) r/min</span></div>
+    <div class="chart-legend">
+        @for (var i = 0; i < candidates.Count; i++)
+        {
+            var item = candidates[i];
+            <button class="legend-item @(Vm.SelectedCandidateId == item.Id ? "active" : "")" @onclick="() => Vm.SelectCandidate(item.Id)"><i style="background:@ChartGeometry.Color(i)"></i>@item.Name <span>@Labels.Number(item.Order) 阶</span></button>
+        }
+    </div>
+    <p class="chart-note">色块：已启用敏感频段；黑点：各定转速频谱前 @project.Review.MaximumPeaks 个内部谱峰（等大小，不编码声级）；灰虚线：选中快照。超出纵轴的频率保留在表格和导出中。图线同频可能重合。</p>
+    @if (Vm.SelectedCandidate is not null)
+    {
+        var item = Vm.SelectedCandidate;
+        <details class="calculation" open><summary>@item.Name · 计算解释</summary><div class="calculation-body"><strong>@item.Formula</strong><p>k=@Labels.Number(item.Order)，n=@Labels.Number(motor.InspectRpm) r/min → f=@Labels.Number(item.Order) × @Labels.Number(motor.InspectRpm) / 60 = <b>@Labels.Number(FrequencyEngine.At(item.Order, motor.InspectRpm)) Hz</b></p><p>@item.Basis</p></div></details>
+    }
+}

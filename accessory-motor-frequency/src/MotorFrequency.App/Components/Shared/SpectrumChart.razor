@@ -1,0 +1,52 @@
+@if (Spectrum is not null)
+{
+    var points = Spectrum.Points;
+    var visible = points.Where(x => x.FrequencyHz <= Motor.MaximumHz).ToList();
+    if (visible.Count == 0)
+    {
+        <p class="empty-inline">当前图表频率范围内没有频点，请在转速与范围检查器提高频率上限。</p>
+    }
+    else
+    {
+        var minimum = visible.Min(x => x.Amplitude);
+        var maximum = visible.Max(x => x.Amplitude);
+        var padding = Math.Max(1, (maximum - minimum) * 0.1);
+        minimum -= padding;
+        maximum += padding;
+        <svg class="spectrum-chart" viewBox="0 0 900 370" role="img" aria-label="选中频谱幅值及候选频率叠加图">
+            @for (var i = 0; i <= 5; i++)
+            {
+                var y = 316 - i * 292.0 / 5;
+                var amplitude = minimum + (maximum - minimum) * i / 5;
+                <line x1="68" x2="860" y1="@ChartGeometry.N(y)" y2="@ChartGeometry.N(y)" stroke="#e4e6dc" />
+                <g><text x="58" y="@ChartGeometry.N(y + 4)" text-anchor="end" class="axis-label">@Labels.Number(amplitude)</text></g>
+            }
+            @for (var i = 0; i <= 6; i++)
+            {
+                var x = 68 + i * 792.0 / 6;
+                var hz = Motor.MaximumHz * i / 6;
+                <g><text x="@ChartGeometry.N(x)" y="338" text-anchor="middle" class="axis-label">@Labels.Number(hz)</text></g>
+            }
+            @for (var i = 0; i < Candidates.Count; i++)
+            {
+                var candidate = Candidates[i];
+                var frequency = FrequencyEngine.At(candidate.Order, Spectrum.Rpm);
+                if (candidate.Visible && frequency <= Motor.MaximumHz)
+                {
+                    var x = 68 + frequency / Motor.MaximumHz * 792;
+                    <line x1="@ChartGeometry.N(x)" x2="@ChartGeometry.N(x)" y1="24" y2="316" stroke="@ChartGeometry.Color(i)" stroke-dasharray="4 5" opacity=".7"><title>@candidate.Name · @Labels.Number(frequency) Hz</title></line>
+                }
+            }
+            <polyline points="@ChartGeometry.SpectrumPolyline(Spectrum, Motor.MaximumHz, minimum, maximum)" fill="none" stroke="#233f36" stroke-width="1.5" />
+            <g><text x="10" y="17" class="axis-label">@Spectrum.Unit</text></g>
+            <g><text x="800" y="361" class="axis-label">频率 Hz</text></g>
+        </svg>
+        <p class="chart-note">实线：选中频谱；虚线：该频谱转速下的候选频率。每次只绘制一条幅值曲线，避免混用不同单位/工况。超过 1000 点时图形按区间保留极值抽稀，原始数据与峰值计算不抽稀。</p>
+    }
+}
+
+@code {
+    [Parameter, EditorRequired] public Spectrum Spectrum { get; set; } = default!;
+    [Parameter, EditorRequired] public MotorConfiguration Motor { get; set; } = default!;
+    [Parameter, EditorRequired] public IReadOnlyList<Candidate> Candidates { get; set; } = [];
+}

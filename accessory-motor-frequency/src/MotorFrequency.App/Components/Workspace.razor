@@ -1,0 +1,99 @@
+@page "/"
+@inherits VmComponent
+@inject IJSRuntime Js
+
+<div class="shell">
+    <aside class="project-rail">
+        <a class="brand" href="/" aria-label="电机频率设计首页"><span class="brand-mark">m<span>ƒ</span></span><span>电机频率设计<span class="version">MOTOR FREQUENCY / V1.0</span></span></a>
+        <div class="rail-caption">项目工作簿</div>
+        <button class="primary wide" @onclick="Vm.NewProject">＋ 新建空白项目</button>
+        <button class="wide" @onclick="Vm.LoadDemo">载入独立模拟示例</button>
+        <label class="file-button">导入 .motorproj<InputFile OnChange="e => Vm.ImportProject(e.File)" accept=".motorproj" /></label>
+        @if (Vm.Current is not null)
+        {
+            <div class="project-card"><span class="dot"></span><strong>@Vm.Current.Name</strong><small>@(Vm.Current.Demonstration ? "模拟演示" : "普通项目") · @(Vm.Dirty ? "未保存" : "已保存")</small></div>
+            <nav class="object-tree" aria-label="工作对象">
+                <a href="#structure" @onclick='() => Vm.SelectObject("rotor")'><span>01</span> 电机结构与条件</a>
+                <a href="#frequency"><span>02</span> 频率—转速图</a>
+                <a href="#orders"><span>03</span> 候选阶次与依据</a>
+                <a href="#bands"><span>04</span> 结构敏感频段</a>
+                <a href="#spectrum"><span>05</span> 导入频谱与核对</a>
+                <a href="#comparison"><span>06</span> 方案快照比较</a>
+                <a href="#sweep"><span>06a</span> 参数扫查与反算</a>
+                <a href="#delivery"><span>07</span> 保存与输出</a>
+            </nav>
+        }
+        <div class="library-heading"><span>本机项目库</span><button class="text-button" @onclick="Vm.RefreshLibrary">刷新</button></div>
+        @if (Vm.Library.Count == 0)
+        {
+            <p class="muted small">尚无保存的项目。示例不会自动写入项目库。</p>
+        }
+        @foreach (var item in Vm.Library)
+        {
+            <div class="library-item">
+                <button class="library-open" @onclick="() => Vm.Open(item.Id)">@item.Name</button>
+                <small>@(item.Demonstration ? "模拟" : "普通") · @(item.Archived ? "已归档" : "可编辑") · @item.ModifiedAt.ToString("MM-dd HH:mm") UTC</small>
+                @if (item.HasBackup)
+                {
+                    <button class="text-button" @onclick="() => Vm.RestoreBackup(item.Id)">读取上一版备份为副本</button>
+                }
+            </div>
+        }
+        @foreach (var warning in Vm.LibraryWarnings)
+        {
+            <p class="warning small">@warning</p>
+        }
+        <div class="rail-foot">单机本地计算<br />参数与内嵌频谱随项目保存</div>
+    </aside>
+    <main>
+        <header class="document-header"><div><div class="eyebrow">ACCESSORY MOTOR / ENGINEERING NOTEBOOK</div><h1>汽车附件电机电磁激励频率设计软件</h1></div><span class="edition">V1.0</span></header>
+        <div class="status @(Vm.IsError ? "error" : "")" role="status" id="status-message">@Vm.Message</div>
+        @if (Vm.Current is null)
+        {
+            <section class="empty-state">
+                <div class="empty-illustration"><span>n</span><i>→</i><span>ƒ</span></div>
+                <div class="eyebrow">从结构出发，核对频率</div>
+                <h2>把一条音调，放回电机的转速与结构中。</h2>
+                <p>建立电机参数、候选阶次和参考依据，查看随转速变化的频率轨迹，再用频谱与结构关注频段做交叉核对。</p>
+                <div class="empty-actions"><button class="primary" @onclick="Vm.NewProject">新建空白项目</button><button @onclick="Vm.LoadDemo">打开 60 Hz 模拟案例</button></div>
+                <div class="empty-principles"><p><strong>01 / 结构对象</strong>直接选取磁极、槽或换向器，联动查看参数及公式。</p><p><strong>02 / 可追溯候选</strong>电频、运动学通过频率与假设候选分别保留依据。</p><p><strong>03 / 工程复核</strong>叠加定转速频谱、扫描关注区间并比较参数方案。</p></div>
+                <p class="boundary">@Software.Boundary</p>
+            </section>
+        }
+        else
+        {
+            <div class="project-strip"><div><span class="tag @(Vm.Current.Demonstration ? "demo" : "")">@(Vm.Current.Demonstration ? "模拟演示" : "普通项目")</span><strong>@Vm.Current.Name</strong><span class="muted">@(Vm.Current.Archived ? "已归档" : "编辑中")</span></div><div class="inline-actions"><button @onclick="Vm.Undo" disabled="@(!Vm.CanUndo)">撤销</button><button @onclick="Vm.Redo" disabled="@(!Vm.CanRedo)">重做</button><button class="primary" @onclick="Vm.Save">保存项目</button></div></div>
+            @if (Vm.HasDraftChanges)
+            {
+                <p class="warning">存在未应用的字段草稿。请在对应检查器应用条件、档案或复核口径；保存和导出只包含已应用输入。</p>
+            }
+            <section id="structure" class="section">
+                <div class="section-heading"><div><span class="index">01</span><h2>结构与工作条件</h2></div><p>点击结构对象，右侧检查器随之更新</p></div>
+                <div class="structure-layout"><MotorDrawing /><Inspector /></div>
+            </section>
+            <section id="frequency" class="section">
+                <div class="section-heading"><div><span class="index">02</span><h2>频率—转速图</h2></div><p>Hz × r/min · 直线为候选频率轨迹</p></div>
+                <FrequencyChart />
+            </section>
+            <OrderPanel />
+            <BandPanel />
+            <SpectrumPanel />
+            <ComparisonPanel />
+            <SweepPanel />
+            <DeliveryPanel />
+        }
+        <footer>@Software.Name @Software.Version<span>@Software.Boundary</span></footer>
+    </main>
+</div>
+@if (!string.IsNullOrEmpty(Vm.Confirmation))
+{
+    <div class="modal-backdrop"><section role="dialog" aria-modal="true" aria-labelledby="confirm-title" class="confirm-dialog"><h2 id="confirm-title">确认当前操作</h2><p>@Vm.Confirmation</p><div class="inline-actions"><button @onclick="Vm.Cancel">取消，保留当前工作</button><button class="primary" @onclick="Vm.Confirm">确认继续</button></div></section></div>
+}
+<div id="blazor-error-ui">界面连接中断或发生错误。请保留已下载/保存的项目，刷新后从项目库重开。<a href="/">重新载入</a></div>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await Js.InvokeVoidAsync("motorFiles.setDirty", Vm.Dirty || Vm.HasDraftChanges);
+    }
+}

@@ -1,0 +1,27 @@
+@inherits VmComponent
+@if (Vm.Current is not null)
+{
+    <details class="editor-fold">
+        <summary>项目输入核对表 · 逐项查看证据与后续动作</summary>
+        <p>下表说明资料完整性和使用条件，不是合格判定或自动诊断。请据此补充输入或安排试验。</p>
+        <div class="table-scroll">
+            <table>
+                <thead>
+                    <tr><th>核对对象</th><th>状态</th><th>当前证据</th><th>后续动作</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in ProjectReview.Inspect(Vm.Current))
+                    {
+                        <tr>
+                            <td>@item.Subject</td>
+                            <td>@item.State</td>
+                            <td>@item.Evidence</td>
+                            <td>@item.NextAction</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <button @onclick='() => Vm.Export("review")'>导出输入核对 JSON</button>
+    </details>
+}

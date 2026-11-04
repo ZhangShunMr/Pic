@@ -1,0 +1,84 @@
+@inherits VmComponent
+@if (Vm.Current is not null)
+{
+    var motor = Vm.Current.Motor;
+    <div class="motor-board">
+        <div class="drawing-title"><span>结构示意 / 非尺寸模型</span><span>@Labels.Topology(motor.Topology)</span></div>
+        <div class="drawing-body">
+            <svg class="motor-svg" viewBox="0 0 320 320" role="img" aria-label="电机横截面结构示意">
+                <defs><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#c8c9b9" stroke-width="1" /></pattern></defs>
+                <circle cx="160" cy="160" r="145" fill="url(#hatch)" stroke="#65766b" stroke-width="2" />
+                <circle cx="160" cy="160" r="132" fill="#f6f5ed" stroke="#65766b" />
+                @if (motor.Topology == MotorTopology.BrushlessPermanentMagnet)
+                {
+                    <g class="selectable @(Vm.SelectedObject == "slots" ? "selected-part" : "")" @onclick='() => Vm.SelectObject("slots")'>
+                        @for (var i = 0; i < Math.Min(motor.Slots, 72); i++)
+                        {
+                            var angle = i * 360.0 / Math.Min(motor.Slots, 72);
+                            <g transform="rotate(@N(angle) 160 160)"><rect x="153" y="33" width="14" height="31" rx="2" fill="#d1a463" stroke="#8d744e" /></g>
+                        }
+                        <title>选择定子槽，配置槽数与理想齿槽候选</title>
+                    </g>
+                }
+                @if (motor.Topology == MotorTopology.BrushedPermanentMagnet)
+                {
+                    <g class="selectable" @onclick='() => Vm.SelectObject("rotor")'>
+                        @for (var i = 0; i < Math.Min(2 * motor.PolePairs, 32); i++)
+                        {
+                            var count = Math.Min(2 * motor.PolePairs, 32);
+                            var start = i * 360.0 / count + 4;
+                            var end = (i + 1) * 360.0 / count - 4;
+                            <path d="@ChartGeometry.MotorArc(start, end, 116)" stroke="@(i % 2 == 0 ? "#1d6860" : "#b65f32")" fill="none" stroke-width="17" />
+                        }
+                        <title>有刷永磁电机外侧固定磁极；极对数仅作结构档案</title>
+                    </g>
+                }
+                <g class="selectable @(Vm.SelectedObject == "rotor" ? "selected-part" : "")" @onclick='() => Vm.SelectObject("rotor")'>
+                    <circle cx="160" cy="160" r="88" fill="#dfe8db" stroke="#426456" stroke-width="2" />
+                    @for (var i = 0; i < (motor.Topology == MotorTopology.BrushlessPermanentMagnet ? Math.Min(2 * motor.PolePairs, 32) : 0); i++)
+                    {
+                        var count = Math.Min(2 * motor.PolePairs, 32);
+                        var start = i * 360.0 / count + 3;
+                        var end = (i + 1) * 360.0 / count - 3;
+                        <path d="@ChartGeometry.MotorArc(start, end, 72)" stroke="@(i % 2 == 0 ? "#1d6860" : "#b65f32")" fill="none" stroke-width="18" />
+                    }
+                                        @if (motor.Topology == MotorTopology.BrushedPermanentMagnet)
+                    {
+                        <ellipse cx="160" cy="160" rx="69" ry="27" fill="none" stroke="#b38b4f" stroke-width="9" />
+                        <ellipse cx="160" cy="160" rx="69" ry="27" transform="rotate(60 160 160)" fill="none" stroke="#b38b4f" stroke-width="9" />
+                        <ellipse cx="160" cy="160" rx="69" ry="27" transform="rotate(120 160 160)" fill="none" stroke="#b38b4f" stroke-width="9" />
+                    }
+<circle cx="160" cy="160" r="25" fill="#f6f5ed" stroke="#426456" stroke-width="2" />
+                    <path d="M 157 136 H 164 V 148 H 157 Z" fill="#426456" />
+                    <title>选择转子与磁极；示意数量有显示上限</title>
+                </g>
+                @if (motor.Topology == MotorTopology.BrushedPermanentMagnet)
+                {
+                    <g class="selectable @(Vm.SelectedObject == "brush" ? "selected-part" : "")" @onclick='() => Vm.SelectObject("brush")'>
+                        <circle cx="160" cy="160" r="48" fill="#d9b97c" stroke="#7c623c" />
+                        @for (var i = 0; i < Math.Min(motor.CommutatorSegments, 32); i++)
+                        {
+                            <path transform="rotate(@N(i * 360.0 / Math.Min(motor.CommutatorSegments, 32)) 160 160)" d="M 160 113 V 133" stroke="#f6f5ed" stroke-width="2" />
+                        }
+                        <rect x="99" y="149" width="22" height="22" fill="#48554f" />
+                        <rect x="199" y="149" width="22" height="22" fill="#48554f" />
+                        <title>选择换向片与电刷；同心叠加示意，不表示真实轴向位置</title>
+                    </g>
+                }
+                <path d="M 18 160 H 302 M 160 18 V 302" stroke="#9da69b" stroke-dasharray="3 6" opacity=".5" pointer-events="none" />
+            </svg>
+            <div class="motor-callouts"><button class="object-button @(Vm.SelectedObject == "rotor" ? "active" : "")" @onclick='() => Vm.SelectObject("rotor")'><span class="object-dot rotor"></span><strong>转子与磁极</strong><small>p = @motor.PolePairs 极对</small></button>
+                @if (motor.Topology == MotorTopology.BrushlessPermanentMagnet)
+                {
+                    <button class="object-button @(Vm.SelectedObject == "slots" ? "active" : "")" @onclick='() => Vm.SelectObject("slots")'><span class="object-dot slots"></span><strong>定子槽与齿</strong><small>Q = @motor.Slots 槽</small></button>
+                }
+                else
+                {
+                    <button class="object-button @(Vm.SelectedObject == "brush" ? "active" : "")" @onclick='() => Vm.SelectObject("brush")'><span class="object-dot slots"></span><strong>换向器</strong><small>K = @motor.CommutatorSegments 片</small></button>
+                }
+                <button class="object-button @(Vm.SelectedObject == "speed" ? "active" : "")" @onclick='() => Vm.SelectObject("speed")'><span class="object-dot speed"></span><strong>转速与范围</strong><small>@Labels.Number(motor.MinimumRpm)–@Labels.Number(motor.MaximumRpm) r/min</small></button>
+                <button class="object-button @(Vm.SelectedObject == "project" ? "active" : "")" @onclick='() => Vm.SelectObject("project")'><span class="object-dot project"></span><strong>项目档案</strong><small>名称 · 负责人 · 目的</small></button></div>
+        </div>
+        <p class="small muted">示意图最多画出 72 槽、32 磁极/换向片；计算始终使用实际输入整数。有刷外侧为固定磁极，内侧为电枢绕组概念图，换向器为轴向同心叠加示意。</p>
+    </div>
+}

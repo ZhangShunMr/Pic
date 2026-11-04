@@ -1,0 +1,195 @@
+{
+  "at": "2026-11-04T07:04:27.073631+00:00",
+  "scope": "手写生产 C# / Razor / CSS / 必要浏览器互操作 JS 的非空行，排除测试、工具、文档、依赖和生成物",
+  "baseline": 0,
+  "target": 3600,
+  "actual": 3684,
+  "languages": {
+    ".razor": 772,
+    ".cs": 2512,
+    ".css": 377,
+    ".js": 23
+  },
+  "files": [
+    {
+      "file": "src/MotorFrequency.App/Components/App.razor",
+      "nonblankLines": 17,
+      "sha256": "4cc94598374f31c749e2f12eba5a206b14b8df5ffea0af71626e9454b61045b1"
+    },
+    {
+      "file": "src/MotorFrequency.App/Components/Routes.razor",
+      "nonblankLines": 8,
+      "sha256": "4a303cdd72f906720ea18d408cf5e3f7c4b9a8c44b7c65c9ff8e93d7fa5bff32"
+    },
+    {
+      "file": "src/MotorFrequency.App/Components/Shared/BandPanel.razor",
+      "nonblankLines": 26,
+      "sha256": "1c2b729307d1502a9e97b49574241502d64ab78ffb8b3d87e02549e5bb3bbece"
+    },
+    {
+      "file": "src/MotorFrequency.App/Components/Shared/ComparisonPanel.razor",
+      "nonblankLines": 56,
+      "sha256": "1748775094f70ade15d788f57b05411428f0e2f8d2c49cf644ba229be98a3ecb"
+    },
+    {
+      "file": "src/MotorFrequency.App/Components/Shared/DeliveryPanel.razor",
+      "nonblankLines": 53,
+      "sha256": "41b287d5fa4654a17780ade840d6834b10ab3c53fe230316e2621ead8c13ac56"
+    },
+    {
+      "file": "src/MotorFrequency.App/Components/Shared/FrequencyChart.razor",
+      "nonblankLines": 63,
+      "sha256": "dd2cd26bc508ab6775c7962c9090c44fe38e7aecb0e3eba0071d717c7c6862c7"
+    },
+    {
+      "file": "src/MotorFrequency.App/Components/Shared/Inspector.razor",
+      "nonblankLines": 63,
+      "sha256": "034aae511fd3ce9d0171aad4b2c4288650dcdcb78c18750b7fca73163254ea04"
+    },
+    {
+      "file": "src/MotorFrequency.App/Components/Shared/MotorDrawing.razor",
+      "nonblankLines": 84,
+      "sha256": "f22c0074d87c137c54998705e48ce9b0708abea003f731c4a11734ba77bc0b1e"
+    },
+    {
+      "file": "src/MotorFrequency.App/Components/Shared/OrderPanel.razor",
+      "nonblankLines": 22,
+      "sha256": "c84bc60dd78deab26820d9f682bdc02a546a5a9031f695d007178eccc47dfe1c"
+    },
+    {
+      "file": "src/MotorFrequency.App/Components/Shared/ReviewPanel.razor",
+      "nonblankLines": 27,
+      "sha256": "9f8157ee07e5200f62246142eb33e5066eb4761cec1c1e64cc80587707858ac2"
+    },
+    {
+      "file": "src/MotorFrequency.App/Components/Shared/SpectrumChart.razor",
+      "nonblankLines": 51,
+      "sha256": "97ae487e981797f4548fbe0cb022780dd6defd89ee62ed6e48a10b27cedd9c57"
+    },
+    {
+      "file": "src/MotorFrequency.App/Components/Shared/SpectrumPanel.razor",
+      "nonblankLines": 111,
+      "sha256": "da36bef3e03873acee1c2b391c840ffba3e6aba498c8fb03e74e01fc206e59b6"
+    },
+    {
+      "file": "src/MotorFrequency.App/Components/Shared/SweepPanel.razor",
+      "nonblankLines": 83,
+      "sha256": "6b2031ffe72590bcebcc02d6a08a381852e11911e45d4f3513befdff0201b1d7"
+    },
+    {
+      "file": "src/MotorFrequency.App/Components/Shared/VmComponent.cs",
+      "nonblankLines": 24,
+      "sha256": "cbaf24e37f56395009d33ec3398b8c30e954ae1cf199e924a55d0b9ba616946c"
+    },
+    {
+      "file": "src/MotorFrequency.App/Components/Workspace.razor",
+      "nonblankLines": 97,
+      "sha256": "bf19deb03415e8849e82ec996e6ae05d9e14fefc5f696142b592f43a509cc75e"
+    },
+    {
+      "file": "src/MotorFrequency.App/Components/_Imports.razor",
+      "nonblankLines": 11,
+      "sha256": "f8ee3bf072ae3c2df7fde6aeb453e9b2ebdec2220e369cd4c4ae84053a6ad84c"
+    },
+    {
+      "file": "src/MotorFrequency.App/Program.cs",
+      "nonblankLines": 22,
+      "sha256": "a123adb6afcffa7ce849ad87ef54cbe9be98a4ec96274fc2b052bc1a5b100196"
+    },
+    {
+      "file": "src/MotorFrequency.App/ViewModels/MotorDraft.cs",
+      "nonblankLines": 76,
+      "sha256": "bff2e5e76e06d7cd35a4313e8ea955b1aaf470c567f84873623cc64812c4bc98"
+    },
+    {
+      "file": "src/MotorFrequency.App/ViewModels/SweepViewModel.cs",
+      "nonblankLines": 73,
+      "sha256": "806d04a452656cecbd04b36119e095957495f638e431ded7f3f90697ec42eb8c"
+    },
+    {
+      "file": "src/MotorFrequency.App/ViewModels/WorkspaceViewModel.cs",
+      "nonblankLines": 571,
+      "sha256": "769f6f2db94defed4c8c6316a097508dedc573f936b3cd994bcec463fdb3493f"
+    },
+    {
+      "file": "src/MotorFrequency.App/wwwroot/app.css",
+      "nonblankLines": 377,
+      "sha256": "013b9fd4231842b472a687099ee34e978bc33ce9a58f80fd77f5b04eb2706a5d"
+    },
+    {
+      "file": "src/MotorFrequency.App/wwwroot/files.js",
+      "nonblankLines": 23,
+      "sha256": "b39824946b091448ee7a07700452ca0a53ead30851c25728f2593fac8df34a7c"
+    },
+    {
+      "file": "src/MotorFrequency.Core/Domain/Models.cs",
+      "nonblankLines": 188,
+      "sha256": "aaad8a46da1814abd769f69b27ed1a7169814cba3bb879ef60ea9683179fb00a"
+    },
+    {
+      "file": "src/MotorFrequency.Core/Services/ChartGeometry.cs",
+      "nonblankLines": 141,
+      "sha256": "08b218757b153c5a13da403cbd1b3a436a7a13b21c7e277b8f8d52c95b1eef18"
+    },
+    {
+      "file": "src/MotorFrequency.Core/Services/Demonstration.cs",
+      "nonblankLines": 84,
+      "sha256": "353c3ed8069885d449cbba8e17e42f34b514607545dd8258c6cae5035f7d3b5e"
+    },
+    {
+      "file": "src/MotorFrequency.Core/Services/ExportService.cs",
+      "nonblankLines": 149,
+      "sha256": "011222b73136781bcf84e214b96f4ad43bc2e69159e120bd6727536a2e82b364"
+    },
+    {
+      "file": "src/MotorFrequency.Core/Services/FrequencyEngine.cs",
+      "nonblankLines": 192,
+      "sha256": "b40af474d5e2acd5cd2e4bf93d455b82e5c01fb3a5ecf9969a70b41c0f7b7e4f"
+    },
+    {
+      "file": "src/MotorFrequency.Core/Services/Labels.cs",
+      "nonblankLines": 29,
+      "sha256": "a0da3431937e8dae2f363fb6b5fa108cc731bb24f5fb1ad381b3d647d4e9ef26"
+    },
+    {
+      "file": "src/MotorFrequency.Core/Services/ParameterSweep.cs",
+      "nonblankLines": 179,
+      "sha256": "cb894ab3ef79517d6e9ab795d2b50421f0783b08f479682aba0207c938d78369"
+    },
+    {
+      "file": "src/MotorFrequency.Core/Services/ProjectCodec.cs",
+      "nonblankLines": 77,
+      "sha256": "d2f1b5ae19a92029c84b4e97fd75d347ff6b29b74db16998e482e4d49d3b73e7"
+    },
+    {
+      "file": "src/MotorFrequency.Core/Services/ProjectReview.cs",
+      "nonblankLines": 60,
+      "sha256": "fde8cc164941e4d2a421ecc33b1b3933d7dd94f26fa1259057f26bf3b2fb3f6f"
+    },
+    {
+      "file": "src/MotorFrequency.Core/Services/ProjectStore.cs",
+      "nonblankLines": 137,
+      "sha256": "0c0553989a9b7d4d33e38b268b0ea8af5e0806fae28db09a225efbd919a01ea6"
+    },
+    {
+      "file": "src/MotorFrequency.Core/Services/ProjectValidator.cs",
+      "nonblankLines": 294,
+      "sha256": "a29adf803363c84ae8c03e2afd02ba13c437dc7d28efb4bc97cb3a65f56df666"
+    },
+    {
+      "file": "src/MotorFrequency.Core/Services/RequiredSchema.cs",
+      "nonblankLines": 62,
+      "sha256": "088a4d64d43fead7aab0acee1a8897c0cd92fcdece71fff6e810ebdc8d64cd58"
+    },
+    {
+      "file": "src/MotorFrequency.Core/Services/SpectrumCsv.cs",
+      "nonblankLines": 90,
+      "sha256": "c5c61d073fa1b9130a54b80ab2cf6227c7230884693edf3219c8f29a4e91d962"
+    },
+    {
+      "file": "src/MotorFrequency.Core/Services/SpectrumStatistics.cs",
+      "nonblankLines": 64,
+      "sha256": "e257e437183e1ea6c18277b884c4ce5679ccb4cd38acbf396a61fb0c527a3089"
+    }
+  ]
+}

@@ -1,0 +1,239 @@
+{
+  "at": "2026-11-04T07:03:15.820972+00:00",
+  "browser": "154.0.8037.57",
+  "viewport": "1440x1000 / 1024x900 / 390x844",
+  "checks": [
+    {
+      "name": "普通启动为空白",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "新建普通项目无示例频谱",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "真实UI非法极对数拒绝",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "对象选择和齿槽条件应用",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "UI交叠手算1650至1950",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "真实UI重复频率整批拒绝",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "真实文件导入751点",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "UI快照比较电频差30Hz",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "撤销重做更新图表",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "实际下载 导出全部参数扫查 CSV",
+      "passed": true,
+      "detail": "电机参数扫查.csv"
+    },
+    {
+      "name": "扫查CSV结构和候选",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "保存到服务器本机文件",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "实际下载 下载项目文件",
+      "passed": true,
+      "detail": "附件电机频率闭环验证.motorproj"
+    },
+    {
+      "name": "实际下载 频率扫描 CSV",
+      "passed": true,
+      "detail": "附件电机频率闭环验证-频率扫描.csv"
+    },
+    {
+      "name": "实际下载 频段交叠 CSV",
+      "passed": true,
+      "detail": "附件电机频率闭环验证-频段交叠.csv"
+    },
+    {
+      "name": "实际下载 谱峰核对 CSV",
+      "passed": true,
+      "detail": "附件电机频率闭环验证-谱峰核对.csv"
+    },
+    {
+      "name": "实际下载 频率图 SVG",
+      "passed": true,
+      "detail": "附件电机频率闭环验证-频率图.svg"
+    },
+    {
+      "name": "实际下载 完整复核报告 HTML",
+      "passed": true,
+      "detail": "附件电机频率闭环验证-复核报告.html"
+    },
+    {
+      "name": "实际下载 导出当前快照比较 CSV",
+      "passed": true,
+      "detail": "附件电机频率闭环验证-方案比较.csv"
+    },
+    {
+      "name": "实际下载 导出全部原始频点 CSV",
+      "passed": true,
+      "detail": "1800转模拟输入-原始频点.csv"
+    },
+    {
+      "name": "下载项目包含原始751点",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "HTML报告含边界与元信息",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "导出实际频率手算",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "SVG导出为真实路径",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "真实UI保存后重开保留频谱与快照",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "第二次保存产生备份",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "真实拓扑切换移除电频",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "未保存离开确认可取消",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "390像素无整页横向溢出",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "1024像素无整页横向溢出",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "新浏览器会话导入下载项目重开",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "同标识导入不能覆盖原项目",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "浏览器无未处理脚本异常",
+      "passed": true,
+      "detail": "[]"
+    }
+  ],
+  "pageErrors": [],
+  "screenshots": [
+    "04-参数错误保留有效结果.png",
+    "16-独立模拟案例.png",
+    "08-频率转速图.png",
+    "11-频谱与来源.png",
+    "15-有刷拓扑.png",
+    "06-候选依据.png",
+    "17-窄屏.png",
+    "14-保存与输出.png",
+    "10-CSV通过预检.png",
+    "02-新建项目.png",
+    "07-频段与转速区间.png",
+    "03-项目档案.png",
+    "12-方案比较.png",
+    "09-CSV错误预检.png",
+    "01-空白启动.png",
+    "05-槽对象与假设.png",
+    "13-参数扫查与反算.png"
+  ],
+  "downloads": [
+    {
+      "file": "附件电机频率闭环验证-频率图.svg",
+      "bytes": 2408,
+      "sha256": "b60b98953cbb59e6b5f94ca69166fb81c12bdbba35b82b7c517196797379f4df"
+    },
+    {
+      "file": "电机参数扫查.csv",
+      "bytes": 11142,
+      "sha256": "8be86383c02d716065eee5f1851630a9c444d0b8414bf038a3695026d7bee54d"
+    },
+    {
+      "file": "附件电机频率闭环验证.motorproj",
+      "bytes": 74685,
+      "sha256": "1f40b561a67debe37bce685d4a5e719ab25d4178479df7e8eb4cd67b0d41c757"
+    },
+    {
+      "file": "1800转模拟输入-原始频点.csv",
+      "bytes": 17177,
+      "sha256": "4359407078db953b21d2f45b020b62ebe1c4925b4872748455f85a6642a6032b"
+    },
+    {
+      "file": "附件电机频率闭环验证-频段交叠.csv",
+      "bytes": 1159,
+      "sha256": "08d132d81a17653aae96e4fd7878cc0f68b2edc7ec85ebfe56c287187066ed8e"
+    },
+    {
+      "file": "附件电机频率闭环验证-谱峰核对.csv",
+      "bytes": 2810,
+      "sha256": "e3b6e48218d4c66882e4f88eb125e9ccec2d658e43189957638d0bcc911ab2f9"
+    },
+    {
+      "file": "附件电机频率闭环验证-频率扫描.csv",
+      "bytes": 104588,
+      "sha256": "83f9832ed92bbe53f4cfd4190163bf6b8b8178c963aaecd32b55bc7da612c442"
+    },
+    {
+      "file": "附件电机频率闭环验证-复核报告.html",
+      "bytes": 10611,
+      "sha256": "13b9ff83ac3667359452b09ba256611ac6f3ef9805dd30e5b900ce82b4490a9f"
+    },
+    {
+      "file": "附件电机频率闭环验证-方案比较.csv",
+      "bytes": 1034,
+      "sha256": "d83487e71337ca9e821f6518cc928642dd5bdb8fdc612d90f9c426c6197d0d34"
+    }
+  ]
+}

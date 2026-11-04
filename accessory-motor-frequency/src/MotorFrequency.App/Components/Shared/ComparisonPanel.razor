@@ -1,0 +1,56 @@
+@inherits VmComponent
+@if (Vm.Current is not null)
+{
+    <section id="comparison" class="section">
+        <div class="section-heading">
+            <div><span class="index">06</span><h2>方案快照比较</h2></div>
+            <p>保留结构与候选，再改变当前参数</p>
+        </div>
+        <div class="snapshot-create">
+            <label>快照名称<input @bind="Vm.ScenarioName" placeholder="如 p=2 / 十二槽基线" /></label>
+            <button @onclick="Vm.CaptureScenario">记录当前方案快照</button>
+        </div>
+        <p class="small muted">快照包含电机、候选阶次、启用状态和模拟标记。比较统一按当前观察转速 @Labels.Number(Vm.Current.Motor.InspectRpm) r/min 换算；不比较声级，也不推荐槽极数方案。</p>
+        @if (Vm.Current.Scenarios.Count == 0)
+        {
+            <p class="empty-inline">尚无方案快照。先记录当前方案，再改变极对数、槽数或自定义阶次。</p>
+        }
+        else
+        {
+            <div class="snapshot-list">
+                @foreach (var scenario in Vm.Current.Scenarios)
+                {
+                    <div class="snapshot @(Vm.SelectedScenarioId == scenario.Id ? "active" : "")">
+                        <button class="text-button" @onclick="() => Vm.SelectScenario(scenario.Id)"><strong>@scenario.Name</strong></button>
+                        <small>@Labels.Topology(scenario.Motor.Topology) · p=@scenario.Motor.PolePairs · Q=@scenario.Motor.Slots · K=@scenario.Motor.CommutatorSegments</small>
+                        <small>@scenario.CapturedAt.ToString("yyyy-MM-dd HH:mm") UTC · @(scenario.Demonstration ? "模拟演示" : "参数快照")</small>
+                        <button class="danger text-button" @onclick="() => Vm.RemoveScenario(scenario.Id)">删除快照</button>
+                    </div>
+                }
+            </div>
+            @if (Vm.SelectedScenario is not null)
+            {
+                @if (Vm.SelectedScenario.Motor.Topology != Vm.Current.Motor.Topology)
+                {
+                    <p class="warning">当前与快照拓扑不同，仅比较共有参考和候选频率；不存在的候选保留为空，不填零。</p>
+                }
+                @if (Vm.SelectedScenario.Motor.MinimumRpm != Vm.Current.Motor.MinimumRpm || Vm.SelectedScenario.Motor.MaximumRpm != Vm.Current.Motor.MaximumRpm)
+                {
+                    <p class="warning">扫描范围不同。图中快照按当前轴范围展示；数表统一在当前观察转速换算，可能超出快照原扫描范围。</p>
+                }
+                <div class="table-scroll">
+                    <table>
+                        <thead><tr><th>候选</th><th>当前阶次</th><th>快照阶次</th><th>当前 Hz</th><th>快照 Hz</th><th>当前−快照 Hz</th><th>口径</th></tr></thead>
+                        <tbody>
+                            @foreach (var row in Vm.Comparison)
+                            {
+                                <tr><td>@row.Name</td><td>@Display(row.CurrentOrder)</td><td>@Display(row.SnapshotOrder)</td><td>@Display(row.CurrentHz)</td><td>@Display(row.SnapshotHz)</td><td>@Display(row.DifferenceHz)</td><td>@row.Statement</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <button @onclick='() => Vm.Export("comparison")'>导出当前快照比较 CSV</button>
+            }
+        }
+    </section>
+}

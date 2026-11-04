@@ -1,0 +1,111 @@
+@inherits VmComponent
+@if (Vm.Current is not null)
+{
+    <section id="spectrum" class="section">
+        <div class="section-heading">
+            <div><span class="index">05</span><h2>导入频谱与邻近核对</h2></div>
+            <p>定转速频谱 · 不执行 FFT 或声学校准</p>
+        </div>
+        <details class="editor-fold" open="@(Vm.Current.Spectra.Count == 0)">
+            <summary>＋ 导入 UTF-8 CSV 频谱</summary>
+            <p>文件仅含两列：<code>frequency_hz,amplitude</code>。频率为 Hz，需严格递增；小数点为英文句点。最多 1 MiB、10000 点；错误会整批拒绝，不排序、补零或跳过错误行。</p>
+            <div class="inline-actions">
+                <label class="file-button">选择 CSV<InputFile @key="Vm.CsvPickerVersion" OnChange="e => Vm.ReadCsv(e.File)" accept=".csv" /></label>
+                <button @onclick='() => Vm.Export("template")'>下载频谱模板</button>
+            </div>
+            <div class="form-grid three">
+                <label>频谱名称<input @bind="Vm.SpectrumName" /></label>
+                <label>采集转速 r/min<input @bind="Vm.SpectrumRpm" /></label>
+                <label>幅值单位<select aria-label="幅值单位" @bind="Vm.SpectrumUnit">
+                    <option>dB</option><option>Pa</option><option>m/s²</option><option>g</option><option>A</option><option>V</option><option>任意单位</option>
+                </select></label>
+                <label>参考量与幅值口径<input @bind="Vm.SpectrumReference" placeholder="如 dB re 20 μPa，窄带 RMS" /></label>
+                <label>工况与采集条件<input @bind="Vm.SpectrumCondition" placeholder="如负载、电压、测点、分辨率" /></label>
+                <label>来源<select aria-label="频谱来源" @bind="Vm.SpectrumOrigin">
+                    @foreach (var value in Enum.GetValues<DataOrigin>())
+                    {
+                        <option value="@value">@Labels.Origin(value)</option>
+                    }
+                </select></label>
+            </div>
+            <label>CSV 文本（可直接粘贴）<textarea class="code-input" rows="6" @bind="Vm.CsvText" spellcheck="false"></textarea></label>
+            <div class="inline-actions">
+                <button @onclick="Vm.PreviewCsv">预检频谱</button>
+                <button class="primary" @onclick="Vm.CommitCsv" disabled="@(Vm.Preview?.Success != true)">确认导入频谱</button>
+            </div>
+            @if (Vm.Preview is not null)
+            {
+                <p class="@(Vm.Preview.Success ? "success-note" : "warning")">解析 @Vm.Preview.ParsedRows 点；@(Vm.Preview.Success ? "预检通过，确认导入时将再次校验当前输入。" : "预检失败，未写入项目。")</p>
+            }
+        </details>
+        @if (Vm.Current.Spectra.Count == 0)
+        {
+            <p class="empty-inline">尚无频谱。可以仅用参数计算候选频率，导入频谱后再核对邻近关系。</p>
+        }
+        else
+        {
+            <div class="spectrum-list">
+                @foreach (var spectrum in Vm.Current.Spectra)
+                {
+                    <div class="spectrum-chip @(Vm.SelectedSpectrumId == spectrum.Id ? "active" : "")">
+                        <input aria-label="叠加 @spectrum.Name" type="checkbox" checked="@spectrum.Visible" @onchange="() => Vm.ToggleSpectrum(spectrum.Id)" />
+                        <button class="text-button" @onclick="() => Vm.SelectSpectrum(spectrum.Id)">@spectrum.Name</button>
+                        <small>@Labels.Number(spectrum.Rpm) r/min · @Labels.Origin(spectrum.Origin)</small>
+                        <button class="danger text-button" @onclick="() => Vm.RemoveSpectrum(spectrum.Id)">删除</button>
+                    </div>
+                }
+            </div>
+            @if (Vm.SelectedSpectrum is not null)
+            {
+                var spectrum = Vm.SelectedSpectrum;
+                <div class="source-summary">
+                    <span class="tag @(spectrum.Origin == DataOrigin.Simulated ? "demo" : "")">@Labels.Origin(spectrum.Origin)</span>
+                    <strong>@spectrum.Name</strong>
+                    <p>@Labels.Number(spectrum.Rpm) r/min · @spectrum.Points.Count 点 · @spectrum.Unit · @spectrum.Reference</p>
+                    <p>条件：@spectrum.Condition</p>
+                    <small>原文件：@spectrum.FileName · SHA-256：@spectrum.InputSha256</small>
+                </div>
+                var grid = SpectrumStatistics.Inspect(spectrum, Vm.Current.Motor.MaximumHz);
+                <div class="source-summary">
+                    <p>原始频率范围 @Labels.Number(grid.MinimumHz)–@Labels.Number(grid.MaximumHz) Hz；网格间距最小/中位/最大：@Labels.Number(grid.MinimumSpacingHz) / @Labels.Number(grid.MedianSpacingHz) / @Labels.Number(grid.MaximumSpacingHz) Hz。</p>
+                    <p>最大输入幅值 @Labels.Number(grid.MaximumAmplitude) @spectrum.Unit，位于 @Labels.Number(grid.MaximumAtHz) Hz；范围内 @grid.PointsInsideView / @grid.TotalPoints 点。</p>
+                    <small>@grid.Statement</small>
+                </div>
+                <SpectrumChart Spectrum="spectrum" Motor="Vm.Current.Motor" Candidates="Vm.Candidates" />
+                <div class="form-grid three">
+                    <label>绝对频差容差 Hz（0–1000）<input @bind="Vm.Tolerance" /></label>
+                    <label>每谱最多内部峰数（1–50）<input @bind="Vm.PeakCount" /></label>
+                    <div class="field-action"><button @onclick="Vm.ApplyReview">应用复核口径</button></div>
+                </div>
+                <p class="small muted">按内部局部极大点筛峰，再按幅值取前 N 个；不找端点峰，不做插值。容差是工程设置。候选在该频谱实际转速计算，同频候选全部保留。</p>
+                <div class="table-scroll">
+                    <table>
+                        <thead><tr><th>谱峰 Hz</th><th>幅值 @spectrum.Unit</th><th>邻近候选</th><th>计算 Hz</th><th>观测−计算 Hz</th></tr></thead>
+                        <tbody>
+                            @foreach (var row in Vm.PeakMatches)
+                            {
+                                <tr><td>@Labels.Number(row.ObservedHz)</td><td>@Labels.Number(row.Amplitude)</td><td>@row.CandidateName</td><td>@Display(row.ExpectedHz)</td><td>@Display(row.DifferenceHz)</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                @if (Vm.PeakMatches.Count == 0)
+                {
+                    <p class="empty-inline">当前频谱无内部局部极大点。可检查原始点表；软件不生成端点峰或合成峰。</p>
+                }
+                <p class="boundary">邻近只是频率关系。电流、振动与声学通道的同步试验、负载和转速变化，仍需用于区分候选来源。</p>
+                <details class="editor-fold">
+                    <summary>查看内嵌原始频点（前 100 点）</summary>
+                    <div class="table-scroll raw-table"><table><thead><tr><th>频率 Hz</th><th>幅值 @spectrum.Unit</th></tr></thead><tbody>
+                        @foreach (var point in spectrum.Points.Take(100))
+                        {
+                            <tr><td>@Labels.Number(point.FrequencyHz)</td><td>@Labels.Number(point.Amplitude)</td></tr>
+                        }
+                    </tbody></table></div>
+                    <button @onclick='() => Vm.Export("raw")'>导出全部原始频点 CSV</button>
+                    <p class="small muted">原始频点 CSV 为两列交换格式；来源、单位、参考量、工况和哈希保存在项目文件及复核报告中。请配套保留。</p>
+                </details>
+            }
+        }
+    </section>
+}

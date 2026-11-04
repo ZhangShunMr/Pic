@@ -1,0 +1,1704 @@
+{
+  "at": "2026-11-04T07:07:45.494095+00:00",
+  "passed": 339,
+  "checks": [
+    {
+      "name": "首部分为软件介绍",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "按用户流程编写有效章节",
+      "passed": true,
+      "detail": "['1. 软件介绍', '2. 启动软件与认识空白状态', '3. 建立项目与填写档案', '4. 配置电机拓扑与磁极', '5. 配置槽数与理想齿槽假设', '6. 设置扫描范围并读取频率图', '7. 添加自定义阶次并核对依据', '8. 添加敏感频段与观察交叠区间', '9. 导入频谱并执行预检', '10. 查看频谱、网格与邻近候选', '11. 记录与比较参数方案', '12. 参数扫查及观察频率反算', '13. 保存项目、备份及搬迁重开', '14. 成果导出与文件核对', '15. 错误恢复与退出前检查']"
+    },
+    {
+      "name": "手册包含 应用背景",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "手册包含 软件概述",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "手册包含 1800",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "手册包含 1650",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "手册包含 1950",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "手册包含 保存",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "手册包含 重开",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "手册包含 导出",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "手册包含 模拟",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "手册包含 Word",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "14张不同真实截图进入手册",
+      "passed": true,
+      "detail": "14"
+    },
+    {
+      "name": "手册没有重复截图",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "LibreOffice实际预览至少10页",
+      "passed": true,
+      "detail": "15"
+    },
+    {
+      "name": "预览第1页有效内容",
+      "passed": true,
+      "detail": "755"
+    },
+    {
+      "name": "预览第1页页眉页脚",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第1页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第1页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第1页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第1页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第1页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第1页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第1页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第1页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第1页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第1页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第1页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第1页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第1页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第1页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第1页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第1页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第1页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第1页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第1页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第1页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第2页有效内容",
+      "passed": true,
+      "detail": "625"
+    },
+    {
+      "name": "预览第2页页眉页脚",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第2页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第2页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第2页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第2页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第2页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第2页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第2页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第2页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第2页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第2页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第2页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第2页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第2页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第2页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第2页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第3页有效内容",
+      "passed": true,
+      "detail": "506"
+    },
+    {
+      "name": "预览第3页页眉页脚",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第3页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第3页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第3页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第3页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第3页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第3页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第3页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第3页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第3页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第3页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第3页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第3页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第3页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第3页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第4页有效内容",
+      "passed": true,
+      "detail": "479"
+    },
+    {
+      "name": "预览第4页页眉页脚",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第4页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第4页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第4页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第4页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第4页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第4页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第4页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第4页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第4页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第4页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第4页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第4页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第4页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第4页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第5页有效内容",
+      "passed": true,
+      "detail": "468"
+    },
+    {
+      "name": "预览第5页页眉页脚",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第5页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第5页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第5页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第5页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第5页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第5页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第5页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第5页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第5页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第5页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第5页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第5页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第5页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第5页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第6页有效内容",
+      "passed": true,
+      "detail": "494"
+    },
+    {
+      "name": "预览第6页页眉页脚",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第6页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第6页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第6页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第6页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第6页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第6页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第6页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第6页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第6页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第6页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第6页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第6页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第6页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第6页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第7页有效内容",
+      "passed": true,
+      "detail": "494"
+    },
+    {
+      "name": "预览第7页页眉页脚",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第7页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第7页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第7页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第7页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第7页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第7页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第7页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第7页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第7页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第7页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第7页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第7页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第7页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第7页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第8页有效内容",
+      "passed": true,
+      "detail": "496"
+    },
+    {
+      "name": "预览第8页页眉页脚",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第8页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第8页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第8页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第8页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第8页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第8页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第8页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第8页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第8页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第8页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第8页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第8页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第8页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第8页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第9页有效内容",
+      "passed": true,
+      "detail": "520"
+    },
+    {
+      "name": "预览第9页页眉页脚",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第9页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第9页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第9页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第9页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第9页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第9页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第9页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第9页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第9页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第9页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第9页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第9页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第9页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第9页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第10页有效内容",
+      "passed": true,
+      "detail": "477"
+    },
+    {
+      "name": "预览第10页页眉页脚",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第10页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第10页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第10页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第10页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第10页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第10页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第10页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第10页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第10页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第10页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第10页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第10页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第10页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第10页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第11页有效内容",
+      "passed": true,
+      "detail": "455"
+    },
+    {
+      "name": "预览第11页页眉页脚",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第11页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第11页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第11页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第11页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第11页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第11页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第11页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第11页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第11页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第11页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第11页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第11页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第11页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第12页有效内容",
+      "passed": true,
+      "detail": "519"
+    },
+    {
+      "name": "预览第12页页眉页脚",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第12页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第12页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第12页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第12页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第12页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第12页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第12页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第12页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第12页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第12页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第12页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第12页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第12页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第12页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第13页有效内容",
+      "passed": true,
+      "detail": "515"
+    },
+    {
+      "name": "预览第13页页眉页脚",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第13页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第13页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第13页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第13页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第13页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第13页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第13页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第13页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第13页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第13页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第13页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第13页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第13页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第13页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第14页有效内容",
+      "passed": true,
+      "detail": "500"
+    },
+    {
+      "name": "预览第14页页眉页脚",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第14页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第14页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第14页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第14页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第14页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第14页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第14页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第14页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第14页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第14页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第14页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第14页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第14页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第14页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第15页有效内容",
+      "passed": true,
+      "detail": "572"
+    },
+    {
+      "name": "预览第15页页眉页脚",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第15页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第15页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第15页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第15页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第15页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第15页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第15页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第15页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第15页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第15页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第15页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第15页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第15页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第15页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "预览第15页文字在页内",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "主要功能Unicode汉字超过500",
+      "passed": true,
+      "detail": "837"
+    },
+    {
+      "name": "身份及日期保留待核实",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "表格预览含功能末尾及字段",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "生产非空行达开工目标",
+      "passed": true,
+      "detail": "3684"
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.App/Components/App.razor",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.App/Components/Routes.razor",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.App/Components/Shared/BandPanel.razor",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.App/Components/Shared/ComparisonPanel.razor",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.App/Components/Shared/DeliveryPanel.razor",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.App/Components/Shared/FrequencyChart.razor",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.App/Components/Shared/Inspector.razor",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.App/Components/Shared/MotorDrawing.razor",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.App/Components/Shared/OrderPanel.razor",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.App/Components/Shared/ReviewPanel.razor",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.App/Components/Shared/SpectrumChart.razor",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.App/Components/Shared/SpectrumPanel.razor",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.App/Components/Shared/SweepPanel.razor",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.App/Components/Shared/VmComponent.cs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.App/Components/Workspace.razor",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.App/Components/_Imports.razor",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.App/Program.cs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.App/ViewModels/MotorDraft.cs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.App/ViewModels/SweepViewModel.cs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.App/ViewModels/WorkspaceViewModel.cs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.App/wwwroot/app.css",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.App/wwwroot/files.js",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.Core/Domain/Models.cs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.Core/Services/ChartGeometry.cs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.Core/Services/Demonstration.cs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.Core/Services/ExportService.cs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.Core/Services/FrequencyEngine.cs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.Core/Services/Labels.cs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.Core/Services/ParameterSweep.cs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.Core/Services/ProjectCodec.cs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.Core/Services/ProjectReview.cs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.Core/Services/ProjectStore.cs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.Core/Services/ProjectValidator.cs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.Core/Services/RequiredSchema.cs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.Core/Services/SpectrumCsv.cs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "源码哈希 src/MotorFrequency.Core/Services/SpectrumStatistics.cs",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "截图尺寸 01-空白启动.png",
+      "passed": true,
+      "detail": "(1440, 1000)"
+    },
+    {
+      "name": "截图包含实际图形 01-空白启动.png",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "截图尺寸 02-新建项目.png",
+      "passed": true,
+      "detail": "(1440, 1000)"
+    },
+    {
+      "name": "截图包含实际图形 02-新建项目.png",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "截图尺寸 03-项目档案.png",
+      "passed": true,
+      "detail": "(1440, 1000)"
+    },
+    {
+      "name": "截图包含实际图形 03-项目档案.png",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "截图尺寸 04-参数错误保留有效结果.png",
+      "passed": true,
+      "detail": "(1440, 1000)"
+    },
+    {
+      "name": "截图包含实际图形 04-参数错误保留有效结果.png",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "截图尺寸 05-槽对象与假设.png",
+      "passed": true,
+      "detail": "(1440, 1000)"
+    },
+    {
+      "name": "截图包含实际图形 05-槽对象与假设.png",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "截图尺寸 06-候选依据.png",
+      "passed": true,
+      "detail": "(1440, 1000)"
+    },
+    {
+      "name": "截图包含实际图形 06-候选依据.png",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "截图尺寸 07-频段与转速区间.png",
+      "passed": true,
+      "detail": "(1440, 1000)"
+    },
+    {
+      "name": "截图包含实际图形 07-频段与转速区间.png",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "截图尺寸 08-频率转速图.png",
+      "passed": true,
+      "detail": "(1440, 1000)"
+    },
+    {
+      "name": "截图包含实际图形 08-频率转速图.png",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "截图尺寸 09-CSV错误预检.png",
+      "passed": true,
+      "detail": "(1440, 1000)"
+    },
+    {
+      "name": "截图包含实际图形 09-CSV错误预检.png",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "截图尺寸 10-CSV通过预检.png",
+      "passed": true,
+      "detail": "(1440, 1000)"
+    },
+    {
+      "name": "截图包含实际图形 10-CSV通过预检.png",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "截图尺寸 11-频谱与来源.png",
+      "passed": true,
+      "detail": "(1440, 1000)"
+    },
+    {
+      "name": "截图包含实际图形 11-频谱与来源.png",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "截图尺寸 12-方案比较.png",
+      "passed": true,
+      "detail": "(1440, 1000)"
+    },
+    {
+      "name": "截图包含实际图形 12-方案比较.png",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "截图尺寸 13-参数扫查与反算.png",
+      "passed": true,
+      "detail": "(1440, 1000)"
+    },
+    {
+      "name": "截图包含实际图形 13-参数扫查与反算.png",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "截图尺寸 14-保存与输出.png",
+      "passed": true,
+      "detail": "(1440, 1000)"
+    },
+    {
+      "name": "截图包含实际图形 14-保存与输出.png",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "截图尺寸 15-有刷拓扑.png",
+      "passed": true,
+      "detail": "(1440, 1000)"
+    },
+    {
+      "name": "截图包含实际图形 15-有刷拓扑.png",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "截图尺寸 16-独立模拟案例.png",
+      "passed": true,
+      "detail": "(1440, 1000)"
+    },
+    {
+      "name": "截图包含实际图形 16-独立模拟案例.png",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "截图尺寸 17-窄屏.png",
+      "passed": true,
+      "detail": "(390, 844)"
+    },
+    {
+      "name": "截图包含实际图形 17-窄屏.png",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "截图尺寸 18-成果导出.png",
+      "passed": true,
+      "detail": "(1440, 1000)"
+    },
+    {
+      "name": "截图包含实际图形 18-成果导出.png",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Word未执行明确标记",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "remaining": [
+    "Microsoft Word实际分页和申请人模板核对未执行"
+  ]
+}

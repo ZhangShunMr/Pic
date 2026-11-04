@@ -1,0 +1,53 @@
+@inherits VmComponent
+@if (Vm.Current is not null)
+{
+    <section id="delivery" class="section">
+        <div class="section-heading">
+            <div><span class="index">07</span><h2>复核、保存与输出</h2></div>
+            <p>项目可重开 · 结果保留来源与版本</p>
+        </div>
+        <div class="quality-notes">
+            @foreach (var note in Vm.QualityNotes)
+            {
+                <p>• @note</p>
+            }
+        </div>
+        <ReviewPanel />
+        <label>工程复核备注<textarea rows="3" @bind="Vm.ReviewNotes" placeholder="记录需要补充的同步测量、假设核对或工况变化"></textarea></label>
+        <button @onclick="Vm.ApplyReview">应用复核备注</button>
+        <div class="save-box">
+            <div><strong>@(Vm.Dirty ? "存在未保存输入" : "当前输入已保存")</strong><p>服务器本机路径：<code>@Vm.LastPath</code></p><small>项目库目录：@Vm.StorePath</small></div>
+            <div class="inline-actions"><button class="primary" @onclick="Vm.Save">保存项目</button><button @onclick='() => Vm.Export("project")'>下载项目文件</button><button @onclick="Vm.DuplicateProject">复制为新项目</button><button @onclick="Vm.ToggleArchive">@(Vm.Current.Archived ? "取消归档" : "归档项目")</button></div>
+        </div>
+        <p class="small muted">保存为 .motorproj JSON，格式版本 1，原始频谱内嵌。再次保存保留上一版 .bak；项目库可读取备份为副本。外部修改或相同标识导入不会直接覆盖。下载文件在浏览器下载目录，请实际核实。未应用字段草稿不包含在项目和导出中。</p>
+        <div class="export-grid">
+            <button @onclick='() => Vm.Export("frequency")'><strong>频率扫描 CSV</strong><small>全部采样转速 × 已显示候选、公式与依据</small></button>
+            <button @onclick='() => Vm.Export("crossing")'><strong>频段交叠 CSV</strong><small>精确进入/离开转速、频段来源依据</small></button>
+            <button @onclick='() => Vm.Export("evidence")'><strong>谱峰核对 CSV</strong><small>工况、来源、单位、频差及解释</small></button>
+            <button @onclick='() => Vm.Export("svg")'><strong>频率图 SVG</strong><small>当前参数轨迹与关注带、可缩放图形</small></button>
+            <button @onclick='() => Vm.Export("html")'><strong>完整复核报告 HTML</strong><small>自包含图、计算依据、数据元信息与审计</small></button>
+        </div>
+        <p class="small muted">SVG 导出为当前方案的纯候选频率图，不含频谱黑点或比较虚线；图形需和报告配套阅读。CSV 使用 UTF-8 BOM，小数点为英文句点。文本字段前导公式字符转义，避免电子表格执行。</p>
+        <details class="editor-fold">
+            <summary>操作追溯 · @Vm.Current.History.Count 条</summary>
+            <p>最近 100 条展示，项目内最多保留 2000 条。撤销/重做保留审计，变更可通过参数快照和项目备份复核。</p>
+            <div class="table-scroll audit-table"><table><thead><tr><th>UTC 时间</th><th>操作</th><th>详情</th></tr></thead><tbody>
+                @foreach (var item in Vm.Current.History.TakeLast(100).Reverse())
+                {
+                    <tr><td>@item.At.ToString("yyyy-MM-dd HH:mm:ss")</td><td>@item.Action</td><td>@item.Detail</td></tr>
+                }
+            </tbody></table></div>
+        </details>
+        <details class="editor-fold">
+            <summary>使用边界与常见问题</summary>
+            <h3>电频为什么不等于噪声主峰？</h3>
+            <p>电流、磁场、力波的时空阶次以及结构传递均影响最终声音。仅有极对数、槽数和转速不能求出声压幅值。软件提供运动学或限定假设下的周期参考，不能诊断根因。</p>
+            <h3>为什么有些频谱点不在频率图上？</h3>
+            <p>上图仅叠加已勾选频谱的前 N 个内部局部极大点，并按频谱自己的采集转速定位。范围外的转速和频率不绘制；原始点仍保存在项目中。可提高图表上限或查看原始频点。</p>
+            <h3>输入错误后怎么恢复？</h3>
+            <p>错误提示列出字段或 CSV 行号。修改对应草稿后重新应用或预检；计算保留最后一次有效输入。点击恢复已应用值放弃电机草稿；已应用修改可撤销。</p>
+            <h3>浏览器刷新会发生什么？</h3>
+            <p>未保存会弹出浏览器离开提示。强制刷新或服务器停止可能丢失会话工作；保存后从左侧项目库重开，或用导入 .motorproj 恢复下载副本。系统无账号，不用于远程多人协作。</p>
+        </details>
+    </section>
+}

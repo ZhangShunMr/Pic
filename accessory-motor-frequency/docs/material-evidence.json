@@ -1,0 +1,122 @@
+{
+  "at": "2026-11-04T07:07:44.728023+00:00",
+  "manualSections": 15,
+  "manualPdfPages": 15,
+  "paginationEngine": "LibreOfficeDev 26.8.0.0.alpha0",
+  "wordPaginationVerified": false,
+  "applicantTemplateProvided": false,
+  "mainFunctionHanCount": 837,
+  "figures": 14,
+  "pages": [
+    {
+      "page": 1,
+      "textCharacters": 755,
+      "images": 0,
+      "hasHeader": true,
+      "hasFooter": true
+    },
+    {
+      "page": 2,
+      "textCharacters": 625,
+      "images": 1,
+      "hasHeader": true,
+      "hasFooter": true
+    },
+    {
+      "page": 3,
+      "textCharacters": 506,
+      "images": 1,
+      "hasHeader": true,
+      "hasFooter": true
+    },
+    {
+      "page": 4,
+      "textCharacters": 479,
+      "images": 1,
+      "hasHeader": true,
+      "hasFooter": true
+    },
+    {
+      "page": 5,
+      "textCharacters": 468,
+      "images": 1,
+      "hasHeader": true,
+      "hasFooter": true
+    },
+    {
+      "page": 6,
+      "textCharacters": 494,
+      "images": 1,
+      "hasHeader": true,
+      "hasFooter": true
+    },
+    {
+      "page": 7,
+      "textCharacters": 494,
+      "images": 1,
+      "hasHeader": true,
+      "hasFooter": true
+    },
+    {
+      "page": 8,
+      "textCharacters": 496,
+      "images": 1,
+      "hasHeader": true,
+      "hasFooter": true
+    },
+    {
+      "page": 9,
+      "textCharacters": 520,
+      "images": 1,
+      "hasHeader": true,
+      "hasFooter": true
+    },
+    {
+      "page": 10,
+      "textCharacters": 477,
+      "images": 1,
+      "hasHeader": true,
+      "hasFooter": true
+    },
+    {
+      "page": 11,
+      "textCharacters": 455,
+      "images": 1,
+      "hasHeader": true,
+      "hasFooter": true
+    },
+    {
+      "page": 12,
+      "textCharacters": 519,
+      "images": 1,
+      "hasHeader": true,
+      "hasFooter": true
+    },
+    {
+      "page": 13,
+      "textCharacters": 515,
+      "images": 1,
+      "hasHeader": true,
+      "hasFooter": true
+    },
+    {
+      "page": 14,
+      "textCharacters": 500,
+      "images": 1,
+      "hasHeader": true,
+      "hasFooter": true
+    },
+    {
+      "page": 15,
+      "textCharacters": 572,
+      "images": 1,
+      "hasHeader": true,
+      "hasFooter": true
+    }
+  ],
+  "remaining": [
+    "Microsoft Word实际分页至少10页终稿验收",
+    "申请人专用模板核对",
+    "申请人身份权属及开发发表事实"
+  ]
+}

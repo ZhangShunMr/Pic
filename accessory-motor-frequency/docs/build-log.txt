@@ -1,0 +1,11 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  MotorFrequency.Core -> /workspace/Pic/accessory-motor-frequency/src/MotorFrequency.Core/bin/Debug/net10.0/MotorFrequency.Core.dll
+  MotorFrequency.Verification -> /workspace/Pic/accessory-motor-frequency/tests/MotorFrequency.Verification/bin/Debug/net10.0/MotorFrequency.Verification.dll
+  MotorFrequency.App -> /workspace/Pic/accessory-motor-frequency/src/MotorFrequency.App/bin/Debug/net10.0/MotorFrequency.App.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:02.48

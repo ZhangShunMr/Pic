@@ -1,0 +1,53 @@
+{
+  "at": "2026-11-04T07:05:19.604210+00:00",
+  "checks": [
+    {
+      "name": "归档阻止内容编辑",
+      "passed": true
+    },
+    {
+      "name": "取消归档恢复编辑",
+      "passed": true
+    },
+    {
+      "name": "删除频段确认后引用更新",
+      "passed": true
+    },
+    {
+      "name": "删除自定义候选并更新图表",
+      "passed": true
+    },
+    {
+      "name": "隐藏候选后图线减少",
+      "passed": true
+    },
+    {
+      "name": "删除频谱可取消且原始数据保留",
+      "passed": true
+    },
+    {
+      "name": "删除快照后比较显示空状态",
+      "passed": true
+    },
+    {
+      "name": "真实UI拒绝未知格式且当前项目保留",
+      "passed": true
+    },
+    {
+      "name": "100字项目名称不造成整页横向溢出",
+      "passed": true
+    },
+    {
+      "name": "输入核对JSON实际下载包含证据项",
+      "passed": true
+    },
+    {
+      "name": "项目库备份实际恢复为新副本",
+      "passed": true
+    },
+    {
+      "name": "Production模式静态框架脚本可用",
+      "passed": true
+    }
+  ]
+}

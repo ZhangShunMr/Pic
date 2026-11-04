@@ -1,0 +1,8 @@
+convert /workspace/Pic/accessory-motor-frequency/docs/操作说明书.docx as a Writer document -> /workspace/Pic/accessory-motor-frequency/docs/pdf-preview/操作说明书.pdf using filter : writer_pdf_Export
+Overwriting: /workspace/Pic/accessory-motor-frequency/docs/pdf-preview/操作说明书.pdf
+convert /workspace/Pic/accessory-motor-frequency/docs/软著信息采集表.docx as a Writer document -> /workspace/Pic/accessory-motor-frequency/docs/pdf-preview/软著信息采集表.pdf using filter : writer_pdf_Export
+Overwriting: /workspace/Pic/accessory-motor-frequency/docs/pdf-preview/软著信息采集表.pdf
+
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories
+Fontconfig error: No writable cache directories

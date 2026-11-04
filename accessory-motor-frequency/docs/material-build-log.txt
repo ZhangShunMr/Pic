@@ -1,0 +1,1 @@
+{"manualPdfPages": 15, "han": 837, "figures": 14, "wordPaginationVerified": false}

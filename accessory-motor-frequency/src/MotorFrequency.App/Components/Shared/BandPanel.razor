@@ -1,0 +1,26 @@
+@inherits VmComponent
+@if (Vm.Current is not null)
+{
+    <section id="bands" class="section">
+        <div class="section-heading"><div><span class="index">04</span><h2>结构敏感频段</h2></div><p>关注频段与候选轨迹的解析求交</p></div>
+        @if (Vm.Current.Bands.Count == 0)
+        {
+            <p class="empty-inline">尚未添加频段。可填写结构试验关注范围，或明确标识的人工观察带。</p>
+        }
+        @foreach (var band in Vm.Current.Bands)
+        {
+            <div class="band-card"><label class="check"><input type="checkbox" checked="@band.Enabled" @onchange="() => Vm.ToggleBand(band.Id)" /><strong>@band.Name</strong></label><span>@Labels.Number(band.LowerHz)–@Labels.Number(band.UpperHz) Hz</span><span class="tag">@Labels.Origin(band.Origin)</span><small>@band.Basis</small><button class="danger text-button" @onclick="() => Vm.RemoveBand(band.Id)">删除频段</button></div>
+        }
+        <details class="editor-fold"><summary>＋ 添加敏感频段</summary><div class="form-grid three"><label>频段名称<input @bind="Vm.BandName" /></label><label>下限 Hz<input @bind="Vm.BandLower" /></label><label>上限 Hz<input @bind="Vm.BandUpper" /></label><label>来源<select aria-label="频段来源" @bind="Vm.BandOrigin">@foreach (var value in Enum.GetValues<DataOrigin>()) { <option value="@value">@Labels.Origin(value)</option> }</select></label><label class="span-two">依据与条件<input @bind="Vm.BandBasis" /></label></div><button @onclick="Vm.AddBand">添加频段</button></details>
+        <h3>落入频段的转速区间</h3>
+        <p class="small muted">n进入=max(n起始,60×f下限/k)，n离开=min(n终止,60×f上限/k)；进入≤离开时保留，包含端点。区间不等于共振风险等级。</p>
+        @if (Vm.Crossings.Count == 0)
+        {
+            <p class="empty-inline">当前范围无交叠区间，或尚未启用敏感频段。</p>
+        }
+        else
+        {
+            <div class="table-scroll"><table><thead><tr><th>候选</th><th>频段</th><th>进入 r/min</th><th>离开 r/min</th><th>动作</th></tr></thead><tbody>@foreach (var row in Vm.Crossings) { <tr><td>@row.CandidateName</td><td>@row.BandName</td><td>@Labels.Number(row.LowerRpm)</td><td>@Labels.Number(row.UpperRpm)</td><td><button class="text-button" @onclick="() => Vm.SetInspect(N((row.LowerRpm + row.UpperRpm) / 2))">观察区间中点</button></td></tr> }</tbody></table></div>
+        }
+    </section>
+}

@@ -1,0 +1,22 @@
+@inherits VmComponent
+@if (Vm.Current is not null)
+{
+    <section id="orders" class="section">
+        <div class="section-heading"><div><span class="index">03</span><h2>候选阶次与依据</h2></div><p>机械阶次 k：每转对应的周期数</p></div>
+        <div class="table-scroll"><table><thead><tr><th>绘制</th><th>候选名称</th><th>类型</th><th>机械阶次</th><th>观察频率 Hz</th><th>计算依据</th></tr></thead><tbody>
+            @foreach (var candidate in Vm.Candidates)
+            {
+                <tr class="@(candidate.Id == Vm.SelectedCandidateId ? "selected-row" : "")"><td><input aria-label="显示 @candidate.Name" type="checkbox" checked="@candidate.Visible" @onchange="() => Vm.ToggleCandidate(candidate.Id)" /></td><td><button class="text-button" @onclick="() => Vm.SelectCandidate(candidate.Id)">@candidate.Name</button></td><td>@candidate.Category</td><td>@Labels.Number(candidate.Order)</td><td>@Labels.Number(FrequencyEngine.At(candidate.Order, Vm.Current.Motor.InspectRpm))</td><td><details><summary>@candidate.Formula</summary><p>@candidate.Basis</p></details></td></tr>
+            }
+        </tbody></table></div>
+        <details class="editor-fold"><summary>＋ 添加或管理自定义候选</summary>
+            <p>使用相对机械轴的阶次。允许非整数阶次；必须填写假设、文献、试验线索或其他依据，软件不自动认证其物理来源。</p>
+            <div class="form-grid three"><label>候选名称<input @bind="Vm.OrderName" /></label><label>阶次 k（0.001–10000）<input @bind="Vm.OrderValue" /></label><label>依据<input @bind="Vm.OrderBasis" /></label></div>
+            <button @onclick="Vm.AddOrder">添加候选</button>
+            @foreach (var order in Vm.Current.CustomOrders)
+            {
+                <div class="record-line"><span><strong>@order.Name</strong> · @Labels.Number(order.Order) 阶 · @order.Basis</span><button class="danger text-button" @onclick="() => Vm.RemoveOrder(order.Id)">删除候选</button></div>
+            }
+        </details>
+    </section>
+}

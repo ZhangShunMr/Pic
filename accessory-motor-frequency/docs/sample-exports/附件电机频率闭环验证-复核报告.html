@@ -1,0 +1,106 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>电机候选频率复核报告</title>
+<style>body{font:15px/1.7 system-ui,sans-serif;max-width:1100px;margin:35px auto;padding:20px;color:#263c36}table{width:100%;border-collapse:collapse;margin:18px 0}td,th{border:1px solid #d5dbd6;padding:7px;text-align:left}h1{font-size:26px}.notice{padding:16px;background:#f5ecd4}svg{width:100%}small{overflow-wrap:anywhere}@media print{body{margin:0}tr{break-inside:avoid}}</style>
+<h1>汽车附件电机电磁激励频率设计软件 V1.0</h1><h2>附件电机频率闭环验证</h2>
+<p>负责人：验证工程师（模拟）；项目标识：7d3ce46a-d61d-4738-912a-1b4d52842f24；输出时间：2026-11-04T07:03:10.1766367+00:00</p>
+<p class="notice">来源：人工参数及用户导入资料。候选频率为运动学或限定假设下的参考，不代表实际电磁力、声压主峰或故障根因。</p>
+<p>项目目的：验证 1800 r/min 下 60 Hz 的多个候选，使用模拟频谱，不作实测结论。</p>
+<h2>电机与计算口径</h2><p>无刷永磁同步电机；p=2 极对，Q=12 槽，K=10 片。无刷使用 p/Q，有刷使用 K；不适用参数仅保留在项目档案。</p>
+<p>转速 0～6000 r/min，步长 100 r/min，观察转速 1800 r/min，图表上限 1500 Hz。终点总是纳入扫描；交叠区间解析计算，不依赖步长。</p>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 430" role="img">
+<rect width="900" height="430" fill="#faf9f4"/>
+<path d="M 68 316 H 860" stroke="#dddcd3"/>
+<text x="58" y="320" text-anchor="end" font-size="12">0</text>
+<path d="M 68 257.6 H 860" stroke="#dddcd3"/>
+<text x="58" y="261.6" text-anchor="end" font-size="12">300</text>
+<path d="M 68 199.2 H 860" stroke="#dddcd3"/>
+<text x="58" y="203.2" text-anchor="end" font-size="12">600</text>
+<path d="M 68 140.8 H 860" stroke="#dddcd3"/>
+<text x="58" y="144.8" text-anchor="end" font-size="12">900</text>
+<path d="M 68 82.4 H 860" stroke="#dddcd3"/>
+<text x="58" y="86.4" text-anchor="end" font-size="12">1200</text>
+<path d="M 68 24 H 860" stroke="#dddcd3"/>
+<text x="58" y="28" text-anchor="end" font-size="12">1500</text>
+<path d="M 68 24 V 316" stroke="#e7e5dc"/>
+<text x="68" y="337" text-anchor="middle" font-size="12">0</text>
+<path d="M 200 24 V 316" stroke="#e7e5dc"/>
+<text x="200" y="337" text-anchor="middle" font-size="12">1000</text>
+<path d="M 332 24 V 316" stroke="#e7e5dc"/>
+<text x="332" y="337" text-anchor="middle" font-size="12">2000</text>
+<path d="M 464 24 V 316" stroke="#e7e5dc"/>
+<text x="464" y="337" text-anchor="middle" font-size="12">3000</text>
+<path d="M 596 24 V 316" stroke="#e7e5dc"/>
+<text x="596" y="337" text-anchor="middle" font-size="12">4000</text>
+<path d="M 728 24 V 316" stroke="#e7e5dc"/>
+<text x="728" y="337" text-anchor="middle" font-size="12">5000</text>
+<path d="M 860 24 V 316" stroke="#e7e5dc"/>
+<text x="860" y="337" text-anchor="middle" font-size="12">6000</text>
+<rect x="68" y="303.347" width="792" height="1.947" fill="#b19136" opacity="0.16"/>
+<path d="M 68 316 L 860 296.533" stroke="#1d6860" fill="none" stroke-width="2"/>
+<path d="M 68 316 L 860 277.067" stroke="#b65f32" fill="none" stroke-width="2"/>
+<path d="M 68 316 L 860 82.4" stroke="#566da1" fill="none" stroke-width="2"/>
+<path d="M 68 316 L 860 82.4" stroke="#9a7c27" fill="none" stroke-width="2"/>
+<path d="M 68 316 L 860 277.067" stroke="#85608b" fill="none" stroke-width="2"/>
+<path d="M 305.6 24 V 316" stroke="#333" stroke-dasharray="5 5"/>
+<text x="10" y="18" font-size="12">Hz</text><text x="790" y="357" font-size="12">r/min</text>
+<text x="68" y="380" font-size="14">附件电机频率闭环验证 · V1.0</text>
+<text x="68" y="403" font-size="12">候选频率参考；人工参数；非声压预测</text>
+</svg>
+
+<h2>候选频率与依据</h2><table><tr><th>候选</th><th>阶次</th><th>观察频率 Hz</th><th>公式与依据</th></tr>
+<tr><td>机械转频</td><td>1</td><td>30</td><td>fᵣ = n / 60；机械轴每转一次的运动学参考；不等同于不平衡已被证实。</td></tr>
+<tr><td>电气基频</td><td>2</td><td>60</td><td>fₑ = p &#215; n / 60；仅适用于同步运行的永磁无刷拓扑，p 为极对数；不是电磁力阶次。</td></tr>
+<tr><td>槽通过参考</td><td>12</td><td>360</td><td>fₛ = Q &#215; n / 60；转子参考点每转经过 Q 个等间距定子槽；只表示相对运动周期，不指认声压主峰。</td></tr>
+<tr><td>理想齿槽周期候选</td><td>12</td><td>360</td><td>f&#120460; = LCM(Q, 2p) &#215; n / 60；等槽、对称永磁结构的理想周期；不含制造偏差、斜槽、饱和与负载影响。用户依据：模拟结构条件：等槽、对称永磁，仅用于周期公式核对。</td></tr>
+<tr><td>二倍转频假设</td><td>2</td><td>60</td><td>f = k &#215; n / 60；模拟线索，需同步电流与振动试验区分。</td></tr>
+</table><h2>结构敏感频段</h2><table><tr><th>频段</th><th>范围 Hz</th><th>来源与依据</th></tr>
+<tr><td>60Hz关注带（模拟）</td><td>55～65</td><td>模拟演示；人为设定范围，不是实测模态。</td></tr>
+</table><h2>交叠转速区间</h2><p>区间包含端点；仅表示频率落入关注范围，不证明实际共振。</p><table><tr><th>候选</th><th>频段</th><th>进入 r/min</th><th>离开 r/min</th></tr>
+<tr><td>槽通过参考</td><td>60Hz关注带（模拟）</td><td>275</td><td>325</td></tr>
+<tr><td>理想齿槽周期候选</td><td>60Hz关注带（模拟）</td><td>275</td><td>325</td></tr>
+<tr><td>电气基频</td><td>60Hz关注带（模拟）</td><td>1650</td><td>1950</td></tr>
+<tr><td>二倍转频假设</td><td>60Hz关注带（模拟）</td><td>1650</td><td>1950</td></tr>
+<tr><td>机械转频</td><td>60Hz关注带（模拟）</td><td>3300</td><td>3900</td></tr>
+</table><h2>导入频谱与邻近核对</h2>
+<p>绝对容差 3 Hz 为用户工程设置；每条频谱按幅值选前 10 个内部局部极大点，不插值、不找端点峰、不合并同频候选。</p>
+<h3>1800转模拟输入</h3><p>模拟演示；1800 r/min；单位 dB；参考量 模拟dB标度，无声学校准；工况 固定数式生成，非真实采集；751 点；输入哈希 2106380b4970f3397ce7e718cd322a91b641374332c563d0329d08ba66ee0fa5</p>
+<table><tr><th>谱峰 Hz</th><th>幅值</th><th>邻近候选</th><th>频差 Hz</th></tr>
+<tr><td>60</td><td>51.08029440549545 dB</td><td>电气基频</td><td>0</td></tr>
+<tr><td>60</td><td>51.08029440549545 dB</td><td>二倍转频假设</td><td>0</td></tr>
+<tr><td>360</td><td>44.84164031330948 dB</td><td>槽通过参考</td><td>0</td></tr>
+<tr><td>360</td><td>44.84164031330948 dB</td><td>理想齿槽周期候选</td><td>0</td></tr>
+<tr><td>120</td><td>37.118227963046586 dB</td><td>无邻近候选</td><td>—</td></tr>
+<tr><td>554</td><td>24.9695935240849 dB</td><td>无邻近候选</td><td>—</td></tr>
+<tr><td>1170</td><td>24.93247912903543 dB</td><td>无邻近候选</td><td>—</td></tr>
+<tr><td>998</td><td>24.918613147945713 dB</td><td>无邻近候选</td><td>—</td></tr>
+<tr><td>726</td><td>24.853420522341114 dB</td><td>无邻近候选</td><td>—</td></tr>
+<tr><td>1442</td><td>24.836360672126013 dB</td><td>无邻近候选</td><td>—</td></tr>
+<tr><td>282</td><td>24.743817961681565 dB</td><td>无邻近候选</td><td>—</td></tr>
+<tr><td>384</td><td>24.527632497687627 dB</td><td>无邻近候选</td><td>—</td></tr>
+</table>
+<h2>方案快照比较</h2><p>差值为当前−快照；均统一使用当前观察转速，非声级改善量。</p>
+<h3>两极对基线（模拟资料） · 参数快照</h3><table><tr><th>候选</th><th>当前 Hz</th><th>快照 Hz</th><th>差值 Hz</th><th>解释</th></tr>
+<tr><td>机械转频</td><td>30</td><td>30</td><td>0</td><td>统一按当前观察转速换算；差值=当前−快照</td></tr>
+<tr><td>电气基频</td><td>60</td><td>60</td><td>0</td><td>统一按当前观察转速换算；差值=当前−快照</td></tr>
+<tr><td>槽通过参考</td><td>360</td><td>360</td><td>0</td><td>统一按当前观察转速换算；差值=当前−快照</td></tr>
+<tr><td>理想齿槽周期候选</td><td>360</td><td>360</td><td>0</td><td>统一按当前观察转速换算；差值=当前−快照</td></tr>
+<tr><td>二倍转频假设</td><td>60</td><td>60</td><td>0</td><td>统一按当前观察转速换算；差值=当前−快照</td></tr>
+</table>
+<h2>复核提示</h2><ul>
+<li>1800转模拟输入：模拟频谱，保留来源标记。</li>
+<li>2 阶存在多个候选：电气基频、二倍转频假设；图线可能重合，依据分别保留。</li>
+<li>12 阶存在多个候选：槽通过参考、理想齿槽周期候选；图线可能重合，依据分别保留。</li>
+<li>候选频率为运动学或限定假设下的参考，不代表实际电磁力、声压主峰或故障根因。</li>
+</ul><p>用户复核备注：</p>
+<h2>操作追溯</h2><table><tr><th>UTC 时间</th><th>操作</th><th>详情</th></tr>
+<tr><td>2026-11-04T07:02:57.6512252+00:00</td><td>更新项目档案</td><td>附件电机频率闭环验证</td></tr>
+<tr><td>2026-11-04T07:02:58.8049246+00:00</td><td>应用电机条件</td><td>电机参数或拓扑变更，频率及历史频谱邻近关系重新计算</td></tr>
+<tr><td>2026-11-04T07:02:59.7389523+00:00</td><td>应用电机条件</td><td>电机参数或拓扑变更，频率及历史频谱邻近关系重新计算</td></tr>
+<tr><td>2026-11-04T07:03:00.8047315+00:00</td><td>添加自定义候选</td><td>二倍转频假设</td></tr>
+<tr><td>2026-11-04T07:03:02.2062525+00:00</td><td>添加敏感频段</td><td>60Hz关注带（模拟）</td></tr>
+<tr><td>2026-11-04T07:03:05.0595523+00:00</td><td>导入频谱</td><td>1800rpm-模拟频谱.csv；所有点内嵌保存</td></tr>
+<tr><td>2026-11-04T07:03:06.8157893+00:00</td><td>记录方案快照</td><td>两极对基线（模拟资料）</td></tr>
+<tr><td>2026-11-04T07:03:07.4244030+00:00</td><td>应用电机条件</td><td>电机参数或拓扑变更，频率及历史频谱邻近关系重新计算</td></tr>
+<tr><td>2026-11-04T07:03:07.9086757+00:00</td><td>撤销</td><td>恢复上一个输入状态；审计记录保留</td></tr>
+<tr><td>2026-11-04T07:03:08.1235848+00:00</td><td>重做</td><td>恢复下一输入状态；审计记录保留</td></tr>
+<tr><td>2026-11-04T07:03:08.3391518+00:00</td><td>撤销</td><td>恢复上一个输入状态；审计记录保留</td></tr>
+</table><small>输入项目 SHA-256：1f40b561a67debe37bce685d4a5e719ab25d4178479df7e8eb4cd67b0d41c757。报告自包含，不访问外部数据。全部频点保存在配套 .motorproj 中。</small></html>

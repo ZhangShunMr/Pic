@@ -1,0 +1,63 @@
+@inherits VmComponent
+@if (Vm.Current is not null)
+{
+    <aside class="inspector">
+        <div class="eyebrow">OBJECT INSPECTOR</div>
+        <h3>@Labels.ObjectName(Vm.SelectedObject)</h3>
+        @if (Vm.SelectedObject == "project")
+        {
+            <label>项目名称<input @bind="Vm.ProjectName" @bind:after="Vm.DraftChanged" maxlength="100" /></label>
+            <label>负责人<input @bind="Vm.Owner" @bind:after="Vm.DraftChanged" maxlength="100" /></label>
+            <label>分析目的<textarea @bind="Vm.Purpose" @bind:after="Vm.DraftChanged" maxlength="2000" rows="3"></textarea></label>
+            <button class="primary" @onclick="Vm.ApplyMetadata">应用项目档案</button>
+            <small>标识：@Vm.Current.Id<br />建立时间：@Vm.Current.CreatedAt.ToString("yyyy-MM-dd HH:mm") UTC</small>
+        }
+        else
+        {
+            <label>电机名称<input @bind="Vm.Editor.Name" @bind:after="Vm.DraftChanged" maxlength="100" /></label>
+            <label>电机拓扑<select aria-label="电机拓扑" @bind="Vm.Editor.Topology" @bind:after="Vm.DraftChanged"><option value="@MotorTopology.BrushlessPermanentMagnet">无刷永磁同步电机</option><option value="@MotorTopology.BrushedPermanentMagnet">有刷永磁直流电机</option></select></label>
+            @if (Vm.SelectedObject is "rotor" or "brush")
+            {
+                <label>极对数 p（整数 1–64）<input inputmode="numeric" @bind="Vm.Editor.PolePairs" @bind:after="Vm.DraftChanged" /></label>
+                @if (Vm.Editor.Topology == MotorTopology.BrushedPermanentMagnet)
+                {
+                    <label>换向片数 K（整数 2–512）<input inputmode="numeric" @bind="Vm.Editor.Segments" @bind:after="Vm.DraftChanged" /></label>
+                    <p class="field-note">有刷参数不生成同步电气基频。极对数仅作结构档案；片通过按单个电刷参考，不乘电刷数量。</p>
+                }
+                else
+                {
+                    <p class="formula">fₑ = p × n / 60</p><p class="field-note">p 为极对数，总磁极数为 2p。电气基频是同步电气周期参考，不是电磁力或噪声阶次。</p>
+                }
+            }
+            @if (Vm.SelectedObject == "slots")
+            {
+                @if (Vm.Editor.Topology == MotorTopology.BrushlessPermanentMagnet)
+                {
+                    <label>定子槽数 Q（整数 1–512）<input inputmode="numeric" @bind="Vm.Editor.Slots" @bind:after="Vm.DraftChanged" /></label>
+                    <label class="check"><input type="checkbox" @bind="Vm.Editor.IncludeSlotPass" @bind:after="Vm.DraftChanged" />槽通过运动学参考</label>
+                    <label class="check"><input type="checkbox" @bind="Vm.Editor.IncludeCogging" @bind:after="Vm.DraftChanged" />启用理想齿槽周期候选</label>
+                    <label class="check"><input type="checkbox" @bind="Vm.Editor.Symmetric" @bind:after="Vm.DraftChanged" />确认等槽、对称永磁理想结构假设</label>
+                    <label>假设依据（启用齿槽候选必填）<textarea @bind="Vm.Editor.Assumptions" @bind:after="Vm.DraftChanged" rows="3"></textarea></label>
+                    <p class="field-note">LCM(Q, 2p) 为理想周期，不处理偏心、斜槽与制造误差。不代表对应频率一定存在声压峰值。</p>
+                }
+                else
+                {
+                    <p class="field-note">槽通过和理想齿槽自动候选仅对本软件的无刷拓扑启用。有刷电机的其他电磁/槽效应请用自定义阶次并记录依据。</p>
+                }
+            }
+            @if (Vm.SelectedObject == "speed")
+            {
+                <div class="form-grid"><label>起始转速 r/min<input @bind="Vm.Editor.MinimumRpm" @bind:after="Vm.DraftChanged" /></label><label>终止转速 r/min<input @bind="Vm.Editor.MaximumRpm" @bind:after="Vm.DraftChanged" /></label><label>扫描步长 r/min<input @bind="Vm.Editor.StepRpm" @bind:after="Vm.DraftChanged" /></label><label>观察转速 r/min<input @bind="Vm.Editor.InspectRpm" @bind:after="Vm.DraftChanged" /></label></div>
+                <label>图表频率上限 Hz<input @bind="Vm.Editor.MaximumHz" @bind:after="Vm.DraftChanged" /></label>
+                <p class="field-note">0≤转速≤100000；终止值大于起始值；步长≥0.1，最多 2000 个区间。频率上限 1–1000000 Hz。交叠区间不受步长影响。</p>
+            }
+            @if (Vm.SelectedObject == "custom")
+            {
+                <p class="field-note">自定义候选位于下方“候选阶次与依据”。填写机械阶次 k 和可追溯依据后，用 f=k×n/60 计算。</p>
+                <a href="#orders">前往自定义候选</a>
+            }
+            <div class="inline-actions"><button class="primary" @onclick="Vm.ApplyMotor">应用电机条件</button><button @onclick="Vm.ResetDraft">恢复已应用值</button></div>
+            <p class="small muted">编辑为草稿；点击应用后才更新计算。切换结构对象保留草稿，打开项目与撤销会重置草稿。</p>
+        }
+    </aside>
+}

@@ -1,0 +1,4026 @@
+汽车附件电机电磁激励频率设计软件 V1.0
+仅实际参与构建的生产源码，非空行统计另见 source-inventory.json。
+
+========================================================================
+FILE: src/MotorFrequency.App/Components/App.razor
+========================================================================
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <base href="/" />
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="app.css" />
+    <title>汽车附件电机电磁激励频率设计软件 V1.0</title>
+    <HeadOutlet @rendermode="InteractiveServer" />
+</head>
+<body>
+    <Routes @rendermode="InteractiveServer" />
+    <script src="files.js"></script>
+    <script src="_framework/blazor.web.js"></script>
+</body>
+</html>
+
+========================================================================
+FILE: src/MotorFrequency.App/Components/Routes.razor
+========================================================================
+<Router AppAssembly="typeof(App).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="routeData" />
+    </Found>
+    <NotFound>
+        <p>未找到页面。<a href="/">回到电机频率设计区</a></p>
+    </NotFound>
+</Router>
+
+========================================================================
+FILE: src/MotorFrequency.App/Components/Shared/BandPanel.razor
+========================================================================
+@inherits VmComponent
+@if (Vm.Current is not null)
+{
+    <section id="bands" class="section">
+        <div class="section-heading"><div><span class="index">04</span><h2>结构敏感频段</h2></div><p>关注频段与候选轨迹的解析求交</p></div>
+        @if (Vm.Current.Bands.Count == 0)
+        {
+            <p class="empty-inline">尚未添加频段。可填写结构试验关注范围，或明确标识的人工观察带。</p>
+        }
+        @foreach (var band in Vm.Current.Bands)
+        {
+            <div class="band-card"><label class="check"><input type="checkbox" checked="@band.Enabled" @onchange="() => Vm.ToggleBand(band.Id)" /><strong>@band.Name</strong></label><span>@Labels.Number(band.LowerHz)–@Labels.Number(band.UpperHz) Hz</span><span class="tag">@Labels.Origin(band.Origin)</span><small>@band.Basis</small><button class="danger text-button" @onclick="() => Vm.RemoveBand(band.Id)">删除频段</button></div>
+        }
+        <details class="editor-fold"><summary>＋ 添加敏感频段</summary><div class="form-grid three"><label>频段名称<input @bind="Vm.BandName" /></label><label>下限 Hz<input @bind="Vm.BandLower" /></label><label>上限 Hz<input @bind="Vm.BandUpper" /></label><label>来源<select aria-label="频段来源" @bind="Vm.BandOrigin">@foreach (var value in Enum.GetValues<DataOrigin>()) { <option value="@value">@Labels.Origin(value)</option> }</select></label><label class="span-two">依据与条件<input @bind="Vm.BandBasis" /></label></div><button @onclick="Vm.AddBand">添加频段</button></details>
+        <h3>落入频段的转速区间</h3>
+        <p class="small muted">n进入=max(n起始,60×f下限/k)，n离开=min(n终止,60×f上限/k)；进入≤离开时保留，包含端点。区间不等于共振风险等级。</p>
+        @if (Vm.Crossings.Count == 0)
+        {
+            <p class="empty-inline">当前范围无交叠区间，或尚未启用敏感频段。</p>
+        }
+        else
+        {
+            <div class="table-scroll"><table><thead><tr><th>候选</th><th>频段</th><th>进入 r/min</th><th>离开 r/min</th><th>动作</th></tr></thead><tbody>@foreach (var row in Vm.Crossings) { <tr><td>@row.CandidateName</td><td>@row.BandName</td><td>@Labels.Number(row.LowerRpm)</td><td>@Labels.Number(row.UpperRpm)</td><td><button class="text-button" @onclick="() => Vm.SetInspect(N((row.LowerRpm + row.UpperRpm) / 2))">观察区间中点</button></td></tr> }</tbody></table></div>
+        }
+    </section>
+}
+
+========================================================================
+FILE: src/MotorFrequency.App/Components/Shared/ComparisonPanel.razor
+========================================================================
+@inherits VmComponent
+@if (Vm.Current is not null)
+{
+    <section id="comparison" class="section">
+        <div class="section-heading">
+            <div><span class="index">06</span><h2>方案快照比较</h2></div>
+            <p>保留结构与候选，再改变当前参数</p>
+        </div>
+        <div class="snapshot-create">
+            <label>快照名称<input @bind="Vm.ScenarioName" placeholder="如 p=2 / 十二槽基线" /></label>
+            <button @onclick="Vm.CaptureScenario">记录当前方案快照</button>
+        </div>
+        <p class="small muted">快照包含电机、候选阶次、启用状态和模拟标记。比较统一按当前观察转速 @Labels.Number(Vm.Current.Motor.InspectRpm) r/min 换算；不比较声级，也不推荐槽极数方案。</p>
+        @if (Vm.Current.Scenarios.Count == 0)
+        {
+            <p class="empty-inline">尚无方案快照。先记录当前方案，再改变极对数、槽数或自定义阶次。</p>
+        }
+        else
+        {
+            <div class="snapshot-list">
+                @foreach (var scenario in Vm.Current.Scenarios)
+                {
+                    <div class="snapshot @(Vm.SelectedScenarioId == scenario.Id ? "active" : "")">
+                        <button class="text-button" @onclick="() => Vm.SelectScenario(scenario.Id)"><strong>@scenario.Name</strong></button>
+                        <small>@Labels.Topology(scenario.Motor.Topology) · p=@scenario.Motor.PolePairs · Q=@scenario.Motor.Slots · K=@scenario.Motor.CommutatorSegments</small>
+                        <small>@scenario.CapturedAt.ToString("yyyy-MM-dd HH:mm") UTC · @(scenario.Demonstration ? "模拟演示" : "参数快照")</small>
+                        <button class="danger text-button" @onclick="() => Vm.RemoveScenario(scenario.Id)">删除快照</button>
+                    </div>
+                }
+            </div>
+            @if (Vm.SelectedScenario is not null)
+            {
+                @if (Vm.SelectedScenario.Motor.Topology != Vm.Current.Motor.Topology)
+                {
+                    <p class="warning">当前与快照拓扑不同，仅比较共有参考和候选频率；不存在的候选保留为空，不填零。</p>
+                }
+                @if (Vm.SelectedScenario.Motor.MinimumRpm != Vm.Current.Motor.MinimumRpm || Vm.SelectedScenario.Motor.MaximumRpm != Vm.Current.Motor.MaximumRpm)
+                {
+                    <p class="warning">扫描范围不同。图中快照按当前轴范围展示；数表统一在当前观察转速换算，可能超出快照原扫描范围。</p>
+                }
+                <div class="table-scroll">
+                    <table>
+                        <thead><tr><th>候选</th><th>当前阶次</th><th>快照阶次</th><th>当前 Hz</th><th>快照 Hz</th><th>当前−快照 Hz</th><th>口径</th></tr></thead>
+                        <tbody>
+                            @foreach (var row in Vm.Comparison)
+                            {
+                                <tr><td>@row.Name</td><td>@Display(row.CurrentOrder)</td><td>@Display(row.SnapshotOrder)</td><td>@Display(row.CurrentHz)</td><td>@Display(row.SnapshotHz)</td><td>@Display(row.DifferenceHz)</td><td>@row.Statement</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <button @onclick='() => Vm.Export("comparison")'>导出当前快照比较 CSV</button>
+            }
+        }
+    </section>
+}
+
+========================================================================
+FILE: src/MotorFrequency.App/Components/Shared/DeliveryPanel.razor
+========================================================================
+@inherits VmComponent
+@if (Vm.Current is not null)
+{
+    <section id="delivery" class="section">
+        <div class="section-heading">
+            <div><span class="index">07</span><h2>复核、保存与输出</h2></div>
+            <p>项目可重开 · 结果保留来源与版本</p>
+        </div>
+        <div class="quality-notes">
+            @foreach (var note in Vm.QualityNotes)
+            {
+                <p>• @note</p>
+            }
+        </div>
+        <ReviewPanel />
+        <label>工程复核备注<textarea rows="3" @bind="Vm.ReviewNotes" placeholder="记录需要补充的同步测量、假设核对或工况变化"></textarea></label>
+        <button @onclick="Vm.ApplyReview">应用复核备注</button>
+        <div class="save-box">
+            <div><strong>@(Vm.Dirty ? "存在未保存输入" : "当前输入已保存")</strong><p>服务器本机路径：<code>@Vm.LastPath</code></p><small>项目库目录：@Vm.StorePath</small></div>
+            <div class="inline-actions"><button class="primary" @onclick="Vm.Save">保存项目</button><button @onclick='() => Vm.Export("project")'>下载项目文件</button><button @onclick="Vm.DuplicateProject">复制为新项目</button><button @onclick="Vm.ToggleArchive">@(Vm.Current.Archived ? "取消归档" : "归档项目")</button></div>
+        </div>
+        <p class="small muted">保存为 .motorproj JSON，格式版本 1，原始频谱内嵌。再次保存保留上一版 .bak；项目库可读取备份为副本。外部修改或相同标识导入不会直接覆盖。下载文件在浏览器下载目录，请实际核实。未应用字段草稿不包含在项目和导出中。</p>
+        <div class="export-grid">
+            <button @onclick='() => Vm.Export("frequency")'><strong>频率扫描 CSV</strong><small>全部采样转速 × 已显示候选、公式与依据</small></button>
+            <button @onclick='() => Vm.Export("crossing")'><strong>频段交叠 CSV</strong><small>精确进入/离开转速、频段来源依据</small></button>
+            <button @onclick='() => Vm.Export("evidence")'><strong>谱峰核对 CSV</strong><small>工况、来源、单位、频差及解释</small></button>
+            <button @onclick='() => Vm.Export("svg")'><strong>频率图 SVG</strong><small>当前参数轨迹与关注带、可缩放图形</small></button>
+            <button @onclick='() => Vm.Export("html")'><strong>完整复核报告 HTML</strong><small>自包含图、计算依据、数据元信息与审计</small></button>
+        </div>
+        <p class="small muted">SVG 导出为当前方案的纯候选频率图，不含频谱黑点或比较虚线；图形需和报告配套阅读。CSV 使用 UTF-8 BOM，小数点为英文句点。文本字段前导公式字符转义，避免电子表格执行。</p>
+        <details class="editor-fold">
+            <summary>操作追溯 · @Vm.Current.History.Count 条</summary>
+            <p>最近 100 条展示，项目内最多保留 2000 条。撤销/重做保留审计，变更可通过参数快照和项目备份复核。</p>
+            <div class="table-scroll audit-table"><table><thead><tr><th>UTC 时间</th><th>操作</th><th>详情</th></tr></thead><tbody>
+                @foreach (var item in Vm.Current.History.TakeLast(100).Reverse())
+                {
+                    <tr><td>@item.At.ToString("yyyy-MM-dd HH:mm:ss")</td><td>@item.Action</td><td>@item.Detail</td></tr>
+                }
+            </tbody></table></div>
+        </details>
+        <details class="editor-fold">
+            <summary>使用边界与常见问题</summary>
+            <h3>电频为什么不等于噪声主峰？</h3>
+            <p>电流、磁场、力波的时空阶次以及结构传递均影响最终声音。仅有极对数、槽数和转速不能求出声压幅值。软件提供运动学或限定假设下的周期参考，不能诊断根因。</p>
+            <h3>为什么有些频谱点不在频率图上？</h3>
+            <p>上图仅叠加已勾选频谱的前 N 个内部局部极大点，并按频谱自己的采集转速定位。范围外的转速和频率不绘制；原始点仍保存在项目中。可提高图表上限或查看原始频点。</p>
+            <h3>输入错误后怎么恢复？</h3>
+            <p>错误提示列出字段或 CSV 行号。修改对应草稿后重新应用或预检；计算保留最后一次有效输入。点击恢复已应用值放弃电机草稿；已应用修改可撤销。</p>
+            <h3>浏览器刷新会发生什么？</h3>
+            <p>未保存会弹出浏览器离开提示。强制刷新或服务器停止可能丢失会话工作；保存后从左侧项目库重开，或用导入 .motorproj 恢复下载副本。系统无账号，不用于远程多人协作。</p>
+        </details>
+    </section>
+}
+
+========================================================================
+FILE: src/MotorFrequency.App/Components/Shared/FrequencyChart.razor
+========================================================================
+@inherits VmComponent
+@if (Vm.Current is not null)
+{
+    var project = Vm.Current;
+    var motor = project.Motor;
+    var chart = new ChartGeometry(motor);
+    var candidates = Vm.Candidates.Where(x => x.Visible).ToList();
+    <div class="chart-toolbar"><div class="metric"><span>观察转速</span><strong>@Labels.Number(motor.InspectRpm)<small>r/min</small></strong></div><div class="metric"><span>机械转频</span><strong>@Labels.Number(motor.InspectRpm / 60)<small>Hz</small></strong></div><div class="metric"><span>@(motor.Topology == MotorTopology.BrushlessPermanentMagnet ? "电气基频" : "单刷片通过")</span><strong>@Labels.Number(FrequencyEngine.At(motor.Topology == MotorTopology.BrushlessPermanentMagnet ? motor.PolePairs : motor.CommutatorSegments, motor.InspectRpm))<small>Hz</small></strong></div><div class="metric"><span>交叠区间</span><strong>@Vm.Crossings.Count<small>条</small></strong></div></div>
+    <svg class="campbell-chart" viewBox="0 0 900 370" role="img" aria-label="候选频率随转速变化图">
+        @foreach (var tick in chart.SpeedTicks())
+        {
+            <line x1="@N(tick.Position)" x2="@N(tick.Position)" y1="24" y2="316" stroke="#e4e6dc" />
+            <g><text x="@N(tick.Position)" y="338" text-anchor="middle" class="axis-label">@Labels.Number(tick.Value)</text></g>
+        }
+        @foreach (var tick in chart.FrequencyTicks())
+        {
+            <line x1="68" x2="860" y1="@N(tick.Position)" y2="@N(tick.Position)" stroke="#e4e6dc" />
+            <g><text x="58" y="@N(tick.Position + 4)" text-anchor="end" class="axis-label">@Labels.Number(tick.Value)</text></g>
+        }
+        @foreach (var band in project.Bands.Where(x => x.Enabled && x.LowerHz <= motor.MaximumHz))
+        {
+            var upper = Math.Min(band.UpperHz, motor.MaximumHz);
+            <rect x="68" y="@N(chart.Y(upper))" width="792" height="@N(Math.Max(1, chart.Y(band.LowerHz) - chart.Y(upper)))" fill="#b19136" opacity=".15"><title>@band.Name · @Labels.Number(band.LowerHz)–@Labels.Number(band.UpperHz) Hz · @Labels.Origin(band.Origin)</title></rect>
+        }
+        @if (Vm.SelectedScenario is not null)
+        {
+            @foreach (var item in FrequencyEngine.Candidates(Vm.SelectedScenario.Motor, Vm.SelectedScenario.CustomOrders).Where(x => x.Visible))
+            {
+                <path d="@chart.CandidateLine(item)" fill="none" stroke="#737e75" stroke-dasharray="5 6" opacity=".45"><title>快照 @Vm.SelectedScenario.Name：@item.Name，@Labels.Number(item.Order) 阶</title></path>
+            }
+        }
+        @for (var i = 0; i < candidates.Count; i++)
+        {
+            var candidate = candidates[i];
+            var index = i;
+            <path class="candidate-line" d="@chart.CandidateLine(candidate)" fill="none" stroke="@ChartGeometry.Color(index)" stroke-width="@(candidate.Id == Vm.SelectedCandidateId ? "4" : "2")" @onclick="() => Vm.SelectCandidate(candidate.Id)"><title>@candidate.Name · @Labels.Number(candidate.Order) 阶 · @candidate.Basis</title></path>
+        }
+        @foreach (var spectrum in project.Spectra.Where(x => x.Visible && x.Rpm >= motor.MinimumRpm && x.Rpm <= motor.MaximumRpm))
+        {
+            <line x1="@N(chart.X(spectrum.Rpm))" x2="@N(chart.X(spectrum.Rpm))" y1="24" y2="316" stroke="#9c8a6c" opacity=".3" />
+            @foreach (var peak in FrequencyEngine.MatchPeaks(project, spectrum).DistinctBy(x => x.ObservedHz).Where(x => x.ObservedHz <= motor.MaximumHz))
+            {
+                <circle cx="@N(chart.X(spectrum.Rpm))" cy="@N(chart.Y(peak.ObservedHz))" r="4" fill="#2c4038" opacity=".65" @onclick="() => Vm.SelectSpectrum(spectrum.Id)"><title>@spectrum.Name · @Labels.Origin(spectrum.Origin) · @Labels.Number(peak.ObservedHz) Hz · @Labels.Number(peak.Amplitude) @spectrum.Unit</title></circle>
+            }
+        }
+        <line x1="@N(chart.X(motor.InspectRpm))" x2="@N(chart.X(motor.InspectRpm))" y1="24" y2="316" stroke="#233e35" stroke-dasharray="4 4" />
+        <g><text x="12" y="18" class="axis-label">Hz</text></g><g><text x="797" y="361" class="axis-label">转速 r/min</text></g>
+    </svg>
+    <div class="speed-scrubber"><span>@Labels.Number(motor.MinimumRpm)</span><input aria-label="观察转速滑杆" type="range" min="@N(motor.MinimumRpm)" max="@N(motor.MaximumRpm)" step="1" value="@N(motor.InspectRpm)" @onchange="e => Vm.SetInspect(e.Value?.ToString() ?? string.Empty)" /><span>@Labels.Number(motor.MaximumRpm) r/min</span></div>
+    <div class="chart-legend">
+        @for (var i = 0; i < candidates.Count; i++)
+        {
+            var item = candidates[i];
+            <button class="legend-item @(Vm.SelectedCandidateId == item.Id ? "active" : "")" @onclick="() => Vm.SelectCandidate(item.Id)"><i style="background:@ChartGeometry.Color(i)"></i>@item.Name <span>@Labels.Number(item.Order) 阶</span></button>
+        }
+    </div>
+    <p class="chart-note">色块：已启用敏感频段；黑点：各定转速频谱前 @project.Review.MaximumPeaks 个内部谱峰（等大小，不编码声级）；灰虚线：选中快照。超出纵轴的频率保留在表格和导出中。图线同频可能重合。</p>
+    @if (Vm.SelectedCandidate is not null)
+    {
+        var item = Vm.SelectedCandidate;
+        <details class="calculation" open><summary>@item.Name · 计算解释</summary><div class="calculation-body"><strong>@item.Formula</strong><p>k=@Labels.Number(item.Order)，n=@Labels.Number(motor.InspectRpm) r/min → f=@Labels.Number(item.Order) × @Labels.Number(motor.InspectRpm) / 60 = <b>@Labels.Number(FrequencyEngine.At(item.Order, motor.InspectRpm)) Hz</b></p><p>@item.Basis</p></div></details>
+    }
+}
+
+========================================================================
+FILE: src/MotorFrequency.App/Components/Shared/Inspector.razor
+========================================================================
+@inherits VmComponent
+@if (Vm.Current is not null)
+{
+    <aside class="inspector">
+        <div class="eyebrow">OBJECT INSPECTOR</div>
+        <h3>@Labels.ObjectName(Vm.SelectedObject)</h3>
+        @if (Vm.SelectedObject == "project")
+        {
+            <label>项目名称<input @bind="Vm.ProjectName" @bind:after="Vm.DraftChanged" maxlength="100" /></label>
+            <label>负责人<input @bind="Vm.Owner" @bind:after="Vm.DraftChanged" maxlength="100" /></label>
+            <label>分析目的<textarea @bind="Vm.Purpose" @bind:after="Vm.DraftChanged" maxlength="2000" rows="3"></textarea></label>
+            <button class="primary" @onclick="Vm.ApplyMetadata">应用项目档案</button>
+            <small>标识：@Vm.Current.Id<br />建立时间：@Vm.Current.CreatedAt.ToString("yyyy-MM-dd HH:mm") UTC</small>
+        }
+        else
+        {
+            <label>电机名称<input @bind="Vm.Editor.Name" @bind:after="Vm.DraftChanged" maxlength="100" /></label>
+            <label>电机拓扑<select aria-label="电机拓扑" @bind="Vm.Editor.Topology" @bind:after="Vm.DraftChanged"><option value="@MotorTopology.BrushlessPermanentMagnet">无刷永磁同步电机</option><option value="@MotorTopology.BrushedPermanentMagnet">有刷永磁直流电机</option></select></label>
+            @if (Vm.SelectedObject is "rotor" or "brush")
+            {
+                <label>极对数 p（整数 1–64）<input inputmode="numeric" @bind="Vm.Editor.PolePairs" @bind:after="Vm.DraftChanged" /></label>
+                @if (Vm.Editor.Topology == MotorTopology.BrushedPermanentMagnet)
+                {
+                    <label>换向片数 K（整数 2–512）<input inputmode="numeric" @bind="Vm.Editor.Segments" @bind:after="Vm.DraftChanged" /></label>
+                    <p class="field-note">有刷参数不生成同步电气基频。极对数仅作结构档案；片通过按单个电刷参考，不乘电刷数量。</p>
+                }
+                else
+                {
+                    <p class="formula">fₑ = p × n / 60</p><p class="field-note">p 为极对数，总磁极数为 2p。电气基频是同步电气周期参考，不是电磁力或噪声阶次。</p>
+                }
+            }
+            @if (Vm.SelectedObject == "slots")
+            {
+                @if (Vm.Editor.Topology == MotorTopology.BrushlessPermanentMagnet)
+                {
+                    <label>定子槽数 Q（整数 1–512）<input inputmode="numeric" @bind="Vm.Editor.Slots" @bind:after="Vm.DraftChanged" /></label>
+                    <label class="check"><input type="checkbox" @bind="Vm.Editor.IncludeSlotPass" @bind:after="Vm.DraftChanged" />槽通过运动学参考</label>
+                    <label class="check"><input type="checkbox" @bind="Vm.Editor.IncludeCogging" @bind:after="Vm.DraftChanged" />启用理想齿槽周期候选</label>
+                    <label class="check"><input type="checkbox" @bind="Vm.Editor.Symmetric" @bind:after="Vm.DraftChanged" />确认等槽、对称永磁理想结构假设</label>
+                    <label>假设依据（启用齿槽候选必填）<textarea @bind="Vm.Editor.Assumptions" @bind:after="Vm.DraftChanged" rows="3"></textarea></label>
+                    <p class="field-note">LCM(Q, 2p) 为理想周期，不处理偏心、斜槽与制造误差。不代表对应频率一定存在声压峰值。</p>
+                }
+                else
+                {
+                    <p class="field-note">槽通过和理想齿槽自动候选仅对本软件的无刷拓扑启用。有刷电机的其他电磁/槽效应请用自定义阶次并记录依据。</p>
+                }
+            }
+            @if (Vm.SelectedObject == "speed")
+            {
+                <div class="form-grid"><label>起始转速 r/min<input @bind="Vm.Editor.MinimumRpm" @bind:after="Vm.DraftChanged" /></label><label>终止转速 r/min<input @bind="Vm.Editor.MaximumRpm" @bind:after="Vm.DraftChanged" /></label><label>扫描步长 r/min<input @bind="Vm.Editor.StepRpm" @bind:after="Vm.DraftChanged" /></label><label>观察转速 r/min<input @bind="Vm.Editor.InspectRpm" @bind:after="Vm.DraftChanged" /></label></div>
+                <label>图表频率上限 Hz<input @bind="Vm.Editor.MaximumHz" @bind:after="Vm.DraftChanged" /></label>
+                <p class="field-note">0≤转速≤100000；终止值大于起始值；步长≥0.1，最多 2000 个区间。频率上限 1–1000000 Hz。交叠区间不受步长影响。</p>
+            }
+            @if (Vm.SelectedObject == "custom")
+            {
+                <p class="field-note">自定义候选位于下方“候选阶次与依据”。填写机械阶次 k 和可追溯依据后，用 f=k×n/60 计算。</p>
+                <a href="#orders">前往自定义候选</a>
+            }
+            <div class="inline-actions"><button class="primary" @onclick="Vm.ApplyMotor">应用电机条件</button><button @onclick="Vm.ResetDraft">恢复已应用值</button></div>
+            <p class="small muted">编辑为草稿；点击应用后才更新计算。切换结构对象保留草稿，打开项目与撤销会重置草稿。</p>
+        }
+    </aside>
+}
+
+========================================================================
+FILE: src/MotorFrequency.App/Components/Shared/MotorDrawing.razor
+========================================================================
+@inherits VmComponent
+@if (Vm.Current is not null)
+{
+    var motor = Vm.Current.Motor;
+    <div class="motor-board">
+        <div class="drawing-title"><span>结构示意 / 非尺寸模型</span><span>@Labels.Topology(motor.Topology)</span></div>
+        <div class="drawing-body">
+            <svg class="motor-svg" viewBox="0 0 320 320" role="img" aria-label="电机横截面结构示意">
+                <defs><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="#c8c9b9" stroke-width="1" /></pattern></defs>
+                <circle cx="160" cy="160" r="145" fill="url(#hatch)" stroke="#65766b" stroke-width="2" />
+                <circle cx="160" cy="160" r="132" fill="#f6f5ed" stroke="#65766b" />
+                @if (motor.Topology == MotorTopology.BrushlessPermanentMagnet)
+                {
+                    <g class="selectable @(Vm.SelectedObject == "slots" ? "selected-part" : "")" @onclick='() => Vm.SelectObject("slots")'>
+                        @for (var i = 0; i < Math.Min(motor.Slots, 72); i++)
+                        {
+                            var angle = i * 360.0 / Math.Min(motor.Slots, 72);
+                            <g transform="rotate(@N(angle) 160 160)"><rect x="153" y="33" width="14" height="31" rx="2" fill="#d1a463" stroke="#8d744e" /></g>
+                        }
+                        <title>选择定子槽，配置槽数与理想齿槽候选</title>
+                    </g>
+                }
+                @if (motor.Topology == MotorTopology.BrushedPermanentMagnet)
+                {
+                    <g class="selectable" @onclick='() => Vm.SelectObject("rotor")'>
+                        @for (var i = 0; i < Math.Min(2 * motor.PolePairs, 32); i++)
+                        {
+                            var count = Math.Min(2 * motor.PolePairs, 32);
+                            var start = i * 360.0 / count + 4;
+                            var end = (i + 1) * 360.0 / count - 4;
+                            <path d="@ChartGeometry.MotorArc(start, end, 116)" stroke="@(i % 2 == 0 ? "#1d6860" : "#b65f32")" fill="none" stroke-width="17" />
+                        }
+                        <title>有刷永磁电机外侧固定磁极；极对数仅作结构档案</title>
+                    </g>
+                }
+                <g class="selectable @(Vm.SelectedObject == "rotor" ? "selected-part" : "")" @onclick='() => Vm.SelectObject("rotor")'>
+                    <circle cx="160" cy="160" r="88" fill="#dfe8db" stroke="#426456" stroke-width="2" />
+                    @for (var i = 0; i < (motor.Topology == MotorTopology.BrushlessPermanentMagnet ? Math.Min(2 * motor.PolePairs, 32) : 0); i++)
+                    {
+                        var count = Math.Min(2 * motor.PolePairs, 32);
+                        var start = i * 360.0 / count + 3;
+                        var end = (i + 1) * 360.0 / count - 3;
+                        <path d="@ChartGeometry.MotorArc(start, end, 72)" stroke="@(i % 2 == 0 ? "#1d6860" : "#b65f32")" fill="none" stroke-width="18" />
+                    }
+                                        @if (motor.Topology == MotorTopology.BrushedPermanentMagnet)
+                    {
+                        <ellipse cx="160" cy="160" rx="69" ry="27" fill="none" stroke="#b38b4f" stroke-width="9" />
+                        <ellipse cx="160" cy="160" rx="69" ry="27" transform="rotate(60 160 160)" fill="none" stroke="#b38b4f" stroke-width="9" />
+                        <ellipse cx="160" cy="160" rx="69" ry="27" transform="rotate(120 160 160)" fill="none" stroke="#b38b4f" stroke-width="9" />
+                    }
+<circle cx="160" cy="160" r="25" fill="#f6f5ed" stroke="#426456" stroke-width="2" />
+                    <path d="M 157 136 H 164 V 148 H 157 Z" fill="#426456" />
+                    <title>选择转子与磁极；示意数量有显示上限</title>
+                </g>
+                @if (motor.Topology == MotorTopology.BrushedPermanentMagnet)
+                {
+                    <g class="selectable @(Vm.SelectedObject == "brush" ? "selected-part" : "")" @onclick='() => Vm.SelectObject("brush")'>
+                        <circle cx="160" cy="160" r="48" fill="#d9b97c" stroke="#7c623c" />
+                        @for (var i = 0; i < Math.Min(motor.CommutatorSegments, 32); i++)
+                        {
+                            <path transform="rotate(@N(i * 360.0 / Math.Min(motor.CommutatorSegments, 32)) 160 160)" d="M 160 113 V 133" stroke="#f6f5ed" stroke-width="2" />
+                        }
+                        <rect x="99" y="149" width="22" height="22" fill="#48554f" />
+                        <rect x="199" y="149" width="22" height="22" fill="#48554f" />
+                        <title>选择换向片与电刷；同心叠加示意，不表示真实轴向位置</title>
+                    </g>
+                }
+                <path d="M 18 160 H 302 M 160 18 V 302" stroke="#9da69b" stroke-dasharray="3 6" opacity=".5" pointer-events="none" />
+            </svg>
+            <div class="motor-callouts"><button class="object-button @(Vm.SelectedObject == "rotor" ? "active" : "")" @onclick='() => Vm.SelectObject("rotor")'><span class="object-dot rotor"></span><strong>转子与磁极</strong><small>p = @motor.PolePairs 极对</small></button>
+                @if (motor.Topology == MotorTopology.BrushlessPermanentMagnet)
+                {
+                    <button class="object-button @(Vm.SelectedObject == "slots" ? "active" : "")" @onclick='() => Vm.SelectObject("slots")'><span class="object-dot slots"></span><strong>定子槽与齿</strong><small>Q = @motor.Slots 槽</small></button>
+                }
+                else
+                {
+                    <button class="object-button @(Vm.SelectedObject == "brush" ? "active" : "")" @onclick='() => Vm.SelectObject("brush")'><span class="object-dot slots"></span><strong>换向器</strong><small>K = @motor.CommutatorSegments 片</small></button>
+                }
+                <button class="object-button @(Vm.SelectedObject == "speed" ? "active" : "")" @onclick='() => Vm.SelectObject("speed")'><span class="object-dot speed"></span><strong>转速与范围</strong><small>@Labels.Number(motor.MinimumRpm)–@Labels.Number(motor.MaximumRpm) r/min</small></button>
+                <button class="object-button @(Vm.SelectedObject == "project" ? "active" : "")" @onclick='() => Vm.SelectObject("project")'><span class="object-dot project"></span><strong>项目档案</strong><small>名称 · 负责人 · 目的</small></button></div>
+        </div>
+        <p class="small muted">示意图最多画出 72 槽、32 磁极/换向片；计算始终使用实际输入整数。有刷外侧为固定磁极，内侧为电枢绕组概念图，换向器为轴向同心叠加示意。</p>
+    </div>
+}
+
+========================================================================
+FILE: src/MotorFrequency.App/Components/Shared/OrderPanel.razor
+========================================================================
+@inherits VmComponent
+@if (Vm.Current is not null)
+{
+    <section id="orders" class="section">
+        <div class="section-heading"><div><span class="index">03</span><h2>候选阶次与依据</h2></div><p>机械阶次 k：每转对应的周期数</p></div>
+        <div class="table-scroll"><table><thead><tr><th>绘制</th><th>候选名称</th><th>类型</th><th>机械阶次</th><th>观察频率 Hz</th><th>计算依据</th></tr></thead><tbody>
+            @foreach (var candidate in Vm.Candidates)
+            {
+                <tr class="@(candidate.Id == Vm.SelectedCandidateId ? "selected-row" : "")"><td><input aria-label="显示 @candidate.Name" type="checkbox" checked="@candidate.Visible" @onchange="() => Vm.ToggleCandidate(candidate.Id)" /></td><td><button class="text-button" @onclick="() => Vm.SelectCandidate(candidate.Id)">@candidate.Name</button></td><td>@candidate.Category</td><td>@Labels.Number(candidate.Order)</td><td>@Labels.Number(FrequencyEngine.At(candidate.Order, Vm.Current.Motor.InspectRpm))</td><td><details><summary>@candidate.Formula</summary><p>@candidate.Basis</p></details></td></tr>
+            }
+        </tbody></table></div>
+        <details class="editor-fold"><summary>＋ 添加或管理自定义候选</summary>
+            <p>使用相对机械轴的阶次。允许非整数阶次；必须填写假设、文献、试验线索或其他依据，软件不自动认证其物理来源。</p>
+            <div class="form-grid three"><label>候选名称<input @bind="Vm.OrderName" /></label><label>阶次 k（0.001–10000）<input @bind="Vm.OrderValue" /></label><label>依据<input @bind="Vm.OrderBasis" /></label></div>
+            <button @onclick="Vm.AddOrder">添加候选</button>
+            @foreach (var order in Vm.Current.CustomOrders)
+            {
+                <div class="record-line"><span><strong>@order.Name</strong> · @Labels.Number(order.Order) 阶 · @order.Basis</span><button class="danger text-button" @onclick="() => Vm.RemoveOrder(order.Id)">删除候选</button></div>
+            }
+        </details>
+    </section>
+}
+
+========================================================================
+FILE: src/MotorFrequency.App/Components/Shared/ReviewPanel.razor
+========================================================================
+@inherits VmComponent
+@if (Vm.Current is not null)
+{
+    <details class="editor-fold">
+        <summary>项目输入核对表 · 逐项查看证据与后续动作</summary>
+        <p>下表说明资料完整性和使用条件，不是合格判定或自动诊断。请据此补充输入或安排试验。</p>
+        <div class="table-scroll">
+            <table>
+                <thead>
+                    <tr><th>核对对象</th><th>状态</th><th>当前证据</th><th>后续动作</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in ProjectReview.Inspect(Vm.Current))
+                    {
+                        <tr>
+                            <td>@item.Subject</td>
+                            <td>@item.State</td>
+                            <td>@item.Evidence</td>
+                            <td>@item.NextAction</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <button @onclick='() => Vm.Export("review")'>导出输入核对 JSON</button>
+    </details>
+}
+
+========================================================================
+FILE: src/MotorFrequency.App/Components/Shared/SpectrumChart.razor
+========================================================================
+@if (Spectrum is not null)
+{
+    var points = Spectrum.Points;
+    var visible = points.Where(x => x.FrequencyHz <= Motor.MaximumHz).ToList();
+    if (visible.Count == 0)
+    {
+        <p class="empty-inline">当前图表频率范围内没有频点，请在转速与范围检查器提高频率上限。</p>
+    }
+    else
+    {
+        var minimum = visible.Min(x => x.Amplitude);
+        var maximum = visible.Max(x => x.Amplitude);
+        var padding = Math.Max(1, (maximum - minimum) * 0.1);
+        minimum -= padding;
+        maximum += padding;
+        <svg class="spectrum-chart" viewBox="0 0 900 370" role="img" aria-label="选中频谱幅值及候选频率叠加图">
+            @for (var i = 0; i <= 5; i++)
+            {
+                var y = 316 - i * 292.0 / 5;
+                var amplitude = minimum + (maximum - minimum) * i / 5;
+                <line x1="68" x2="860" y1="@ChartGeometry.N(y)" y2="@ChartGeometry.N(y)" stroke="#e4e6dc" />
+                <g><text x="58" y="@ChartGeometry.N(y + 4)" text-anchor="end" class="axis-label">@Labels.Number(amplitude)</text></g>
+            }
+            @for (var i = 0; i <= 6; i++)
+            {
+                var x = 68 + i * 792.0 / 6;
+                var hz = Motor.MaximumHz * i / 6;
+                <g><text x="@ChartGeometry.N(x)" y="338" text-anchor="middle" class="axis-label">@Labels.Number(hz)</text></g>
+            }
+            @for (var i = 0; i < Candidates.Count; i++)
+            {
+                var candidate = Candidates[i];
+                var frequency = FrequencyEngine.At(candidate.Order, Spectrum.Rpm);
+                if (candidate.Visible && frequency <= Motor.MaximumHz)
+                {
+                    var x = 68 + frequency / Motor.MaximumHz * 792;
+                    <line x1="@ChartGeometry.N(x)" x2="@ChartGeometry.N(x)" y1="24" y2="316" stroke="@ChartGeometry.Color(i)" stroke-dasharray="4 5" opacity=".7"><title>@candidate.Name · @Labels.Number(frequency) Hz</title></line>
+                }
+            }
+            <polyline points="@ChartGeometry.SpectrumPolyline(Spectrum, Motor.MaximumHz, minimum, maximum)" fill="none" stroke="#233f36" stroke-width="1.5" />
+            <g><text x="10" y="17" class="axis-label">@Spectrum.Unit</text></g>
+            <g><text x="800" y="361" class="axis-label">频率 Hz</text></g>
+        </svg>
+        <p class="chart-note">实线：选中频谱；虚线：该频谱转速下的候选频率。每次只绘制一条幅值曲线，避免混用不同单位/工况。超过 1000 点时图形按区间保留极值抽稀，原始数据与峰值计算不抽稀。</p>
+    }
+}
+
+@code {
+    [Parameter, EditorRequired] public Spectrum Spectrum { get; set; } = default!;
+    [Parameter, EditorRequired] public MotorConfiguration Motor { get; set; } = default!;
+    [Parameter, EditorRequired] public IReadOnlyList<Candidate> Candidates { get; set; } = [];
+}
+
+========================================================================
+FILE: src/MotorFrequency.App/Components/Shared/SpectrumPanel.razor
+========================================================================
+@inherits VmComponent
+@if (Vm.Current is not null)
+{
+    <section id="spectrum" class="section">
+        <div class="section-heading">
+            <div><span class="index">05</span><h2>导入频谱与邻近核对</h2></div>
+            <p>定转速频谱 · 不执行 FFT 或声学校准</p>
+        </div>
+        <details class="editor-fold" open="@(Vm.Current.Spectra.Count == 0)">
+            <summary>＋ 导入 UTF-8 CSV 频谱</summary>
+            <p>文件仅含两列：<code>frequency_hz,amplitude</code>。频率为 Hz，需严格递增；小数点为英文句点。最多 1 MiB、10000 点；错误会整批拒绝，不排序、补零或跳过错误行。</p>
+            <div class="inline-actions">
+                <label class="file-button">选择 CSV<InputFile @key="Vm.CsvPickerVersion" OnChange="e => Vm.ReadCsv(e.File)" accept=".csv" /></label>
+                <button @onclick='() => Vm.Export("template")'>下载频谱模板</button>
+            </div>
+            <div class="form-grid three">
+                <label>频谱名称<input @bind="Vm.SpectrumName" /></label>
+                <label>采集转速 r/min<input @bind="Vm.SpectrumRpm" /></label>
+                <label>幅值单位<select aria-label="幅值单位" @bind="Vm.SpectrumUnit">
+                    <option>dB</option><option>Pa</option><option>m/s²</option><option>g</option><option>A</option><option>V</option><option>任意单位</option>
+                </select></label>
+                <label>参考量与幅值口径<input @bind="Vm.SpectrumReference" placeholder="如 dB re 20 μPa，窄带 RMS" /></label>
+                <label>工况与采集条件<input @bind="Vm.SpectrumCondition" placeholder="如负载、电压、测点、分辨率" /></label>
+                <label>来源<select aria-label="频谱来源" @bind="Vm.SpectrumOrigin">
+                    @foreach (var value in Enum.GetValues<DataOrigin>())
+                    {
+                        <option value="@value">@Labels.Origin(value)</option>
+                    }
+                </select></label>
+            </div>
+            <label>CSV 文本（可直接粘贴）<textarea class="code-input" rows="6" @bind="Vm.CsvText" spellcheck="false"></textarea></label>
+            <div class="inline-actions">
+                <button @onclick="Vm.PreviewCsv">预检频谱</button>
+                <button class="primary" @onclick="Vm.CommitCsv" disabled="@(Vm.Preview?.Success != true)">确认导入频谱</button>
+            </div>
+            @if (Vm.Preview is not null)
+            {
+                <p class="@(Vm.Preview.Success ? "success-note" : "warning")">解析 @Vm.Preview.ParsedRows 点；@(Vm.Preview.Success ? "预检通过，确认导入时将再次校验当前输入。" : "预检失败，未写入项目。")</p>
+            }
+        </details>
+        @if (Vm.Current.Spectra.Count == 0)
+        {
+            <p class="empty-inline">尚无频谱。可以仅用参数计算候选频率，导入频谱后再核对邻近关系。</p>
+        }
+        else
+        {
+            <div class="spectrum-list">
+                @foreach (var spectrum in Vm.Current.Spectra)
+                {
+                    <div class="spectrum-chip @(Vm.SelectedSpectrumId == spectrum.Id ? "active" : "")">
+                        <input aria-label="叠加 @spectrum.Name" type="checkbox" checked="@spectrum.Visible" @onchange="() => Vm.ToggleSpectrum(spectrum.Id)" />
+                        <button class="text-button" @onclick="() => Vm.SelectSpectrum(spectrum.Id)">@spectrum.Name</button>
+                        <small>@Labels.Number(spectrum.Rpm) r/min · @Labels.Origin(spectrum.Origin)</small>
+                        <button class="danger text-button" @onclick="() => Vm.RemoveSpectrum(spectrum.Id)">删除</button>
+                    </div>
+                }
+            </div>
+            @if (Vm.SelectedSpectrum is not null)
+            {
+                var spectrum = Vm.SelectedSpectrum;
+                <div class="source-summary">
+                    <span class="tag @(spectrum.Origin == DataOrigin.Simulated ? "demo" : "")">@Labels.Origin(spectrum.Origin)</span>
+                    <strong>@spectrum.Name</strong>
+                    <p>@Labels.Number(spectrum.Rpm) r/min · @spectrum.Points.Count 点 · @spectrum.Unit · @spectrum.Reference</p>
+                    <p>条件：@spectrum.Condition</p>
+                    <small>原文件：@spectrum.FileName · SHA-256：@spectrum.InputSha256</small>
+                </div>
+                var grid = SpectrumStatistics.Inspect(spectrum, Vm.Current.Motor.MaximumHz);
+                <div class="source-summary">
+                    <p>原始频率范围 @Labels.Number(grid.MinimumHz)–@Labels.Number(grid.MaximumHz) Hz；网格间距最小/中位/最大：@Labels.Number(grid.MinimumSpacingHz) / @Labels.Number(grid.MedianSpacingHz) / @Labels.Number(grid.MaximumSpacingHz) Hz。</p>
+                    <p>最大输入幅值 @Labels.Number(grid.MaximumAmplitude) @spectrum.Unit，位于 @Labels.Number(grid.MaximumAtHz) Hz；范围内 @grid.PointsInsideView / @grid.TotalPoints 点。</p>
+                    <small>@grid.Statement</small>
+                </div>
+                <SpectrumChart Spectrum="spectrum" Motor="Vm.Current.Motor" Candidates="Vm.Candidates" />
+                <div class="form-grid three">
+                    <label>绝对频差容差 Hz（0–1000）<input @bind="Vm.Tolerance" /></label>
+                    <label>每谱最多内部峰数（1–50）<input @bind="Vm.PeakCount" /></label>
+                    <div class="field-action"><button @onclick="Vm.ApplyReview">应用复核口径</button></div>
+                </div>
+                <p class="small muted">按内部局部极大点筛峰，再按幅值取前 N 个；不找端点峰，不做插值。容差是工程设置。候选在该频谱实际转速计算，同频候选全部保留。</p>
+                <div class="table-scroll">
+                    <table>
+                        <thead><tr><th>谱峰 Hz</th><th>幅值 @spectrum.Unit</th><th>邻近候选</th><th>计算 Hz</th><th>观测−计算 Hz</th></tr></thead>
+                        <tbody>
+                            @foreach (var row in Vm.PeakMatches)
+                            {
+                                <tr><td>@Labels.Number(row.ObservedHz)</td><td>@Labels.Number(row.Amplitude)</td><td>@row.CandidateName</td><td>@Display(row.ExpectedHz)</td><td>@Display(row.DifferenceHz)</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                @if (Vm.PeakMatches.Count == 0)
+                {
+                    <p class="empty-inline">当前频谱无内部局部极大点。可检查原始点表；软件不生成端点峰或合成峰。</p>
+                }
+                <p class="boundary">邻近只是频率关系。电流、振动与声学通道的同步试验、负载和转速变化，仍需用于区分候选来源。</p>
+                <details class="editor-fold">
+                    <summary>查看内嵌原始频点（前 100 点）</summary>
+                    <div class="table-scroll raw-table"><table><thead><tr><th>频率 Hz</th><th>幅值 @spectrum.Unit</th></tr></thead><tbody>
+                        @foreach (var point in spectrum.Points.Take(100))
+                        {
+                            <tr><td>@Labels.Number(point.FrequencyHz)</td><td>@Labels.Number(point.Amplitude)</td></tr>
+                        }
+                    </tbody></table></div>
+                    <button @onclick='() => Vm.Export("raw")'>导出全部原始频点 CSV</button>
+                    <p class="small muted">原始频点 CSV 为两列交换格式；来源、单位、参考量、工况和哈希保存在项目文件及复核报告中。请配套保留。</p>
+                </details>
+            }
+        }
+    </section>
+}
+
+========================================================================
+FILE: src/MotorFrequency.App/Components/Shared/SweepPanel.razor
+========================================================================
+@inherits VmComponent
+@inject IJSRuntime Js
+@if (Vm.Current is not null)
+{
+    <section id="sweep" class="section">
+        <div class="section-heading">
+            <div><span class="index">06a</span><h2>参数扫查与反算转速</h2></div>
+            <p>探索不同结构整数的频率关系，不改当前电机</p>
+        </div>
+        <details class="editor-fold">
+            <summary>展开参数扫查工具</summary>
+            <p>在当前拓扑及启用假设下枚举输入整数。每组最多 12 个值，用英文逗号分隔。扫查不进行绕组可行性、电磁力或声压预测；相近不表示优选。</p>
+            <div class="form-grid three">
+                @if (Vm.Current.Motor.Topology == MotorTopology.BrushlessPermanentMagnet)
+                {
+                    <label>极对数组 p<input @bind="Tool.PolePairs" /></label>
+                    <label>槽数组 Q<input @bind="Tool.Slots" /></label>
+                }
+                else
+                {
+                    <label>换向片数组 K<input @bind="Tool.Segments" /></label>
+                }
+                <label>参考转速 r/min<input @bind="Tool.ReferenceRpm" /></label>
+                <label>观察频率 Hz<input @bind="Tool.ObservedHz" /></label>
+                <label>绝对容差 Hz<input @bind="Tool.ToleranceHz" /></label>
+            </div>
+            <div class="inline-actions">
+                <button @onclick="Run">运行参数扫查与反算</button>
+                <button @onclick="Tool.Clear">清除扫查结果</button>
+            </div>
+            <p class="@(Tool.Error ? "warning" : "success-note")">@Tool.Summary</p>
+            @if (Tool.Stale(Vm.Current))
+            {
+                <p class="warning">当前电机或候选已变化，下方为历史扫查结果。请重新运行后再导出或使用。</p>
+            }
+            @if (Tool.Rows.Count > 0)
+            {
+                <label class="check"><input type="checkbox" @bind="Tool.OnlyNearby" />仅显示容差内候选</label>
+                <div class="table-scroll sweep-table">
+                    <table>
+                        <thead><tr><th>p / Q / K</th><th>候选</th><th>阶次</th><th>频率 Hz</th><th>计算−观察 Hz</th><th>容差内</th></tr></thead>
+                        <tbody>
+                            @foreach (var row in Tool.DisplayRows)
+                            {
+                                <tr><td>@row.PolePairs / @row.Slots / @row.Segments</td><td>@row.Candidate</td><td>@Labels.Number(row.Order)</td><td>@Labels.Number(row.FrequencyHz)</td><td>@Labels.Number(row.DifferenceHz)</td><td>@(row.WithinTolerance ? "是" : "否")</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <button disabled="@Tool.Stale(Vm.Current)" @onclick="Download">导出全部参数扫查 CSV</button>
+                <h3>当前方案的观察频率反算</h3>
+                <p>中心转速 n=60×观察频率/k；容差转速区间不裁切到扫描范围，仅另外标记中心是否位于范围内。不是测得的实际转速。</p>
+                <div class="table-scroll">
+                    <table>
+                        <thead><tr><th>当前候选</th><th>中心 r/min</th><th>容差区间 r/min</th><th>中心在扫描范围内</th></tr></thead>
+                        <tbody>
+                            @foreach (var row in Tool.ReverseRows)
+                            {
+                                <tr><td>@row.Candidate</td><td>@Labels.Number(row.CenterRpm)</td><td>@Labels.Number(row.LowerRpm)–@Labels.Number(row.UpperRpm)</td><td>@(row.WithinScan ? "是" : "否")</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <p class="small muted">扫查为会话工具，不随项目保存；需要留存时导出 CSV。结果对应已运行时输入，编辑工具草稿后请重新运行。</p>
+            }
+        </details>
+    </section>
+}
+
+@code {
+    private SweepViewModel Tool { get; } = new();
+
+    private void Run()
+    {
+        if (Vm.Current is not null)
+        {
+            Tool.Run(Vm.Current);
+        }
+    }
+
+    private async Task Download()
+    {
+        if (Vm.Current is null || Tool.Stale(Vm.Current)) return;
+        await Js.InvokeVoidAsync("motorFiles.download", "电机参数扫查.csv", "text/csv;charset=utf-8", "\uFEFF" + ParameterSweep.Csv(Vm.Current, Tool.Rows));
+    }
+}
+
+========================================================================
+FILE: src/MotorFrequency.App/Components/Shared/VmComponent.cs
+========================================================================
+using MotorFrequency.Core.Services;
+using System.ComponentModel;
+using Microsoft.AspNetCore.Components;
+using MotorFrequency.App.ViewModels;
+
+namespace MotorFrequency.App.Components.Shared;
+
+public abstract class VmComponent : ComponentBase, IDisposable
+{
+    [Inject] protected WorkspaceViewModel Vm { get; set; } = default!;
+
+    protected override void OnInitialized()
+    {
+        Vm.PropertyChanged += Changed;
+    }
+
+    private void Changed(object? sender, PropertyChangedEventArgs args)
+    {
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    protected static string N(double value) => ChartGeometry.N(value);
+    protected static string Display(double? value) => value is double number ? Labels.Number(number) : "—";
+
+    public void Dispose()
+    {
+        Vm.PropertyChanged -= Changed;
+        GC.SuppressFinalize(this);
+    }
+}
+
+========================================================================
+FILE: src/MotorFrequency.App/Components/Workspace.razor
+========================================================================
+@page "/"
+@inherits VmComponent
+@inject IJSRuntime Js
+
+<div class="shell">
+    <aside class="project-rail">
+        <a class="brand" href="/" aria-label="电机频率设计首页"><span class="brand-mark">m<span>ƒ</span></span><span>电机频率设计<span class="version">MOTOR FREQUENCY / V1.0</span></span></a>
+        <div class="rail-caption">项目工作簿</div>
+        <button class="primary wide" @onclick="Vm.NewProject">＋ 新建空白项目</button>
+        <button class="wide" @onclick="Vm.LoadDemo">载入独立模拟示例</button>
+        <label class="file-button">导入 .motorproj<InputFile OnChange="e => Vm.ImportProject(e.File)" accept=".motorproj" /></label>
+        @if (Vm.Current is not null)
+        {
+            <div class="project-card"><span class="dot"></span><strong>@Vm.Current.Name</strong><small>@(Vm.Current.Demonstration ? "模拟演示" : "普通项目") · @(Vm.Dirty ? "未保存" : "已保存")</small></div>
+            <nav class="object-tree" aria-label="工作对象">
+                <a href="#structure" @onclick='() => Vm.SelectObject("rotor")'><span>01</span> 电机结构与条件</a>
+                <a href="#frequency"><span>02</span> 频率—转速图</a>
+                <a href="#orders"><span>03</span> 候选阶次与依据</a>
+                <a href="#bands"><span>04</span> 结构敏感频段</a>
+                <a href="#spectrum"><span>05</span> 导入频谱与核对</a>
+                <a href="#comparison"><span>06</span> 方案快照比较</a>
+                <a href="#sweep"><span>06a</span> 参数扫查与反算</a>
+                <a href="#delivery"><span>07</span> 保存与输出</a>
+            </nav>
+        }
+        <div class="library-heading"><span>本机项目库</span><button class="text-button" @onclick="Vm.RefreshLibrary">刷新</button></div>
+        @if (Vm.Library.Count == 0)
+        {
+            <p class="muted small">尚无保存的项目。示例不会自动写入项目库。</p>
+        }
+        @foreach (var item in Vm.Library)
+        {
+            <div class="library-item">
+                <button class="library-open" @onclick="() => Vm.Open(item.Id)">@item.Name</button>
+                <small>@(item.Demonstration ? "模拟" : "普通") · @(item.Archived ? "已归档" : "可编辑") · @item.ModifiedAt.ToString("MM-dd HH:mm") UTC</small>
+                @if (item.HasBackup)
+                {
+                    <button class="text-button" @onclick="() => Vm.RestoreBackup(item.Id)">读取上一版备份为副本</button>
+                }
+            </div>
+        }
+        @foreach (var warning in Vm.LibraryWarnings)
+        {
+            <p class="warning small">@warning</p>
+        }
+        <div class="rail-foot">单机本地计算<br />参数与内嵌频谱随项目保存</div>
+    </aside>
+    <main>
+        <header class="document-header"><div><div class="eyebrow">ACCESSORY MOTOR / ENGINEERING NOTEBOOK</div><h1>汽车附件电机电磁激励频率设计软件</h1></div><span class="edition">V1.0</span></header>
+        <div class="status @(Vm.IsError ? "error" : "")" role="status" id="status-message">@Vm.Message</div>
+        @if (Vm.Current is null)
+        {
+            <section class="empty-state">
+                <div class="empty-illustration"><span>n</span><i>→</i><span>ƒ</span></div>
+                <div class="eyebrow">从结构出发，核对频率</div>
+                <h2>把一条音调，放回电机的转速与结构中。</h2>
+                <p>建立电机参数、候选阶次和参考依据，查看随转速变化的频率轨迹，再用频谱与结构关注频段做交叉核对。</p>
+                <div class="empty-actions"><button class="primary" @onclick="Vm.NewProject">新建空白项目</button><button @onclick="Vm.LoadDemo">打开 60 Hz 模拟案例</button></div>
+                <div class="empty-principles"><p><strong>01 / 结构对象</strong>直接选取磁极、槽或换向器，联动查看参数及公式。</p><p><strong>02 / 可追溯候选</strong>电频、运动学通过频率与假设候选分别保留依据。</p><p><strong>03 / 工程复核</strong>叠加定转速频谱、扫描关注区间并比较参数方案。</p></div>
+                <p class="boundary">@Software.Boundary</p>
+            </section>
+        }
+        else
+        {
+            <div class="project-strip"><div><span class="tag @(Vm.Current.Demonstration ? "demo" : "")">@(Vm.Current.Demonstration ? "模拟演示" : "普通项目")</span><strong>@Vm.Current.Name</strong><span class="muted">@(Vm.Current.Archived ? "已归档" : "编辑中")</span></div><div class="inline-actions"><button @onclick="Vm.Undo" disabled="@(!Vm.CanUndo)">撤销</button><button @onclick="Vm.Redo" disabled="@(!Vm.CanRedo)">重做</button><button class="primary" @onclick="Vm.Save">保存项目</button></div></div>
+            @if (Vm.HasDraftChanges)
+            {
+                <p class="warning">存在未应用的字段草稿。请在对应检查器应用条件、档案或复核口径；保存和导出只包含已应用输入。</p>
+            }
+            <section id="structure" class="section">
+                <div class="section-heading"><div><span class="index">01</span><h2>结构与工作条件</h2></div><p>点击结构对象，右侧检查器随之更新</p></div>
+                <div class="structure-layout"><MotorDrawing /><Inspector /></div>
+            </section>
+            <section id="frequency" class="section">
+                <div class="section-heading"><div><span class="index">02</span><h2>频率—转速图</h2></div><p>Hz × r/min · 直线为候选频率轨迹</p></div>
+                <FrequencyChart />
+            </section>
+            <OrderPanel />
+            <BandPanel />
+            <SpectrumPanel />
+            <ComparisonPanel />
+            <SweepPanel />
+            <DeliveryPanel />
+        }
+        <footer>@Software.Name @Software.Version<span>@Software.Boundary</span></footer>
+    </main>
+</div>
+@if (!string.IsNullOrEmpty(Vm.Confirmation))
+{
+    <div class="modal-backdrop"><section role="dialog" aria-modal="true" aria-labelledby="confirm-title" class="confirm-dialog"><h2 id="confirm-title">确认当前操作</h2><p>@Vm.Confirmation</p><div class="inline-actions"><button @onclick="Vm.Cancel">取消，保留当前工作</button><button class="primary" @onclick="Vm.Confirm">确认继续</button></div></section></div>
+}
+<div id="blazor-error-ui">界面连接中断或发生错误。请保留已下载/保存的项目，刷新后从项目库重开。<a href="/">重新载入</a></div>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await Js.InvokeVoidAsync("motorFiles.setDirty", Vm.Dirty || Vm.HasDraftChanges);
+    }
+}
+
+========================================================================
+FILE: src/MotorFrequency.App/Components/_Imports.razor
+========================================================================
+@using System.Globalization
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.JSInterop
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@using MotorFrequency.Core.Domain
+@using MotorFrequency.Core.Services
+@using MotorFrequency.App.ViewModels
+@using MotorFrequency.App.Components.Shared
+
+@using Microsoft.AspNetCore.Components.Routing
+
+========================================================================
+FILE: src/MotorFrequency.App/Program.cs
+========================================================================
+using MotorFrequency.App.Components;
+using MotorFrequency.App.ViewModels;
+using MotorFrequency.Core.Services;
+
+var builder = WebApplication.CreateBuilder(args);
+var port = builder.Configuration["port"] ?? "8774";
+if (!int.TryParse(port, out var number) || number is < 1024 or > 65535)
+{
+    throw new ArgumentException("--port 需为 1024～65535 的整数。");
+}
+builder.WebHost.UseStaticWebAssets();
+builder.WebHost.UseUrls("http://127.0.0.1:" + port);
+var directory = builder.Configuration["data-directory"] ?? Path.Combine(builder.Environment.ContentRootPath, "Data");
+builder.Services.AddSingleton(new ProjectStore(directory));
+builder.Services.AddScoped<WorkspaceViewModel>();
+builder.Services.AddRazorComponents().AddInteractiveServerComponents();
+builder.Services.AddServerSideBlazor().AddHubOptions(options => options.MaximumReceiveMessageSize = 1024 * 1024);
+var app = builder.Build();
+app.UseStaticFiles();
+app.UseAntiforgery();
+app.MapGet("/health", () => Results.Json(new { software = "MotorFrequency", version = "V1.0", status = "ready" }));
+app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
+app.Run();
+
+========================================================================
+FILE: src/MotorFrequency.App/ViewModels/MotorDraft.cs
+========================================================================
+using System.Globalization;
+using MotorFrequency.Core.Domain;
+using MotorFrequency.Core.Services;
+
+namespace MotorFrequency.App.ViewModels;
+
+public sealed class MotorDraft
+{
+    public string Name { get; set; } = "当前电机";
+    public MotorTopology Topology { get; set; }
+    public string PolePairs { get; set; } = "2";
+    public string Slots { get; set; } = "12";
+    public string Segments { get; set; } = "10";
+    public string MinimumRpm { get; set; } = "0";
+    public string MaximumRpm { get; set; } = "6000";
+    public string StepRpm { get; set; } = "100";
+    public string InspectRpm { get; set; } = "1800";
+    public string MaximumHz { get; set; } = "1500";
+    public bool IncludeSlotPass { get; set; } = true;
+    public bool IncludeCogging { get; set; }
+    public bool Symmetric { get; set; }
+    public string Assumptions { get; set; } = "";
+
+    public static MotorDraft From(MotorConfiguration motor)
+    {
+        return new MotorDraft
+        {
+            Name = motor.Name,
+            Topology = motor.Topology,
+            PolePairs = Labels.Number(motor.PolePairs),
+            Slots = Labels.Number(motor.Slots),
+            Segments = Labels.Number(motor.CommutatorSegments),
+            MinimumRpm = Labels.Number(motor.MinimumRpm),
+            MaximumRpm = Labels.Number(motor.MaximumRpm),
+            StepRpm = Labels.Number(motor.StepRpm),
+            InspectRpm = Labels.Number(motor.InspectRpm),
+            MaximumHz = Labels.Number(motor.MaximumHz),
+            IncludeSlotPass = motor.IncludeSlotPass,
+            IncludeCogging = motor.IncludeIdealCogging,
+            Symmetric = motor.SymmetricUnskewedAssumption,
+            Assumptions = motor.AssumptionNotes
+        };
+    }
+
+    public MotorConfiguration Build(MotorConfiguration previous)
+    {
+        var result = ProjectCodec.Clone(previous);
+        result.Name = Name.Trim();
+        result.Topology = Topology;
+        result.PolePairs = ParseInt(PolePairs, "极对数");
+        result.Slots = ParseInt(Slots, "槽数");
+        result.CommutatorSegments = ParseInt(Segments, "换向片数");
+        result.MinimumRpm = Parse(MinimumRpm, "起始转速");
+        result.MaximumRpm = Parse(MaximumRpm, "终止转速");
+        result.StepRpm = Parse(StepRpm, "扫描步长");
+        result.InspectRpm = Parse(InspectRpm, "观察转速");
+        result.MaximumHz = Parse(MaximumHz, "频率上限");
+        result.IncludeSlotPass = IncludeSlotPass;
+        result.IncludeIdealCogging = IncludeCogging;
+        result.SymmetricUnskewedAssumption = Symmetric;
+        result.AssumptionNotes = Assumptions.Trim();
+        return result;
+    }
+
+    public static double Parse(string value, string name)
+    {
+        if (!double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var number) || !double.IsFinite(number))
+        {
+            throw new InvalidDataException(name + "：请输入有限数值，小数点用英文句点。");
+        }
+        return number;
+    }
+
+    public static int ParseInt(string value, string name)
+    {
+        if (!int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var number))
+        {
+            throw new InvalidDataException(name + "：请输入整数。");
+        }
+        return number;
+    }
+}
+
+========================================================================
+FILE: src/MotorFrequency.App/ViewModels/SweepViewModel.cs
+========================================================================
+using MotorFrequency.Core.Domain;
+using MotorFrequency.Core.Services;
+
+namespace MotorFrequency.App.ViewModels;
+
+public sealed class SweepViewModel
+{
+    public string PolePairs { get; set; } = "1,2,3";
+    public string Slots { get; set; } = "6,12,18";
+    public string Segments { get; set; } = "8,10,12";
+    public string ReferenceRpm { get; set; } = "1800";
+    public string ObservedHz { get; set; } = "60";
+    public string ToleranceHz { get; set; } = "3";
+    public string InputHash { get; private set; } = "";
+    public string Summary { get; private set; } = "尚未运行参数扫查。";
+    public IReadOnlyList<SweepRow> Rows { get; private set; } = [];
+    public IReadOnlyList<ReverseRow> ReverseRows { get; private set; } = [];
+    public bool Error { get; private set; }
+    public bool OnlyNearby { get; set; }
+    public SweepRequest? LastRequest { get; private set; }
+
+    public IReadOnlyList<SweepRow> DisplayRows => OnlyNearby ? Rows.Where(x => x.WithinTolerance).ToList() : Rows;
+
+    public bool Stale(Project project)
+    {
+        return InputHash.Length > 0 && InputHash != ContextHash(project);
+    }
+
+    private static string ContextHash(Project project)
+    {
+        return ParameterSweep.ContextHash(project);
+    }
+
+    public void Run(Project project)
+    {
+        try
+        {
+            var request = new SweepRequest
+            {
+                ReferenceRpm = MotorDraft.Parse(ReferenceRpm, "参考转速"),
+                ObservedHz = MotorDraft.Parse(ObservedHz, "观察频率"),
+                ToleranceHz = MotorDraft.Parse(ToleranceHz, "容差")
+            };
+            if (project.Motor.Topology == MotorTopology.BrushlessPermanentMagnet)
+            {
+                request.PolePairs = ParameterSweep.ParseIntegers(PolePairs, "极对数组", 1, 64).ToList();
+                request.Slots = ParameterSweep.ParseIntegers(Slots, "槽数组", 1, 512).ToList();
+            }
+            else
+            {
+                request.Segments = ParameterSweep.ParseIntegers(Segments, "换向片数组", 2, 512).ToList();
+            }
+            Rows = ParameterSweep.Calculate(project, request);
+            ReverseRows = ParameterSweep.Reverse(project, request.ObservedHz, request.ToleranceHz);
+            LastRequest = request;
+            InputHash = ContextHash(project);
+            Error = false;
+            Summary = $"扫查完成：{Rows.Count} 条候选参考，{Rows.Count(x => x.WithinTolerance)} 条在 ±{Labels.Number(request.ToleranceHz)} Hz 内；不作可制造性或噪声优劣排序。";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or ArgumentException)
+        {
+            Rows = [];
+            ReverseRows = [];
+            LastRequest = null;
+            InputHash = "";
+            Error = true;
+            Summary = ex.Message;
+        }
+    }
+
+    public void Clear()
+    {
+        Rows = [];
+        ReverseRows = [];
+        InputHash = "";
+        LastRequest = null;
+        Error = false;
+        Summary = "扫查结果已清除；项目输入没有改变。";
+    }
+}
+
+========================================================================
+FILE: src/MotorFrequency.App/ViewModels/WorkspaceViewModel.cs
+========================================================================
+using System.ComponentModel;
+using System.Text;
+using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.JSInterop;
+using MotorFrequency.Core.Domain;
+using MotorFrequency.Core.Services;
+
+namespace MotorFrequency.App.ViewModels;
+
+public sealed class WorkspaceViewModel : INotifyPropertyChanged
+{
+    private readonly ProjectStore store;
+    private readonly IJSRuntime js;
+    private readonly Stack<string> undo = new();
+    private readonly Stack<string> redo = new();
+    private string? revision;
+    private string savedHash = "";
+    private Action? pending;
+    private string? pendingProjectText;
+    public event PropertyChangedEventHandler? PropertyChanged;
+    public Project? Current { get; private set; }
+    public MotorDraft Editor { get; private set; } = new();
+    public string SelectedObject { get; private set; } = "rotor";
+    public string SelectedCandidateId { get; private set; } = "electrical";
+    public Guid? SelectedSpectrumId { get; set; }
+    public Guid? SelectedScenarioId { get; set; }
+    public string Message { get; private set; } = "新建空白项目，或从独立示例开始。";
+    public bool IsError { get; private set; }
+    public string Confirmation { get; private set; } = "";
+    public string LastPath { get; private set; } = "尚未保存";
+    public IReadOnlyList<ProjectSummary> Library { get; private set; } = [];
+    public IReadOnlyList<string> LibraryWarnings { get; private set; } = [];
+    public string ProjectName { get; set; } = "附件电机频率项目";
+    public string Owner { get; set; } = "";
+    public string Purpose { get; set; } = "";
+    public string OrderName { get; set; } = "";
+    public string OrderValue { get; set; } = "2";
+    public string OrderBasis { get; set; } = "";
+    public string BandName { get; set; } = "";
+    public string BandLower { get; set; } = "55";
+    public string BandUpper { get; set; } = "65";
+    public string BandBasis { get; set; } = "";
+    public DataOrigin BandOrigin { get; set; }
+    public string SpectrumName { get; set; } = "";
+    public string SpectrumRpm { get; set; } = "1800";
+    public string SpectrumUnit { get; set; } = "dB";
+    public string SpectrumReference { get; set; } = "";
+    public string SpectrumCondition { get; set; } = "";
+    public DataOrigin SpectrumOrigin { get; set; }
+    public string CsvText { get; set; } = "";
+    public int CsvPickerVersion { get; private set; }
+    public string CsvFileName { get; private set; } = "手动粘贴.csv";
+    public CsvImportResult? Preview { get; private set; }
+    public string ScenarioName { get; set; } = "";
+    public string Tolerance { get; set; } = "3";
+    public string PeakCount { get; set; } = "10";
+    public string ReviewNotes { get; set; } = "";
+    public bool HasDraftChanges
+    {
+        get
+        {
+            if (Current is null) return false;
+            if (ProjectName != Current.Name || Owner != Current.Owner || Purpose != Current.Purpose)
+            {
+                return true;
+            }
+            if (Tolerance != Labels.Number(Current.Review.MatchToleranceHz)
+                || PeakCount != Current.Review.MaximumPeaks.ToString()
+                || ReviewNotes != Current.Review.Notes)
+            {
+                return true;
+            }
+            var applied = MotorDraft.From(Current.Motor);
+            return Editor.Name != applied.Name
+                || Editor.Topology != applied.Topology
+                || Editor.PolePairs != applied.PolePairs
+                || Editor.Slots != applied.Slots
+                || Editor.Segments != applied.Segments
+                || Editor.MinimumRpm != applied.MinimumRpm
+                || Editor.MaximumRpm != applied.MaximumRpm
+                || Editor.StepRpm != applied.StepRpm
+                || Editor.InspectRpm != applied.InspectRpm
+                || Editor.MaximumHz != applied.MaximumHz
+                || Editor.IncludeSlotPass != applied.IncludeSlotPass
+                || Editor.IncludeCogging != applied.IncludeCogging
+                || Editor.Symmetric != applied.Symmetric
+                || Editor.Assumptions != applied.Assumptions;
+        }
+    }
+
+    public void DraftChanged()
+    {
+        Notify();
+    }
+
+    public bool CanUndo => undo.Count > 0;
+    public bool CanRedo => redo.Count > 0;
+    public bool Dirty => Current is not null && ProjectCodec.Hash(ProjectCodec.Serialize(Current)) != savedHash;
+    public IReadOnlyList<Candidate> Candidates => Current is null ? [] : FrequencyEngine.Candidates(Current.Motor, Current.CustomOrders);
+    public Candidate? SelectedCandidate => Candidates.FirstOrDefault(x => x.Id == SelectedCandidateId);
+    public Spectrum? SelectedSpectrum => Current?.Spectra.FirstOrDefault(x => x.Id == SelectedSpectrumId);
+    public Scenario? SelectedScenario => Current?.Scenarios.FirstOrDefault(x => x.Id == SelectedScenarioId);
+    public IReadOnlyList<BandCrossing> Crossings => Current is null ? [] : FrequencyEngine.Crossings(Current);
+    public IReadOnlyList<PeakMatch> PeakMatches => Current is null || SelectedSpectrum is null ? [] : FrequencyEngine.MatchPeaks(Current, SelectedSpectrum);
+    public IReadOnlyList<ComparisonRow> Comparison => Current is null || SelectedScenario is null ? [] : FrequencyEngine.Compare(Current, SelectedScenario);
+    public IReadOnlyList<string> QualityNotes => Current is null ? [] : FrequencyEngine.QualityNotes(Current);
+    public string StorePath => store.DirectoryPath;
+
+    public WorkspaceViewModel(ProjectStore store, IJSRuntime js)
+    {
+        this.store = store;
+        this.js = js;
+        RefreshLibrary();
+    }
+
+    public void RefreshLibrary()
+    {
+        Execute(() =>
+        {
+            Library = store.List(out var warnings);
+            LibraryWarnings = warnings;
+        }, "项目库已刷新。" );
+    }
+
+    public void NewProject()
+    {
+        ReplaceGuard(() => SetCurrent(new Project(), null), "新建空白项目会离开当前未保存工作。");
+    }
+
+    public void LoadDemo()
+    {
+        ReplaceGuard(() => SetCurrent(Demonstration.Create(), null), "载入独立模拟示例会离开当前未保存工作。");
+    }
+
+    public void DuplicateProject()
+    {
+        if (Current is null) return;
+        var copy = ProjectCodec.Duplicate(Current);
+        ReplaceGuard(() => SetCurrent(copy, null), "复制会打开新项目；请先保存原项目中需要保留的修改。");
+    }
+
+    public void Open(Guid id)
+    {
+        ReplaceGuard(() =>
+        {
+            var read = store.Open(id);
+            SetCurrent(read.Project, read.Revision);
+            LastPath = Path.Combine(store.DirectoryPath, id.ToString("N") + Software.Extension);
+        }, "打开磁盘项目会替换当前未保存工作。");
+    }
+
+    public void RestoreBackup(Guid id)
+    {
+        ReplaceGuard(() => SetCurrent(store.ReadBackupAsCopy(id), null), "读取备份会打开一个副本，替换当前未保存工作。");
+    }
+
+    private void ReplaceGuard(Action action, string warning)
+    {
+        if (Dirty || HasDraftChanges)
+        {
+            Ask(warning + " 确认继续？", action);
+        }
+        else
+        {
+            Execute(action, "工作项目已打开。" );
+        }
+    }
+
+    private void SetCurrent(Project project, string? readRevision)
+    {
+        Current = project;
+        revision = readRevision;
+        savedHash = readRevision is null ? "" : ProjectCodec.Hash(ProjectCodec.Serialize(project));
+        LastPath = readRevision is null ? "尚未保存；关闭前请保存或下载项目" : LastPath;
+        undo.Clear();
+        redo.Clear();
+        SelectedObject = "rotor";
+        SelectedCandidateId = "electrical";
+        SelectedSpectrumId = project.Spectra.FirstOrDefault()?.Id;
+        SelectedScenarioId = project.Scenarios.FirstOrDefault()?.Id;
+        Preview = null;
+        CsvText = "";
+        SyncDrafts();
+    }
+
+    private void SyncDrafts()
+    {
+        if (Current is null) return;
+        Editor = MotorDraft.From(Current.Motor);
+        ProjectName = Current.Name;
+        Owner = Current.Owner;
+        Purpose = Current.Purpose;
+        Tolerance = Labels.Number(Current.Review.MatchToleranceHz);
+        PeakCount = Current.Review.MaximumPeaks.ToString();
+        ReviewNotes = Current.Review.Notes;
+        SpectrumRpm = Labels.Number(Current.Motor.InspectRpm);
+    }
+
+    private void Mutate(string action, string detail, Action<Project> change)
+    {
+        Execute(() =>
+        {
+            if (Current is null) throw new InvalidDataException("请先新建项目。");
+            if (Current.Archived && action != "取消归档") throw new InvalidDataException("项目已归档；请先取消归档，或复制项目。");
+            var before = ProjectCodec.Serialize(Current);
+            var next = ProjectCodec.Clone(Current);
+            change(next);
+            next.ModifiedAt = DateTimeOffset.UtcNow;
+            next.History.Add(new AuditEvent { Action = action, Detail = detail });
+            if (next.History.Count > 2000) next.History.RemoveRange(0, next.History.Count - 2000);
+            ProjectValidator.ThrowIfInvalid(next);
+            undo.Push(before);
+            if (undo.Count > 30)
+            {
+                var keep = undo.Take(30).Reverse().ToList();
+                undo.Clear();
+                foreach (var text in keep) undo.Push(text);
+            }
+            redo.Clear();
+            Current = next;
+        }, action + "完成；结果已按当前输入更新。" );
+    }
+
+    public void ApplyMetadata()
+    {
+        Mutate("更新项目档案", ProjectName, p =>
+        {
+            p.Name = ProjectName.Trim();
+            p.Owner = Owner.Trim();
+            p.Purpose = Purpose.Trim();
+        });
+    }
+
+    public void ApplyMotor()
+    {
+        Mutate("应用电机条件", "电机参数或拓扑变更，频率及历史频谱邻近关系重新计算", p => p.Motor = Editor.Build(p.Motor));
+    }
+
+    public void ResetDraft()
+    {
+        SyncDrafts();
+        Notify();
+    }
+
+    public void SelectObject(string key)
+    {
+        SelectedObject = key;
+        var candidate = Candidates.FirstOrDefault(x => x.ObjectKey == key);
+        if (candidate is not null) SelectedCandidateId = candidate.Id;
+        Notify();
+    }
+
+    public void SelectCandidate(string id)
+    {
+        var candidate = Candidates.FirstOrDefault(x => x.Id == id);
+        if (candidate is null) return;
+        SelectedCandidateId = id;
+        SelectedObject = candidate.ObjectKey;
+        Notify();
+    }
+
+    public void SetInspect(string value)
+    {
+        Mutate("移动观察转速", value + " r/min", p => p.Motor.InspectRpm = MotorDraft.Parse(value, "观察转速"));
+        if (Current is not null) Editor.InspectRpm = Labels.Number(Current.Motor.InspectRpm);
+    }
+
+    public void ToggleCandidate(string id)
+    {
+        Mutate("切换候选显示", id, p =>
+        {
+            if (p.Motor.HiddenCandidates.Contains(id)) p.Motor.HiddenCandidates.Remove(id);
+            else p.Motor.HiddenCandidates.Add(id);
+        });
+    }
+
+    public void AddOrder()
+    {
+        Mutate("添加自定义候选", OrderName, p => p.CustomOrders.Add(new CustomOrder
+        {
+            Name = OrderName.Trim(),
+            Order = MotorDraft.Parse(OrderValue, "自定义阶次"),
+            Basis = OrderBasis.Trim()
+        }));
+        if (!IsError)
+        {
+            OrderName = "";
+            OrderBasis = "";
+        }
+    }
+
+    public void RemoveOrder(Guid id)
+    {
+        Ask("删除该自定义候选？方案快照中的历史副本仍保留。", () => Mutate("删除自定义候选", id.ToString(), p =>
+        {
+            p.CustomOrders.RemoveAll(x => x.Id == id);
+            p.Motor.HiddenCandidates.Remove("custom:" + id);
+        }));
+    }
+
+    public void AddBand()
+    {
+        Mutate("添加敏感频段", BandName, p => p.Bands.Add(new SensitiveBand
+        {
+            Name = BandName.Trim(),
+            LowerHz = MotorDraft.Parse(BandLower, "频段下限"),
+            UpperHz = MotorDraft.Parse(BandUpper, "频段上限"),
+            Basis = BandBasis.Trim(),
+            Origin = BandOrigin
+        }));
+    }
+
+    public void ToggleBand(Guid id)
+    {
+        Mutate("切换频段", id.ToString(), p =>
+        {
+            var band = p.Bands.First(x => x.Id == id);
+            band.Enabled = !band.Enabled;
+        });
+    }
+
+    public void RemoveBand(Guid id)
+    {
+        Ask("删除该敏感频段？", () => Mutate("删除敏感频段", id.ToString(), p => p.Bands.RemoveAll(x => x.Id == id)));
+    }
+
+    public async Task ReadCsv(IBrowserFile file)
+    {
+        await ExecuteAsync(async () =>
+        {
+            if (!file.Name.EndsWith(".csv", StringComparison.OrdinalIgnoreCase)) throw new InvalidDataException("请选择 .csv 文件。");
+            using var stream = file.OpenReadStream(SpectrumCsv.MaximumBytes);
+            using var reader = new StreamReader(stream, new UTF8Encoding(false, true));
+            CsvText = await reader.ReadToEndAsync();
+            CsvFileName = file.Name;
+            CsvPickerVersion++;
+            if (string.IsNullOrWhiteSpace(SpectrumName)) SpectrumName = Path.GetFileNameWithoutExtension(file.Name);
+            Preview = null;
+        }, "CSV 已读取。填写元数据后点击预检，确认后导入。" );
+    }
+
+    private CsvImportResult ParseCsv()
+    {
+        return SpectrumCsv.Parse(CsvText, new SpectrumMetadata(SpectrumName.Trim(), MotorDraft.Parse(SpectrumRpm, "频谱转速"), SpectrumUnit, SpectrumReference.Trim(), SpectrumCondition.Trim(), SpectrumOrigin, CsvFileName));
+    }
+
+    public void PreviewCsv()
+    {
+        Execute(() =>
+        {
+            Preview = ParseCsv();
+            if (!Preview.Success) throw new InvalidDataException(string.Join("\n", Preview.Issues.Select(x => x.Path + "：" + x.Message)));
+        }, "预检通过；尚未写入项目。请核对频点数和元数据，再确认导入。" );
+    }
+
+    public void CommitCsv()
+    {
+        Mutate("导入频谱", CsvFileName + "；所有点内嵌保存", p =>
+        {
+            var parsed = ParseCsv();
+            if (!parsed.Success) throw new InvalidDataException(string.Join("\n", parsed.Issues.Select(x => x.Path + "：" + x.Message)));
+            p.Spectra.Add(parsed.Spectrum!);
+            SelectedSpectrumId = parsed.Spectrum!.Id;
+        });
+        if (!IsError) Preview = null;
+    }
+
+    public void SelectSpectrum(Guid id)
+    {
+        SelectedSpectrumId = id;
+        Notify();
+    }
+
+    public void ToggleSpectrum(Guid id)
+    {
+        Mutate("切换频谱叠加", id.ToString(), p =>
+        {
+            var spectrum = p.Spectra.First(x => x.Id == id);
+            spectrum.Visible = !spectrum.Visible;
+        });
+    }
+
+    public void RemoveSpectrum(Guid id)
+    {
+        Ask("删除该频谱及其内嵌频点？", () =>
+        {
+            Mutate("删除频谱", id.ToString(), p => p.Spectra.RemoveAll(x => x.Id == id));
+            if (SelectedSpectrumId == id) SelectedSpectrumId = Current?.Spectra.FirstOrDefault()?.Id;
+        });
+    }
+
+    public void CaptureScenario()
+    {
+        Mutate("记录方案快照", ScenarioName, p =>
+        {
+            var scenario = new Scenario
+            {
+                Name = ScenarioName.Trim(),
+                Motor = ProjectCodec.Clone(p.Motor),
+                CustomOrders = ProjectCodec.Clone(p.CustomOrders),
+                Demonstration = p.Demonstration
+            };
+            p.Scenarios.Add(scenario);
+            SelectedScenarioId = scenario.Id;
+        });
+    }
+
+    public void SelectScenario(Guid id)
+    {
+        SelectedScenarioId = id;
+        Notify();
+    }
+
+    public void RemoveScenario(Guid id)
+    {
+        Ask("删除该方案快照？", () =>
+        {
+            Mutate("删除方案快照", id.ToString(), p => p.Scenarios.RemoveAll(x => x.Id == id));
+            if (SelectedScenarioId == id) SelectedScenarioId = Current?.Scenarios.FirstOrDefault()?.Id;
+        });
+    }
+
+    public void ApplyReview()
+    {
+        Mutate("更新复核口径", "重新筛选谱峰邻近候选，不改变原始频点", p =>
+        {
+            p.Review.MatchToleranceHz = MotorDraft.Parse(Tolerance, "绝对频差容差");
+            p.Review.MaximumPeaks = MotorDraft.ParseInt(PeakCount, "谱峰数量");
+            p.Review.Notes = ReviewNotes;
+        });
+    }
+
+    public void ToggleArchive()
+    {
+        if (Current is null) return;
+        var archived = Current.Archived;
+        Ask(archived ? "取消项目归档并继续编辑？" : "归档后将暂停内容编辑，仍可保存、下载和复制。确认归档？", () => Mutate(archived ? "取消归档" : "归档项目", "用户确认", p => p.Archived = !p.Archived));
+    }
+
+    public void Undo()
+    {
+        Execute(() =>
+        {
+            if (Current is null || undo.Count == 0) return;
+            redo.Push(ProjectCodec.Serialize(Current));
+            var restored = ProjectCodec.Parse(undo.Pop());
+            restored.History = ProjectCodec.Clone(Current.History);
+            restored.History.Add(new AuditEvent { Action = "撤销", Detail = "恢复上一个输入状态；审计记录保留" });
+            if (restored.History.Count > 2000) restored.History.RemoveRange(0, restored.History.Count - 2000);
+            restored.ModifiedAt = DateTimeOffset.UtcNow;
+            Current = restored;
+            SyncDrafts();
+        }, "已撤销；请检查后保存。" );
+    }
+
+    public void Redo()
+    {
+        Execute(() =>
+        {
+            if (Current is null || redo.Count == 0) return;
+            undo.Push(ProjectCodec.Serialize(Current));
+            var restored = ProjectCodec.Parse(redo.Pop());
+            restored.History = ProjectCodec.Clone(Current.History);
+            restored.History.Add(new AuditEvent { Action = "重做", Detail = "恢复下一输入状态；审计记录保留" });
+            if (restored.History.Count > 2000) restored.History.RemoveRange(0, restored.History.Count - 2000);
+            restored.ModifiedAt = DateTimeOffset.UtcNow;
+            Current = restored;
+            SyncDrafts();
+        }, "已重做；请检查后保存。" );
+    }
+
+    public void Save()
+    {
+        Execute(() =>
+        {
+            if (Current is null) throw new InvalidDataException("请先新建项目。");
+            var written = store.Save(Current, revision);
+            revision = written.Revision;
+            savedHash = ProjectCodec.Hash(ProjectCodec.Serialize(Current));
+            LastPath = written.Path;
+            Library = store.List(out var warnings);
+            LibraryWarnings = warnings;
+        }, "已保存到本机项目库；再次保存会保留上一版 .bak。未应用的输入草稿不包含在保存中。" );
+    }
+
+    public async Task ImportProject(IBrowserFile file)
+    {
+        await ExecuteAsync(async () =>
+        {
+            if (!file.Name.EndsWith(Software.Extension, StringComparison.OrdinalIgnoreCase)) throw new InvalidDataException("请选择 .motorproj 项目文件。");
+            using var stream = file.OpenReadStream(ProjectCodec.MaximumFileBytes);
+            using var reader = new StreamReader(stream, new UTF8Encoding(false, true));
+            var text = await reader.ReadToEndAsync();
+            _ = ProjectCodec.Parse(text);
+            pendingProjectText = text;
+            ReplaceGuard(() =>
+            {
+                SetCurrent(ProjectCodec.Parse(pendingProjectText!), null);
+                pendingProjectText = null;
+            }, "导入将替换当前工作。相同标识的磁盘文件不会被直接覆盖。");
+        }, "项目已校验；若出现确认框，请决定是否离开当前工作。" );
+    }
+
+    public async Task Export(string kind)
+    {
+        await ExecuteAsync(async () =>
+        {
+            if (kind == "template")
+            {
+                await Download("频谱导入模板.csv", "text/csv;charset=utf-8", SpectrumCsv.Template(), true);
+                return;
+            }
+            if (Current is null) throw new InvalidDataException("请先打开项目。");
+            var name = ExportService.SafeName(Current.Name);
+            switch (kind)
+            {
+                case "review":
+                    await Download(name + "-输入核对.json", "application/json", ProjectReview.Json(Current));
+                    break;
+                case "project":
+                    await Download(name + Software.Extension, "application/json", ProjectCodec.Serialize(Current));
+                    break;
+                case "frequency":
+                    await Download(name + "-频率扫描.csv", "text/csv;charset=utf-8", ExportService.FrequencyCsv(Current), true);
+                    break;
+                case "crossing":
+                    await Download(name + "-频段交叠.csv", "text/csv;charset=utf-8", ExportService.CrossingCsv(Current), true);
+                    break;
+                case "evidence":
+                    await Download(name + "-谱峰核对.csv", "text/csv;charset=utf-8", ExportService.EvidenceCsv(Current), true);
+                    break;
+                case "comparison":
+                    if (SelectedScenario is null) throw new InvalidDataException("请先选中方案快照。");
+                    await Download(name + "-方案比较.csv", "text/csv;charset=utf-8", ExportService.ComparisonCsv(Current, SelectedScenario), true);
+                    break;
+                case "svg":
+                    await Download(name + "-频率图.svg", "image/svg+xml;charset=utf-8", new ChartGeometry(Current.Motor).Svg(Current));
+                    break;
+                case "html":
+                    await Download(name + "-复核报告.html", "text/html;charset=utf-8", ExportService.Html(Current));
+                    break;
+                case "raw":
+                    if (SelectedSpectrum is null) throw new InvalidDataException("请先选中频谱。");
+                    await Download(ExportService.SafeName(SelectedSpectrum.Name) + "-原始频点.csv", "text/csv;charset=utf-8", SpectrumCsv.Export(SelectedSpectrum), true);
+                    break;
+                default:
+                    throw new InvalidDataException("不支持的导出类型。");
+            }
+        }, "已发起浏览器下载；目标为浏览器下载目录，请在下载列表核实文件。导出使用已应用输入。" );
+    }
+
+    private async Task Download(string name, string mime, string text, bool bom = false)
+    {
+        await js.InvokeVoidAsync("motorFiles.download", name, mime, (bom ? "\uFEFF" : "") + text);
+    }
+
+    private void Ask(string text, Action action)
+    {
+        Confirmation = text;
+        pending = action;
+        Notify();
+    }
+
+    public void Confirm()
+    {
+        var action = pending;
+        pending = null;
+        Confirmation = "";
+        if (action is not null)
+        {
+            Execute(action, null);
+        }
+    }
+
+    public void Cancel()
+    {
+        pending = null;
+        pendingProjectText = null;
+        Confirmation = "";
+        Notify();
+    }
+
+    private void Execute(Action action, string? success)
+    {
+        try
+        {
+            action();
+            if (success is not null)
+            {
+                Message = success;
+                IsError = false;
+            }
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException or ArgumentException or InvalidOperationException)
+        {
+            Message = ex.Message;
+            IsError = true;
+        }
+        Notify();
+    }
+
+    private async Task ExecuteAsync(Func<Task> action, string success)
+    {
+        try
+        {
+            await action();
+            Message = success;
+            IsError = false;
+        }
+        catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException or ArgumentException or InvalidOperationException or JSException)
+        {
+            Message = ex.Message;
+            IsError = true;
+        }
+        Notify();
+    }
+
+    private void Notify()
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
+    }
+}
+
+========================================================================
+FILE: src/MotorFrequency.App/wwwroot/app.css
+========================================================================
+:root {
+    color-scheme: light;
+    --ink: #263d34;
+    --muted: #6c766c;
+    --paper: #faf9f3;
+    --canvas: #eeeee4;
+    --line: #d9ddd0;
+    --green: #1d6860;
+    --rust: #ac542f;
+    --ochre: #b19136;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 20px; }
+body {
+    margin: 0;
+    font-family: "Noto Sans CJK SC", "Microsoft YaHei", system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--ink);
+    background: var(--canvas);
+}
+button, input, textarea, select { font: inherit; }
+button, .file-button {
+    cursor: pointer;
+    border: 1px solid #bbc5b8;
+    background: #fffef8;
+    color: var(--ink);
+    padding: 7px 13px;
+    border-radius: 3px;
+    transition: background .15s, border-color .15s;
+}
+button:hover, .file-button:hover { background: #e9eee3; border-color: #6f8977; }
+button:disabled { opacity: .42; cursor: default; }
+button:focus-visible, a:focus-visible, summary:focus-visible {
+    outline: 3px solid #bf9652;
+    outline-offset: 3px;
+}
+a { color: var(--green); }
+button.primary { background: var(--green); border-color: var(--green); color: #fffef5; }
+button.primary:hover { background: #174e48; }
+button.text-button {
+    border: 0;
+    background: transparent;
+    padding: 2px 4px;
+    text-align: left;
+    color: var(--green);
+}
+button.text-button:hover { background: #e7ecdf; }
+button.danger { color: #a34228; }
+label {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 12px;
+    font-size: 12px;
+    color: #50604e;
+}
+input:not([type="checkbox"]):not([type="range"]), textarea, select {
+    width: 100%;
+    min-width: 0;
+    border: 1px solid #bfc9b9;
+    border-radius: 2px;
+    background: #fffef9;
+    padding: 8px 9px;
+    color: var(--ink);
+    outline-color: var(--green);
+    font-size: 14px;
+}
+textarea { resize: vertical; }
+input[type="checkbox"] {
+    accent-color: var(--green);
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+input[type="range"] { accent-color: var(--green); }
+.check { flex-direction: row; align-items: center; gap: 8px; margin: 9px 0; }
+small, .small { font-size: 11px; line-height: 1.65; }
+.muted { color: var(--muted); }
+.shell {
+    display: grid;
+    grid-template-columns: 242px minmax(0, 1fr);
+    max-width: 1920px;
+    margin: 0 auto;
+    min-height: 100vh;
+}
+.project-rail {
+    background: #e4e7da;
+    border-right: 1px solid #c8cebd;
+    padding: 25px 19px;
+    position: sticky;
+    top: 0;
+    align-self: start;
+    height: 100vh;
+    overflow-y: auto;
+}
+.brand {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 40px;
+    text-decoration: none;
+    color: var(--ink);
+    font-weight: 700;
+}
+.brand-mark {
+    font-family: Georgia, serif;
+    font-size: 30px;
+    line-height: 42px;
+    width: 42px;
+    text-align: center;
+    border: 1px solid #5d7664;
+    position: relative;
+}
+.brand-mark span { color: var(--rust); font-size: 18px; }
+.version {
+    display: block;
+    font-size: 8px;
+    letter-spacing: 1px;
+    font-weight: normal;
+    margin-top: 3px;
+}
+.rail-caption, .library-heading, .eyebrow {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+}
+.rail-caption { margin-bottom: 12px; }
+.wide { width: 100%; margin-bottom: 8px; text-align: left; }
+.file-button {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-size: 12px;
+    position: relative;
+    overflow: hidden;
+}
+.file-button input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    width: 100%;
+    cursor: pointer;
+}
+.project-card {
+    background: #f2f3e9;
+    border-left: 3px solid var(--green);
+    padding: 12px;
+    margin-top: 25px;
+    overflow-wrap: anywhere;
+}
+.project-card small { display: block; padding-top: 7px; color: var(--muted); }
+.object-tree { margin: 16px 0 28px; display: grid; gap: 2px; }
+.object-tree a { padding: 9px 5px; text-decoration: none; color: #415745; font-size: 12px; }
+.object-tree a:hover { background: #d4dece; }
+.object-tree a span { font-family: monospace; color: #87917f; margin-right: 10px; }
+.library-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #bdc7b6;
+    padding-top: 16px;
+    margin-top: 30px;
+    letter-spacing: 1px;
+}
+.library-item { padding: 12px 0; border-bottom: 1px solid #ccd2c2; overflow-wrap: anywhere; }
+.library-open {
+    display: block;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    text-align: left;
+    font-size: 12px;
+}
+.library-item small { display: block; color: var(--muted); margin-top: 4px; }
+.rail-foot { color: #78816e; font-size: 10px; margin-top: 45px; }
+main { min-width: 0; padding: 27px 32px 0; }
+.document-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    align-items: center;
+    border-bottom: 1px solid #bfc8b7;
+    padding-bottom: 18px;
+}
+h1 { margin: 5px 0 0; font-size: 22px; font-weight: 600; letter-spacing: .5px; }
+h2, h3, p { margin-top: 0; }
+h2 { font-size: 18px; font-weight: 600; margin-bottom: 0; }
+h3 { font-size: 15px; margin: 18px 0 12px; }
+.edition { font: 12px monospace; color: var(--muted); border: 1px solid #bac6b3; padding: 4px 10px; }
+.status {
+    background: #e6ede0;
+    border-left: 3px solid #6f8e73;
+    padding: 10px 15px;
+    font-size: 12px;
+    margin: 16px 0;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+.status.error { border-color: #a4472c; background: #f8e5d7; color: #8b3924; }
+.project-strip { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; align-items: center; margin: 20px 0; }
+.project-strip strong { margin: 0 12px; overflow-wrap: anywhere; }
+.inline-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.tag { display: inline-block; font-size: 10px; padding: 2px 7px; border: 1px solid #b6c4b0; background: #e9eee2; white-space: nowrap; }
+.tag.demo { border-color: #cbb270; background: #f2e9ce; color: #795824; }
+.section { background: var(--paper); border: 1px solid var(--line); margin-bottom: 22px; padding: 22px; }
+.section-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 10px; border-bottom: 1px solid var(--line); padding-bottom: 13px; margin-bottom: 19px; }
+.section-heading > div { display: flex; align-items: center; gap: 12px; }
+.section-heading p { color: var(--muted); font-size: 11px; margin: 0; }
+.index { color: var(--rust); font-family: Georgia, serif; font-size: 20px; }
+.structure-layout { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(280px, 1fr); gap: 24px; }
+.motor-board {
+    background-image: linear-gradient(#dbe0d130 1px, transparent 1px), linear-gradient(90deg, #dbe0d130 1px, transparent 1px);
+    background-size: 18px 18px;
+    border: 1px solid #d7ddce;
+    padding: 16px;
+}
+.drawing-title { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 5px; color: var(--muted); font-size: 10px; }
+.drawing-body { display: flex; align-items: center; justify-content: center; min-height: 320px; gap: 12px; }
+.motor-svg { width: 64%; max-width: 340px; }
+.selectable { cursor: pointer; }
+.selectable:hover { filter: brightness(1.1); }
+.selected-part { filter: drop-shadow(0 0 3px #bc874b); }
+.motor-callouts { display: grid; gap: 12px; min-width: 130px; }
+.object-button { display: grid; grid-template-columns: 10px auto; column-gap: 7px; text-align: left; border: 1px solid transparent; background: #faf9f3b0; padding: 9px 6px; font-size: 11px; }
+.object-button small { grid-column: 2; color: var(--muted); font-size: 9px; }
+.object-button.active { border-color: #b98250; background: #f4ead8; }
+.object-dot { width: 8px; height: 8px; border-radius: 50%; align-self: center; background: #6a8072; }
+.object-dot.rotor { background: var(--green); }
+.object-dot.slots { background: #c79652; }
+.object-dot.speed { background: #566da1; }
+.inspector { border-left: 2px solid #9caa8c; padding-left: 20px; }
+.inspector h3 { margin-top: 3px; margin-bottom: 18px; }
+.inspector small { display: block; margin-top: 12px; overflow-wrap: anywhere; }
+.field-note { font-size: 11px; padding: 10px; background: #f0f0e5; color: #67705e; }
+.formula { font-family: Georgia, serif; font-size: 23px; color: var(--green); margin: 16px 0; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 16px; }
+.form-grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.span-two { grid-column: span 2; }
+.chart-toolbar { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); background: #f0f2e8; border: 1px solid var(--line); }
+.metric { padding: 12px 19px; border-right: 1px solid var(--line); }
+.metric:last-child { border: 0; }
+.metric > span { display: block; font-size: 10px; color: var(--muted); }
+.metric strong { font-family: Georgia, serif; font-size: 28px; font-weight: normal; }
+.metric small { margin-left: 7px; font: 10px system-ui; color: var(--muted); }
+.campbell-chart, .spectrum-chart { width: 100%; height: auto; display: block; margin-top: 16px; }
+.axis-label { fill: #667462; font-size: 11px; font-family: system-ui, sans-serif; }
+.candidate-line { cursor: pointer; pointer-events: stroke; }
+.candidate-line:hover { stroke-width: 5; }
+.speed-scrubber { display: flex; align-items: center; gap: 12px; margin: 0 25px 15px 50px; font-size: 10px; color: var(--muted); }
+.speed-scrubber input { flex: 1; min-width: 30px; }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 7px; }
+.legend-item { border: 1px solid transparent; display: flex; gap: 7px; align-items: center; font-size: 11px; padding: 5px 9px; }
+.legend-item.active { border-color: #bfa56c; background: #f2ead7; }
+.legend-item i { width: 15px; height: 3px; }
+.legend-item span { color: var(--muted); }
+.chart-note { font-size: 10px; color: var(--muted); margin: 12px 0 18px; }
+.calculation, .editor-fold { background: #f1f2e9; border: 1px solid var(--line); margin: 16px 0 4px; }
+summary { cursor: pointer; padding: 10px 13px; font-size: 12px; color: var(--green); }
+.calculation-body, .editor-fold > :not(summary) { margin-left: 14px; margin-right: 14px; }
+.calculation-body { font-size: 12px; padding-bottom: 3px; }
+.editor-fold > p { font-size: 12px; }
+.editor-fold > button, .editor-fold > .inline-actions { margin-bottom: 14px; }
+.table-scroll { overflow-x: auto; max-width: 100%; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th { background: #eef0e6; text-align: left; color: #65715e; font-size: 11px; font-weight: normal; white-space: nowrap; }
+th, td { padding: 10px 11px; border-bottom: 1px solid #e0e3d8; vertical-align: top; }
+td { max-width: 420px; overflow-wrap: anywhere; }
+td summary { padding: 0; }
+.selected-row { background: #f4ecd9; }
+.record-line { display: flex; justify-content: space-between; gap: 15px; border-top: 1px solid var(--line); padding: 11px 0; font-size: 12px; }
+.band-card { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; padding: 9px 13px; background: #f3efde; margin-bottom: 8px; border-left: 3px solid var(--ochre); }
+.band-card small { flex: 1; min-width: 150px; color: #756d51; }
+.empty-inline { border: 1px dashed #c6cebc; padding: 16px; font-size: 12px; color: var(--muted); margin: 14px 0; }
+.code-input { font-family: "Noto Sans Mono", monospace; font-size: 12px; }
+.spectrum-list, .snapshot-list { display: flex; gap: 12px; flex-wrap: wrap; margin: 17px 0; }
+.spectrum-chip, .snapshot { border: 1px solid var(--line); background: #f2f4ea; padding: 12px; }
+.spectrum-chip { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.spectrum-chip.active, .snapshot.active { border-color: #ac8850; background: #f4ecda; }
+.source-summary { padding: 14px 16px; border-left: 3px solid var(--green); background: #eff2e8; overflow-wrap: anywhere; }
+.source-summary strong { margin-left: 10px; }
+.source-summary p { font-size: 12px; margin: 7px 0 0; }
+.source-summary small { color: var(--muted); font-size: 10px; }
+.field-action { display: flex; align-items: end; padding-bottom: 12px; }
+.raw-table, .audit-table { max-height: 330px; overflow-y: auto; margin-bottom: 12px; }
+.boundary, .warning { background: #f5ecd7; border-left: 3px solid #b79548; padding: 12px; color: #7f6130; font-size: 12px; margin-top: 15px; }
+.success-note { color: var(--green); font-size: 12px; }
+.snapshot-create { display: flex; gap: 15px; align-items: end; margin-bottom: 12px; }
+.snapshot-create label { min-width: 250px; margin: 0; }
+.snapshot small { display: block; margin: 5px 0; color: var(--muted); }
+.quality-notes { background: #f2efdf; padding: 14px 17px; margin-bottom: 18px; font-size: 12px; color: #736744; }
+.quality-notes p { margin: 5px 0; }
+.save-box { background: #e8ede1; border: 1px solid #c3cfba; padding: 18px; margin: 20px 0 12px; }
+.save-box p { font-size: 12px; margin: 6px 0; overflow-wrap: anywhere; }
+.save-box small { display: block; margin-bottom: 15px; overflow-wrap: anywhere; }
+.export-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 20px 0 12px; }
+.export-grid button { text-align: left; padding: 15px; }
+.export-grid small { display: block; color: var(--muted); margin-top: 7px; }
+footer { border-top: 1px solid #c7cfbc; padding: 20px 0 25px; font-size: 10px; color: var(--muted); }
+footer span { display: block; margin-top: 5px; }
+.empty-state { max-width: 1000px; margin: 50px auto 70px; background: var(--paper); border: 1px solid var(--line); padding: 45px; }
+.empty-illustration { display: flex; align-items: center; gap: 30px; margin-bottom: 40px; }
+.empty-illustration span { width: 88px; height: 88px; border: 1px solid #8eaa91; border-radius: 50%; color: var(--green); font: italic 50px/88px Georgia, serif; text-align: center; }
+.empty-illustration i { color: var(--rust); font-size: 30px; }
+.empty-state h2 { font-size: 25px; margin: 12px 0 20px; }
+.empty-state > p { max-width: 650px; color: var(--muted); font-size: 13px; }
+.empty-actions { display: flex; gap: 12px; margin: 25px 0 40px; }
+.empty-principles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; border-top: 1px solid var(--line); padding-top: 20px; font-size: 12px; color: var(--muted); }
+.empty-principles strong { display: block; color: var(--ink); margin-bottom: 10px; }
+.modal-backdrop { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; background: #172c2377; padding: 20px; }
+.confirm-dialog { max-width: 540px; width: 100%; padding: 30px; background: var(--paper); border: 1px solid #8e9f87; box-shadow: 0 15px 60px #14251e44; }
+.confirm-dialog h2 { margin-bottom: 20px; }
+#blazor-error-ui { display: none; position: fixed; bottom: 0; width: 100%; padding: 16px; background: #f4d0b5; z-index: 999; }
+@media (min-width: 1700px) {
+    main { padding-left: 50px; padding-right: 50px; }
+    .structure-layout { grid-template-columns: minmax(0, 1.6fr) minmax(310px, 1fr); }
+}
+@media (max-width: 1180px) {
+    .shell { grid-template-columns: 205px minmax(0, 1fr); }
+    main { padding: 22px 18px 0; }
+    h1 { font-size: 18px; }
+    .structure-layout { grid-template-columns: 1fr; }
+    .motor-board { max-width: none; }
+    .motor-svg { width: 45%; }
+    .drawing-body { justify-content: space-evenly; }
+    .inspector { border-left: 0; border-top: 2px solid #9caa8c; padding: 18px 0 0; }
+    .form-grid.three { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .export-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .empty-state { padding: 25px; }
+}
+@media (max-width: 720px) {
+    .shell { display: block; }
+    .project-rail { position: relative; height: auto; max-height: none; border-right: 0; border-bottom: 1px solid #bac7af; padding: 15px; }
+    .brand { margin-bottom: 18px; }
+    .wide { width: auto; margin-right: 6px; }
+    .project-card, .rail-foot { display: none; }
+    .object-tree { grid-template-columns: repeat(2, 1fr); margin: 15px 0; }
+    .library-heading { margin-top: 12px; }
+    .document-header { align-items: start; }
+    .eyebrow { font-size: 8px; letter-spacing: 1px; }
+    h1 { font-size: 17px; }
+    main { padding: 20px 12px 0; }
+    .section { padding: 15px 12px; }
+    .section-heading p { display: none; }
+    .section-heading h2 { font-size: 16px; }
+    .structure-layout { gap: 18px; }
+    .drawing-body { min-height: 230px; gap: 5px; }
+    .motor-svg { width: 56%; }
+    .motor-board { padding: 9px; }
+    .motor-callouts { min-width: 110px; gap: 5px; }
+    .object-button { padding: 6px 4px; }
+    .chart-toolbar { grid-template-columns: repeat(2, 1fr); }
+    .metric { padding: 10px 12px; }
+    .metric strong { font-size: 24px; }
+    .form-grid, .form-grid.three { grid-template-columns: 1fr; }
+    .span-two { grid-column: auto; }
+    .snapshot-create { display: block; }
+    .snapshot-create label { min-width: 0; margin-bottom: 10px; }
+    .export-grid { grid-template-columns: 1fr; }
+    .empty-principles { grid-template-columns: 1fr; gap: 8px; }
+    .empty-state { margin: 25px 0; padding: 22px; }
+    .empty-state h2 { font-size: 21px; }
+    .empty-actions { flex-wrap: wrap; }
+    .speed-scrubber { margin-left: 15px; margin-right: 10px; }
+}
+@media print {
+    .project-rail, button, .file-button, .status, .modal-backdrop { display: none !important; }
+    .shell { display: block; }
+    main { padding: 0; }
+    .section { break-inside: auto; }
+    .table-scroll { overflow: visible; }
+    .raw-table, .audit-table { max-height: none; }
+}
+
+.sweep-table { max-height: 430px; overflow-y: auto; margin-bottom: 15px; }
+
+========================================================================
+FILE: src/MotorFrequency.App/wwwroot/files.js
+========================================================================
+window.motorFiles = {
+    dirty: false,
+    setDirty(value) {
+        this.dirty = value;
+    },
+    download(filename, mime, text) {
+        const blob = new Blob([text], { type: mime });
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        anchor.href = url;
+        anchor.download = filename;
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 30000);
+    }
+};
+window.addEventListener('beforeunload', event => {
+    if (window.motorFiles.dirty) {
+        event.preventDefault();
+        event.returnValue = '';
+    }
+});
+
+========================================================================
+FILE: src/MotorFrequency.Core/Domain/Models.cs
+========================================================================
+namespace MotorFrequency.Core.Domain;
+
+public static class Software
+{
+    public const string Name = "汽车附件电机电磁激励频率设计软件";
+    public const string Version = "V1.0";
+    public const int FormatVersion = 1;
+    public const string Extension = ".motorproj";
+    public const string Boundary = "候选频率为运动学或限定假设下的参考，不代表实际电磁力、声压主峰或故障根因。";
+}
+
+public enum MotorTopology
+{
+    BrushlessPermanentMagnet,
+    BrushedPermanentMagnet
+}
+
+public enum DataOrigin
+{
+    Manual,
+    MeasuredDeclared,
+    Simulated,
+    Estimated
+}
+
+public sealed class Project
+{
+    public int FormatVersion { get; set; } = Software.FormatVersion;
+    public string SoftwareVersion { get; set; } = Software.Version;
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public string Name { get; set; } = "未命名项目";
+    public string Owner { get; set; } = "";
+    public string Purpose { get; set; } = "";
+    public bool Demonstration { get; set; }
+    public bool Archived { get; set; }
+    public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset ModifiedAt { get; set; } = DateTimeOffset.UtcNow;
+    public MotorConfiguration Motor { get; set; } = new();
+    public List<CustomOrder> CustomOrders { get; set; } = [];
+    public List<SensitiveBand> Bands { get; set; } = [];
+    public List<Spectrum> Spectra { get; set; } = [];
+    public List<Scenario> Scenarios { get; set; } = [];
+    public List<AuditEvent> History { get; set; } = [];
+    public ReviewSettings Review { get; set; } = new();
+}
+
+public sealed class MotorConfiguration
+{
+    public string Name { get; set; } = "当前电机";
+    public MotorTopology Topology { get; set; }
+    public int PolePairs { get; set; } = 2;
+    public int Slots { get; set; } = 12;
+    public int CommutatorSegments { get; set; } = 10;
+    public double MinimumRpm { get; set; }
+    public double MaximumRpm { get; set; } = 6000;
+    public double StepRpm { get; set; } = 100;
+    public double InspectRpm { get; set; } = 1800;
+    public double MaximumHz { get; set; } = 1500;
+    public bool IncludeSlotPass { get; set; } = true;
+    public bool IncludeIdealCogging { get; set; }
+    public bool SymmetricUnskewedAssumption { get; set; }
+    public string AssumptionNotes { get; set; } = "";
+    public List<string> HiddenCandidates { get; set; } = [];
+}
+
+public sealed class CustomOrder
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public string Name { get; set; } = "自定义候选";
+    public double Order { get; set; } = 2;
+    public string Basis { get; set; } = "";
+    public bool Enabled { get; set; } = true;
+}
+
+public sealed class SensitiveBand
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public string Name { get; set; } = "敏感频段";
+    public double LowerHz { get; set; } = 55;
+    public double UpperHz { get; set; } = 65;
+    public DataOrigin Origin { get; set; } = DataOrigin.Manual;
+    public string Basis { get; set; } = "";
+    public bool Enabled { get; set; } = true;
+}
+
+public sealed class Spectrum
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public string Name { get; set; } = "";
+    public string FileName { get; set; } = "";
+    public double Rpm { get; set; }
+    public string Unit { get; set; } = "dB";
+    public string Reference { get; set; } = "";
+    public string Condition { get; set; } = "";
+    public DataOrigin Origin { get; set; } = DataOrigin.Manual;
+    public DateTimeOffset ImportedAt { get; set; } = DateTimeOffset.UtcNow;
+    public string InputSha256 { get; set; } = "";
+    public bool Visible { get; set; } = true;
+    public List<SpectrumPoint> Points { get; set; } = [];
+}
+
+public sealed class SpectrumPoint
+{
+    public double FrequencyHz { get; set; }
+    public double Amplitude { get; set; }
+}
+
+public sealed class Scenario
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public string Name { get; set; } = "";
+    public DateTimeOffset CapturedAt { get; set; } = DateTimeOffset.UtcNow;
+    public MotorConfiguration Motor { get; set; } = new();
+    public List<CustomOrder> CustomOrders { get; set; } = [];
+    public bool Demonstration { get; set; }
+}
+
+public sealed class AuditEvent
+{
+    public DateTimeOffset At { get; set; } = DateTimeOffset.UtcNow;
+    public string Action { get; set; } = "";
+    public string Detail { get; set; } = "";
+}
+
+public sealed class ReviewSettings
+{
+    public double MatchToleranceHz { get; set; } = 3;
+    public int MaximumPeaks { get; set; } = 10;
+    public string Notes { get; set; } = "";
+}
+
+public sealed record Candidate(
+    string Id,
+    string Name,
+    double Order,
+    string Formula,
+    string Basis,
+    string Category,
+    string ObjectKey,
+    bool Visible);
+
+public sealed record FrequencyRow(
+    string CandidateId,
+    string Name,
+    double Order,
+    double Rpm,
+    double FrequencyHz,
+    string Formula,
+    string Basis);
+
+public sealed record BandCrossing(
+    string CandidateId,
+    string CandidateName,
+    string BandName,
+    double LowerRpm,
+    double UpperRpm,
+    double LowerHz,
+    double UpperHz,
+    string Basis);
+
+public sealed record PeakMatch(
+    string SpectrumName,
+    double Rpm,
+    double ObservedHz,
+    double Amplitude,
+    string Unit,
+    string CandidateName,
+    double? ExpectedHz,
+    double? DifferenceHz,
+    string Statement);
+
+public sealed record ComparisonRow(
+    string Name,
+    double? CurrentOrder,
+    double? SnapshotOrder,
+    double? CurrentHz,
+    double? SnapshotHz,
+    double? DifferenceHz,
+    string Statement);
+
+public sealed record ValidationIssue(string Path, string Message);
+
+public sealed record ProjectSummary(
+    Guid Id,
+    string Name,
+    bool Demonstration,
+    bool Archived,
+    DateTimeOffset ModifiedAt,
+    string FileName,
+    bool HasBackup);
+
+public sealed record StoreRead(Project Project, string Revision);
+
+public sealed record StoreWrite(string Path, string Revision, bool BackupCreated);
+
+public sealed record CsvImportResult(
+    Spectrum? Spectrum,
+    IReadOnlyList<ValidationIssue> Issues,
+    int ParsedRows)
+{
+    public bool Success => Spectrum is not null && Issues.Count == 0;
+}
+
+public sealed record SpectrumMetadata(
+    string Name,
+    double Rpm,
+    string Unit,
+    string Reference,
+    string Condition,
+    DataOrigin Origin,
+    string FileName);
+
+========================================================================
+FILE: src/MotorFrequency.Core/Services/ChartGeometry.cs
+========================================================================
+using System.Globalization;
+using System.Text;
+using MotorFrequency.Core.Domain;
+
+namespace MotorFrequency.Core.Services;
+
+public sealed class ChartGeometry
+{
+    public const double Width = 900;
+    public const double Height = 370;
+    public const double Left = 68;
+    public const double Right = 860;
+    public const double Top = 24;
+    public const double Bottom = 316;
+    private static readonly string[] palette = ["#1d6860", "#b65f32", "#566da1", "#9a7c27", "#85608b", "#4b7c8b", "#6d7743"];
+    public MotorConfiguration Motor { get; }
+
+    public ChartGeometry(MotorConfiguration motor)
+    {
+        Motor = motor;
+    }
+
+    public double X(double rpm)
+    {
+        return Left + (rpm - Motor.MinimumRpm) / (Motor.MaximumRpm - Motor.MinimumRpm) * (Right - Left);
+    }
+
+    public double Y(double hz)
+    {
+        return Bottom - hz / Motor.MaximumHz * (Bottom - Top);
+    }
+
+    public static string N(double value)
+    {
+        return value.ToString("0.###", CultureInfo.InvariantCulture);
+    }
+
+    public static string Color(int index)
+    {
+        return palette[Math.Abs(index) % palette.Length];
+    }
+
+    public string CandidateLine(Candidate candidate)
+    {
+        var lower = Motor.MinimumRpm;
+        var upper = Math.Min(Motor.MaximumRpm, 60 * Motor.MaximumHz / candidate.Order);
+        if (upper < lower)
+        {
+            return "";
+        }
+        return $"M {N(X(lower))} {N(Y(FrequencyEngine.At(candidate.Order, lower)))} L {N(X(upper))} {N(Y(FrequencyEngine.At(candidate.Order, upper)))}";
+    }
+
+    public IEnumerable<(double Value, double Position)> SpeedTicks()
+    {
+        for (var i = 0; i <= 6; i++)
+        {
+            var value = Motor.MinimumRpm + (Motor.MaximumRpm - Motor.MinimumRpm) * i / 6;
+            yield return (value, X(value));
+        }
+    }
+
+    public IEnumerable<(double Value, double Position)> FrequencyTicks()
+    {
+        for (var i = 0; i <= 5; i++)
+        {
+            var value = Motor.MaximumHz * i / 5;
+            yield return (value, Y(value));
+        }
+    }
+
+    public static IReadOnlyList<SpectrumPoint> DisplayPoints(Spectrum spectrum, int maximum = 1000)
+    {
+        if (spectrum.Points.Count <= maximum)
+        {
+            return spectrum.Points;
+        }
+        var output = new List<SpectrumPoint>();
+        var bucketCount = maximum / 2;
+        for (var bucket = 0; bucket < bucketCount; bucket++)
+        {
+            var start = bucket * spectrum.Points.Count / bucketCount;
+            var end = (bucket + 1) * spectrum.Points.Count / bucketCount;
+            var segment = spectrum.Points.GetRange(start, end - start);
+            var low = segment.MinBy(x => x.Amplitude)!;
+            var high = segment.MaxBy(x => x.Amplitude)!;
+            if (low.FrequencyHz <= high.FrequencyHz)
+            {
+                output.Add(low);
+                if (low != high) output.Add(high);
+            }
+            else
+            {
+                output.Add(high);
+                output.Add(low);
+            }
+        }
+        return output;
+    }
+
+    public static string SpectrumPolyline(Spectrum spectrum, double maximumHz, double minimumAmplitude, double maximumAmplitude)
+    {
+        var range = Math.Max(1e-9, maximumAmplitude - minimumAmplitude);
+        return string.Join(" ", DisplayPoints(spectrum).Where(x => x.FrequencyHz <= maximumHz).Select(point =>
+        {
+            var x = Left + point.FrequencyHz / maximumHz * (Right - Left);
+            var y = Bottom - (point.Amplitude - minimumAmplitude) / range * (Bottom - Top);
+            return N(x) + "," + N(y);
+        }));
+    }
+
+    public static string MotorArc(double startDegrees, double endDegrees, double radius, double centerX = 160, double centerY = 160)
+    {
+        var a = startDegrees * Math.PI / 180;
+        var b = endDegrees * Math.PI / 180;
+        var x1 = centerX + radius * Math.Cos(a);
+        var y1 = centerY + radius * Math.Sin(a);
+        var x2 = centerX + radius * Math.Cos(b);
+        var y2 = centerY + radius * Math.Sin(b);
+        return $"M {N(x1)} {N(y1)} A {N(radius)} {N(radius)} 0 {(endDegrees - startDegrees > 180 ? 1 : 0)} 1 {N(x2)} {N(y2)}";
+    }
+
+    public string Svg(Project project)
+    {
+        var text = new StringBuilder();
+        text.AppendLine("<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 900 430\" role=\"img\">");
+        text.AppendLine("<rect width=\"900\" height=\"430\" fill=\"#faf9f4\"/>");
+        foreach (var tick in FrequencyTicks())
+        {
+            text.AppendLine($"<path d=\"M 68 {N(tick.Position)} H 860\" stroke=\"#dddcd3\"/>");
+            text.AppendLine($"<text x=\"58\" y=\"{N(tick.Position + 4)}\" text-anchor=\"end\" font-size=\"12\">{Labels.Number(tick.Value)}</text>");
+        }
+        foreach (var tick in SpeedTicks())
+        {
+            text.AppendLine($"<path d=\"M {N(tick.Position)} 24 V 316\" stroke=\"#e7e5dc\"/>");
+            text.AppendLine($"<text x=\"{N(tick.Position)}\" y=\"337\" text-anchor=\"middle\" font-size=\"12\">{Labels.Number(tick.Value)}</text>");
+        }
+        foreach (var band in project.Bands.Where(x => x.Enabled && x.LowerHz <= Motor.MaximumHz))
+        {
+            var upper = Math.Min(band.UpperHz, Motor.MaximumHz);
+            text.AppendLine($"<rect x=\"68\" y=\"{N(Y(upper))}\" width=\"792\" height=\"{N(Y(band.LowerHz) - Y(upper))}\" fill=\"#b19136\" opacity=\"0.16\"/>");
+        }
+        var candidates = FrequencyEngine.Candidates(project.Motor, project.CustomOrders).Where(x => x.Visible).ToList();
+        for (var i = 0; i < candidates.Count; i++)
+        {
+            text.AppendLine($"<path d=\"{CandidateLine(candidates[i])}\" stroke=\"{Color(i)}\" fill=\"none\" stroke-width=\"2\"/>");
+        }
+        text.AppendLine($"<path d=\"M {N(X(Motor.InspectRpm))} 24 V 316\" stroke=\"#333\" stroke-dasharray=\"5 5\"/>");
+        text.AppendLine("<text x=\"10\" y=\"18\" font-size=\"12\">Hz</text><text x=\"790\" y=\"357\" font-size=\"12\">r/min</text>");
+        text.AppendLine("<text x=\"68\" y=\"380\" font-size=\"14\">" + System.Net.WebUtility.HtmlEncode(project.Name) + " · " + Software.Version + "</text>");
+        text.AppendLine("<text x=\"68\" y=\"403\" font-size=\"12\">候选频率参考；" + (project.Demonstration ? "模拟演示" : "人工参数") + "；非声压预测</text>");
+        text.AppendLine("</svg>");
+        return text.ToString();
+    }
+}
+
+========================================================================
+FILE: src/MotorFrequency.Core/Services/Demonstration.cs
+========================================================================
+using MotorFrequency.Core.Domain;
+
+namespace MotorFrequency.Core.Services;
+
+public static class Demonstration
+{
+    public static Project Create()
+    {
+        var project = new Project
+        {
+            Name = "附件电机 · 60 Hz 候选核对（模拟）",
+            Owner = "示例工程师",
+            Purpose = "用固定模拟样例核对 1800 r/min 下转频 30 Hz、电气基频 60 Hz；验证候选同频不等于因果。",
+            Demonstration = true,
+            Motor = new MotorConfiguration
+            {
+                Name = "两极对十二槽无刷示例",
+                PolePairs = 2,
+                Slots = 12,
+                MinimumRpm = 0,
+                MaximumRpm = 6000,
+                StepRpm = 100,
+                InspectRpm = 1800,
+                MaximumHz = 1500,
+                IncludeSlotPass = true,
+                IncludeIdealCogging = true,
+                SymmetricUnskewedAssumption = true,
+                AssumptionNotes = "仅示例：等槽、对称永磁、无偏心的理想周期，不作幅值预测。"
+            }
+        };
+        project.CustomOrders.Add(new CustomOrder
+        {
+            Name = "二倍转频待验证",
+            Order = 2,
+            Basis = "模拟工程假设，与电气基频同频；通过变转速和电流/振动同步采集进一步区分。"
+        });
+        project.Bands.Add(new SensitiveBand
+        {
+            Name = "60 Hz 附近关注带",
+            LowerHz = 55,
+            UpperHz = 65,
+            Origin = DataOrigin.Simulated,
+            Basis = "人为设定的示例频段，不代表结构模态实测值。"
+        });
+        project.Bands.Add(new SensitiveBand
+        {
+            Name = "结构观察带（模拟）",
+            LowerHz = 340,
+            UpperHz = 380,
+            Origin = DataOrigin.Simulated,
+            Basis = "用于交叠区间计算示范，非实测结构模态。"
+        });
+        var spectrum = new Spectrum
+        {
+            Name = "1800 转模拟频谱",
+            FileName = "内置确定性公式",
+            Rpm = 1800,
+            Unit = "dB",
+            Reference = "模拟 dB 标度，无实际声学校准",
+            Condition = "固定算式生成，非真实采集",
+            Origin = DataOrigin.Simulated
+        };
+        for (var frequency = 0; frequency <= 1500; frequency += 2)
+        {
+            var background = 22 + 2 * Math.Sin(frequency * 0.071) + Math.Cos(frequency * 0.113);
+            var peakA = 30 * Math.Exp(-Math.Pow((frequency - 60) / 5.0, 2));
+            var peakB = 23 * Math.Exp(-Math.Pow((frequency - 360) / 8.0, 2));
+            var peakC = 13 * Math.Exp(-Math.Pow((frequency - 120) / 7.0, 2));
+            spectrum.Points.Add(new SpectrumPoint { FrequencyHz = frequency, Amplitude = background + peakA + peakB + peakC });
+        }
+        spectrum.InputSha256 = ProjectCodec.Hash(SpectrumCsv.Export(spectrum));
+        project.Spectra.Add(spectrum);
+        var baseline = ProjectCodec.Clone(project.Motor);
+        baseline.PolePairs = 3;
+        baseline.Name = "三极对方案（模拟）";
+        project.Scenarios.Add(new Scenario
+        {
+            Name = "三极对参考（模拟）",
+            Motor = baseline,
+            CustomOrders = ProjectCodec.Clone(project.CustomOrders),
+            Demonstration = true
+        });
+        project.History.Add(new AuditEvent { Action = "载入独立示例", Detail = "固定模拟公式；非实测；1800 r/min、p=2、Q=12" });
+        return project;
+    }
+}
+
+========================================================================
+FILE: src/MotorFrequency.Core/Services/ExportService.cs
+========================================================================
+using System.Globalization;
+using System.Net;
+using System.Text;
+using MotorFrequency.Core.Domain;
+
+namespace MotorFrequency.Core.Services;
+
+public static class ExportService
+{
+    public static string SafeName(string name)
+    {
+        var invalid = Path.GetInvalidFileNameChars().Concat(['/', '\\', ':', '*', '?', '"', '<', '>', '|']).ToHashSet();
+        var value = new string(name.Where(x => !invalid.Contains(x) && !char.IsControl(x)).Take(70).ToArray());
+        return string.IsNullOrWhiteSpace(value) ? "motor-frequency" : value;
+    }
+
+    public static string CsvCell(string? text)
+    {
+        text ??= "";
+        if (text.Length > 0 && "=+-@\t\r".Contains(text[0]))
+        {
+            text = "'" + text;
+        }
+        return "\"" + text.Replace("\"", "\"\"") + "\"";
+    }
+
+    private static string N(double value)
+    {
+        return value.ToString("R", CultureInfo.InvariantCulture);
+    }
+
+    public static string FrequencyCsv(Project project)
+    {
+        ProjectValidator.ThrowIfInvalid(project);
+        var text = new StringBuilder();
+        text.AppendLine("project_id,project_name,software_version,source,candidate_id,candidate_name,order,rpm,frequency_hz,formula,basis,input_sha256");
+        var hash = ProjectCodec.Hash(ProjectCodec.Serialize(project));
+        foreach (var row in FrequencyEngine.Rows(project, true))
+        {
+            text.AppendLine(string.Join(',',
+                CsvCell(project.Id.ToString()),
+                CsvCell(project.Name),
+                CsvCell(Software.Version),
+                CsvCell(project.Demonstration ? "模拟演示" : "人工参数"),
+                CsvCell(row.CandidateId),
+                CsvCell(row.Name),
+                N(row.Order),
+                N(row.Rpm),
+                N(row.FrequencyHz),
+                CsvCell(row.Formula),
+                CsvCell(row.Basis),
+                CsvCell(hash)));
+        }
+        return text.ToString();
+    }
+
+    public static string CrossingCsv(Project project)
+    {
+        var text = new StringBuilder("project_name,source,candidate,band,lower_rpm,upper_rpm,lower_hz,upper_hz,band_basis,statement\n");
+        foreach (var row in FrequencyEngine.Crossings(project))
+        {
+            text.AppendLine(string.Join(',', CsvCell(project.Name), CsvCell(project.Demonstration ? "模拟演示" : "人工参数"), CsvCell(row.CandidateName), CsvCell(row.BandName), N(row.LowerRpm), N(row.UpperRpm), N(row.LowerHz), N(row.UpperHz), CsvCell(row.Basis), CsvCell("仅几何频率交叠，不代表共振或噪声幅值")));
+        }
+        return text.ToString();
+    }
+
+    public static string EvidenceCsv(Project project)
+    {
+        var text = new StringBuilder("spectrum,source,condition,reference,rpm,frequency_hz,amplitude,unit,candidate,expected_hz,difference_hz,tolerance_hz,statement\n");
+        foreach (var spectrum in project.Spectra)
+        {
+            foreach (var match in FrequencyEngine.MatchPeaks(project, spectrum))
+            {
+                text.AppendLine(string.Join(',', CsvCell(spectrum.Name), CsvCell(Labels.Origin(spectrum.Origin)), CsvCell(spectrum.Condition), CsvCell(spectrum.Reference), N(match.Rpm), N(match.ObservedHz), N(match.Amplitude), CsvCell(match.Unit), CsvCell(match.CandidateName), match.ExpectedHz is double expected ? N(expected) : "", match.DifferenceHz is double difference ? N(difference) : "", N(project.Review.MatchToleranceHz), CsvCell(match.Statement)));
+            }
+        }
+        return text.ToString();
+    }
+
+    public static string ComparisonCsv(Project project, Scenario scenario)
+    {
+        var text = new StringBuilder("project,snapshot,source,inspect_rpm,candidate,current_order,snapshot_order,current_hz,snapshot_hz,delta_hz,statement\n");
+        foreach (var row in FrequencyEngine.Compare(project, scenario))
+        {
+            string Value(double? number) => number is double value ? N(value) : "";
+            text.AppendLine(string.Join(',', CsvCell(project.Name), CsvCell(scenario.Name), CsvCell(scenario.Demonstration ? "快照为模拟演示" : "参数快照"), N(project.Motor.InspectRpm), CsvCell(row.Name), Value(row.CurrentOrder), Value(row.SnapshotOrder), Value(row.CurrentHz), Value(row.SnapshotHz), Value(row.DifferenceHz), CsvCell(row.Statement)));
+        }
+        return text.ToString();
+    }
+
+    public static string Html(Project project)
+    {
+        ProjectValidator.ThrowIfInvalid(project);
+        var text = new StringBuilder();
+        string H(string? value) => WebUtility.HtmlEncode(value ?? "");
+        text.AppendLine("<!doctype html><html lang=\"zh-CN\"><meta charset=\"utf-8\"><title>电机候选频率复核报告</title>");
+        text.AppendLine("<style>body{font:15px/1.7 system-ui,sans-serif;max-width:1100px;margin:35px auto;padding:20px;color:#263c36}table{width:100%;border-collapse:collapse;margin:18px 0}td,th{border:1px solid #d5dbd6;padding:7px;text-align:left}h1{font-size:26px}.notice{padding:16px;background:#f5ecd4}svg{width:100%}small{overflow-wrap:anywhere}@media print{body{margin:0}tr{break-inside:avoid}}</style>");
+        text.AppendLine($"<h1>{H(Software.Name)} {Software.Version}</h1><h2>{H(project.Name)}</h2>");
+        text.AppendLine($"<p>负责人：{H(project.Owner)}；项目标识：{project.Id}；输出时间：{DateTimeOffset.UtcNow:O}</p>");
+        text.AppendLine($"<p class=\"notice\">来源：{(project.Demonstration ? "模拟演示" : "人工参数及用户导入资料")}。{H(Software.Boundary)}</p>");
+        text.AppendLine("<p>项目目的：" + H(project.Purpose) + "</p>");
+        var m = project.Motor;
+        text.AppendLine($"<h2>电机与计算口径</h2><p>{H(Labels.Topology(m.Topology))}；p={m.PolePairs} 极对，Q={m.Slots} 槽，K={m.CommutatorSegments} 片。无刷使用 p/Q，有刷使用 K；不适用参数仅保留在项目档案。</p>");
+        text.AppendLine($"<p>转速 {N(m.MinimumRpm)}～{N(m.MaximumRpm)} r/min，步长 {N(m.StepRpm)} r/min，观察转速 {N(m.InspectRpm)} r/min，图表上限 {N(m.MaximumHz)} Hz。终点总是纳入扫描；交叠区间解析计算，不依赖步长。</p>");
+        text.AppendLine(new ChartGeometry(m).Svg(project));
+        text.AppendLine("<h2>候选频率与依据</h2><table><tr><th>候选</th><th>阶次</th><th>观察频率 Hz</th><th>公式与依据</th></tr>");
+        foreach (var candidate in FrequencyEngine.Candidates(m, project.CustomOrders))
+        {
+            text.AppendLine($"<tr><td>{H(candidate.Name)}{(candidate.Visible ? "" : "（隐藏）")}</td><td>{N(candidate.Order)}</td><td>{N(FrequencyEngine.At(candidate.Order, m.InspectRpm))}</td><td>{H(candidate.Formula)}；{H(candidate.Basis)}</td></tr>");
+        }
+        text.AppendLine("</table><h2>结构敏感频段</h2><table><tr><th>频段</th><th>范围 Hz</th><th>来源与依据</th></tr>");
+        foreach (var band in project.Bands)
+        {
+            text.AppendLine($"<tr><td>{H(band.Name)}{(band.Enabled ? "" : "（停用）")}</td><td>{N(band.LowerHz)}～{N(band.UpperHz)}</td><td>{H(Labels.Origin(band.Origin))}；{H(band.Basis)}</td></tr>");
+        }
+        text.AppendLine("</table><h2>交叠转速区间</h2><p>区间包含端点；仅表示频率落入关注范围，不证明实际共振。</p><table><tr><th>候选</th><th>频段</th><th>进入 r/min</th><th>离开 r/min</th></tr>");
+        foreach (var crossing in FrequencyEngine.Crossings(project))
+        {
+            text.AppendLine($"<tr><td>{H(crossing.CandidateName)}</td><td>{H(crossing.BandName)}</td><td>{N(crossing.LowerRpm)}</td><td>{N(crossing.UpperRpm)}</td></tr>");
+        }
+        text.AppendLine("</table><h2>导入频谱与邻近核对</h2>");
+        text.AppendLine($"<p>绝对容差 {N(project.Review.MatchToleranceHz)} Hz 为用户工程设置；每条频谱按幅值选前 {project.Review.MaximumPeaks} 个内部局部极大点，不插值、不找端点峰、不合并同频候选。</p>");
+        foreach (var spectrum in project.Spectra)
+        {
+            text.AppendLine($"<h3>{H(spectrum.Name)}</h3><p>{H(Labels.Origin(spectrum.Origin))}；{N(spectrum.Rpm)} r/min；单位 {H(spectrum.Unit)}；参考量 {H(spectrum.Reference)}；工况 {H(spectrum.Condition)}；{spectrum.Points.Count} 点；输入哈希 {H(spectrum.InputSha256)}</p>");
+            text.AppendLine("<table><tr><th>谱峰 Hz</th><th>幅值</th><th>邻近候选</th><th>频差 Hz</th></tr>");
+            foreach (var match in FrequencyEngine.MatchPeaks(project, spectrum))
+            {
+                text.AppendLine($"<tr><td>{N(match.ObservedHz)}</td><td>{N(match.Amplitude)} {H(match.Unit)}</td><td>{H(match.CandidateName)}</td><td>{(match.DifferenceHz is double delta ? N(delta) : "—")}</td></tr>");
+            }
+            text.AppendLine("</table>");
+        }
+        text.AppendLine("<h2>方案快照比较</h2><p>差值为当前−快照；均统一使用当前观察转速，非声级改善量。</p>");
+        foreach (var scenario in project.Scenarios)
+        {
+            text.AppendLine($"<h3>{H(scenario.Name)} · {(scenario.Demonstration ? "模拟演示" : "参数快照")}</h3><table><tr><th>候选</th><th>当前 Hz</th><th>快照 Hz</th><th>差值 Hz</th><th>解释</th></tr>");
+            foreach (var row in FrequencyEngine.Compare(project, scenario))
+            {
+                string V(double? value) => value is double number ? N(number) : "—";
+                text.AppendLine($"<tr><td>{H(row.Name)}</td><td>{V(row.CurrentHz)}</td><td>{V(row.SnapshotHz)}</td><td>{V(row.DifferenceHz)}</td><td>{H(row.Statement)}</td></tr>");
+            }
+            text.AppendLine("</table>");
+        }
+        text.AppendLine("<h2>复核提示</h2><ul>");
+        foreach (var note in FrequencyEngine.QualityNotes(project))
+        {
+            text.AppendLine("<li>" + H(note) + "</li>");
+        }
+        text.AppendLine("</ul><p>用户复核备注：" + H(project.Review.Notes) + "</p>");
+        text.AppendLine("<h2>操作追溯</h2><table><tr><th>UTC 时间</th><th>操作</th><th>详情</th></tr>");
+        foreach (var item in project.History.TakeLast(100))
+        {
+            text.AppendLine($"<tr><td>{item.At:O}</td><td>{H(item.Action)}</td><td>{H(item.Detail)}</td></tr>");
+        }
+        text.AppendLine("</table><small>输入项目 SHA-256：" + ProjectCodec.Hash(ProjectCodec.Serialize(project)) + "。报告自包含，不访问外部数据。全部频点保存在配套 .motorproj 中。</small></html>");
+        return text.ToString();
+    }
+}
+
+========================================================================
+FILE: src/MotorFrequency.Core/Services/FrequencyEngine.cs
+========================================================================
+using MotorFrequency.Core.Domain;
+
+namespace MotorFrequency.Core.Services;
+
+public static class FrequencyEngine
+{
+    public static IReadOnlyList<Candidate> Candidates(MotorConfiguration motor, IReadOnlyList<CustomOrder> custom)
+    {
+        var output = new List<Candidate>();
+        void Add(string id, string name, double order, string formula, string basis, string category, string key)
+        {
+            output.Add(new Candidate(id, name, order, formula, basis, category, key, !motor.HiddenCandidates.Contains(id)));
+        }
+        Add("rotation", "机械转频", 1, "fᵣ = n / 60", "机械轴每转一次的运动学参考；不等同于不平衡已被证实。", "运动学", "speed");
+        if (motor.Topology == MotorTopology.BrushlessPermanentMagnet)
+        {
+            Add("electrical", "电气基频", motor.PolePairs, "fₑ = p × n / 60", "仅适用于同步运行的永磁无刷拓扑，p 为极对数；不是电磁力阶次。", "电气参考", "rotor");
+            if (motor.IncludeSlotPass)
+            {
+                Add("slot", "槽通过参考", motor.Slots, "fₛ = Q × n / 60", "转子参考点每转经过 Q 个等间距定子槽；只表示相对运动周期，不指认声压主峰。", "运动学", "slots");
+            }
+            if (motor.IncludeIdealCogging && motor.SymmetricUnskewedAssumption && !string.IsNullOrWhiteSpace(motor.AssumptionNotes))
+            {
+                var order = LeastCommonMultiple(motor.Slots, 2 * motor.PolePairs);
+                Add("cogging", "理想齿槽周期候选", order, "f𝚌 = LCM(Q, 2p) × n / 60", "等槽、对称永磁结构的理想周期；不含制造偏差、斜槽、饱和与负载影响。用户依据：" + motor.AssumptionNotes, "假设候选", "slots");
+            }
+        }
+        else
+        {
+            Add("commutator", "单刷换向片通过参考", motor.CommutatorSegments, "fₖ = K × n / 60", "理想等宽 K 片换向器相对单个固定电刷的片通过；全机脉冲可能重合或出现不同谐波，不乘电刷数。", "运动学", "brush");
+        }
+        foreach (var order in custom.Where(x => x.Enabled))
+        {
+            Add("custom:" + order.Id, order.Name, order.Order, "f = k × n / 60", order.Basis, "用户候选", "custom");
+        }
+        return output;
+    }
+
+    public static double At(double order, double rpm)
+    {
+        if (!double.IsFinite(order) || !double.IsFinite(rpm) || order <= 0 || rpm < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(order), "阶次必须大于零、转速非负且均为有限数值。");
+        }
+        return order * rpm / 60.0;
+    }
+
+    public static int GreatestCommonDivisor(int a, int b)
+    {
+        if (a <= 0 || b <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(a));
+        }
+        while (b != 0)
+        {
+            (a, b) = (b, a % b);
+        }
+        return a;
+    }
+
+    public static int LeastCommonMultiple(int a, int b)
+    {
+        return checked(a / GreatestCommonDivisor(a, b) * b);
+    }
+
+    public static IReadOnlyList<double> Speeds(MotorConfiguration motor)
+    {
+        var errors = ProjectValidator.ValidateMotor(motor);
+        if (errors.Count > 0)
+        {
+            throw new InvalidDataException(string.Join("; ", errors.Select(x => x.Message)));
+        }
+        var values = new List<double>();
+        var count = (int)Math.Floor((motor.MaximumRpm - motor.MinimumRpm) / motor.StepRpm);
+        for (var index = 0; index <= count; index++)
+        {
+            values.Add(motor.MinimumRpm + index * motor.StepRpm);
+        }
+        if (Math.Abs(values[^1] - motor.MaximumRpm) > 1e-7)
+        {
+            values.Add(motor.MaximumRpm);
+        }
+        return values;
+    }
+
+    public static IReadOnlyList<FrequencyRow> Rows(Project project, bool fullScan)
+    {
+        var speeds = fullScan ? Speeds(project.Motor) : [project.Motor.InspectRpm];
+        var candidates = Candidates(project.Motor, project.CustomOrders).Where(x => x.Visible);
+        var result = new List<FrequencyRow>();
+        foreach (var candidate in candidates)
+        {
+            foreach (var rpm in speeds)
+            {
+                result.Add(new(candidate.Id, candidate.Name, candidate.Order, rpm, At(candidate.Order, rpm), candidate.Formula, candidate.Basis));
+            }
+        }
+        return result;
+    }
+
+    public static IReadOnlyList<BandCrossing> Crossings(Project project)
+    {
+        var result = new List<BandCrossing>();
+        foreach (var candidate in Candidates(project.Motor, project.CustomOrders).Where(x => x.Visible))
+        {
+            foreach (var band in project.Bands.Where(x => x.Enabled))
+            {
+                var low = Math.Max(project.Motor.MinimumRpm, 60 * band.LowerHz / candidate.Order);
+                var high = Math.Min(project.Motor.MaximumRpm, 60 * band.UpperHz / candidate.Order);
+                if (low <= high)
+                {
+                    result.Add(new(candidate.Id, candidate.Name, band.Name, low, high, band.LowerHz, band.UpperHz, band.Basis));
+                }
+            }
+        }
+        return result.OrderBy(x => x.LowerRpm).ToList();
+    }
+
+    public static IReadOnlyList<PeakMatch> MatchPeaks(Project project, Spectrum spectrum)
+    {
+        var candidates = Candidates(project.Motor, project.CustomOrders).Where(x => x.Visible).ToList();
+        var result = new List<PeakMatch>();
+        var points = spectrum.Points;
+        var peaks = Enumerable.Range(1, Math.Max(0, points.Count - 2))
+            .Where(i => points[i].Amplitude > points[i - 1].Amplitude && points[i].Amplitude >= points[i + 1].Amplitude)
+            .Select(i => points[i])
+            .OrderByDescending(x => x.Amplitude)
+            .Take(project.Review.MaximumPeaks);
+        foreach (var peak in peaks)
+        {
+            var nearby = candidates
+                .Select(x => (Candidate: x, Frequency: At(x.Order, spectrum.Rpm)))
+                .Where(x => Math.Abs(x.Frequency - peak.FrequencyHz) <= project.Review.MatchToleranceHz)
+                .OrderBy(x => Math.Abs(x.Frequency - peak.FrequencyHz))
+                .ToList();
+            if (nearby.Count == 0)
+            {
+                result.Add(new(spectrum.Name, spectrum.Rpm, peak.FrequencyHz, peak.Amplitude, spectrum.Unit, "无邻近候选", null, null, "容差内无候选；不排除未建模激励。"));
+            }
+            foreach (var item in nearby)
+            {
+                result.Add(new(spectrum.Name, spectrum.Rpm, peak.FrequencyHz, peak.Amplitude, spectrum.Unit, item.Candidate.Name, item.Frequency, peak.FrequencyHz - item.Frequency, "仅频率邻近，不能证明来源；同频候选均保留。"));
+            }
+        }
+        return result;
+    }
+
+    public static IReadOnlyList<ComparisonRow> Compare(Project project, Scenario snapshot)
+    {
+        var current = Candidates(project.Motor, project.CustomOrders).Where(x => x.Visible).ToDictionary(x => x.Id);
+        var previous = Candidates(snapshot.Motor, snapshot.CustomOrders).Where(x => x.Visible).ToDictionary(x => x.Id);
+        var result = new List<ComparisonRow>();
+        foreach (var id in current.Keys.Union(previous.Keys))
+        {
+            current.TryGetValue(id, out var now);
+            previous.TryGetValue(id, out var before);
+            double? currentHz = now is null ? null : At(now.Order, project.Motor.InspectRpm);
+            double? previousHz = before is null ? null : At(before.Order, project.Motor.InspectRpm);
+            var statement = now is null ? "当前未启用" : before is null ? "快照未启用" : "统一按当前观察转速换算；差值=当前−快照";
+            if (project.Motor.Topology != snapshot.Motor.Topology)
+            {
+                statement += "；拓扑不同，只作频率参考对照";
+            }
+            result.Add(new(now?.Name ?? before!.Name, now?.Order, before?.Order, currentHz, previousHz, currentHz - previousHz, statement));
+        }
+        return result;
+    }
+
+    public static IReadOnlyList<string> QualityNotes(Project project)
+    {
+        var notes = new List<string>();
+        if (project.Demonstration)
+        {
+            notes.Add("本项目为模拟演示，不能证明实际车辆噪声来源或改善效果。");
+        }
+        foreach (var spectrum in project.Spectra)
+        {
+            if (spectrum.Rpm < project.Motor.MinimumRpm || spectrum.Rpm > project.Motor.MaximumRpm)
+            {
+                notes.Add(spectrum.Name + "：频谱转速在当前扫描范围外，Campbell 图不显示该切片。");
+            }
+            if (spectrum.Origin == DataOrigin.Simulated)
+            {
+                notes.Add(spectrum.Name + "：模拟频谱，保留来源标记。");
+            }
+            if (spectrum.Points.Count > 1 && spectrum.Points.Zip(spectrum.Points.Skip(1)).Any(x => x.Second.FrequencyHz - x.First.FrequencyHz > project.Review.MatchToleranceHz * 2))
+            {
+                notes.Add(spectrum.Name + "：部分频率间距大于两倍邻近容差，粗分辨率可能漏检；未插值补点。");
+            }
+        }
+        if (project.Bands.Any(x => x.Enabled && x.UpperHz > project.Motor.MaximumHz))
+        {
+            notes.Add("部分敏感频段超出图表上限，交叠表仍按完整范围计算。");
+        }
+        var duplicates = Candidates(project.Motor, project.CustomOrders).Where(x => x.Visible).GroupBy(x => x.Order).Where(x => x.Count() > 1);
+        foreach (var group in duplicates)
+        {
+            notes.Add($"{Labels.Number(group.Key)} 阶存在多个候选：{string.Join("、", group.Select(x => x.Name))}；图线可能重合，依据分别保留。");
+        }
+        notes.Add(Software.Boundary);
+        return notes;
+    }
+}
+
+========================================================================
+FILE: src/MotorFrequency.Core/Services/Labels.cs
+========================================================================
+using MotorFrequency.Core.Domain;
+
+namespace MotorFrequency.Core.Services;
+
+public static class Labels
+{
+    public static string Topology(MotorTopology value) => value switch
+    {
+        MotorTopology.BrushlessPermanentMagnet => "无刷永磁同步电机",
+        MotorTopology.BrushedPermanentMagnet => "有刷永磁直流电机",
+        _ => "未知拓扑"
+    };
+
+    public static string Origin(DataOrigin value) => value switch
+    {
+        DataOrigin.Manual => "人工填写",
+        DataOrigin.MeasuredDeclared => "实测（用户声明）",
+        DataOrigin.Simulated => "模拟演示",
+        DataOrigin.Estimated => "估算",
+        _ => "未知来源"
+    };
+
+    public static string Number(double value) => value.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture);
+
+    public static string ObjectName(string key) => key switch
+    {
+        "rotor" => "转子与磁极",
+        "slots" => "槽与齿",
+        "brush" => "换向片与电刷",
+        "speed" => "转速与观察范围",
+        "project" => "项目档案",
+        _ => "自定义候选"
+    };
+}
+
+========================================================================
+FILE: src/MotorFrequency.Core/Services/ParameterSweep.cs
+========================================================================
+using System.Globalization;
+using System.Text;
+using MotorFrequency.Core.Domain;
+
+namespace MotorFrequency.Core.Services;
+
+public sealed class SweepRequest
+{
+    public List<int> PolePairs { get; set; } = [1, 2, 3];
+    public List<int> Slots { get; set; } = [6, 12, 18];
+    public List<int> Segments { get; set; } = [8, 10, 12];
+    public double ReferenceRpm { get; set; } = 1800;
+    public double ObservedHz { get; set; } = 60;
+    public double ToleranceHz { get; set; } = 3;
+}
+
+public sealed record SweepRow(
+    MotorTopology Topology,
+    int PolePairs,
+    int Slots,
+    int Segments,
+    string Candidate,
+    double Order,
+    double ReferenceRpm,
+    double FrequencyHz,
+    double ObservedHz,
+    double DifferenceHz,
+    bool WithinTolerance,
+    string Basis);
+
+public sealed record ReverseRow(
+    string Candidate,
+    double Order,
+    double CenterRpm,
+    double LowerRpm,
+    double UpperRpm,
+    bool WithinScan,
+    string Basis);
+
+public static class ParameterSweep
+{
+    public static string ContextHash(Project project)
+    {
+        var input = new
+        {
+            projectId = project.Id,
+            projectName = project.Name,
+            demonstration = project.Demonstration,
+            motor = project.Motor,
+            customOrders = project.CustomOrders
+        };
+        return ProjectCodec.Hash(System.Text.Json.JsonSerializer.Serialize(input, ProjectCodec.Options));
+    }
+
+    public static IReadOnlyList<int> ParseIntegers(string text, string field, int min, int max)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            throw new InvalidDataException(field + "不能为空。");
+        }
+        var values = new List<int>();
+        var tokens = text.Split(',', StringSplitOptions.TrimEntries);
+        if (tokens.Length > 12)
+        {
+            throw new InvalidDataException(field + "最多输入 12 个整数，以英文逗号分隔。");
+        }
+        foreach (var token in tokens)
+        {
+            if (!int.TryParse(token, NumberStyles.Integer, CultureInfo.InvariantCulture, out var value) || value < min || value > max)
+            {
+                throw new InvalidDataException($"{field} 中的“{token}”无效，范围 {min}～{max}。");
+            }
+            if (values.Contains(value))
+            {
+                throw new InvalidDataException(field + "包含重复值 " + value + "，请删除重复项。");
+            }
+            values.Add(value);
+        }
+        return values.Order().ToList();
+    }
+
+    public static IReadOnlyList<ValidationIssue> Validate(SweepRequest request, MotorTopology topology)
+    {
+        var issues = new List<ValidationIssue>();
+        if (!double.IsFinite(request.ReferenceRpm) || request.ReferenceRpm < 0 || request.ReferenceRpm > 100000)
+        {
+            issues.Add(new("referenceRpm", "参考转速需为 0～100000 r/min。"));
+        }
+        if (!double.IsFinite(request.ObservedHz) || request.ObservedHz < 0 || request.ObservedHz > 1000000)
+        {
+            issues.Add(new("observedHz", "观察频率需为 0～1000000 Hz。"));
+        }
+        if (!double.IsFinite(request.ToleranceHz) || request.ToleranceHz < 0 || request.ToleranceHz > 1000)
+        {
+            issues.Add(new("toleranceHz", "容差需为 0～1000 Hz。"));
+        }
+        void Check(IReadOnlyList<int>? list, string path, int minimum, int maximum)
+        {
+            if (list is null || list.Count is < 1 or > 12)
+            {
+                issues.Add(new(path, "每组需 1～12 个整数。"));
+            }
+            else if (list.Distinct().Count() != list.Count || list.Any(x => x < minimum || x > maximum))
+            {
+                issues.Add(new(path, "列表含重复项或超范围整数。"));
+            }
+        }
+        if (topology == MotorTopology.BrushlessPermanentMagnet)
+        {
+            Check(request.PolePairs, "polePairs", 1, 64);
+            Check(request.Slots, "slots", 1, 512);
+        }
+        else if (topology == MotorTopology.BrushedPermanentMagnet)
+        {
+            Check(request.Segments, "segments", 2, 512);
+        }
+        else
+        {
+            issues.Add(new("topology", "不支持的拓扑。"));
+        }
+        return issues;
+    }
+
+    public static IReadOnlyList<SweepRow> Calculate(Project project, SweepRequest request)
+    {
+        var errors = Validate(request, project.Motor.Topology);
+        if (errors.Count > 0)
+        {
+            throw new InvalidDataException(string.Join("；", errors.Select(x => x.Path + "：" + x.Message)));
+        }
+        var result = new List<SweepRow>();
+        var poles = project.Motor.Topology == MotorTopology.BrushlessPermanentMagnet ? request.PolePairs : [project.Motor.PolePairs];
+        var slots = project.Motor.Topology == MotorTopology.BrushlessPermanentMagnet ? request.Slots : [project.Motor.Slots];
+        var segments = project.Motor.Topology == MotorTopology.BrushedPermanentMagnet ? request.Segments : [project.Motor.CommutatorSegments];
+        foreach (var pole in poles)
+        {
+            foreach (var slot in slots)
+            {
+                foreach (var segment in segments)
+                {
+                    var configuration = ProjectCodec.Clone(project.Motor);
+                    configuration.PolePairs = pole;
+                    configuration.Slots = slot;
+                    configuration.CommutatorSegments = segment;
+                    foreach (var candidate in FrequencyEngine.Candidates(configuration, project.CustomOrders).Where(x => x.Visible))
+                    {
+                        var frequency = FrequencyEngine.At(candidate.Order, request.ReferenceRpm);
+                        var difference = frequency - request.ObservedHz;
+                        result.Add(new(configuration.Topology, pole, slot, segment, candidate.Name, candidate.Order, request.ReferenceRpm, frequency, request.ObservedHz, difference, Math.Abs(difference) <= request.ToleranceHz, candidate.Basis));
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    public static IReadOnlyList<ReverseRow> Reverse(Project project, double observedHz, double toleranceHz)
+    {
+        if (!double.IsFinite(observedHz) || observedHz < 0 || observedHz > 1000000)
+        {
+            throw new InvalidDataException("观察频率需为 0～1000000 Hz。");
+        }
+        if (!double.IsFinite(toleranceHz) || toleranceHz < 0 || toleranceHz > 1000)
+        {
+            throw new InvalidDataException("容差需为 0～1000 Hz。");
+        }
+        var output = new List<ReverseRow>();
+        foreach (var candidate in FrequencyEngine.Candidates(project.Motor, project.CustomOrders).Where(x => x.Visible))
+        {
+            var center = observedHz * 60 / candidate.Order;
+            var lower = Math.Max(0, observedHz - toleranceHz) * 60 / candidate.Order;
+            var upper = (observedHz + toleranceHz) * 60 / candidate.Order;
+            var inScan = center >= project.Motor.MinimumRpm && center <= project.Motor.MaximumRpm;
+            output.Add(new(candidate.Name, candidate.Order, center, lower, upper, inScan, candidate.Basis));
+        }
+        return output.OrderBy(x => x.CenterRpm).ToList();
+    }
+
+    public static string Csv(Project project, IReadOnlyList<SweepRow> rows)
+    {
+        var text = new StringBuilder("project,software_version,source,topology,pole_pairs,slots,segments,candidate,order,rpm,frequency_hz,observed_hz,delta_hz,within_tolerance,basis\n");
+        string N(double value) => value.ToString("R", CultureInfo.InvariantCulture);
+        foreach (var row in rows)
+        {
+            text.AppendLine(string.Join(',', ExportService.CsvCell(project.Name), ExportService.CsvCell(Software.Version), ExportService.CsvCell(project.Demonstration ? "模拟演示" : "人工参数扫查"), ExportService.CsvCell(Labels.Topology(row.Topology)), row.PolePairs, row.Slots, row.Segments, ExportService.CsvCell(row.Candidate), N(row.Order), N(row.ReferenceRpm), N(row.FrequencyHz), N(row.ObservedHz), N(row.DifferenceHz), row.WithinTolerance ? "true" : "false", ExportService.CsvCell(row.Basis)));
+        }
+        return text.ToString();
+    }
+}
+
+========================================================================
+FILE: src/MotorFrequency.Core/Services/ProjectCodec.cs
+========================================================================
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using MotorFrequency.Core.Domain;
+
+namespace MotorFrequency.Core.Services;
+
+public static class ProjectCodec
+{
+    public const int MaximumFileBytes = 8 * 1024 * 1024;
+    public static JsonSerializerOptions Options { get; } = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        WriteIndented = true,
+        Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        Converters = { new JsonStringEnumConverter() },
+        UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
+        MaxDepth = 32
+    };
+
+    public static string Serialize(Project project)
+    {
+        ProjectValidator.ThrowIfInvalid(project);
+        return JsonSerializer.Serialize(project, Options);
+    }
+
+    public static Project Parse(string text)
+    {
+        if (Encoding.UTF8.GetByteCount(text) > MaximumFileBytes)
+        {
+            throw new InvalidDataException("项目超过 8 MiB，未载入。请拆分频谱数据。");
+        }
+        try
+        {
+            using var document = JsonDocument.Parse(text, new JsonDocumentOptions { MaxDepth = 32 });
+            var root = document.RootElement;
+            if (!root.TryGetProperty("formatVersion", out var version) || version.GetInt32() != Software.FormatVersion)
+            {
+                throw new InvalidDataException("formatVersion 缺失或不支持；仅支持版本 1，原文件未修改。");
+            }
+            string[] required = ["id", "name", "motor", "customOrders", "bands", "spectra", "scenarios", "history", "review"];
+            foreach (var property in required)
+            {
+                if (!root.TryGetProperty(property, out var value) || value.ValueKind == JsonValueKind.Null)
+                {
+                    throw new InvalidDataException($"项目必需字段 {property} 缺失或为空。");
+                }
+            }
+            RequiredSchema.Validate(root);
+            var project = JsonSerializer.Deserialize<Project>(text, Options)
+                ?? throw new InvalidDataException("项目不是有效对象。");
+            ProjectValidator.ThrowIfInvalid(project);
+            return project;
+        }
+        catch (Exception ex) when (ex is JsonException or InvalidOperationException or FormatException)
+        {
+            throw new InvalidDataException("项目 JSON 损坏或字段类型错误：" + ex.Message, ex);
+        }
+    }
+
+    public static T Clone<T>(T value)
+    {
+        return JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(value, Options), Options)
+            ?? throw new InvalidOperationException("无法复制对象。");
+    }
+
+    public static string Hash(string text)
+    {
+        return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(text))).ToLowerInvariant();
+    }
+
+    public static Project Duplicate(Project project)
+    {
+        var copy = Clone(project);
+        copy.Id = Guid.NewGuid();
+        copy.Name = project.Name + "（副本）";
+        copy.Archived = false;
+        copy.CreatedAt = DateTimeOffset.UtcNow;
+        copy.ModifiedAt = copy.CreatedAt;
+        copy.History.Add(new AuditEvent { Action = "复制项目", Detail = "来源项目 " + project.Id });
+        return copy;
+    }
+}
+
+========================================================================
+FILE: src/MotorFrequency.Core/Services/ProjectReview.cs
+========================================================================
+using MotorFrequency.Core.Domain;
+
+namespace MotorFrequency.Core.Services;
+
+public sealed record ReviewItem(string Subject, string State, string Evidence, string NextAction);
+
+public static class ProjectReview
+{
+    public static IReadOnlyList<ReviewItem> Inspect(Project project)
+    {
+        var result = new List<ReviewItem>();
+        result.Add(new("项目档案", string.IsNullOrWhiteSpace(project.Purpose) ? "待补充" : "已填写", "项目目的：" + project.Purpose, "确认负责人和本次要区分的频率来源；不自动认证身份。"));
+        var motor = project.Motor;
+        var candidates = FrequencyEngine.Candidates(motor, project.CustomOrders);
+        result.Add(new("电机拓扑", "已限定", Labels.Topology(motor.Topology), motor.Topology == MotorTopology.BrushlessPermanentMagnet ? "确认同步运行；异步电机及滑差模型不适用。" : "确认永磁有刷直流；单刷片通过不是全机换向事件数。"));
+        result.Add(new("采样转速", "可复核", $"{FrequencyEngine.Speeds(motor).Count} 个转速点；终点纳入；观察 {Labels.Number(motor.InspectRpm)} r/min", "CSV 扫描按步长，直线和交叠按解析公式，不混用采样精度。"));
+        result.Add(new("候选清单", "可复核", $"共 {candidates.Count} 个候选，显示 {candidates.Count(x => x.Visible)} 个", "隐藏项不进入图、频率扫描、交叠和匹配；报告仍列出其依据。"));
+        if (motor.IncludeIdealCogging && motor.Topology == MotorTopology.BrushlessPermanentMagnet)
+        {
+            result.Add(new("理想齿槽假设", "用户确认", motor.AssumptionNotes, "需要电磁模型或试验确认周期；软件未计算空间力波或幅值。"));
+        }
+        foreach (var band in project.Bands)
+        {
+            result.Add(new("频段：" + band.Name, band.Enabled ? "已启用" : "已停用", $"{Labels.Number(band.LowerHz)}～{Labels.Number(band.UpperHz)} Hz；{Labels.Origin(band.Origin)}；{band.Basis}", "核对模态/敏感区来源与边界条件，频率交叠不证明共振。"));
+        }
+        foreach (var spectrum in project.Spectra)
+        {
+            var total = spectrum.Points.Count;
+            var inside = spectrum.Points.Count(x => x.FrequencyHz <= motor.MaximumHz);
+            var inputHash = spectrum.InputSha256;
+            var state = spectrum.Origin == DataOrigin.MeasuredDeclared ? "用户声明实测" : Labels.Origin(spectrum.Origin);
+            result.Add(new("频谱：" + spectrum.Name, state, $"{total} 个原始点，{inside} 点在图表范围；{Labels.Number(spectrum.Rpm)} r/min；单位 {spectrum.Unit}；参考 {spectrum.Reference}", "确认幅值是频谱值而非时域样本，转速与实际采集一致。"));
+            result.Add(new("输入追溯：" + spectrum.Name, inputHash.Length == 64 ? "已记录哈希" : "待补充", "文件 " + spectrum.FileName + "；SHA-256 " + inputHash, "哈希用于识别导入文本，不认证采集设备或校准。原始频点内嵌保存。"));
+        }
+        if (project.Spectra.Count == 0)
+        {
+            result.Add(new("频谱证据", "未提供", "当前仅有参数候选", "可继续参数研究；判断实际激励需另行导入相应工况频谱并同步验证。"));
+        }
+        foreach (var scenario in project.Scenarios)
+        {
+            var different = scenario.Motor.Topology != motor.Topology;
+            result.Add(new("快照：" + scenario.Name, different ? "拓扑不同" : "同拓扑参考", $"快照 p={scenario.Motor.PolePairs}，Q={scenario.Motor.Slots}，K={scenario.Motor.CommutatorSegments}；当前观察 {Labels.Number(motor.InspectRpm)} r/min", "比较只给同一转速下频率差，不比较声级、效率或制造可行性。"));
+        }
+        result.Add(new("输出边界", "持续保留", Software.Boundary, "报告和项目配套保存；原始点 CSV 不单独携带工况，需保留元信息。"));
+        return result;
+    }
+
+    public static string Json(Project project)
+    {
+        var output = new
+        {
+            software = Software.Name,
+            version = Software.Version,
+            projectId = project.Id,
+            projectName = project.Name,
+            source = project.Demonstration ? "模拟演示" : "人工参数及用户资料",
+            generatedAt = DateTimeOffset.UtcNow,
+            inputSha256 = ProjectCodec.Hash(ProjectCodec.Serialize(project)),
+            items = Inspect(project),
+            boundary = Software.Boundary
+        };
+        return System.Text.Json.JsonSerializer.Serialize(output, ProjectCodec.Options);
+    }
+}
+
+========================================================================
+FILE: src/MotorFrequency.Core/Services/ProjectStore.cs
+========================================================================
+using System.Text;
+using MotorFrequency.Core.Domain;
+
+namespace MotorFrequency.Core.Services;
+
+public sealed class ProjectStore
+{
+    private readonly string directory;
+    private readonly object gate = new();
+    public string DirectoryPath => directory;
+
+    public ProjectStore(string directory)
+    {
+        this.directory = Path.GetFullPath(directory);
+        Directory.CreateDirectory(this.directory);
+    }
+
+    private string ProjectPath(Guid id)
+    {
+        if (id == Guid.Empty)
+        {
+            throw new InvalidDataException("项目标识不能为空。");
+        }
+        return Path.Combine(directory, id.ToString("N") + Software.Extension);
+    }
+
+    public StoreWrite Save(Project project, string? expectedRevision)
+    {
+        ProjectValidator.ThrowIfInvalid(project);
+        lock (gate)
+        {
+            var path = ProjectPath(project.Id);
+            var exists = File.Exists(path);
+            if (exists)
+            {
+                var oldText = File.ReadAllText(path, Encoding.UTF8);
+                var actualRevision = ProjectCodec.Hash(oldText);
+                if (expectedRevision is null || actualRevision != expectedRevision)
+                {
+                    throw new InvalidDataException("磁盘项目已存在或被外部修改，未覆盖。请先从项目库打开核对，或复制为新项目。");
+                }
+            }
+            else if (expectedRevision is not null)
+            {
+                throw new InvalidDataException("原项目文件已被移动或删除，未写入。请复制项目后保存。");
+            }
+            var text = ProjectCodec.Serialize(project);
+            if (Encoding.UTF8.GetByteCount(text) > ProjectCodec.MaximumFileBytes)
+            {
+                throw new InvalidDataException("保存内容超过 8 MiB，未写入。");
+            }
+            var temporary = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
+            try
+            {
+                File.WriteAllText(temporary, text, new UTF8Encoding(false));
+                if (exists)
+                {
+                    File.Copy(path, path + ".bak", true);
+                }
+                File.Move(temporary, path, true);
+            }
+            finally
+            {
+                if (File.Exists(temporary))
+                {
+                    File.Delete(temporary);
+                }
+            }
+            return new(path, ProjectCodec.Hash(text), exists);
+        }
+    }
+
+    public StoreRead Open(Guid id)
+    {
+        lock (gate)
+        {
+            var path = ProjectPath(id);
+            var text = ReadLimited(path);
+            var project = ProjectCodec.Parse(text);
+            if (project.Id != id)
+            {
+                throw new InvalidDataException("项目内容标识与文件名不一致，请通过导入入口核对。");
+            }
+            return new(project, ProjectCodec.Hash(text));
+        }
+    }
+
+    public Project ReadBackupAsCopy(Guid id)
+    {
+        lock (gate)
+        {
+            var text = ReadLimited(ProjectPath(id) + ".bak");
+            var project = ProjectCodec.Duplicate(ProjectCodec.Parse(text));
+            project.Name += "（备份恢复）";
+            project.History.Add(new AuditEvent { Action = "读取备份", Detail = "以新项目恢复，不覆盖原文件" });
+            return project;
+        }
+    }
+
+    public IReadOnlyList<ProjectSummary> List(out IReadOnlyList<string> warnings)
+    {
+        var result = new List<ProjectSummary>();
+        var errors = new List<string>();
+        lock (gate)
+        {
+            var files = Directory.EnumerateFiles(directory, "*" + Software.Extension).Take(501).ToList();
+            if (files.Count > 500)
+            {
+                errors.Add("项目库超过 500 个文件，仅列出前 500 个；请归档到其他目录。");
+            }
+            foreach (var file in files.Take(500))
+            {
+                try
+                {
+                    var p = ProjectCodec.Parse(ReadLimited(file));
+                    if (Path.GetFileName(file) != p.Id.ToString("N") + Software.Extension)
+                    {
+                        errors.Add(Path.GetFileName(file) + "：标识不匹配，未列入可打开项目。");
+                        continue;
+                    }
+                    result.Add(new(p.Id, p.Name, p.Demonstration, p.Archived, p.ModifiedAt, file, File.Exists(file + ".bak")));
+                }
+                catch (Exception ex) when (ex is IOException or InvalidDataException or UnauthorizedAccessException or DecoderFallbackException)
+                {
+                    errors.Add(Path.GetFileName(file) + "：" + ex.Message);
+                }
+            }
+        }
+        warnings = errors;
+        return result.OrderByDescending(x => x.ModifiedAt).ToList();
+    }
+
+    private static string ReadLimited(string path)
+    {
+        var info = new FileInfo(path);
+        if (!info.Exists)
+        {
+            throw new FileNotFoundException("找不到项目文件。", path);
+        }
+        if (info.Length > ProjectCodec.MaximumFileBytes)
+        {
+            throw new InvalidDataException("项目文件超过 8 MiB。");
+        }
+        return File.ReadAllText(path, new UTF8Encoding(false, true));
+    }
+}
+
+========================================================================
+FILE: src/MotorFrequency.Core/Services/ProjectValidator.cs
+========================================================================
+using MotorFrequency.Core.Domain;
+
+namespace MotorFrequency.Core.Services;
+
+public static class ProjectValidator
+{
+    public static IReadOnlyList<ValidationIssue> Validate(Project? project)
+    {
+        var issues = new List<ValidationIssue>();
+        if (project is null)
+        {
+            issues.Add(new("project", "项目不能为空。"));
+            return issues;
+        }
+        if (project.FormatVersion != Software.FormatVersion)
+        {
+            issues.Add(new("formatVersion", "不支持的项目格式版本。"));
+        }
+        if (project.Id == Guid.Empty)
+        {
+            issues.Add(new("id", "项目标识不能为空。"));
+        }
+        Text(issues, "name", project.Name, 100, true);
+        Text(issues, "owner", project.Owner, 100, false);
+        Text(issues, "purpose", project.Purpose, 2000, false);
+        issues.AddRange(ValidateMotor(project.Motor));
+        if (project.Review is null)
+        {
+            issues.Add(new("review", "复核设置缺失。"));
+        }
+        else
+        {
+            Range(issues, "review.matchToleranceHz", project.Review.MatchToleranceHz, 0, 1000);
+            if (project.Review.MaximumPeaks is < 1 or > 50)
+            {
+                issues.Add(new("review.maximumPeaks", "谱峰数量需为 1～50。"));
+            }
+            Text(issues, "review.notes", project.Review.Notes, 4000, false);
+        }
+        ValidateCollections(project, issues);
+        return issues;
+    }
+
+    public static IReadOnlyList<ValidationIssue> ValidateMotor(MotorConfiguration? motor)
+    {
+        var issues = new List<ValidationIssue>();
+        if (motor is null)
+        {
+            issues.Add(new("motor", "电机参数缺失。"));
+            return issues;
+        }
+        Text(issues, "motor.name", motor.Name, 100, true);
+        if (!Enum.IsDefined(motor.Topology))
+        {
+            issues.Add(new("motor.topology", "不支持的电机拓扑。"));
+        }
+        Integer(issues, "motor.polePairs", motor.PolePairs, 1, 64);
+        Integer(issues, "motor.slots", motor.Slots, 1, 512);
+        Integer(issues, "motor.commutatorSegments", motor.CommutatorSegments, 2, 512);
+        Range(issues, "motor.minimumRpm", motor.MinimumRpm, 0, 100000);
+        Range(issues, "motor.maximumRpm", motor.MaximumRpm, 0, 100000);
+        Range(issues, "motor.stepRpm", motor.StepRpm, 0.1, 100000);
+        Range(issues, "motor.inspectRpm", motor.InspectRpm, 0, 100000);
+        Range(issues, "motor.maximumHz", motor.MaximumHz, 1, 1000000);
+        if (motor.MaximumRpm <= motor.MinimumRpm)
+        {
+            issues.Add(new("motor.maximumRpm", "终止转速必须大于起始转速。"));
+        }
+        if (motor.InspectRpm < motor.MinimumRpm || motor.InspectRpm > motor.MaximumRpm)
+        {
+            issues.Add(new("motor.inspectRpm", "观察转速必须位于扫描范围内。"));
+        }
+        if (motor.StepRpm > 0 && (motor.MaximumRpm - motor.MinimumRpm) / motor.StepRpm > 2000)
+        {
+            issues.Add(new("motor.stepRpm", "扫描区间最多 2000 个步长，请增大步长。"));
+        }
+        if (motor.IncludeIdealCogging && motor.Topology == MotorTopology.BrushlessPermanentMagnet)
+        {
+            if (!motor.SymmetricUnskewedAssumption || string.IsNullOrWhiteSpace(motor.AssumptionNotes))
+            {
+                issues.Add(new("motor.includeIdealCogging", "启用理想齿槽候选前，须确认等槽对称假设并填写依据。"));
+            }
+        }
+        Text(issues, "motor.assumptionNotes", motor.AssumptionNotes, 2000, false);
+        if (motor.HiddenCandidates is null || motor.HiddenCandidates.Count > 100)
+        {
+            issues.Add(new("motor.hiddenCandidates", "隐藏候选记录缺失或超过 100 条。"));
+        }
+        return issues;
+    }
+
+    private static void ValidateCollections(Project p, List<ValidationIssue> issues)
+    {
+        if (p.CustomOrders is null || p.Bands is null || p.Spectra is null || p.Scenarios is null || p.History is null)
+        {
+            issues.Add(new("collections", "候选、频段、频谱、快照及历史集合均须存在。"));
+            return;
+        }
+        Limit(issues, "customOrders", p.CustomOrders.Count, 40);
+        Limit(issues, "bands", p.Bands.Count, 30);
+        Limit(issues, "spectra", p.Spectra.Count, 12);
+        Limit(issues, "scenarios", p.Scenarios.Count, 12);
+        Limit(issues, "history", p.History.Count, 2000);
+        Unique(issues, "customOrders", p.CustomOrders.Where(x => x is not null).Select(x => x.Id));
+        Unique(issues, "bands", p.Bands.Where(x => x is not null).Select(x => x.Id));
+        Unique(issues, "spectra", p.Spectra.Where(x => x is not null).Select(x => x.Id));
+        Unique(issues, "scenarios", p.Scenarios.Where(x => x is not null).Select(x => x.Id));
+        foreach (var order in p.CustomOrders)
+        {
+            if (order is null)
+            {
+                issues.Add(new("customOrders", "候选对象不能为空。"));
+                continue;
+            }
+            ValidateOrder(order, "customOrders/" + order.Id, issues);
+        }
+        foreach (var band in p.Bands)
+        {
+            if (band is null)
+            {
+                issues.Add(new("bands", "敏感频段对象不能为空。"));
+                continue;
+            }
+            var path = "bands/" + band.Id;
+            Text(issues, path + "/name", band.Name, 100, true);
+            Text(issues, path + "/basis", band.Basis, 2000, true);
+            Range(issues, path + "/lowerHz", band.LowerHz, 0, 1000000);
+            Range(issues, path + "/upperHz", band.UpperHz, 0, 1000000);
+            if (band.UpperHz < band.LowerHz)
+            {
+                issues.Add(new(path, "频段上限不能小于下限。"));
+            }
+            if (!Enum.IsDefined(band.Origin))
+            {
+                issues.Add(new(path + "/origin", "未知来源分类。"));
+            }
+        }
+        var totalPoints = 0;
+        foreach (var spectrum in p.Spectra)
+        {
+            if (spectrum is null)
+            {
+                issues.Add(new("spectra", "频谱对象不能为空。"));
+                continue;
+            }
+            issues.AddRange(ValidateSpectrum(spectrum));
+            totalPoints += spectrum.Points?.Count ?? 0;
+        }
+        if (totalPoints > 30000)
+        {
+            issues.Add(new("spectra", "项目内频谱点总数不能超过 30000。"));
+        }
+        foreach (var scenario in p.Scenarios)
+        {
+            if (scenario is null)
+            {
+                issues.Add(new("scenarios", "快照不能为空。"));
+                continue;
+            }
+            var path = "scenarios/" + scenario.Id;
+            Text(issues, path + "/name", scenario.Name, 100, true);
+            issues.AddRange(ValidateMotor(scenario.Motor).Select(x => new ValidationIssue(path + "/" + x.Path, x.Message)));
+            if (scenario.CustomOrders is null || scenario.CustomOrders.Count > 40)
+            {
+                issues.Add(new(path + "/customOrders", "快照候选缺失或超出限制。"));
+            }
+            else
+            {
+                Unique(issues, path + "/customOrders", scenario.CustomOrders.Where(x => x is not null).Select(x => x.Id));
+                foreach (var order in scenario.CustomOrders)
+                {
+                    if (order is null)
+                    {
+                        issues.Add(new(path, "快照候选不能为空。"));
+                    }
+                    else
+                    {
+                        ValidateOrder(order, path, issues);
+                    }
+                }
+            }
+        }
+        foreach (var item in p.History)
+        {
+            if (item is null)
+            {
+                issues.Add(new("history", "历史事件不能为空。"));
+                continue;
+            }
+            Text(issues, "history/action", item.Action, 100, true);
+            Text(issues, "history/detail", item.Detail, 4000, false);
+        }
+    }
+
+    private static void ValidateOrder(CustomOrder order, string path, List<ValidationIssue> issues)
+    {
+        Text(issues, path + "/name", order.Name, 100, true);
+        Text(issues, path + "/basis", order.Basis, 2000, true);
+        Range(issues, path + "/order", order.Order, 0.001, 10000);
+    }
+
+    public static IReadOnlyList<ValidationIssue> ValidateSpectrum(Spectrum spectrum)
+    {
+        var issues = new List<ValidationIssue>();
+        var path = "spectra/" + spectrum.Id;
+        Text(issues, path + "/name", spectrum.Name, 100, true);
+        Text(issues, path + "/fileName", spectrum.FileName, 255, false);
+        Text(issues, path + "/reference", spectrum.Reference, 200, true);
+        Text(issues, path + "/condition", spectrum.Condition, 1000, true);
+        Range(issues, path + "/rpm", spectrum.Rpm, 0, 100000);
+        if (!Enum.IsDefined(spectrum.Origin))
+        {
+            issues.Add(new(path + "/origin", "未知来源分类。"));
+        }
+        if (spectrum.Unit is not ("dB" or "Pa" or "m/s²" or "g" or "A" or "V" or "任意单位"))
+        {
+            issues.Add(new(path + "/unit", "请选择支持的频谱单位。"));
+        }
+        if (spectrum.Points is null || spectrum.Points.Count < 2 || spectrum.Points.Count > 10000)
+        {
+            issues.Add(new(path + "/points", "每条频谱需 2～10000 个点。"));
+            return issues;
+        }
+        double previous = -1;
+        for (var i = 0; i < spectrum.Points.Count; i++)
+        {
+            var point = spectrum.Points[i];
+            if (point is null)
+            {
+                issues.Add(new(path + "/points/" + i, "频谱点不能为空。"));
+                continue;
+            }
+            Range(issues, path + $"/points/{i}/frequencyHz", point.FrequencyHz, 0, 1000000);
+            Range(issues, path + $"/points/{i}/amplitude", point.Amplitude, -1000000000, 1000000000);
+            if (point.FrequencyHz <= previous)
+            {
+                issues.Add(new(path + $"/points/{i}", "频率必须严格递增，无重复。"));
+            }
+            if (spectrum.Unit != "dB" && point.Amplitude < 0)
+            {
+                issues.Add(new(path + $"/points/{i}", "线性幅值频谱不接受负值。"));
+            }
+            previous = point.FrequencyHz;
+            if (issues.Count > 25)
+            {
+                issues.Add(new(path, "错误过多，停止继续列出；整条频谱不导入。"));
+                break;
+            }
+        }
+        return issues;
+    }
+
+    public static void ThrowIfInvalid(Project project)
+    {
+        var issues = Validate(project);
+        if (issues.Count > 0)
+        {
+            throw new InvalidDataException(string.Join("\n", issues.Take(25).Select(x => x.Path + "：" + x.Message)));
+        }
+    }
+
+    private static void Text(List<ValidationIssue> issues, string path, string? value, int max, bool required)
+    {
+        if (value is null || (required && string.IsNullOrWhiteSpace(value)))
+        {
+            issues.Add(new(path, "字段必须填写。"));
+        }
+        else if (value.Length > max)
+        {
+            issues.Add(new(path, $"长度不能超过 {max} 字符。"));
+        }
+    }
+
+    private static void Range(List<ValidationIssue> issues, string path, double value, double min, double max)
+    {
+        if (!double.IsFinite(value) || value < min || value > max)
+        {
+            issues.Add(new(path, $"请输入 {Labels.Number(min)}～{Labels.Number(max)} 范围的有限数值。"));
+        }
+    }
+
+    private static void Integer(List<ValidationIssue> issues, string path, int value, int min, int max)
+    {
+        if (value < min || value > max)
+        {
+            issues.Add(new(path, $"请输入 {min}～{max} 的整数。"));
+        }
+    }
+
+    private static void Limit(List<ValidationIssue> issues, string path, int count, int max)
+    {
+        if (count > max)
+        {
+            issues.Add(new(path, $"对象数量超过上限 {max}。"));
+        }
+    }
+
+    private static void Unique(List<ValidationIssue> issues, string path, IEnumerable<Guid> ids)
+    {
+        var values = ids.ToList();
+        if (values.Any(x => x == Guid.Empty) || values.Distinct().Count() != values.Count)
+        {
+            issues.Add(new(path, "对象标识为空或重复。"));
+        }
+    }
+}
+
+========================================================================
+FILE: src/MotorFrequency.Core/Services/RequiredSchema.cs
+========================================================================
+using System.Reflection;
+using System.Text.Json;
+using MotorFrequency.Core.Domain;
+
+namespace MotorFrequency.Core.Services;
+
+public static class RequiredSchema
+{
+    public static void Validate(JsonElement root)
+    {
+        var issues = new List<string>();
+        Visit(root, typeof(Project), "project", issues);
+        if (issues.Count > 0)
+        {
+            throw new InvalidDataException("项目格式字段不完整：\n" + string.Join("\n", issues.Take(25)));
+        }
+    }
+
+    private static void Visit(JsonElement element, Type type, string path, List<string> issues)
+    {
+        if (issues.Count >= 25) return;
+        if (element.ValueKind == JsonValueKind.Null)
+        {
+            issues.Add(path + " 不能为 null。");
+            return;
+        }
+        if (type == typeof(string) || type.IsValueType)
+        {
+            return;
+        }
+        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
+        {
+            if (element.ValueKind != JsonValueKind.Array)
+            {
+                issues.Add(path + " 必须为数组。");
+                return;
+            }
+            var itemType = type.GetGenericArguments()[0];
+            var index = 0;
+            foreach (var child in element.EnumerateArray())
+            {
+                Visit(child, itemType, path + "/" + index, issues);
+                index++;
+                if (issues.Count >= 25) break;
+            }
+            return;
+        }
+        if (element.ValueKind != JsonValueKind.Object)
+        {
+            issues.Add(path + " 必须为对象。");
+            return;
+        }
+        foreach (var property in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
+        {
+            if (!property.CanRead || !property.CanWrite) continue;
+            var name = JsonNamingPolicy.CamelCase.ConvertName(property.Name);
+            if (!element.TryGetProperty(name, out var child))
+            {
+                issues.Add(path + "/" + name + " 缺失。版本 1 不静默填入默认值。");
+                continue;
+            }
+            Visit(child, property.PropertyType, path + "/" + name, issues);
+        }
+    }
+}
+
+========================================================================
+FILE: src/MotorFrequency.Core/Services/SpectrumCsv.cs
+========================================================================
+using System.Globalization;
+using System.Text;
+using MotorFrequency.Core.Domain;
+
+namespace MotorFrequency.Core.Services;
+
+public static class SpectrumCsv
+{
+    public const int MaximumBytes = 1024 * 1024;
+
+    public static CsvImportResult Parse(string content, SpectrumMetadata metadata)
+    {
+        var issues = new List<ValidationIssue>();
+        var points = new List<SpectrumPoint>();
+        if (Encoding.UTF8.GetByteCount(content) > MaximumBytes)
+        {
+            return new(null, [new("file", "CSV 超过 1 MiB；请减少频点。")], 0);
+        }
+        var lines = content.TrimStart('\uFEFF').Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
+        if (lines.Length < 3)
+        {
+            return new(null, [new("file", "需表头和至少两行频谱点。")], 0);
+        }
+        if (lines[0].Trim() != "frequency_hz,amplitude")
+        {
+            return new(null, [new("line 1", "表头必须为 frequency_hz,amplitude，使用英文逗号。")], 0);
+        }
+        for (var index = 1; index < lines.Length; index++)
+        {
+            if (string.IsNullOrWhiteSpace(lines[index]))
+            {
+                if (index < lines.Length - 1 && lines.Skip(index).Any(x => !string.IsNullOrWhiteSpace(x)))
+                {
+                    issues.Add(new("line " + (index + 1), "中间空行不接受；请移除后重试。"));
+                }
+                continue;
+            }
+            var cells = lines[index].Split(',');
+            if (cells.Length != 2)
+            {
+                issues.Add(new("line " + (index + 1), "每行必须正好两列，不支持千位分隔符。"));
+                continue;
+            }
+            var style = NumberStyles.Float;
+            var culture = CultureInfo.InvariantCulture;
+            if (!double.TryParse(cells[0], style, culture, out var hz) || !double.IsFinite(hz))
+            {
+                issues.Add(new("line " + (index + 1) + ", frequency_hz", "频率必须为有限数值，单位 Hz，小数点使用英文句点。"));
+                continue;
+            }
+            if (!double.TryParse(cells[1], style, culture, out var amplitude) || !double.IsFinite(amplitude))
+            {
+                issues.Add(new("line " + (index + 1) + ", amplitude", "幅值必须为有限数值。"));
+                continue;
+            }
+            points.Add(new SpectrumPoint { FrequencyHz = hz, Amplitude = amplitude });
+            if (issues.Count >= 25 || points.Count > 10000)
+            {
+                issues.Add(new("file", "超过 25 条错误或 10000 点，停止解析。"));
+                break;
+            }
+        }
+        var spectrum = new Spectrum
+        {
+            Name = metadata.Name,
+            Rpm = metadata.Rpm,
+            Unit = metadata.Unit,
+            Reference = metadata.Reference,
+            Condition = metadata.Condition,
+            Origin = metadata.Origin,
+            FileName = metadata.FileName,
+            InputSha256 = ProjectCodec.Hash(content),
+            Points = points
+        };
+        issues.AddRange(ProjectValidator.ValidateSpectrum(spectrum));
+        return new(issues.Count == 0 ? spectrum : null, issues, points.Count);
+    }
+
+    public static string Template()
+    {
+        return "frequency_hz,amplitude\n0,20\n30,25\n59,32\n60,48\n61,33\n90,21\n";
+    }
+
+    public static string Export(Spectrum spectrum)
+    {
+        var text = new StringBuilder("frequency_hz,amplitude\n");
+        foreach (var point in spectrum.Points)
+        {
+            text.Append(point.FrequencyHz.ToString("R", CultureInfo.InvariantCulture));
+            text.Append(',');
+            text.AppendLine(point.Amplitude.ToString("R", CultureInfo.InvariantCulture));
+        }
+        return text.ToString();
+    }
+}
+
+========================================================================
+FILE: src/MotorFrequency.Core/Services/SpectrumStatistics.cs
+========================================================================
+using MotorFrequency.Core.Domain;
+
+namespace MotorFrequency.Core.Services;
+
+public sealed record SpectrumSummary(
+    double MinimumHz,
+    double MaximumHz,
+    double MinimumSpacingHz,
+    double MaximumSpacingHz,
+    double MedianSpacingHz,
+    bool UniformSpacing,
+    double MaximumAmplitude,
+    double MaximumAtHz,
+    int PointsInsideView,
+    int TotalPoints,
+    string Statement);
+
+public static class SpectrumStatistics
+{
+    public static SpectrumSummary Inspect(Spectrum spectrum, double maximumViewHz)
+    {
+        var issues = ProjectValidator.ValidateSpectrum(spectrum);
+        if (issues.Count > 0)
+        {
+            throw new InvalidDataException("无法汇总无效频谱：" + issues[0].Message);
+        }
+        var points = spectrum.Points;
+        var spacings = new List<double>();
+        for (var i = 1; i < points.Count; i++)
+        {
+            spacings.Add(points[i].FrequencyHz - points[i - 1].FrequencyHz);
+        }
+        spacings.Sort();
+        var middle = spacings.Count / 2;
+        var median = spacings.Count % 2 == 0
+            ? (spacings[middle - 1] + spacings[middle]) / 2
+            : spacings[middle];
+        var minimum = spacings[0];
+        var maximum = spacings[^1];
+        var uniform = maximum - minimum <= Math.Max(1e-9, maximum * 1e-6);
+        var maximumPoint = points.MaxBy(x => x.Amplitude)!;
+        var inside = points.Count(x => x.FrequencyHz <= maximumViewHz);
+        var statement = uniform
+            ? "频率间距近似一致；仅汇总输入网格，不推断时域采样率或FFT分辨率。"
+            : "频率间距不一致；保留原始网格，不做重采样，峰值邻近结果需结合局部间距阅读。";
+        if (maximumPoint == points[0] || maximumPoint == points[^1])
+        {
+            statement += " 最大输入幅值在端点，不会作为内部谱峰参与邻近核对。";
+        }
+        if (inside < points.Count)
+        {
+            statement += " 部分原始频点超出当前图表上限。";
+        }
+        return new SpectrumSummary(
+            points[0].FrequencyHz,
+            points[^1].FrequencyHz,
+            minimum,
+            maximum,
+            median,
+            uniform,
+            maximumPoint.Amplitude,
+            maximumPoint.FrequencyHz,
+            inside,
+            points.Count,
+            statement);
+    }
+}

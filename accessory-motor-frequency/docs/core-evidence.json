@@ -1,0 +1,265 @@
+{
+  "at": "2026-11-04T07:04:27.0239872+00:00",
+  "runtime": "10.0.0",
+  "os": "Unix 6.18.57.0",
+  "passed": 64,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "示例项目全量校验",
+      "passed": true
+    },
+    {
+      "name": "人工手算1800转机械30电气60槽360齿槽360",
+      "passed": true
+    },
+    {
+      "name": "多转速手算 n=0",
+      "passed": true
+    },
+    {
+      "name": "多转速手算 n=600",
+      "passed": true
+    },
+    {
+      "name": "多转速手算 n=1800",
+      "passed": true
+    },
+    {
+      "name": "多转速手算 n=3600",
+      "passed": true
+    },
+    {
+      "name": "多转速手算 n=100000",
+      "passed": true
+    },
+    {
+      "name": "12槽10极理想齿槽60阶",
+      "passed": true
+    },
+    {
+      "name": "分数阶次0.5",
+      "passed": true
+    },
+    {
+      "name": "非法负阶与负转速",
+      "passed": true
+    },
+    {
+      "name": "非有限数值",
+      "passed": true
+    },
+    {
+      "name": "有刷单刷10片300Hz且不输出同步电频槽齿槽",
+      "passed": true
+    },
+    {
+      "name": "齿槽假设缺失拒绝",
+      "passed": true
+    },
+    {
+      "name": "未启用齿槽不自动提供候选",
+      "passed": true
+    },
+    {
+      "name": "输入边界 reversed",
+      "passed": true
+    },
+    {
+      "name": "输入边界 step",
+      "passed": true
+    },
+    {
+      "name": "输入边界 inspect",
+      "passed": true
+    },
+    {
+      "name": "输入边界 zeroPole",
+      "passed": true
+    },
+    {
+      "name": "输入边界 slots",
+      "passed": true
+    },
+    {
+      "name": "输入边界 NaN",
+      "passed": true
+    },
+    {
+      "name": "输入边界 tooManySteps",
+      "passed": true
+    },
+    {
+      "name": "输入边界 negative",
+      "passed": true
+    },
+    {
+      "name": "合法参数上下限",
+      "passed": true
+    },
+    {
+      "name": "扫描非整步长终点纳入",
+      "passed": true
+    },
+    {
+      "name": "解析频段转速1650至1950",
+      "passed": true
+    },
+    {
+      "name": "单点频段边界包含",
+      "passed": true
+    },
+    {
+      "name": "同频多候选均保留",
+      "passed": true
+    },
+    {
+      "name": "比较统一1800转当前60快照90差负30",
+      "passed": true
+    },
+    {
+      "name": "CSV有效与BOM",
+      "passed": true
+    },
+    {
+      "name": "CSV整批拒绝 坏表头",
+      "passed": true
+    },
+    {
+      "name": "CSV整批拒绝 重复频率",
+      "passed": true
+    },
+    {
+      "name": "CSV整批拒绝 降序",
+      "passed": true
+    },
+    {
+      "name": "CSV整批拒绝 坏数字",
+      "passed": true
+    },
+    {
+      "name": "CSV整批拒绝 NaN",
+      "passed": true
+    },
+    {
+      "name": "CSV整批拒绝 额外列",
+      "passed": true
+    },
+    {
+      "name": "CSV整批拒绝 中间空行",
+      "passed": true
+    },
+    {
+      "name": "CSV整批拒绝 负频率",
+      "passed": true
+    },
+    {
+      "name": "CSV整批拒绝 仅一行",
+      "passed": true
+    },
+    {
+      "name": "CSV线性幅值拒负数",
+      "passed": true
+    },
+    {
+      "name": "CSV负dB可接受",
+      "passed": true
+    },
+    {
+      "name": "元信息缺参考量拒绝",
+      "passed": true
+    },
+    {
+      "name": "项目序列化完整往返",
+      "passed": true
+    },
+    {
+      "name": "损坏JSON拒绝",
+      "passed": true
+    },
+    {
+      "name": "未知版本拒绝",
+      "passed": true
+    },
+    {
+      "name": "未知字段拒绝",
+      "passed": true
+    },
+    {
+      "name": "缺少motor字段不静默默认",
+      "passed": true
+    },
+    {
+      "name": "重复标识与空对象拒绝",
+      "passed": true
+    },
+    {
+      "name": "实际写入并重开全部内嵌频点",
+      "passed": true
+    },
+    {
+      "name": "同标识导入禁止隐式覆盖",
+      "passed": true
+    },
+    {
+      "name": "保存第二版保留备份",
+      "passed": true
+    },
+    {
+      "name": "外部修改冲突阻断",
+      "passed": true
+    },
+    {
+      "name": "目录搬迁重新打开",
+      "passed": true
+    },
+    {
+      "name": "无效UTF8项目库保留健康项目并列警告",
+      "passed": true
+    },
+    {
+      "name": "损坏项目库文件给警告",
+      "passed": true
+    },
+    {
+      "name": "CSV公式注入转义",
+      "passed": true
+    },
+    {
+      "name": "HTML用户文本编码",
+      "passed": true
+    },
+    {
+      "name": "导出频率CSV来源版本单位哈希",
+      "passed": true
+    },
+    {
+      "name": "SVG含真实候选路径",
+      "passed": true
+    },
+    {
+      "name": "扫查9组含二极对60Hz",
+      "passed": true
+    },
+    {
+      "name": "扫查重复值和超限拒绝",
+      "passed": true
+    },
+    {
+      "name": "反算60Hz电频对应1800转",
+      "passed": true
+    },
+    {
+      "name": "输入复核表与JSON包含来源边界",
+      "passed": true
+    },
+    {
+      "name": "频谱网格统计2Hz与最大幅值范围",
+      "passed": true
+    },
+    {
+      "name": "扫查上下文哈希稳定且响应参数变化",
+      "passed": true
+    }
+  ]
+}

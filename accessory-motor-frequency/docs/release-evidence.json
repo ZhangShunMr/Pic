@@ -1,0 +1,41 @@
+{
+  "at": "2026-11-04T07:08:42.227909+00:00",
+  "software": "汽车附件电机电磁激励频率设计软件",
+  "version": "V1.0",
+  "repository": "ZhangShunMr/Pic",
+  "branch": "codex/accessory-motor-frequency-20261104",
+  "baseBranch": "codex/cloud-dev-20261102",
+  "baseSha": "8abe75017a382f03da0bac6499425725b1a5858d",
+  "changedScope": "仅新增 accessory-motor-frequency/",
+  "productionNonblankLines": 3684,
+  "productionLanguages": {
+    ".razor": 772,
+    ".cs": 2512,
+    ".css": 377,
+    ".js": 23
+  },
+  "coreChecksPassed": 64,
+  "coreChecksFailed": 0,
+  "browserChecksPassed": 33,
+  "supplementaryChecksPassed": 12,
+  "materialChecksPassed": 339,
+  "screenshots": 18,
+  "manualLibreOfficePages": 15,
+  "manualWordVerified": false,
+  "mainFunctionHanCount": 837,
+  "environment": {
+    "python": "3.12.14",
+    "packages": {
+      "playwright": "1.62.0",
+      "python-docx": "1.2.0",
+      "PyMuPDF": "1.26.6",
+      "Pillow": "12.3.0"
+    }
+  },
+  "remaining": [
+    "Microsoft Word实际分页至少10页终稿验收未执行",
+    "申请人专用模板待提供核对",
+    "身份权属和开发发表事实待申请人核实"
+  ],
+  "permissionsBlockers": []
+}
