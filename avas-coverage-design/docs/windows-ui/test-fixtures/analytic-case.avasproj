@@ -1,7 +1,7 @@
 {
   "Schema": 1,
   "SoftwareVersion": "2.0",
-  "Id": "6dbf9ea1-e5b0-4cca-852d-df961f771880",
+  "Id": "8d954e2a-c295-42ea-a9e2-f8c073dfd77b",
   "Name": "\u72EC\u7ACB\u89E3\u6790\u6838\u5BF9",
   "Owner": "\u81EA\u52A8\u9A8C\u8BC1",
   "Vehicle": "",
@@ -9,7 +9,7 @@
   "Note": "",
   "Archived": false,
   "Revision": 0,
-  "Created": "2026-11-04T15:40:52.8800994+00:00",
+  "Created": "2026-11-04T15:43:15.0272836+00:00",
   "Settings": {
     "MinX": -10,
     "MaxX": 10,
@@ -68,7 +68,7 @@
   },
   "Speakers": [
     {
-      "Id": "b95d6d63-4ecb-48e1-a9fb-a40b9b0f8f5d",
+      "Id": "3ce08947-d579-40f8-8895-f1d100785be2",
       "Name": "\u65B0\u626C\u58F0\u5668",
       "Enabled": true,
       "X": 0,
@@ -124,7 +124,7 @@
   ],
   "Listeners": [
     {
-      "Id": "f00bafb5-27ee-42c4-8671-3c3a5324b964",
+      "Id": "dfddaf23-2035-46df-a213-2c833ddbb3c8",
       "Name": "2m\u6838\u5BF9\u70B9",
       "X": 2,
       "Y": 0,

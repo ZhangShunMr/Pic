@@ -1,0 +1,61 @@
+{
+  "at": "2026-11-04T15:43:25.745902+00:00",
+  "os": "Microsoft Windows 10.0.26100",
+  "runtime": ".NET 10.0.14",
+  "status": "failed",
+  "limitations": [
+    "File picker and confirmation host replaced for deterministic automation",
+    "Audio playback and perceived audibility not verified",
+    "Client area captures exclude operating-system window chrome",
+    "Manual keyboard, scaling and screen-reader checks still required"
+  ],
+  "checks": [
+    "\u771F\u5B9E\u7A97\u53E3\u7A7A\u767D\u542F\u52A8",
+    "01-\u7A7A\u767D\u9879\u76EE\uFF1A\u539F\u751F\u80CC\u666F\u4E0D\u900F\u660E",
+    "01-\u7A7A\u767D\u9879\u76EE\uFF1A\u5305\u542B\u5B9E\u9645\u6E32\u67D3\u5185\u5BB9",
+    "WPF\u6587\u672C\u7ED1\u5B9A\u5199\u5165\u8349\u7A3F",
+    "\u539F\u751F\u547D\u4EE4\u5E94\u7528\u5B57\u6BB5",
+    "\u72EC\u7ACB\u6A21\u62DF\u793A\u4F8B\u5B8C\u6210\u58F0\u573A\u8BA1\u7B97",
+    "02-\u6A21\u62DF\u58F0\u573A\uFF1A\u539F\u751F\u80CC\u666F\u4E0D\u900F\u660E",
+    "02-\u6A21\u62DF\u58F0\u573A\uFF1A\u5305\u542B\u5B9E\u9645\u6E32\u67D3\u5185\u5BB9",
+    "\u8FDB\u5165\u5DE5\u4F5C\u533A\uFF1A\u626C\u58F0\u5668",
+    "03-\u626C\u58F0\u5668\u9891\u5E26\uFF1A\u539F\u751F\u80CC\u666F\u4E0D\u900F\u660E",
+    "03-\u626C\u58F0\u5668\u9891\u5E26\uFF1A\u5305\u542B\u5B9E\u9645\u6E32\u67D3\u5185\u5BB9",
+    "\u6B63\u5E38\u8F93\u5165\u9636\u6BB5\u6CA1\u6709WPF\u7ED1\u5B9A\u9519\u8BEF",
+    "FAILED: System.InvalidOperationException: \u539F\u751F\u6570\u503C\u7ED1\u5B9A\u62D2\u7EDD\u6587\u5B57\u8F93\u5165\r\n   at Program.\u003C\u003Ec__DisplayClass0_0.\u003CMain\u003Eg__Assert|0(Boolean value, String message) in D:\\a\\Pic\\Pic\\avas-coverage-design\\tests\\Avas.DesktopVerification\\Program.cs:line 38\r\n   at Program.\u003C\u003Ec__DisplayClass0_0.\u003C\u003CMain\u003Eb__4\u003Ed.MoveNext() in D:\\a\\Pic\\Pic\\avas-coverage-design\\tests\\Avas.DesktopVerification\\Program.cs:line 102",
+    "failure\uFF1A\u539F\u751F\u80CC\u666F\u4E0D\u900F\u660E",
+    "failure\uFF1A\u5305\u542B\u5B9E\u9645\u6E32\u67D3\u5185\u5BB9"
+  ],
+  "bindingErrors": [],
+  "expectedInvalidNumericValidationTrace": [],
+  "images": [
+    {
+      "file": "01-\u7A7A\u767D\u9879\u76EE.png",
+      "sha256": "c34ed93b8ad253c5463dd82dd2ce14d4e013ba7174a6261ddcea2c33ada0ef6a",
+      "width": 1104,
+      "height": 749,
+      "provenance": "live Windows WPF client visual, shown MainWindow"
+    },
+    {
+      "file": "02-\u6A21\u62DF\u58F0\u573A.png",
+      "sha256": "3446ed009e7a39fb2631b2da3e663e5edaa04eb4dc49b317da7ac57252683e7c",
+      "width": 1104,
+      "height": 749,
+      "provenance": "live Windows WPF client visual, shown MainWindow"
+    },
+    {
+      "file": "03-\u626C\u58F0\u5668\u9891\u5E26.png",
+      "sha256": "19eda948c749c02f4668b5dfae74b46cd9caf20dcc55a197e8567cd52b528861",
+      "width": 1104,
+      "height": 749,
+      "provenance": "live Windows WPF client visual, shown MainWindow"
+    },
+    {
+      "file": "failure.png",
+      "sha256": "a1e975beb3f2faa4c89e3a00ad34d69d6891661a76da21fdb97d44f7aafa43e8",
+      "width": 1104,
+      "height": 749,
+      "provenance": "live Windows WPF client visual, shown MainWindow"
+    }
+  ]
+}
