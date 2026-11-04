@@ -131,7 +131,7 @@ for key, value in fields:
             paragraph.paragraph_format.keep_together = False
 info.save(root / 'docs/软著信息采集表-草稿.docx')
 
-inventory = json.loads((root / 'docs/source-inventory.json').read_text())
+inventory = json.loads((root / 'docs/source-inventory.json').read_text(encoding='utf-8'))
 source = setup('完整生产源码排印稿', source=True)
 normal = source.styles['Normal']
 normal.font.name = 'Consolas'
@@ -144,7 +144,7 @@ source.add_paragraph(f"实际参与构建的手写生产文件{len(inventory['fi
 for item in inventory['files']:
     source.add_heading(item['path'], 1)
     source.add_paragraph(item['purpose'] + ' | SHA-256 ' + item['sha256'])
-    for number, line in enumerate((root / item['path']).read_text().splitlines(), 1):
+    for number, line in enumerate((root / item['path']).read_text(encoding='utf-8').splitlines(), 1):
         paragraph = source.add_paragraph(f'{number:04d}  {line}')
         paragraph.paragraph_format.widow_control = False
 source.save(root / 'docs/完整生产源码排印稿.docx')

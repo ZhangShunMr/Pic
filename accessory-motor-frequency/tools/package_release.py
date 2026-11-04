@@ -29,7 +29,7 @@ with zipfile.ZipFile(archive) as check:
     bad = check.testzip()
     if bad:
         raise RuntimeError('Corrupt ZIP entry: ' + bad)
-source = json.loads((root / 'docs/source-inventory.json').read_text())
+source = json.loads((root / 'docs/source-inventory.json').read_text(encoding='utf-8'))
 proof_path = root / 'docs/windows-evidence/published-exe.json'
 proof = json.loads(proof_path.read_text(encoding='utf-8-sig')) if proof_path.exists() else {}
 verified = (os.name == 'nt' and os.environ.get('GITHUB_SHA') == proof.get('sourceCommit')
