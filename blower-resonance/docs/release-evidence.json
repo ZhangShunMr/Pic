@@ -1,12 +1,14 @@
 {
   "archive": "release/BlowerResonance-V2.0-win-x64.zip",
-  "archive_bytes": 70114798,
-  "archive_sha256": "d3d3fb4ab951ae11aacda0cb8629e2a5fe7911d41f093c35d9d0bac5907da552",
-  "file_count": 473,
+  "archive_bytes": 72288405,
+  "archive_sha256": "822f50ee66c338d6f75d9f2a9bc250574d33e295976456803fae8ea080efbbeb",
+  "file_count": 472,
   "exe_pe_signature": "MZ",
-  "exe_sha256": "96fa88c6c6f1a97128dde1e169ee3b0cb9c6723e97bd5f4c067d4541cc09c387",
+  "exe_sha256": "cec23ba607d9fa90d9448608f1eaef767e06d91ec4b0cc0b37b97c95b9ed33b5",
   "self_contained": true,
   "target": "win-x64",
-  "packaging_check": "zip CRC and required executable/framework files passed",
-  "windows_runtime_verified": false
+  "source_commit": "2c88f6c9cb270cdd2482f86b6ddf77b117f76d69",
+  "windows_runtime_verified": true,
+  "workflow_run": "https://github.com/ZhangShunMr/Pic/actions/runs/41861131666",
+  "verification": "Windows generated bundle matched its CI SHA256; archived exe matches the directly launched Windows exe SHA256; ZIP CRC and required runtime files passed"
 }

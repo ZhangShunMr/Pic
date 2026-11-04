@@ -175,7 +175,7 @@ Test("blank native workflow through compute scan compare save reopen export", ()
     Assert(reopened.Plans.Count==2 && reopened.Checks.Count==1,"reopen lost inputs");
 });
 File.WriteAllText(args.FirstOrDefault() ?? "workflow-evidence.json",
-    JsonSerializer.Serialize(new { date = DateTimeOffset.UtcNow, platform = "Linux; linked production ViewModels and file service, no WPF runtime", passed = checks.Count - failures, failed = failures, checks }, new JsonSerializerOptions { WriteIndented = true }));
+    JsonSerializer.Serialize(new { date = DateTimeOffset.UtcNow, platform = System.Runtime.InteropServices.RuntimeInformation.OSDescription + "; linked production ViewModels and file service; this test does not instantiate WPF", passed = checks.Count - failures, failed = failures, checks }, new JsonSerializerOptions { WriteIndented = true }));
 Directory.Delete(root, true);
 Console.WriteLine($"{checks.Count - failures}/{checks.Count} passed");
 return failures == 0 ? 0 : 1;
