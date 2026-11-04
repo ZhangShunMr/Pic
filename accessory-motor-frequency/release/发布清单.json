@@ -5,29 +5,29 @@
   "base_main_sha": "2bf4fc16fbca9c7ef36c4cce0a7d3034a16a2cd4",
   "runtime": "Windows 10/11 x64, self-contained .NET10 WPF; offline target",
   "archive": "MotorFrequency-V2.0-win-x64.zip",
-  "archive_bytes": 72318105,
-  "archive_sha256": "4363356eb7b4cbf3b25e307609fac1bab1be2bf829592430319655045e7b720a",
+  "archive_bytes": 72317420,
+  "archive_sha256": "6617acdf4f1682c3fe503c4cc0142bb74ac22609a8719feb2825dd45b1ea62af",
   "zip_integrity_verified": true,
   "windows_pe_header_verified": true,
   "windows_execution_verified": true,
   "signed": false,
   "windows_execution_scope": "Windows Server 2025 CI: native window startup and normal exit; byte hashes of EXE and three application assemblies matched",
-  "windows_ci_source_commit": "ed5123ae2f26f1083783a009d099e084cf1a265b",
+  "windows_ci_source_commit": "21e62020f9fc1ed1a28b468a54f3b453270df812",
   "windows_ci_assembly_hashes": [
     {
-      "sha256": "3E7B54D031F607D33FA626B4A90B5F306D56F1F5400D636A23FB319984F15E7B",
-      "file": "MotorFrequency.dll"
+      "file": "MotorFrequency.dll",
+      "sha256": "EDD60415D03146BF03CA6118D23D445F5AAF75ECFCCF8A957847F5F17E8A72D1"
     },
     {
-      "sha256": "F080975228982E9F2F22D798D48A045A5F73BD68F50A9DF5EDC5DBD705364CB1",
-      "file": "MotorFrequency.Application.dll"
+      "file": "MotorFrequency.Application.dll",
+      "sha256": "BC0D56DA08035BFB02D13184843EB6B2D47E959C31F75048555DEB64BFC65A00"
     },
     {
-      "sha256": "B0FF1BA95804299E9AE6FEDCD1CF4AADC665EBA53F10A0908558CB3B3C6F79AA",
-      "file": "MotorFrequency.Core.dll"
+      "file": "MotorFrequency.Core.dll",
+      "sha256": "02564B2B586C3630102F8F46CC5A150553DD96D68486800CC764A0B6BC3FC4EC"
     }
   ],
-  "windows_ci_run": "https://github.com/ZhangShunMr/Pic/actions/runs/41868921695",
+  "windows_ci_run": "https://github.com/ZhangShunMr/Pic/actions/runs/41869681185",
   "production_source_nonblank_lines": 4130,
   "production_source_manifest_sha256": "af38dc3dd2e5f84abc4bc6dcc666428592a12bd4a7c8e62c9421084ea405c6f7",
   "tests": {
@@ -209,8 +209,8 @@
     },
     {
       "path": "docs/application-evidence.json",
-      "bytes": 3588,
-      "sha256": "ea4ab49614ec1d2433e6c48332130730c00dded5a7cab649a89a5b99f6600096"
+      "bytes": 3589,
+      "sha256": "84f4816d2d1dad49da1c68343364a29f122819d33e4aa70301a73e4ba4b26fd2"
     },
     {
       "path": "docs/application-test-log.txt",
@@ -225,7 +225,7 @@
     {
       "path": "docs/core-evidence.json",
       "bytes": 4840,
-      "sha256": "e797faab8b91d615fcf3a17269f1119c8900585a7ba9b4e101e79dea940a5d38"
+      "sha256": "02d931e53357ad1642342a69b73013ad4ce8b7b99486778cf6891c24d1d808ba"
     },
     {
       "path": "docs/core-test-log.txt",
@@ -270,22 +270,22 @@
     {
       "path": "docs/sample-exports/模拟-comparison.csv",
       "bytes": 1845,
-      "sha256": "945209bceba605ef9ac46573d26227aa7f745f0ecee49a5b04e9efad5c1d80b9"
+      "sha256": "0e67afce23d969035f377473befaf7200c136acedbad4c8f4d35d662c6a9c9d9"
     },
     {
       "path": "docs/sample-exports/模拟-crossing.csv",
       "bytes": 2786,
-      "sha256": "f0c1a9369fa3e39390124fbe110093659ae5377b4bbfc28a6161eb7055e5a3de"
+      "sha256": "522fb0ebde2db30c99534d8fec2d267cb0781ead3242ff17589558fbb74cb7ba"
     },
     {
       "path": "docs/sample-exports/模拟-evidence.csv",
       "bytes": 5267,
-      "sha256": "4947b4029630dd80ba2c4c031299fb5b6e8a6017bc886e83e29f82309d737c61"
+      "sha256": "6a1d2f3d69420c5cb0bdcbc1b45a996cbc7fee5ede29836f27f78279a650c4cf"
     },
     {
       "path": "docs/sample-exports/模拟-frequency.csv",
       "bytes": 113678,
-      "sha256": "dfdad6aa8ec8459ddd568395acf07ac4fbccdde41d7e9752fd8be644e911667c"
+      "sha256": "25afeb73ea2f4249cb8109ce166c4ea015270613978313aecd1d21d41a90d939"
     },
     {
       "path": "docs/sample-exports/模拟-raw.csv",
@@ -295,7 +295,7 @@
     {
       "path": "docs/sample-exports/模拟-report.html",
       "bytes": 10700,
-      "sha256": "6284a7a4290f7a6baf5a8d30055a297c1120d465dd5185bd56862d37cf30426b"
+      "sha256": "6503963ce7ed6c72d7ea178e4613a8059cb0361a8ecf2486eeded81aac06e447"
     },
     {
       "path": "docs/sample-exports/模拟-reverse.csv",
@@ -305,7 +305,7 @@
     {
       "path": "docs/sample-exports/模拟-review.json",
       "bytes": 3790,
-      "sha256": "92885aad129d3f38363ca33a4ccd789cdd0202da10d94ca1bf0ddeb981d1aed8"
+      "sha256": "c96c9e48a379d28d841b8550846b8062e6143d7a066d258f56fe09a361a76c88"
     },
     {
       "path": "docs/sample-exports/模拟-svg.svg",
@@ -320,7 +320,7 @@
     {
       "path": "docs/sample-exports/独立模拟案例.motorproj",
       "bytes": 76683,
-      "sha256": "ce36e5a3316e700239b55742304ed539f10b35a2a74c927efe64f31078fa3250"
+      "sha256": "7c3e4cb379f5a01c8d186a4903df4abb65ebc8e67e641e5668420d3a568f1d53"
     },
     {
       "path": "docs/sample-exports/独立模拟案例.motorproj.bak",
@@ -459,8 +459,8 @@
     },
     {
       "path": "docs/windows-dialog-evidence/dialog-01-save.png",
-      "bytes": 24764,
-      "sha256": "51b32350194d295caf2eb0dfa8fdfe288e2660fc3c58c7f949e852df372e00c7"
+      "bytes": 24655,
+      "sha256": "c753b17ba5d4dd5ff058806ea61ef7983ecf28f5753108ac900ffcfe680e9e2e"
     },
     {
       "path": "docs/windows-dialog-evidence/dialog-01-save.png.controls.json",
@@ -470,7 +470,7 @@
     {
       "path": "docs/windows-dialog-evidence/dialog-01-save.png.selection.json",
       "bytes": 713,
-      "sha256": "059a5d582754e237f79f0884e0b1bec2ba38e4c2142616fe831c5c2ca7a3e5cc"
+      "sha256": "5536412eaf91c40bba1764e5c3c7c94e9e2dd55326d866ecd0354f3fb241608b"
     },
     {
       "path": "docs/windows-dialog-evidence/dialog-02-open.png",
@@ -484,8 +484,8 @@
     },
     {
       "path": "docs/windows-dialog-evidence/dialog-02-open.png.failure.txt",
-      "bytes": 538,
-      "sha256": "f48aa7d2a965ee5dad616d691b5df4c685bff0620472b818125332b678b265de"
+      "bytes": 757,
+      "sha256": "26d078d1300f544be5fb9167afff52c153a152c4b6413a7f48794ac43135c52b"
     },
     {
       "path": "docs/windows-dialog-evidence/failure.txt",
@@ -494,8 +494,8 @@
     },
     {
       "path": "docs/windows-dialog-evidence/history.png",
-      "bytes": 144056,
-      "sha256": "15c8d0f73e63af73f34728220299cae03383f4ca9733525d27cb9c6a35e57fce"
+      "bytes": 143908,
+      "sha256": "1123a704fe9f882db5ad824ffd36e9557770b5774eefd1b69f0ac9e0f6da4b10"
     },
     {
       "path": "docs/windows-dialog-evidence/minimum-window.png",
@@ -530,7 +530,7 @@
     {
       "path": "docs/windows-dialog-evidence/workflow-state.json",
       "bytes": 240,
-      "sha256": "9086b72c0ea7504a47ab6b941d46fde8023b590018a0168cf74c0e0413a8550d"
+      "sha256": "11ee113df6be18c131b6ce289be3bcf16e9113a82018a71aa84c310435ec131e"
     },
     {
       "path": "docs/windows-evidence/00-empty.png",
@@ -544,8 +544,8 @@
     },
     {
       "path": "docs/windows-evidence/application-evidence.json",
-      "bytes": 3588,
-      "sha256": "ea4ab49614ec1d2433e6c48332130730c00dded5a7cab649a89a5b99f6600096"
+      "bytes": 3589,
+      "sha256": "84f4816d2d1dad49da1c68343364a29f122819d33e4aa70301a73e4ba4b26fd2"
     },
     {
       "path": "docs/windows-evidence/application-log.txt",
@@ -560,22 +560,22 @@
     {
       "path": "docs/windows-evidence/build-log.txt",
       "bytes": 1894,
-      "sha256": "f205ab272d3f1ae1be132f2996c0b3156f6ab528435cafd81a92c6cfd2fb47c0"
+      "sha256": "e02302d8a3af1c157319ae02a0a8adc48783af28b1822565d708269e43ee05dd"
     },
     {
       "path": "docs/windows-evidence/candidates.png",
-      "bytes": 165741,
-      "sha256": "b513b3907846d952dbf61c4338266978998960a10258245e5e0fafd02de0f388"
+      "bytes": 165685,
+      "sha256": "9364e7cbd9f2212ab03c8177e70e7d30404627702e599855b3ea8e501dcb5fc2"
     },
     {
       "path": "docs/windows-evidence/compare.png",
-      "bytes": 165738,
-      "sha256": "79d69368c9cebe89bda8007dec3a983945ef1e3d1c74930bb8b52b9c118cf082"
+      "bytes": 165676,
+      "sha256": "e7f120efdf9ccefb4bc12bdd3951c2103f2a728ccce99ffefab6c8f8545ff44e"
     },
     {
       "path": "docs/windows-evidence/core-evidence.json",
       "bytes": 4840,
-      "sha256": "e797faab8b91d615fcf3a17269f1119c8900585a7ba9b4e101e79dea940a5d38"
+      "sha256": "02d931e53357ad1642342a69b73013ad4ce8b7b99486778cf6891c24d1d808ba"
     },
     {
       "path": "docs/windows-evidence/core-log.txt",
@@ -584,13 +584,13 @@
     },
     {
       "path": "docs/windows-evidence/history.png",
-      "bytes": 144084,
-      "sha256": "12be9a24e8cb57e0e0957ee3091136ca6a5438f803ea53917ab69fafacf59183"
+      "bytes": 144001,
+      "sha256": "98b07a9d5ea031651564b370df999dd4b16f275857ab282804069a32832f47fc"
     },
     {
       "path": "docs/windows-evidence/minimum-window.png",
-      "bytes": 149254,
-      "sha256": "ae3c95fa8ebca90673a7bf46d1b8bc555de61fa22f1a6ec7178ea4e1ec4a8e63"
+      "bytes": 149210,
+      "sha256": "88d75bd8bc1f1f97dcdf279540124b2a6422098eb067e5bd89b5d1f1a9528b28"
     },
     {
       "path": "docs/windows-evidence/motor.png",
@@ -610,12 +610,12 @@
     {
       "path": "docs/windows-evidence/published-exe.json",
       "bytes": 1105,
-      "sha256": "b5b9bb8285f4fa0a4703637e9255670257840dbc4dad5b1efc2b1e5cf1a40917"
+      "sha256": "69801cdbd46dfc19e668211a522733e67c5b9949143fb7e3bae0a7cc1078b511"
     },
     {
       "path": "docs/windows-evidence/result.json",
       "bytes": 579,
-      "sha256": "2dbfd3f93aefab7f1757661dc9701e225a03bbf4114bb661ab7b870b43222c7d"
+      "sha256": "20167bba9310c6bcd3c6b0448fb6cc33b00440406ff704a86820e1e077457e47"
     },
     {
       "path": "docs/windows-evidence/spectrum.png",
@@ -630,7 +630,7 @@
     {
       "path": "docs/windows-evidence/word-pagination.json",
       "bytes": 403,
-      "sha256": "7d4aeae206edcd5081ba912eb16d56682c273d39eb9068d8d09db855dd79e312"
+      "sha256": "ff8b9105af3883cba8404b8b034f5d39a2ffce8e016e02315102acc162a41e15"
     },
     {
       "path": "docs/windows-evidence/wpf-log.txt",
@@ -779,8 +779,8 @@
     },
     {
       "path": "examples/60Hz-模拟案例.motorproj",
-      "bytes": 76681,
-      "sha256": "dabdec531a856e2bc7b005e06b0cde65acb941ed9b9df7e4f14f65f26e31b5df"
+      "bytes": 76682,
+      "sha256": "c472cd24099a397cbd1665abab8993a0d5d93a0231290862a6acb642cc24880d"
     },
     {
       "path": "examples/频谱模板.csv",
@@ -1080,12 +1080,12 @@
     {
       "path": "MotorFrequency.Application.dll",
       "bytes": 74240,
-      "sha256": "f080975228982e9f2f22d798d48a045a5f73bd68f50a9df5edc5dbd705364cb1"
+      "sha256": "bc0d56da08035bfb02d13184843eb6b2d47e959c31f75048555deb64bfc65a00"
     },
     {
       "path": "MotorFrequency.Core.dll",
       "bytes": 122880,
-      "sha256": "b0ff1ba95804299e9ae6fedcd1cf4aadc665eba53f10a0908558cb3b3c6f79aa"
+      "sha256": "02564b2b586c3630102f8f46cc5a150553dd96d68486800cc764a0b6bc3fc4ec"
     },
     {
       "path": "MotorFrequency.deps.json",
@@ -1095,12 +1095,12 @@
     {
       "path": "MotorFrequency.dll",
       "bytes": 69120,
-      "sha256": "3e7b54d031f607d33fa626b4a90b5f306d56f1f5400d636a23fb319984f15e7b"
+      "sha256": "edd60415d03146bf03ca6118d23d445f5aaf75ecfccf8a957847f5f17e8a72d1"
     },
     {
       "path": "MotorFrequency.exe",
       "bytes": 162304,
-      "sha256": "392a1128d5a9c41ff6fdc2118e8cfc6cf2c8dc3e6d3908eff83bb13ddf44df80"
+      "sha256": "4cf7d025942459756883fb0f1aa879846c9b7d7a62a381ae6c2979c8da6b59a9"
     },
     {
       "path": "MotorFrequency.runtimeconfig.json",

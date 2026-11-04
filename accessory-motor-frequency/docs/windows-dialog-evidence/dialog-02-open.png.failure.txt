@@ -1,3 +1,4 @@
-System.InvalidOperationException: Native filename edit did not retain entered path
+System.InvalidOperationException: Native capture is unexpectedly blank
    at MotorFrequency.Desktop.Verification.NativeDialogVerification.Require(Boolean condition, String message) in D:\a\Pic\Pic\accessory-motor-frequency\tests\MotorFrequency.Desktop.Verification\NativeDialogVerification.cs:line 54
-   at MotorFrequency.Desktop.Verification.NativeDialogVerification.<>c__DisplayClass3_0.<Dialog>b__1() in D:\a\Pic\Pic\accessory-motor-frequency\tests\MotorFrequency.Desktop.Verification\NativeDialogVerification.cs:line 144
+   at MotorFrequency.Desktop.Verification.NativeDialogVerification.CaptureDialog(IntPtr window, String path) in D:\a\Pic\Pic\accessory-motor-frequency\tests\MotorFrequency.Desktop.Verification\NativeDialogVerification.cs:line 226
+   at MotorFrequency.Desktop.Verification.NativeDialogVerification.<>c__DisplayClass3_0.<Dialog>b__1() in D:\a\Pic\Pic\accessory-motor-frequency\tests\MotorFrequency.Desktop.Verification\NativeDialogVerification.cs:line 110

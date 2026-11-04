@@ -1,10 +1,10 @@
   Determining projects to restore...
-  Restored D:\a\Pic\Pic\accessory-motor-frequency\src\MotorFrequency.Desktop\MotorFrequency.Desktop.csproj (in 707 ms).
-  Restored D:\a\Pic\Pic\accessory-motor-frequency\tests\MotorFrequency.Verification\MotorFrequency.Verification.csproj (in 707 ms).
-  Restored D:\a\Pic\Pic\accessory-motor-frequency\src\MotorFrequency.Core\MotorFrequency.Core.csproj (in 703 ms).
-  Restored D:\a\Pic\Pic\accessory-motor-frequency\src\MotorFrequency.Application\MotorFrequency.Application.csproj (in 707 ms).
-  Restored D:\a\Pic\Pic\accessory-motor-frequency\tests\MotorFrequency.Application.Verification\MotorFrequency.Application.Verification.csproj (in 3 ms).
-  Restored D:\a\Pic\Pic\accessory-motor-frequency\tests\MotorFrequency.Desktop.Verification\MotorFrequency.Desktop.Verification.csproj (in 3 ms).
+  Restored D:\a\Pic\Pic\accessory-motor-frequency\src\MotorFrequency.Application\MotorFrequency.Application.csproj (in 174 ms).
+  Restored D:\a\Pic\Pic\accessory-motor-frequency\src\MotorFrequency.Desktop\MotorFrequency.Desktop.csproj (in 179 ms).
+  Restored D:\a\Pic\Pic\accessory-motor-frequency\tests\MotorFrequency.Verification\MotorFrequency.Verification.csproj (in 176 ms).
+  Restored D:\a\Pic\Pic\accessory-motor-frequency\src\MotorFrequency.Core\MotorFrequency.Core.csproj (in 157 ms).
+  Restored D:\a\Pic\Pic\accessory-motor-frequency\tests\MotorFrequency.Application.Verification\MotorFrequency.Application.Verification.csproj (in 4 ms).
+  Restored D:\a\Pic\Pic\accessory-motor-frequency\tests\MotorFrequency.Desktop.Verification\MotorFrequency.Desktop.Verification.csproj (in 7 ms).
   MotorFrequency.Core -> D:\a\Pic\Pic\accessory-motor-frequency\src\MotorFrequency.Core\bin\Release\net10.0\MotorFrequency.Core.dll
   MotorFrequency.Verification -> D:\a\Pic\Pic\accessory-motor-frequency\tests\MotorFrequency.Verification\bin\Release\net10.0\MotorFrequency.Verification.dll
   MotorFrequency.Application -> D:\a\Pic\Pic\accessory-motor-frequency\src\MotorFrequency.Application\bin\Release\net10.0\MotorFrequency.Application.dll
@@ -16,4 +16,4 @@ Build succeeded.
     0 Warning(s)
     0 Error(s)
 
-Time Elapsed 00:00:15.93
+Time Elapsed 00:00:18.11

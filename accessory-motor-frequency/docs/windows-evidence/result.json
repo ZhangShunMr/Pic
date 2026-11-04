@@ -1,7 +1,7 @@
 {
-  "at": "2026-11-04T16:36:53.8618253+00:00",
-  "sourceCommit": "ed5123ae2f26f1083783a009d099e084cf1a265b",
-  "runId": "41868921695",
+  "at": "2026-11-04T16:41:09.3439903+00:00",
+  "sourceCommit": "21e62020f9fc1ed1a28b468a54f3b453270df812",
+  "runId": "41869681185",
   "os": "Microsoft Windows NT 10.0.26100.0",
   "result": "passed",
   "source": "Live shown WPF window, RenderTargetBitmap capture, no browser",
