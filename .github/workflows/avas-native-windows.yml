@@ -1,0 +1,71 @@
+name: AVAS native Windows verification
+on:
+  push:
+    branches: [windows-native/avas-coverage-20261104]
+    paths:
+      - 'avas-coverage-design/**'
+      - '.github/workflows/avas-native-windows.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  windows:
+    runs-on: windows-2025
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: avas-coverage-design
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.403'
+      - name: Build and execute native Windows tests
+        id: verify
+        run: |
+          New-Item docs/windows-ui -ItemType Directory -Force | Out-Null
+          dotnet build AvasCoverage.sln -c Release 2>&1 | Tee-Object docs/windows-ui/build-windows.log
+          if ($LASTEXITCODE -ne 0) { throw 'Native build failed' }
+          dotnet run --no-build -c Release --project tests/Avas.Verification -- docs/windows-ui/core-verification.json 2>&1 | Tee-Object docs/windows-ui/core-tests.log
+          if ($LASTEXITCODE -ne 0) { throw 'Core verification failed' }
+          dotnet run --no-build -c Release --project tests/Avas.WorkspaceVerification -- docs/windows-ui/workspace-verification.json 2>&1 | Tee-Object docs/windows-ui/workspace-tests.log
+          if ($LASTEXITCODE -ne 0) { throw 'Workspace verification failed' }
+          dotnet run --no-build -c Release --project tests/Avas.DesktopVerification -- docs/windows-ui
+          if ($LASTEXITCODE -ne 0) { throw 'Actual WPF verification failed' }
+      - name: Publish and directly launch self-contained executable
+        id: publish
+        run: |
+          dotnet publish src/Avas.Desktop -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o artifacts/AvasCoverage-win-x64 2>&1 | Tee-Object docs/windows-ui/publish-windows.log
+          if ($LASTEXITCODE -ne 0) { throw 'Native publish failed' }
+          ./tools/smoke-published.ps1
+      - name: Check Microsoft Word availability and pagination
+        if: always()
+        run: ./tools/check-word.ps1
+      - name: Retain native evidence and offline program
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: avas-windows-native
+          path: |
+            avas-coverage-design/docs/windows-ui
+            avas-coverage-design/artifacts/AvasCoverage-win-x64
+            avas-coverage-design/docs/materials
+          if-no-files-found: warn
+      - name: Preserve actual verification evidence on this branch
+        if: always()
+        env:
+          VERIFY_STATUS: ${{ steps.verify.outcome }}
+          PUBLISH_STATUS: ${{ steps.publish.outcome }}
+        run: |
+          New-Item docs/windows-ui -ItemType Directory -Force | Out-Null
+          @{ run_id=$env:GITHUB_RUN_ID; run_url="https://github.com/$env:GITHUB_REPOSITORY/actions/runs/$env:GITHUB_RUN_ID"; source_sha=$env:GITHUB_SHA; verify=$env:VERIFY_STATUS; publish=$env:PUBLISH_STATUS; at=(Get-Date).ToUniversalTime().ToString('o') } | ConvertTo-Json | Set-Content docs/windows-ui/run-context.json -Encoding utf8
+          git config user.name 'AVAS Windows verification'
+          git config user.email 'codex@openai.com'
+          git add docs/windows-ui
+          git diff --cached --quiet
+          if ($LASTEXITCODE -eq 1) {
+            git commit -m 'Record actual AVAS Windows native verification [skip ci]'
+            git push origin HEAD:windows-native/avas-coverage-20261104
+            if ($LASTEXITCODE -ne 0) { throw 'Could not preserve evidence on AVAS branch' }
+          }
