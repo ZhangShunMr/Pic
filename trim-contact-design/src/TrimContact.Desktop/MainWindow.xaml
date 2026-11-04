@@ -51,7 +51,7 @@
   </Menu>
   <StatusBar DockPanel.Dock="Bottom" Background="#DFE9E8">
    <StatusBarItem><TextBlock Text="{Binding Status}" TextWrapping="Wrap" MaxWidth="1000"/></StatusBarItem>
-   <StatusBarItem><ProgressBar Value="{Binding Progress}" Width="100" Height="12"/></StatusBarItem>
+   <StatusBarItem><ProgressBar Value="{Binding Progress, Mode=OneWay}" Width="100" Height="12"/></StatusBarItem>
    <StatusBarItem><Button Content="取消计算" Command="{Binding CancelCommand}"/></StatusBarItem>
   </StatusBar>
   <Border DockPanel.Dock="Bottom" Background="#FFF1D9" Padding="12,5">

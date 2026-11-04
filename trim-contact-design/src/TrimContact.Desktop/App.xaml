@@ -21,9 +21,11 @@
    <Setter Property="Margin" Value="0,3,8,7"/>
    <Setter Property="MinWidth" Value="70"/>
    <Setter Property="VerticalContentAlignment" Value="Center"/>
-   <Setter Property="ToolTip">
-    <Setter.Value><Binding RelativeSource="{RelativeSource Self}" Path="(Validation.Errors)[0].ErrorContent"/></Setter.Value>
-   </Setter>
+   <Style.Triggers>
+    <Trigger Property="Validation.HasError" Value="True">
+     <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}"/>
+    </Trigger>
+   </Style.Triggers>
   </Style>
   <Style TargetType="ComboBox">
    <Setter Property="Padding" Value="6,4"/>
