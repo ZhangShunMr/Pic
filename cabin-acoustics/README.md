@@ -4,6 +4,8 @@
 
 理想矩形刚性腔的低频研究工具。输入矩形尺寸、声速、等效阻尼、相干点声源与座位耳点，查看模态、空间剖面、相对频响、复数贡献、基准比较、参数扫描和截断敏感性。**相对响应不是Pa或dB SPL，不代表实车绝对声压或真实降噪效果。**
 
+已在远端Windows Server 2025完成实际WPF窗口检查（51/51检查，18张实际原生截图），并直接启动自包含exe正常退出。核心计算与共享MVVM测试70/70通过。下载[Windows自包含运行包](https://github.com/ZhangShunMr/Pic/actions/runs/41858289334/artifacts/13337359397)，证据见[成功工作流](https://github.com/ZhangShunMr/Pic/actions/runs/41858289334)。下载解压后，在artifacts/win-x64目录双击exe。GitHub artifact有保留期限，过期可从源码重建。
+
 ## Windows 运行
 
 运行平台：Windows 10/11 x64。离线自包含发布文件夹中双击 `CabinAcoustics.exe`；复制整个文件夹即可运行，无需安装 .NET、联网、启动服务器或打开浏览器。普通启动为空白。通过文件菜单“新建空白项目”或“载入独立模拟示例…”开始。

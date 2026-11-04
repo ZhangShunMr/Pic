@@ -67,4 +67,5 @@ PASS field rejects invalid resolution and frequency
 PASS density rejects unbounded number of bands
 PASS CSV apply revalidates mutable preview before mutation
 PASS scan cancellation interrupts candidate calculation
-69/69 passed
+PASS MVVM source coordinate scan includes rigid wall zero boundary
+70/70 passed

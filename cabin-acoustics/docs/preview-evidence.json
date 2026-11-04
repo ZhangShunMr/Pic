@@ -1,0 +1,25 @@
+{
+  "generatedUtc": "2026-11-04T15:35:06.328456+00:00",
+  "renderer": "LibreOfficeDev 26.8.0.0.alpha0 Writer PDF export",
+  "review": "Manual preview contact sheet inspected across all 19 manual pages; introduction and both information-form pages also inspected at larger size. No blank filler pages or repeated screenshot padding. Native images checked separately.",
+  "formalMicrosoftWordPageCount": null,
+  "notWordComplianceEvidence": true,
+  "documents": [
+    {
+      "file": "操作说明书-非Word排版预览.pdf",
+      "previewPages": 19,
+      "sourceDocx": "操作说明书-草稿.docx",
+      "sourceDocxSha256": "3dde983d4e67a305e930372a6a776477ef849142acb2b3295abe15dcdb6823b4",
+      "documentXmlSha256": "8bcc1213edd169cf36ff8c09f95f0cd27c5d55cd4f59f47c79a0a6167bb0f9ee",
+      "pdfSha256": "c8d87116e12be2fff5809718774b2d8873527232a8afd46968d822784b6bb1cb"
+    },
+    {
+      "file": "软著信息采集表-非Word排版预览.pdf",
+      "previewPages": 2,
+      "sourceDocx": "软著信息采集表-工作稿.docx",
+      "sourceDocxSha256": "3086a6056902750d5cf5867f31e42bf5f0219bda05497345a7633f9b3c18d3c4",
+      "documentXmlSha256": "b25ef28e9884907267b19dd9f2681384ba0dab85c75a3dd59607a4fe3a528725",
+      "pdfSha256": "25cc9f88e434566bf06183c0712cb646a2fd35db6391e861322e8dd0bcea58b2"
+    }
+  ]
+}

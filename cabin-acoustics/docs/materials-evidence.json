@@ -1,0 +1,12 @@
+{
+  "majorFunctionHanzi": 1060,
+  "productionNonblank": 3583,
+  "sourceFiles": 33,
+  "nativeWpfFiguresEmbedded": 16,
+  "nativeScreenshotSourceCommit": "557e32e5b1ba0335e7969f035a09666c0f645944",
+  "manualWordPageCount": null,
+  "manualPageCountStatus": "Pending Microsoft Word actual pagination and per-page review; no page count inferred.",
+  "providedApplicantTemplate": false,
+  "layoutReference": "Backed-up cabin manual A4, 2cm side margins, 1.8cm top/bottom, Microsoft YaHei; applicant-specific template not supplied.",
+  "status": "Draft; all native PNGs visually reviewed with hashes in screenshot-review.json; Microsoft Word actual pagination and applicant-specific fields remain pending."
+}

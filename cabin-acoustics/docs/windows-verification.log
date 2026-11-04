@@ -1,0 +1,130 @@
+2026-11-04T15:30:08.8746747Z   Cabin.Desktop -> D:\a\Pic\Pic\cabin-acoustics\src\Cabin.Desktop\bin\Release\net8.0-windows\CabinAcoustics.dll
+2026-11-04T15:30:09.5581642Z Build succeeded.
+2026-11-04T15:30:09.5584440Z     0 Error(s)
+2026-11-04T15:30:11.9410457Z PASS rectangular axial analytic frequency
+2026-11-04T15:30:11.9411101Z PASS tangential analytic frequency
+2026-11-04T15:30:11.9457859Z PASS enumeration excludes 000 and sorts
+2026-11-04T15:30:11.9468658Z PASS cubic first eigenfrequency triple degeneracy
+2026-11-04T15:30:11.9480686Z PASS axial center node and rigid wall extrema
+2026-11-04T15:30:11.9482174Z PASS rigid boundary normal derivative zero
+2026-11-04T15:30:11.9484597Z PASS mode normalization factors
+2026-11-04T15:30:11.9500416Z PASS modal resonance analytic damping value
+2026-11-04T15:30:11.9502871Z PASS modal resonance inversely scales with damping
+2026-11-04T15:30:12.0146519Z PASS source on axial node has zero coupling
+2026-11-04T15:30:12.0489196Z PASS coincident anti-phase sources cancel
+2026-11-04T15:30:12.0758897Z PASS doubling all source amplitudes doubles response
+2026-11-04T15:30:12.0830945Z PASS source receiver reciprocity
+2026-11-04T15:30:12.0965276Z PASS symmetric left right ears give identical response
+2026-11-04T15:30:12.0978081Z PASS frequency grid includes nondivisible endpoint exactly
+2026-11-04T15:30:12.1128155Z PASS complex contributions sum to total
+2026-11-04T15:30:12.1131139Z PASS field maps each plane correctly
+2026-11-04T15:30:12.1290377Z PASS field values agree with direct point evaluation
+2026-11-04T15:30:12.1422241Z PASS invalid field plane and fraction rejected
+2026-11-04T15:30:12.1423200Z PASS dB relative ratios and finite zero display
+2026-11-04T15:30:12.1618962Z PASS empty project saves but cannot calculate
+2026-11-04T15:30:12.1623311Z PASS nonfinite geometry rejected
+2026-11-04T15:30:12.1627387Z PASS zero damping rejected
+2026-11-04T15:30:12.1632111Z PASS cutoff below band rejected
+2026-11-04T15:30:12.1636102Z PASS equal reversed frequency band rejected
+2026-11-04T15:30:12.1640516Z PASS out of bounds ear rejected with point name
+2026-11-04T15:30:12.1643269Z PASS points exactly on walls accepted
+2026-11-04T15:30:12.1648780Z PASS duplicate point identity rejected
+2026-11-04T15:30:12.1652918Z PASS all disabled sources cannot calculate
+2026-11-04T15:30:12.1706028Z PASS null point and null collection rejected
+2026-11-04T15:30:12.1714220Z PASS unknown schema rejected
+2026-11-04T15:30:12.1724028Z PASS missing geometry field rejected
+2026-11-04T15:30:12.1792913Z PASS unknown JSON field rejected
+2026-11-04T15:30:12.1797345Z PASS duplicate JSON property rejected
+2026-11-04T15:30:12.1806422Z PASS broken JSON and oversized file rejected
+2026-11-04T15:30:12.2101201Z PASS native save open retains full project
+2026-11-04T15:30:12.2162395Z PASS atomic overwrite saves latest revision
+2026-11-04T15:30:12.2180425Z PASS invalid save preserves existing file
+2026-11-04T15:30:12.2242129Z PASS CSV point roundtrip retains positions and names
+2026-11-04T15:30:12.2250983Z PASS CSV invalid cell has line-specific issue and is atomic
+2026-11-04T15:30:12.2251900Z PASS CSV wrong header and malformed quotes rejected
+2026-11-04T15:30:12.2259031Z PASS CSV point limits enforced
+2026-11-04T15:30:12.2262660Z PASS multiline point labels rejected before export
+2026-11-04T15:30:12.2619480Z PASS same baseline comparison is zero ratio
+2026-11-04T15:30:12.2998948Z PASS comparison disallows incompatible frequency grid
+2026-11-04T15:30:12.3259047Z PASS comparison disallows mixed demonstration provenance
+2026-11-04T15:30:12.3530414Z PASS comparison warns changed ear location
+2026-11-04T15:30:12.3793673Z PASS comparison rejects no matching ear identity
+2026-11-04T15:30:12.4477007Z PASS scan has inclusive endpoints and leaves source unchanged
+2026-11-04T15:30:12.4633945Z PASS scan records invalid geometries instead of ranking them
+2026-11-04T15:30:12.4640246Z PASS scan invalid settings rejected
+2026-11-04T15:30:12.4649807Z PASS cancellation token interrupts computation
+2026-11-04T15:30:12.4809081Z PASS density bands conserve mode count
+2026-11-04T15:30:12.5188539Z PASS truncation extension preserves input and adds modes
+2026-11-04T15:30:12.5351922Z PASS response exports retain identity provenance units complex parts
+2026-11-04T15:30:12.5551575Z PASS scan export leaves invalid numeric cells empty
+2026-11-04T15:30:12.5759411Z PASS research report includes actual conditions and limitation
+2026-11-04T15:30:12.5828952Z PASS blank MVVM state does not auto load data
+2026-11-04T15:30:12.5864749Z PASS numeric draft rejects malformed text without silent fallback
+2026-11-04T15:30:12.5870846Z PASS new project cancellation preserves current draft
+2026-11-04T15:30:12.5885966Z PASS save invalid draft does not close project
+2026-11-04T15:30:12.5949139Z PASS MVVM save reopen and stable source provenance
+2026-11-04T15:30:12.6540698Z PASS MVVM calculate input change invalidates stale results
+2026-11-04T15:30:12.7492825Z PASS MVVM baseline capture and scan apply use current computed inputs
+2026-11-04T15:30:12.7958019Z PASS MVVM fractional scan count rejected
+2026-11-04T15:30:12.8088621Z PASS field rejects invalid resolution and frequency
+2026-11-04T15:30:12.8217919Z PASS density rejects unbounded number of bands
+2026-11-04T15:30:12.8226653Z PASS CSV apply revalidates mutable preview before mutation
+2026-11-04T15:30:12.8230251Z PASS scan cancellation interrupts candidate calculation
+2026-11-04T15:30:12.9221169Z PASS MVVM source coordinate scan includes rigid wall zero boundary
+2026-11-04T15:30:12.9614060Z 70/70 passed
+2026-11-04T15:30:19.9985906Z PASS 01-empty has opaque native window background
+2026-11-04T15:30:20.1907857Z PASS 01-empty contains rendered pixels
+2026-11-04T15:30:20.2247949Z PASS ordinary native startup is empty
+2026-11-04T15:30:20.2859716Z PASS blank project has no points
+2026-11-04T15:30:20.2989098Z PASS blank save is a real reopenable file
+2026-11-04T15:30:20.8964970Z PASS 02-project has opaque native window background
+2026-11-04T15:30:21.0975652Z PASS 02-project contains rendered pixels
+2026-11-04T15:30:21.5507805Z PASS 03-points has opaque native window background
+2026-11-04T15:30:21.7457369Z PASS 03-points contains rendered pixels
+2026-11-04T15:30:22.0559365Z PASS WPF calculate populates field and spectrum
+2026-11-04T15:30:22.6756383Z PASS 04a-field-settings has opaque native window background
+2026-11-04T15:30:22.8724015Z PASS 04a-field-settings contains rendered pixels
+2026-11-04T15:30:23.3209351Z PASS 04-response-field has opaque native window background
+2026-11-04T15:30:23.5275815Z PASS 04-response-field contains rendered pixels
+2026-11-04T15:30:24.1385871Z PASS 05-mode-shape has opaque native window background
+2026-11-04T15:30:24.3407639Z PASS 05-mode-shape contains rendered pixels
+2026-11-04T15:30:24.8107975Z PASS 06-seat-spectrum has opaque native window background
+2026-11-04T15:30:25.0203967Z PASS 06-seat-spectrum contains rendered pixels
+2026-11-04T15:30:25.4584590Z PASS 07-modes has opaque native window background
+2026-11-04T15:30:25.4964215Z PASS 07-modes contains rendered pixels
+2026-11-04T15:30:25.7555354Z PASS 08-coupling has opaque native window background
+2026-11-04T15:30:25.7766007Z PASS 08-coupling contains rendered pixels
+2026-11-04T15:30:25.9503477Z PASS native baseline comparison populated
+2026-11-04T15:30:26.1798303Z PASS 09-comparison has opaque native window background
+2026-11-04T15:30:26.2025336Z PASS 09-comparison contains rendered pixels
+2026-11-04T15:30:26.4271450Z PASS native scan completed
+2026-11-04T15:30:26.6623960Z PASS 10-scan has opaque native window background
+2026-11-04T15:30:26.6837496Z PASS 10-scan contains rendered pixels
+2026-11-04T15:30:26.8406298Z PASS native truncation study populated
+2026-11-04T15:30:27.0880604Z PASS 11-diagnostics has opaque native window background
+2026-11-04T15:30:27.1132863Z PASS 11-diagnostics contains rendered pixels
+2026-11-04T15:30:27.3772246Z PASS 12-reviews has opaque native window background
+2026-11-04T15:30:27.4041257Z PASS 12-reviews contains rendered pixels
+2026-11-04T15:30:27.4330704Z PASS native report contains model limitation
+2026-11-04T15:30:27.4596473Z PASS saved project reopened in native VM
+2026-11-04T15:30:28.0595756Z PASS 13-minimum-window has opaque native window background
+2026-11-04T15:30:28.0811400Z PASS 13-minimum-window contains rendered pixels
+2026-11-04T15:30:28.1025012Z PASS minimum native window rendered
+2026-11-04T15:30:28.4056461Z PASS 14-invalid-input has opaque native window background
+2026-11-04T15:30:28.4264635Z PASS 14-invalid-input contains rendered pixels
+2026-11-04T15:30:28.4483808Z PASS edit invalidates native results
+2026-11-04T15:30:28.4484415Z PASS native interactions have no service errors
+2026-11-04T15:30:28.6967350Z PASS 15-help has opaque native window background
+2026-11-04T15:30:28.7179663Z PASS 15-help contains rendered pixels
+2026-11-04T15:30:29.0049669Z PASS 16-invalid-csv-dialog has opaque native window background
+2026-11-04T15:30:29.0150468Z PASS 16-invalid-csv-dialog contains rendered pixels
+2026-11-04T15:30:29.0251493Z PASS native import dialog is rendered
+2026-11-04T15:30:29.2410498Z PASS 17-example-dialog has opaque native window background
+2026-11-04T15:30:29.2458835Z PASS 17-example-dialog contains rendered pixels
+2026-11-04T15:30:29.2512552Z PASS native example dialog rendered
+2026-11-04T15:30:29.2582448Z PASS WPF binding errors absent
+2026-11-04T15:30:39.6313100Z   Cabin.Desktop -> D:\a\Pic\Pic\cabin-acoustics\src\Cabin.Desktop\bin\Release\net8.0-windows\win-x64\CabinAcoustics.dll
+2026-11-04T15:30:40.3530972Z   Cabin.Desktop -> D:\a\Pic\Pic\cabin-acoustics\artifacts\win-x64\
+2026-11-04T15:30:40.4476929Z Offline native application: artifacts/win-x64/CabinAcoustics.exe. Copy the entire folder, not just the exe.
+2026-11-04T15:30:42.2269765Z PASS published self-contained executable opened and closed its actual native window
+2026-11-04T15:30:50.3232301Z Artifact cabin-windows-native.zip successfully finalized. Artifact ID 13337359397

@@ -1,0 +1,426 @@
+{
+  "checks": [
+    {
+      "name": "minimum production nonblank",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Core/Analysis/Comparison.cs",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Core/Analysis/Diagnostics.cs",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Core/Analysis/Engine.cs",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Core/Analysis/Modes.cs",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Core/Domain/Demo.cs",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Core/Domain/Project.cs",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Core/Domain/Validation.cs",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Core/IO/NativeFiles.cs",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Core/IO/PointCsv.cs",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Core/IO/ProjectCodec.cs",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Core/IO/ResearchExports.cs",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Desktop/App.xaml",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Desktop/App.xaml.cs",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Desktop/Controls/DrawingTools.cs",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Desktop/Controls/FieldCanvas.cs",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Desktop/Controls/SpectrumChart.cs",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Desktop/Infrastructure/Commands.cs",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Desktop/Infrastructure/Converters.cs",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Desktop/Infrastructure/ObservableObject.cs",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Desktop/Services/DesktopServices.cs",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Desktop/Services/IDesktopServices.cs",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Desktop/ViewModels/InputField.cs",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Desktop/ViewModels/PlotData.cs",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Desktop/ViewModels/PointEditor.cs",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Desktop/ViewModels/ProjectEditor.cs",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Desktop/ViewModels/ReviewEditor.cs",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Desktop/ViewModels/WorkspaceViewModel.cs",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Desktop/Views/ExampleWindow.xaml",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Desktop/Views/ExampleWindow.xaml.cs",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Desktop/Views/ImportWindow.xaml",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Desktop/Views/ImportWindow.xaml.cs",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Desktop/Views/MainWindow.xaml",
+      "status": "passed"
+    },
+    {
+      "name": "production source hash src/Cabin.Desktop/Views/MainWindow.xaml.cs",
+      "status": "passed"
+    },
+    {
+      "name": "major function Unicode Hanzi exceeds 500",
+      "status": "passed"
+    },
+    {
+      "name": "unverified Word count remains explicit",
+      "status": "passed"
+    },
+    {
+      "name": "manual starts with software introduction",
+      "status": "passed"
+    },
+    {
+      "name": "manual contains native screenshot figures",
+      "status": "passed"
+    },
+    {
+      "name": "native image count matches material manifest",
+      "status": "passed"
+    },
+    {
+      "name": "actual Windows WPF checks passed",
+      "status": "passed"
+    },
+    {
+      "name": "actual published executable started and exited normally",
+      "status": "passed"
+    },
+    {
+      "name": "native images and published exe share source commit",
+      "status": "passed"
+    },
+    {
+      "name": "native screenshot review matches source commit",
+      "status": "passed"
+    },
+    {
+      "name": "reviewed image hash 01-empty.png",
+      "status": "passed"
+    },
+    {
+      "name": "reviewed image hash 02-project.png",
+      "status": "passed"
+    },
+    {
+      "name": "reviewed image hash 03-points.png",
+      "status": "passed"
+    },
+    {
+      "name": "reviewed image hash 04-response-field.png",
+      "status": "passed"
+    },
+    {
+      "name": "reviewed image hash 04a-field-settings.png",
+      "status": "passed"
+    },
+    {
+      "name": "reviewed image hash 05-mode-shape.png",
+      "status": "passed"
+    },
+    {
+      "name": "reviewed image hash 06-seat-spectrum.png",
+      "status": "passed"
+    },
+    {
+      "name": "reviewed image hash 07-modes.png",
+      "status": "passed"
+    },
+    {
+      "name": "reviewed image hash 08-coupling.png",
+      "status": "passed"
+    },
+    {
+      "name": "reviewed image hash 09-comparison.png",
+      "status": "passed"
+    },
+    {
+      "name": "reviewed image hash 10-scan.png",
+      "status": "passed"
+    },
+    {
+      "name": "reviewed image hash 11-diagnostics.png",
+      "status": "passed"
+    },
+    {
+      "name": "reviewed image hash 12-reviews.png",
+      "status": "passed"
+    },
+    {
+      "name": "reviewed image hash 13-minimum-window.png",
+      "status": "passed"
+    },
+    {
+      "name": "reviewed image hash 14-invalid-input.png",
+      "status": "passed"
+    },
+    {
+      "name": "reviewed image hash 15-help.png",
+      "status": "passed"
+    },
+    {
+      "name": "reviewed image hash 16-invalid-csv-dialog.png",
+      "status": "passed"
+    },
+    {
+      "name": "reviewed image hash 17-example-dialog.png",
+      "status": "passed"
+    },
+    {
+      "name": "native binding error log empty",
+      "status": "passed"
+    },
+    {
+      "name": "test-evidence.json all core tests passed",
+      "status": "passed"
+    },
+    {
+      "name": "test-windows.json all core tests passed",
+      "status": "passed"
+    },
+    {
+      "name": "Release build success recorded",
+      "status": "passed"
+    },
+    {
+      "name": "actual solution file exists",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Core/Cabin.Core.csproj",
+      "status": "passed"
+    },
+    {
+      "name": "no web SDK Cabin.Core.csproj",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Desktop/App.xaml",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Desktop/app.manifest",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Desktop/App.xaml.cs",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Desktop/Cabin.Desktop.csproj",
+      "status": "passed"
+    },
+    {
+      "name": "no web SDK Cabin.Desktop.csproj",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Core/Domain/Project.cs",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Core/Domain/Demo.cs",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Core/Domain/Validation.cs",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Core/Analysis/Modes.cs",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Core/Analysis/Comparison.cs",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Core/Analysis/Engine.cs",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Core/Analysis/Diagnostics.cs",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Core/IO/ProjectCodec.cs",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Core/IO/PointCsv.cs",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Core/IO/ResearchExports.cs",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Core/IO/NativeFiles.cs",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Desktop/ViewModels/WorkspaceViewModel.cs",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Desktop/ViewModels/ProjectEditor.cs",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Desktop/ViewModels/InputField.cs",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Desktop/ViewModels/ReviewEditor.cs",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Desktop/ViewModels/PointEditor.cs",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Desktop/ViewModels/PlotData.cs",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Desktop/Services/IDesktopServices.cs",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Desktop/Services/DesktopServices.cs",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Desktop/Controls/FieldCanvas.cs",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Desktop/Controls/SpectrumChart.cs",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Desktop/Controls/DrawingTools.cs",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Desktop/Infrastructure/ObservableObject.cs",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Desktop/Infrastructure/Commands.cs",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Desktop/Infrastructure/Converters.cs",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Desktop/Views/ImportWindow.xaml",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Desktop/Views/ExampleWindow.xaml",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Desktop/Views/ExampleWindow.xaml.cs",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Desktop/Views/ImportWindow.xaml.cs",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Desktop/Views/MainWindow.xaml.cs",
+      "status": "passed"
+    },
+    {
+      "name": "no browser source src/Cabin.Desktop/Views/MainWindow.xaml",
+      "status": "passed"
+    }
+  ],
+  "passed": 104,
+  "failed": 0,
+  "limits": [
+    "Microsoft Word actual pagination pending",
+    "Windows 10/11 client hardware and DPI manual verification pending"
+  ]
+}

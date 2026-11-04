@@ -1,0 +1,207 @@
+{
+  "scope": "Actual handwritten src/**/*.cs and src/**/*.xaml participating in the build; nonblank lines; excludes tests, scripts, docs, bin, obj, project config, dependencies and generated files.",
+  "baselineOldWebNonblank": 3608,
+  "minimumNativeReplacementNonblank": 3500,
+  "note": "Native platform replacement, not a scope-expansion project. No claim of 2x expansion.",
+  "productionNonblank": 3583,
+  "files": [
+    {
+      "path": "src/Cabin.Core/Analysis/Comparison.cs",
+      "nonblank": 140,
+      "sha256": "9108358a30982cf2c3167841e6b5935aa0cc3162a0592662e404345c4ba86029",
+      "purpose": "解析模态、复数频响、比较扫描与数值诊断"
+    },
+    {
+      "path": "src/Cabin.Core/Analysis/Diagnostics.cs",
+      "nonblank": 97,
+      "sha256": "5b23ffb63e755c0086584191923bda1385371b2e0c037842cf4697fdea499045",
+      "purpose": "解析模态、复数频响、比较扫描与数值诊断"
+    },
+    {
+      "path": "src/Cabin.Core/Analysis/Engine.cs",
+      "nonblank": 163,
+      "sha256": "d47de6d8b106e6ce289435fdd4dbe5ca33622d19ca23f84fd26b1d9a0bec082c",
+      "purpose": "解析模态、复数频响、比较扫描与数值诊断"
+    },
+    {
+      "path": "src/Cabin.Core/Analysis/Modes.cs",
+      "nonblank": 83,
+      "sha256": "48b69cb00fa035624db344a18a3e948753a280eec94f2303b66df01a40ac9ccb",
+      "purpose": "解析模态、复数频响、比较扫描与数值诊断"
+    },
+    {
+      "path": "src/Cabin.Core/Domain/Demo.cs",
+      "nonblank": 60,
+      "sha256": "452502b17dcf7ddd21d578a4add15950e60aa65dae927d0d7519328d6074b722",
+      "purpose": "项目领域模型、示例与约束边界"
+    },
+    {
+      "path": "src/Cabin.Core/Domain/Project.cs",
+      "nonblank": 98,
+      "sha256": "eeeb08054cacb2b1b654c68bf3a7968b063801142d3f5ccf36ae3173b9701166",
+      "purpose": "项目领域模型、示例与约束边界"
+    },
+    {
+      "path": "src/Cabin.Core/Domain/Validation.cs",
+      "nonblank": 175,
+      "sha256": "14391038c45e96b98c296ca2d4ba3d2b53f246cbb9ff17b3ce05be7dd5409688",
+      "purpose": "项目领域模型、示例与约束边界"
+    },
+    {
+      "path": "src/Cabin.Core/IO/NativeFiles.cs",
+      "nonblank": 50,
+      "sha256": "3f826bf29a71d6064e1434026b02550fea9363affe3939b45e2f0989ee5f34b4",
+      "purpose": "版本化项目读写、点位交换与研究成果输出"
+    },
+    {
+      "path": "src/Cabin.Core/IO/PointCsv.cs",
+      "nonblank": 152,
+      "sha256": "4c12bb5a3194c79ce4b3e2c5714c3f073c3b3d76963ddec22297fd9e407d656e",
+      "purpose": "版本化项目读写、点位交换与研究成果输出"
+    },
+    {
+      "path": "src/Cabin.Core/IO/ProjectCodec.cs",
+      "nonblank": 93,
+      "sha256": "504fcfe61b1ee6f9de48e7691ec8ab1e304c5131654809c44eb359d878857794",
+      "purpose": "版本化项目读写、点位交换与研究成果输出"
+    },
+    {
+      "path": "src/Cabin.Core/IO/ResearchExports.cs",
+      "nonblank": 173,
+      "sha256": "3e0bceafb6a0aa5848fe0e3d66b76bb3f30d17ecab634d750cda7f85b4e0f98b",
+      "purpose": "版本化项目读写、点位交换与研究成果输出"
+    },
+    {
+      "path": "src/Cabin.Desktop/App.xaml",
+      "nonblank": 113,
+      "sha256": "1ed7203ba2cdd8e2192d011af13387206f592d096f4ac5abdc07f9b6865f7a9f",
+      "purpose": "WPF应用启动和共享资源"
+    },
+    {
+      "path": "src/Cabin.Desktop/App.xaml.cs",
+      "nonblank": 15,
+      "sha256": "abba853a319d37da60fb8cb7ad7d9da5df02ca9abaf3a8db2e992024640833af",
+      "purpose": "WPF应用启动和共享资源"
+    },
+    {
+      "path": "src/Cabin.Desktop/Controls/DrawingTools.cs",
+      "nonblank": 38,
+      "sha256": "6df2e11267210fe8a2929565760c644c0ac7db3fafab0c8e9921751a354af31c",
+      "purpose": "WPF声场和频响原生绘制与读数"
+    },
+    {
+      "path": "src/Cabin.Desktop/Controls/FieldCanvas.cs",
+      "nonblank": 140,
+      "sha256": "cb285f22bca09ca210764b7669aa994ce0f5d38de86e72234e6fec2494dcc6fa",
+      "purpose": "WPF声场和频响原生绘制与读数"
+    },
+    {
+      "path": "src/Cabin.Desktop/Controls/SpectrumChart.cs",
+      "nonblank": 160,
+      "sha256": "e57d85b17526b88a5233d8c3065d4d0372994838aa3e87e2d253326cde99b4c8",
+      "purpose": "WPF声场和频响原生绘制与读数"
+    },
+    {
+      "path": "src/Cabin.Desktop/Infrastructure/Commands.cs",
+      "nonblank": 38,
+      "sha256": "98d1ad9053ab5fe698b6d6b887880a7e662adb3612e828b3573c115112e20c91",
+      "purpose": "属性通知、命令与原生界面转换"
+    },
+    {
+      "path": "src/Cabin.Desktop/Infrastructure/Converters.cs",
+      "nonblank": 30,
+      "sha256": "de6df0e5e94d51494d088a15535df11e37ce723565f704951efafa935eb246d5",
+      "purpose": "属性通知、命令与原生界面转换"
+    },
+    {
+      "path": "src/Cabin.Desktop/Infrastructure/ObservableObject.cs",
+      "nonblank": 19,
+      "sha256": "d5928d5fcb405f68345a4954f7675ced23ea612588b0fa2a29be9c4bb961e2d7",
+      "purpose": "属性通知、命令与原生界面转换"
+    },
+    {
+      "path": "src/Cabin.Desktop/Services/DesktopServices.cs",
+      "nonblank": 113,
+      "sha256": "69cc143ad9d23c960d5b824d88abced13559523e1a35cbfcccb051a8aa6f3165",
+      "purpose": "原生文件对话框、导入确认及画布输出"
+    },
+    {
+      "path": "src/Cabin.Desktop/Services/IDesktopServices.cs",
+      "nonblank": 16,
+      "sha256": "00fd917317d006bc4efb285e6e4411fecb4c99bfb3caf0caebcdabe69ccfa051",
+      "purpose": "原生文件对话框、导入确认及画布输出"
+    },
+    {
+      "path": "src/Cabin.Desktop/ViewModels/InputField.cs",
+      "nonblank": 91,
+      "sha256": "e8ef0ee0d743228cf53c0abe46f013d5edba85510bf58194c482f4ddb8dc0ea8",
+      "purpose": "可校验输入、研究状态与MVVM业务命令"
+    },
+    {
+      "path": "src/Cabin.Desktop/ViewModels/PlotData.cs",
+      "nonblank": 8,
+      "sha256": "07e6064cabfc8641013fe0055fb8be15b46e8c259032e9f37455a38f09f3b611",
+      "purpose": "可校验输入、研究状态与MVVM业务命令"
+    },
+    {
+      "path": "src/Cabin.Desktop/ViewModels/PointEditor.cs",
+      "nonblank": 78,
+      "sha256": "4c47039399e362deff18823101426aea4ebe18c1c815b455086b80597934f682",
+      "purpose": "可校验输入、研究状态与MVVM业务命令"
+    },
+    {
+      "path": "src/Cabin.Desktop/ViewModels/ProjectEditor.cs",
+      "nonblank": 103,
+      "sha256": "1f0bbb4546559713d3909f1187902363375105bc127bf47d38b491613634079f",
+      "purpose": "可校验输入、研究状态与MVVM业务命令"
+    },
+    {
+      "path": "src/Cabin.Desktop/ViewModels/ReviewEditor.cs",
+      "nonblank": 31,
+      "sha256": "1cf84b5dfc23b593d35cd65c8d338d641503939c681fe35e9d356fd9ecc9fbac",
+      "purpose": "可校验输入、研究状态与MVVM业务命令"
+    },
+    {
+      "path": "src/Cabin.Desktop/ViewModels/WorkspaceViewModel.cs",
+      "nonblank": 688,
+      "sha256": "e0773d67aa05b9a62c5ae1c5648524d725ce3bacaf9eec701629504129ed819a",
+      "purpose": "可校验输入、研究状态与MVVM业务命令"
+    },
+    {
+      "path": "src/Cabin.Desktop/Views/ExampleWindow.xaml",
+      "nonblank": 18,
+      "sha256": "0aecf0d0c7fb9d878fa293e834502cad454706333158e07312b2fd541b9eade7",
+      "purpose": "原生主窗口和独立对话框"
+    },
+    {
+      "path": "src/Cabin.Desktop/Views/ExampleWindow.xaml.cs",
+      "nonblank": 15,
+      "sha256": "1518b4df02d2cfa7be633b47a8ffca0c834059224c976159b0ba918483203d2f",
+      "purpose": "原生主窗口和独立对话框"
+    },
+    {
+      "path": "src/Cabin.Desktop/Views/ImportWindow.xaml",
+      "nonblank": 39,
+      "sha256": "2b765cda4cd837755bfd51ce96cccb8009342c43acae14c4a5a22797a819bcf5",
+      "purpose": "原生主窗口和独立对话框"
+    },
+    {
+      "path": "src/Cabin.Desktop/Views/ImportWindow.xaml.cs",
+      "nonblank": 16,
+      "sha256": "dd380b40a47c95b9e65e2c558a2448adc3152a374408ec60d79b33edfce7621d",
+      "purpose": "原生主窗口和独立对话框"
+    },
+    {
+      "path": "src/Cabin.Desktop/Views/MainWindow.xaml",
+      "nonblank": 469,
+      "sha256": "c1c6cd5faa4330265a11cd3d668f061563c73573741bf8f73178fee735c71810",
+      "purpose": "原生主窗口和独立对话框"
+    },
+    {
+      "path": "src/Cabin.Desktop/Views/MainWindow.xaml.cs",
+      "nonblank": 61,
+      "sha256": "39b88bdd0dfed587a80f1cff185ddf488dda896d93aab63d536bcc5cd81c345a",
+      "purpose": "原生主窗口和独立对话框"
+    }
+  ]
+}

@@ -1,9 +1,9 @@
 {
-  "executedUtc": "2026-11-04T14:58:48.5788511+00:00",
+  "executedUtc": "2026-11-04T15:30:41.087909+00:00",
   "framework": ".NET 8.0.33",
   "platform": "Debian GNU/Linux 13 (trixie)",
   "note": "Core and shared MVVM logic executed on Linux. CommandManager shim is test-only. WPF bindings, dialogs, rendering and Windows executable were not executed by this suite.",
-  "total": 69,
+  "total": 70,
   "failed": 0,
   "results": [
     {
@@ -280,6 +280,10 @@
     },
     {
       "name": "scan cancellation interrupts candidate calculation",
+      "status": "passed"
+    },
+    {
+      "name": "MVVM source coordinate scan includes rigid wall zero boundary",
       "status": "passed"
     }
   ]

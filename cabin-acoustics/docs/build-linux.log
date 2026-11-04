@@ -1,6 +1,7 @@
   Determining projects to restore...
-  Restored /workspace/cabin-native/cabin-acoustics/tests/Cabin.WindowsChecks/Cabin.WindowsChecks.csproj (in 125 ms).
-  3 of 4 projects are up-to-date for restore.
+  Restored /workspace/cabin-native/cabin-acoustics/src/Cabin.Core/Cabin.Core.csproj (in 118 ms).
+  Restored /workspace/cabin-native/cabin-acoustics/src/Cabin.Desktop/Cabin.Desktop.csproj (in 139 ms).
+  2 of 4 projects are up-to-date for restore.
   Cabin.Core -> /workspace/cabin-native/cabin-acoustics/src/Cabin.Core/bin/Release/net8.0/Cabin.Core.dll
   Cabin.Tests -> /workspace/cabin-native/cabin-acoustics/tests/Cabin.Tests/bin/Release/net8.0/Cabin.Tests.dll
   Cabin.Desktop -> /workspace/cabin-native/cabin-acoustics/src/Cabin.Desktop/bin/Release/net8.0-windows/CabinAcoustics.dll
@@ -10,4 +11,4 @@ Build succeeded.
     0 Warning(s)
     0 Error(s)
 
-Time Elapsed 00:00:09.82
+Time Elapsed 00:00:07.73

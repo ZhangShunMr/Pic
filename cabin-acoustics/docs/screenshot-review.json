@@ -1,0 +1,98 @@
+{
+  "reviewedUtc": "2026-11-04T15:33:39.766864+00:00",
+  "reviewType": "Assistant final contact-sheet inspection of all 18 images, following individual full-size inspection of identical production UI layout before the zero-coordinate boundary change.",
+  "sourceCommit": "557e32e5b1ba0335e7969f035a09666c0f645944",
+  "scope": "Actual Windows WPF client visual captures, no browser or mock-up. System frames and outer margins omitted; long tables use native scrolling. Not a manual mouse/keyboard hardware regression or Word pagination check.",
+  "images": [
+    {
+      "path": "01-empty.png",
+      "sha256": "65b97c5b7cb82dfafe1898c237ef0d9807b907eebe5ee90c0f92eb55130df5c1",
+      "checked": "Appropriate loaded graph/table or empty/error state; legible labels and simulation context; final capture has native opaque background."
+    },
+    {
+      "path": "02-project.png",
+      "sha256": "106b10a8e6aff6ce0534b80702e08eac52ab8619438aee700233a593912f8994",
+      "checked": "Appropriate loaded graph/table or empty/error state; legible labels and simulation context; final capture has native opaque background."
+    },
+    {
+      "path": "03-points.png",
+      "sha256": "8c12b97ca667f6ac30b8d4c2aff365ad73f3595aaa335ddc6d52e1ea0eb77732",
+      "checked": "Appropriate loaded graph/table or empty/error state; legible labels and simulation context; final capture has native opaque background."
+    },
+    {
+      "path": "04-response-field.png",
+      "sha256": "7ca69b62502cbc9176a280787d6915e6fea2992cea7c9f32943abe753abf2995",
+      "checked": "Appropriate loaded graph/table or empty/error state; legible labels and simulation context; final capture has native opaque background."
+    },
+    {
+      "path": "04a-field-settings.png",
+      "sha256": "d93bb489babc48693aebe66277daabfac124a5fa7d0402e9996c7fdd71c1d6db",
+      "checked": "Appropriate loaded graph/table or empty/error state; legible labels and simulation context; final capture has native opaque background."
+    },
+    {
+      "path": "05-mode-shape.png",
+      "sha256": "9c4388ef74eca424cbbdfa6050acdc39042e644b523c86d87c3ad83d102ef0c1",
+      "checked": "Appropriate loaded graph/table or empty/error state; legible labels and simulation context; final capture has native opaque background."
+    },
+    {
+      "path": "06-seat-spectrum.png",
+      "sha256": "f4a0ee1586a455f04b58811d9e574dcd089ee30af9e6e1a76c662285839177c9",
+      "checked": "Appropriate loaded graph/table or empty/error state; legible labels and simulation context; final capture has native opaque background."
+    },
+    {
+      "path": "07-modes.png",
+      "sha256": "d9e3fa57d228a0d7640d118d6d8a96433071f149ac9f733bdd1bac5b8a6ca780",
+      "checked": "Appropriate loaded graph/table or empty/error state; legible labels and simulation context; final capture has native opaque background."
+    },
+    {
+      "path": "08-coupling.png",
+      "sha256": "278ce1e28201882d1d00f01e9f02fdf317597284106badca98d4623e0fd438ec",
+      "checked": "Appropriate loaded graph/table or empty/error state; legible labels and simulation context; final capture has native opaque background."
+    },
+    {
+      "path": "09-comparison.png",
+      "sha256": "e23926eace8faffe792f2c4412b36a409d7e5742a9518ff873a5d0b0c9c3830a",
+      "checked": "Appropriate loaded graph/table or empty/error state; legible labels and simulation context; final capture has native opaque background."
+    },
+    {
+      "path": "10-scan.png",
+      "sha256": "3077f68cb72fa1e39045ec8eb60b91e86e98c5b033f611c06969b2e538cc45ca",
+      "checked": "Appropriate loaded graph/table or empty/error state; legible labels and simulation context; final capture has native opaque background."
+    },
+    {
+      "path": "11-diagnostics.png",
+      "sha256": "9e96ab5c8ca9a3ff8c6322b70fe951f2bb59d45178b745dcef797671fd3badff",
+      "checked": "Appropriate loaded graph/table or empty/error state; legible labels and simulation context; final capture has native opaque background."
+    },
+    {
+      "path": "12-reviews.png",
+      "sha256": "468093f0b95575d47db7d3be4a82fc169de4c473f262bfa7c1c85c092aa65cfe",
+      "checked": "Appropriate loaded graph/table or empty/error state; legible labels and simulation context; final capture has native opaque background."
+    },
+    {
+      "path": "13-minimum-window.png",
+      "sha256": "7bb76c65285e42fec1678269837b4d8328ab1cf0a03894b1adb36340d5095fef",
+      "checked": "Appropriate loaded graph/table or empty/error state; legible labels and simulation context; final capture has native opaque background."
+    },
+    {
+      "path": "14-invalid-input.png",
+      "sha256": "2e75d39d4a532b98210d0887acd3b8fe3552efca217328d1a4cf19a5955bd5a6",
+      "checked": "Appropriate loaded graph/table or empty/error state; legible labels and simulation context; final capture has native opaque background."
+    },
+    {
+      "path": "15-help.png",
+      "sha256": "a5dae0f40cf14691d28888f9f86f1e603f4434bb4dba05369e22d12dffeff3de",
+      "checked": "Appropriate loaded graph/table or empty/error state; legible labels and simulation context; final capture has native opaque background."
+    },
+    {
+      "path": "16-invalid-csv-dialog.png",
+      "sha256": "dfbb9b002a37918e77b12c49d1dd1336c5fce9fddeaf7d9e80a331b404a1d778",
+      "checked": "Appropriate loaded graph/table or empty/error state; legible labels and simulation context; final capture has native opaque background."
+    },
+    {
+      "path": "17-example-dialog.png",
+      "sha256": "34fa774206b7a4ddad97dcb2af987a0875307e8dc49ce9df09e62d9d10aaec72",
+      "checked": "Appropriate loaded graph/table or empty/error state; legible labels and simulation context; final capture has native opaque background."
+    }
+  ]
+}
