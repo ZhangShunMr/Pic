@@ -1,0 +1,240 @@
+{
+  "date": "2026-11-04T14:56:35.6022102+00:00",
+  "environment": ".NET 8.0.33",
+  "passed": 58,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "independent formula: 40 blades at 900rpm = 600Hz",
+      "status": "passed"
+    },
+    {
+      "name": "zero RPM is zero frequency",
+      "status": "passed"
+    },
+    {
+      "name": "fractional shaft order",
+      "status": "passed"
+    },
+    {
+      "name": "blade harmonic order",
+      "status": "passed"
+    },
+    {
+      "name": "band maximum: 600Hz -\u003E max(5,18,12,0) =18Hz",
+      "status": "passed"
+    },
+    {
+      "name": "crossing: 600Hz / 40X -\u003E900rpm, sensitive [853,947]",
+      "status": "passed"
+    },
+    {
+      "name": "frequency interval at900 \u002B/-20RPM -\u003E[586.6667,613.3333]Hz",
+      "status": "passed"
+    },
+    {
+      "name": "exact boundary counts as contact",
+      "status": "passed"
+    },
+    {
+      "name": "beyond boundary is outside",
+      "status": "passed"
+    },
+    {
+      "name": "damping unknown stays null and adds no band",
+      "status": "passed"
+    },
+    {
+      "name": "damping switches and extra band",
+      "status": "passed"
+    },
+    {
+      "name": "disabled modes and orders excluded",
+      "status": "passed"
+    },
+    {
+      "name": "empty project can save but cannot compute",
+      "status": "passed"
+    },
+    {
+      "name": "negative speed rejected",
+      "status": "passed"
+    },
+    {
+      "name": "invalid spacing rejected transactionally",
+      "status": "passed"
+    },
+    {
+      "name": "NaN rejected",
+      "status": "passed"
+    },
+    {
+      "name": "out of range damping rejected",
+      "status": "passed"
+    },
+    {
+      "name": "zero blade count rejected",
+      "status": "passed"
+    },
+    {
+      "name": "missing active order rejected",
+      "status": "passed"
+    },
+    {
+      "name": "comparison direction and shared conditions",
+      "status": "passed"
+    },
+    {
+      "name": "different gear count preserves missing value",
+      "status": "passed"
+    },
+    {
+      "name": "stale result cannot compare/export",
+      "status": "passed"
+    },
+    {
+      "name": "scan independent brute force optimum",
+      "status": "passed"
+    },
+    {
+      "name": "scan fixed gear remains unchanged",
+      "status": "passed"
+    },
+    {
+      "name": "scan step limit controlled",
+      "status": "passed"
+    },
+    {
+      "name": "scan accept adds new plan and leaves original",
+      "status": "passed"
+    },
+    {
+      "name": "stale scan rejected",
+      "status": "passed"
+    },
+    {
+      "name": "rule study nonmutating with nine scenarios",
+      "status": "passed"
+    },
+    {
+      "name": "rule study invalid list rejected",
+      "status": "passed"
+    },
+    {
+      "name": "check generation deduplicates",
+      "status": "passed"
+    },
+    {
+      "name": "check dependencies protect object deletion",
+      "status": "passed"
+    },
+    {
+      "name": "completed check needs evidence",
+      "status": "passed"
+    },
+    {
+      "name": "input change marks completed check for recheck",
+      "status": "passed"
+    },
+    {
+      "name": "undo redo retains audit",
+      "status": "passed"
+    },
+    {
+      "name": "archived project rejects changes",
+      "status": "passed"
+    },
+    {
+      "name": "project exact round trip",
+      "status": "passed"
+    },
+    {
+      "name": "corrupt JSON and schema rejected",
+      "status": "passed"
+    },
+    {
+      "name": "missing nested field rejected",
+      "status": "passed"
+    },
+    {
+      "name": "null object and unknown field rejected",
+      "status": "passed"
+    },
+    {
+      "name": "duplicate property rejected",
+      "status": "passed"
+    },
+    {
+      "name": "duplicate identities rejected",
+      "status": "passed"
+    },
+    {
+      "name": "CSV quoted commas parsed",
+      "status": "passed"
+    },
+    {
+      "name": "CSV error lists row, no mutation",
+      "status": "passed"
+    },
+    {
+      "name": "CSV sorted spacing invalid",
+      "status": "passed"
+    },
+    {
+      "name": "CSV unknown damping retained",
+      "status": "passed"
+    },
+    {
+      "name": "CSV formula escape and negative numeric",
+      "status": "passed"
+    },
+    {
+      "name": "HTML report escapes content and embeds SVG",
+      "status": "passed"
+    },
+    {
+      "name": "SVG axis source and self containment",
+      "status": "passed"
+    },
+    {
+      "name": "duplicate enabled effective orders rejected",
+      "status": "passed"
+    },
+    {
+      "name": "disabled duplicate order preserved safely",
+      "status": "passed"
+    },
+    {
+      "name": "check key mismatch rejected",
+      "status": "passed"
+    },
+    {
+      "name": "source-specific CSV column preserved",
+      "status": "passed"
+    },
+    {
+      "name": "oversized encoded draft rejected before save",
+      "status": "passed"
+    },
+    {
+      "name": "overflow schema is readable error",
+      "status": "passed"
+    },
+    {
+      "name": "CSV unknown type rejected",
+      "status": "passed"
+    },
+    {
+      "name": "save reopen backup conflict and migration",
+      "status": "passed"
+    },
+    {
+      "name": "store path traversal rejected",
+      "status": "passed"
+    },
+    {
+      "name": "damaged library entry visible",
+      "status": "passed"
+    }
+  ]
+}

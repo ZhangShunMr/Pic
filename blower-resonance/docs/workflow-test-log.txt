@@ -1,0 +1,15 @@
+PASS startup is blank and dirty
+PASS invalid editor is transactional and stays editable
+PASS invalid numeric text points to field
+PASS valid editor applies and history restores
+PASS blank save reopen uses real file and hash
+PASS demo is explicit and independent
+PASS read only locked plan refuses gear changes
+PASS CSV preview rejects bad data without mutation
+PASS CSV preview apply creates a separate plan
+PASS edited CSV invalidates preview
+PASS atomic desktop save keeps backup and detects conflicts
+PASS completed evidence and archive validation at editor boundary
+PASS unsaved close cancel and discard
+PASS blank native workflow through compute scan compare save reopen export
+14/14 passed

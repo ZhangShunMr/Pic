@@ -1,0 +1,7 @@
+{
+  "kind": "static XML and declared binding name audit only",
+  "binding_roots": 89,
+  "command_bindings": 37,
+  "missing": [],
+  "wpf_runtime_verified": false
+}

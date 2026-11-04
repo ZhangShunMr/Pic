@@ -1,0 +1,170 @@
+{
+  "definition": "handwritten nonempty production lines; src .cs/.xaml; tests/generated/dependencies/build/material scripts/docs excluded",
+  "purpose": "native desktop platform migration of existing functional scope; minimum 3500",
+  "minimum": 3500,
+  "total": 3824,
+  "baseline_total": 0,
+  "baseline_files": [],
+  "files": [
+    {
+      "path": "src/Blower.Core/Analysis/ChartModel.cs",
+      "nonempty_lines": 115,
+      "sha256": "90f19291e114f5ff78ca3dbe45a3d97bdce5e6038aac9e57bbbe859a5d25e36f"
+    },
+    {
+      "path": "src/Blower.Core/Analysis/Engine.cs",
+      "nonempty_lines": 149,
+      "sha256": "8fe5c6efee5fefa35256e695bfe959c4537a8564097acd00ec3f695ef102c055"
+    },
+    {
+      "path": "src/Blower.Core/Analysis/PlanComparison.cs",
+      "nonempty_lines": 53,
+      "sha256": "43e37ef5e080de5e0c1b60c23d7988ebdba9a71047c80dc9547edc7d0f91d809"
+    },
+    {
+      "path": "src/Blower.Core/Analysis/QualityReview.cs",
+      "nonempty_lines": 75,
+      "sha256": "be3af0535aea5aa42f6f52ef917103b656afe2a310cd066a5dc82e1efbbd4438"
+    },
+    {
+      "path": "src/Blower.Core/Analysis/RuleStudy.cs",
+      "nonempty_lines": 103,
+      "sha256": "dfdad8826f99229674952dffb4f3c1ebb42204bd415ae456c0a02d330ef370df"
+    },
+    {
+      "path": "src/Blower.Core/Analysis/SpeedScanner.cs",
+      "nonempty_lines": 106,
+      "sha256": "92a87b0d0b237e84150aa4d3d3b05ac432371661e8a5590c2cd6ea8328f50e1b"
+    },
+    {
+      "path": "src/Blower.Core/Domain/Demo.cs",
+      "nonempty_lines": 59,
+      "sha256": "1dce769704e0b9562d07a89bcf0f138adedef73e1a99cf2ed7bc5c7a1568246b"
+    },
+    {
+      "path": "src/Blower.Core/Domain/Project.cs",
+      "nonempty_lines": 145,
+      "sha256": "dd7f2946aca9e2a1c5f17b174381c3c93758bb908f0f304b0808e8af66b11b53"
+    },
+    {
+      "path": "src/Blower.Core/Domain/Validation.cs",
+      "nonempty_lines": 181,
+      "sha256": "054eb9d39176eeaa96603809ac918ea09874b6bb7314befe4933ae966b427291"
+    },
+    {
+      "path": "src/Blower.Core/IO/CsvExchange.cs",
+      "nonempty_lines": 183,
+      "sha256": "a769dce2dd01d0fdc560559cf5853e02e6451a688e92958cffa1e91e936b256d"
+    },
+    {
+      "path": "src/Blower.Core/IO/Exports.cs",
+      "nonempty_lines": 152,
+      "sha256": "4acb6725bb45006c320a768d224df55a64fe9f5ce9cb288f19864bf0d57b6f07"
+    },
+    {
+      "path": "src/Blower.Core/IO/ProjectCodec.cs",
+      "nonempty_lines": 86,
+      "sha256": "1751a1cba9b1969ca14ea1bf1cad90821d0b3ecce3529af6115e721a2851c928"
+    },
+    {
+      "path": "src/Blower.Core/IO/ProjectStore.cs",
+      "nonempty_lines": 97,
+      "sha256": "e49b9f1a5158c37f28be181f5fadf623546e935a801500e63b0304bc4ee2be00"
+    },
+    {
+      "path": "src/Blower.Core/IO/SchemaGuard.cs",
+      "nonempty_lines": 78,
+      "sha256": "5ea7099e485fb2cadb2ddf739434053e56f437f63705db5f31513867106bbb67"
+    },
+    {
+      "path": "src/Blower.Core/Operations/ProjectCommands.cs",
+      "nonempty_lines": 129,
+      "sha256": "45ce58d4f559d2077d8da459caba89884c8fa477a260d5b5ce68363eb736147f"
+    },
+    {
+      "path": "src/Blower.Core/Operations/ProjectSession.cs",
+      "nonempty_lines": 93,
+      "sha256": "85a719af02add659c52feb3b4d4531591a4f207c78ddf14e62925a40812b8b0d"
+    },
+    {
+      "path": "src/Blower.Desktop/App.xaml",
+      "nonempty_lines": 50,
+      "sha256": "66996bb40372191a271d93afe357426fc0b44bca023c14a0546acb7466d3e41d"
+    },
+    {
+      "path": "src/Blower.Desktop/App.xaml.cs",
+      "nonempty_lines": 5,
+      "sha256": "c219f79cded76fb4477f39fd01752627028c3325f59c940f83c3b7853ab6b4b7"
+    },
+    {
+      "path": "src/Blower.Desktop/Controls/FrequencyCanvas.cs",
+      "nonempty_lines": 96,
+      "sha256": "d4cc43d4f581d3d0dbf877ddbeb14c545c15d9c0e88f3c86c7c5354c4283be88"
+    },
+    {
+      "path": "src/Blower.Desktop/MainWindow.xaml",
+      "nonempty_lines": 197,
+      "sha256": "250ba841f77a66c3916d77953a4f3e2e0651af9caf2140f07ac3d0c9af592df5"
+    },
+    {
+      "path": "src/Blower.Desktop/MainWindow.xaml.cs",
+      "nonempty_lines": 115,
+      "sha256": "27393046fa5881bc016687660b5c19eba581e692343a00efe1a577b0f3d476d8"
+    },
+    {
+      "path": "src/Blower.Desktop/Services/DesktopDialogs.cs",
+      "nonempty_lines": 77,
+      "sha256": "4a1bb85a343af477864c4d2eec1f1d7d3748681ec722d765878cbcba08849d6a"
+    },
+    {
+      "path": "src/Blower.Desktop/Services/DesktopFiles.cs",
+      "nonempty_lines": 78,
+      "sha256": "1c96a8c6ed1386fcf3dff2455639e263e4ee1f8e5c30307c76f442d0d3a8df5f"
+    },
+    {
+      "path": "src/Blower.Desktop/Services/IDesktopDialogs.cs",
+      "nonempty_lines": 16,
+      "sha256": "c72432a1d16486ab0cb7250d9c70d67816ab5208745b0a35b9c2dd2c9ccea5aa"
+    },
+    {
+      "path": "src/Blower.Desktop/ViewModels/EditorField.cs",
+      "nonempty_lines": 146,
+      "sha256": "dcdc319c1974f72669cbb2794f7304efa9e6a231708b8bffa73f12ffbc74564f"
+    },
+    {
+      "path": "src/Blower.Desktop/ViewModels/ObservableObject.cs",
+      "nonempty_lines": 38,
+      "sha256": "3faa81c713d49222ad46e6a7bb1f4ccb416cf50d8e81a6e7c39a802dcb0d4ef0"
+    },
+    {
+      "path": "src/Blower.Desktop/ViewModels/WorkspaceAnalysis.cs",
+      "nonempty_lines": 255,
+      "sha256": "c8f357913d8793c69df8865a43f91536a8dd42b8b38a3a1fd74f704790f99e8f"
+    },
+    {
+      "path": "src/Blower.Desktop/ViewModels/WorkspaceCommands.cs",
+      "nonempty_lines": 41,
+      "sha256": "477103d5ca2818574c7ba01c1416e3a8667003b53644ffc1db6a8cb92c7cf442"
+    },
+    {
+      "path": "src/Blower.Desktop/ViewModels/WorkspaceEditor.cs",
+      "nonempty_lines": 417,
+      "sha256": "47acb1863b07d54efa04eb0cecfb264d7bc9bc175327e064c78c730207eec5af"
+    },
+    {
+      "path": "src/Blower.Desktop/ViewModels/WorkspaceHelp.cs",
+      "nonempty_lines": 38,
+      "sha256": "36077e0557fb16d9a2afe0ab9623bc9166bdef26e3af628093fd30506ed2ce16"
+    },
+    {
+      "path": "src/Blower.Desktop/ViewModels/WorkspaceLibrary.cs",
+      "nonempty_lines": 84,
+      "sha256": "8bce63249fb07f14af2df89b96b47e44aedae0bc4c3d5559d0909d60fba2deef"
+    },
+    {
+      "path": "src/Blower.Desktop/ViewModels/WorkspaceViewModel.cs",
+      "nonempty_lines": 367,
+      "sha256": "d5e580dd2f199c54a83744b522e5ba6005c3ca4428f985464770fd7159343755"
+    }
+  ]
+}

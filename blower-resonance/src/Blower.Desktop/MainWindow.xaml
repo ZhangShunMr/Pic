@@ -1,0 +1,197 @@
+<Window x:Class="Blower.Desktop.MainWindow"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:controls="clr-namespace:Blower.Desktop.Controls"
+ Title="{Binding Title}" Width="1450" Height="940" MinWidth="1040" MinHeight="700"
+ Closing="WindowClosing">
+ <Window.InputBindings>
+  <KeyBinding Key="N" Modifiers="Control" Command="{Binding NewCommand}"/>
+  <KeyBinding Key="O" Modifiers="Control" Command="{Binding OpenCommand}"/>
+  <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveCommand}"/>
+  <KeyBinding Key="Z" Modifiers="Control" Command="{Binding UndoCommand}"/>
+  <KeyBinding Key="Y" Modifiers="Control" Command="{Binding RedoCommand}"/>
+  <KeyBinding Key="F5" Command="{Binding ComputeCommand}"/>
+ </Window.InputBindings>
+ <DockPanel>
+  <Menu DockPanel.Dock="Top" Background="#FFFFFF" Padding="8,3">
+   <MenuItem Header="文件(_F)">
+    <MenuItem Header="新建空白项目" Command="{Binding NewCommand}" InputGestureText="Ctrl+N"/>
+    <MenuItem Header="打开项目…" Command="{Binding OpenCommand}" InputGestureText="Ctrl+O"/>
+    <MenuItem Header="保存" Command="{Binding SaveCommand}" InputGestureText="Ctrl+S"/>
+    <MenuItem Header="另存为…" Command="{Binding SaveAsCommand}"/>
+    <Separator/>
+    <MenuItem Header="载入独立模拟示例" Command="{Binding DemoCommand}"/>
+    <MenuItem Header="复制为独立项目" Command="{Binding DuplicateProjectCommand}"/>
+    <MenuItem Header="归档 / 解除归档" Command="{Binding ArchiveCommand}"/>
+   </MenuItem>
+   <MenuItem Header="编辑(_E)">
+    <MenuItem Header="撤销" Command="{Binding UndoCommand}" InputGestureText="Ctrl+Z"/>
+    <MenuItem Header="重做" Command="{Binding RedoCommand}" InputGestureText="Ctrl+Y"/>
+    <MenuItem Header="新增对象" Command="{Binding AddCommand}"/>
+    <MenuItem Header="删除所选对象" Command="{Binding DeleteCommand}"/>
+   </MenuItem>
+   <MenuItem Header="计算(_R)">
+    <MenuItem Header="计算交叉与挡位接近" Command="{Binding ComputeCommand}" InputGestureText="F5"/>
+    <MenuItem Header="运行约束扫描" Command="{Binding ScanCommand}"/>
+    <MenuItem Header="生成验证清单" Command="{Binding GenerateChecksCommand}"/>
+   </MenuItem>
+   <MenuItem Header="导出(_X)">
+    <MenuItem Header="挡位接近明细 CSV…" Command="{Binding ExportContactsCommand}"/>
+    <MenuItem Header="交叉区间 CSV…" Command="{Binding ExportCrossingsCommand}"/>
+    <MenuItem Header="自包含设计报告 HTML…" Command="{Binding ExportReportCommand}"/>
+    <MenuItem Header="转速频率图 SVG…" Command="{Binding ExportSvgCommand}"/>
+    <MenuItem Header="验证清单 CSV…" Command="{Binding ExportChecksCommand}"/>
+    <MenuItem Header="规则敏感性 CSV…" Command="{Binding ExportStudyCommand}"/>
+    <MenuItem Header="方案比较 CSV…" Command="{Binding ExportComparisonCommand}"/>
+   </MenuItem>
+  </Menu>
+  <Border DockPanel.Dock="Bottom" Background="#FFFFFF" Padding="12,7" BorderThickness="0,1,0,0" BorderBrush="#C9D9DB">
+   <StackPanel>
+    <ProgressBar Height="3" IsIndeterminate="True" Visibility="{Binding Busy, Converter={StaticResource Visible}}"/>
+    <TextBlock Text="{Binding Notice}" TextWrapping="Wrap" AutomationProperties.Name="操作状态">
+     <TextBlock.Style>
+      <Style TargetType="TextBlock">
+       <Setter Property="Foreground" Value="#086F78"/>
+       <Style.Triggers><DataTrigger Binding="{Binding Error}" Value="True"><Setter Property="Foreground" Value="#A22F23"/></DataTrigger></Style.Triggers>
+      </Style>
+     </TextBlock.Style>
+    </TextBlock>
+    <TextBlock Text="{Binding FilePath}" FontSize="11" Foreground="#5E747C" TextTrimming="CharacterEllipsis"/>
+   </StackPanel>
+  </Border>
+  <Border DockPanel.Dock="Left" Width="234" Background="#213D48" Padding="12">
+   <DockPanel>
+    <StackPanel DockPanel.Dock="Top" Margin="7,12,7,18">
+     <TextBlock Text="BLOWER / DESIGN" Foreground="#94CED0" FontSize="12" FontWeight="SemiBold"/>
+     <TextBlock Text="挡位与共振避让" Foreground="White" FontSize="21" Margin="0,8,0,9"/>
+     <TextBlock Text="{Binding SourceLabel}" Foreground="#F7DB97" TextWrapping="Wrap"/>
+     <TextBlock Text="{Binding RevisionLabel}" Foreground="#C7DADC" Margin="0,7,0,0" TextWrapping="Wrap"/>
+    </StackPanel>
+    <Button DockPanel.Dock="Bottom" Content="计算交叉与接近  F5" Command="{Binding ComputeCommand}" Margin="0,10"/>
+    <ListBox ItemsSource="{Binding Nodes}" SelectedItem="{Binding SelectedNode}" Background="Transparent"
+     BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Foreground="White"
+     AutomationProperties.Name="工程导航">
+     <ListBox.ItemContainerStyle>
+      <Style TargetType="ListBoxItem">
+       <Setter Property="Padding" Value="8,6"/>
+       <Setter Property="Margin" Value="0,2"/>
+       <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+      </Style>
+     </ListBox.ItemContainerStyle>
+     <ListBox.ItemTemplate><DataTemplate><StackPanel>
+      <TextBlock Text="{Binding Title}" FontSize="14"/>
+      <TextBlock Text="{Binding Hint}" FontSize="10" Opacity="0.76" TextWrapping="Wrap" Margin="0,3,0,0"/>
+     </StackPanel></DataTemplate></ListBox.ItemTemplate>
+    </ListBox>
+   </DockPanel>
+  </Border>
+  <Grid Margin="18,14">
+   <Grid.RowDefinitions>
+    <RowDefinition Height="Auto"/>
+    <RowDefinition Height="Auto"/>
+    <RowDefinition Height="*"/>
+    <RowDefinition Height="Auto"/>
+   </Grid.RowDefinitions>
+   <StackPanel Margin="0,0,0,12">
+    <TextBlock Text="{Binding SectionTitle}" FontSize="25" FontWeight="SemiBold"/>
+    <TextBlock Text="{Binding SectionHint}" Foreground="#607981" Margin="0,4,0,0"/>
+   </StackPanel>
+   <StackPanel Grid.Row="1" Margin="0,0,0,8">
+    <WrapPanel Visibility="{Binding IsPlans, Converter={StaticResource Visible}}">
+     <TextBlock Text="当前 / 基准方案" VerticalAlignment="Center" Margin="0,0,8,0"/>
+     <ComboBox ItemsSource="{Binding Plans}" SelectedItem="{Binding ActivePlan}" DisplayMemberPath="Name" MinWidth="230"/>
+     <Button Content="复制当前方案" Command="{Binding CopyPlanCommand}"/>
+    </WrapPanel>
+    <WrapPanel Visibility="{Binding IsLibrary, Converter={StaticResource Visible}}">
+     <Button Content="保存到项目库" Command="{Binding LibrarySaveCommand}"/>
+     <Button Content="打开选中项目" Command="{Binding LibraryOpenCommand}"/>
+     <Button Content="恢复选中项目备份" Command="{Binding LibraryBackupCommand}"/>
+    </WrapPanel>
+    <WrapPanel Visibility="{Binding IsPlanEditor, Converter={StaticResource Visible}}">
+     <Button Content="新增方案" Command="{Binding AddPlanCommand}"/>
+     <Button Content="新增挡位" Command="{Binding AddGearCommand}"/>
+     <Button Content="方案属性" Command="{Binding PlanPropertiesCommand}"/>
+    </WrapPanel>
+    <WrapPanel>
+     <Button Content="新增对象" Command="{Binding AddCommand}"/>
+     <Button Content="删除所选" Command="{Binding DeleteCommand}"/>
+     <Button Content="撤销" Command="{Binding UndoCommand}"/>
+     <Button Content="重做" Command="{Binding RedoCommand}"/>
+     <TextBlock Text="{Binding ResultStatus}" VerticalAlignment="Center" Margin="14,0,0,0" TextWrapping="Wrap"/>
+    </WrapPanel>
+    <WrapPanel Visibility="{Binding IsContacts, Converter={StaticResource Visible}}">
+     <CheckBox Content="仅显示潜在接近" IsChecked="{Binding OnlyNear}" VerticalAlignment="Center" Margin="5"/>
+     <TextBox Text="{Binding ContactSearch, UpdateSourceTrigger=PropertyChanged}" Width="220" ToolTip="按挡位、阶次、模态名称筛选"/>
+     <Button Content="导出明细" Command="{Binding ExportContactsCommand}"/>
+    </WrapPanel>
+    <StackPanel Visibility="{Binding IsScan, Converter={StaticResource Visible}}">
+     <WrapPanel><Button Content="运行约束扫描" Command="{Binding ScanCommand}"/><Button Content="接纳为新方案" Command="{Binding AcceptScanCommand}"/></WrapPanel>
+     <TextBlock Text="{Binding ScanStatus}" TextWrapping="Wrap" Margin="4"/>
+    </StackPanel>
+    <StackPanel Visibility="{Binding IsCompare, Converter={StaticResource Visible}}">
+     <WrapPanel><TextBlock Text="目标方案" VerticalAlignment="Center"/><ComboBox ItemsSource="{Binding Plans}" SelectedItem="{Binding ComparePlan}" DisplayMemberPath="Name" MinWidth="230"/><Button Content="比较" Command="{Binding CompareCommand}"/><Button Content="导出比较" Command="{Binding ExportComparisonCommand}"/></WrapPanel>
+     <TextBlock Text="{Binding ComparisonStatus}" TextWrapping="Wrap" Margin="4"/>
+    </StackPanel>
+    <WrapPanel Visibility="{Binding IsStudy, Converter={StaticResource Visible}}">
+     <TextBlock Text="绝对半宽 Hz" VerticalAlignment="Center"/>
+     <TextBox Text="{Binding StudyBands, UpdateSourceTrigger=PropertyChanged}" Width="110"/>
+     <TextBlock Text="转速容差 rpm" VerticalAlignment="Center" Margin="10,0,0,0"/>
+     <TextBox Text="{Binding StudyTolerances, UpdateSourceTrigger=PropertyChanged}" Width="110"/>
+     <Button Content="试算规则组合" Command="{Binding StudyCommand}"/>
+     <Button Content="导出试算" Command="{Binding ExportStudyCommand}"/>
+    </WrapPanel>
+    <WrapPanel Visibility="{Binding IsChecks, Converter={StaticResource Visible}}">
+     <Button Content="为当前方案生成验证任务" Command="{Binding GenerateChecksCommand}"/>
+     <Button Content="导出验证清单" Command="{Binding ExportChecksCommand}"/>
+    </WrapPanel>
+    <StackPanel Visibility="{Binding IsExchange, Converter={StaticResource Visible}}">
+     <WrapPanel>
+      <ComboBox ItemsSource="{Binding CsvKinds}" SelectedItem="{Binding CsvKind}"/>
+      <Button Content="读取 CSV…" Command="{Binding ImportReadCommand}"/>
+      <Button Content="预检" Command="{Binding PreviewCommand}"/>
+      <Button Content="整批应用" Command="{Binding ImportApplyCommand}"/>
+      <Button Content="导出当前模板" Command="{Binding TemplateCommand}"/>
+     </WrapPanel>
+     <TextBox Text="{Binding CsvText, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" AcceptsTab="True" Height="150" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" FontFamily="Consolas"/>
+     <TextBlock Text="{Binding PreviewStatus}" TextWrapping="Wrap" Margin="4"/>
+    </StackPanel>
+   </StackPanel>
+   <Grid Grid.Row="2">
+    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+    <DataGrid ItemsSource="{Binding Rows}" SelectedItem="{Binding SelectedRow}" AutoGeneratingColumn="GenerateColumn"
+     Visibility="{Binding IsTable, Converter={StaticResource Visible}}" AutomationProperties.Name="工程数据表"/>
+    <DockPanel Visibility="{Binding IsPlot, Converter={StaticResource Visible}}" Background="White">
+     <WrapPanel DockPanel.Dock="Top" Margin="10">
+      <TextBlock Text="频率上限 Hz（空白自动）" VerticalAlignment="Center"/>
+      <TextBox Width="130" Text="{Binding ChartCeiling, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}"/>
+      <Button Content="导出 SVG" Command="{Binding ExportSvgCommand}"/>
+     </WrapPanel>
+     <controls:FrequencyCanvas Model="{Binding Chart}" SourceLabel="{Binding SourceLabel}"/>
+    </DockPanel>
+    <ScrollViewer Visibility="{Binding IsHelp, Converter={StaticResource Visible}}" VerticalScrollBarVisibility="Auto" Background="White" Padding="20">
+     <TextBlock Text="{Binding HelpText}" TextWrapping="Wrap" LineHeight="25"/>
+    </ScrollViewer>
+    <GridSplitter Grid.Column="1" Width="6" HorizontalAlignment="Center" Background="#C9D9DB" Visibility="{Binding HasEditor, Converter={StaticResource Visible}}"/>
+    <Border Grid.Column="2" Width="320" Background="White" Padding="14" Visibility="{Binding HasEditor, Converter={StaticResource Visible}}">
+     <DockPanel>
+      <StackPanel DockPanel.Dock="Top"><TextBlock Text="{Binding Form.Title}" FontSize="15" FontWeight="SemiBold"/><TextBlock Text="表格选中对象后在此编辑；未应用草稿会提示。" TextWrapping="Wrap" Foreground="#607981" Margin="0,6,0,10"/></StackPanel>
+      <WrapPanel DockPanel.Dock="Bottom" Margin="0,10,0,0"><Button Content="应用属性" Command="{Binding ApplyCommand}"/><Button Content="还原草稿" Command="{Binding ResetEditorCommand}"/></WrapPanel>
+      <ScrollViewer VerticalScrollBarVisibility="Auto">
+       <ItemsControl ItemsSource="{Binding Form.Fields}">
+        <ItemsControl.ItemTemplate><DataTemplate><StackPanel Margin="0,0,0,12">
+         <TextBlock Text="{Binding Label}" FontWeight="SemiBold" TextWrapping="Wrap"/>
+         <TextBox Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding IsText, Converter={StaticResource Visible}}" TextWrapping="Wrap" MaxHeight="110" VerticalScrollBarVisibility="Auto"/>
+         <ComboBox ItemsSource="{Binding Choices}" SelectedItem="{Binding Value, UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding IsChoice, Converter={StaticResource Visible}}"/>
+         <TextBlock Text="{Binding Help}" FontSize="11" Foreground="#607981" TextWrapping="Wrap"/>
+        </StackPanel></DataTemplate></ItemsControl.ItemTemplate>
+       </ItemsControl>
+      </ScrollViewer>
+     </DockPanel>
+    </Border>
+   </Grid>
+   <Border Grid.Row="3" Background="#FFF4DA" Padding="10" Margin="0,10,0,0">
+    <TextBlock Text="{Binding Boundary}" TextWrapping="Wrap" Foreground="#775520"/>
+   </Border>
+  </Grid>
+ </DockPanel>
+</Window>

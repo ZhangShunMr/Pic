@@ -1,0 +1,207 @@
+{
+  "schema": 1,
+  "id": "2c146b00788f4b7c80d27bfdee4f8465",
+  "name": "\u6A21\u62DF \u00B7 40\u53F6\u7247\u9F13\u98CE\u673A\u6321\u4F4D\u8BBE\u8BA1",
+  "owner": "\u6F14\u793A\u5DE5\u7A0B\u5E08",
+  "vehicle": "\u6F14\u793A\u5E73\u53F0 HVAC-A",
+  "notes": "\u7528\u4E8E\u6838\u5BF9\u516C\u5F0F\u4E0E\u64CD\u4F5C\uFF1B600Hz\u6A21\u6001\u548C40\u9636\u5728900rpm\u7CBE\u786E\u4EA4\u53C9\u3002",
+  "origin": "Simulation",
+  "source": "\u5185\u7F6E\u53EF\u91CD\u590D\u6A21\u62DF\u53C2\u6570\uFF0C\u4E0D\u662F\u8BD5\u9A8C\u91C7\u96C6",
+  "archived": false,
+  "created": "2026-11-04T14:56:35.4729803+00:00",
+  "modified": "2026-11-04T14:56:35.4729805+00:00",
+  "revision": 0,
+  "settings": {
+    "blades": 40,
+    "minRpm": 500,
+    "maxRpm": 5000,
+    "absoluteBandHz": 5,
+    "relativeBandPercent": 3,
+    "useDamping": true,
+    "speedToleranceRpm": 20,
+    "minimumGapRpm": 100,
+    "scanStepRpm": 25,
+    "scanWindowRpm": 250,
+    "shiftWeight": 0.15
+  },
+  "orders": [
+    {
+      "id": "833c3421801b43528dce15b0a0061e43",
+      "name": "\u8F74\u9891 1X",
+      "kind": "Shaft",
+      "multiplier": 1,
+      "enabled": true,
+      "evidence": "\u8BBE\u8BA1\u5019\u9009\uFF1B\u5F85\u9A8C\u8BC1\u6FC0\u52B1\u5B58\u5728\u6027"
+    },
+    {
+      "id": "0bedfb83e0b54cbaad25b5f63c5e908e",
+      "name": "\u8F74\u9891 2X",
+      "kind": "Shaft",
+      "multiplier": 2,
+      "enabled": true,
+      "evidence": "\u8BBE\u8BA1\u5019\u9009\uFF1B\u5F85\u9A8C\u8BC1\u6FC0\u52B1\u5B58\u5728\u6027"
+    },
+    {
+      "id": "69c283fb1aaf49279745b0550ecb7d28",
+      "name": "\u53F6\u7247\u901A\u8FC7 BPF",
+      "kind": "Blade",
+      "multiplier": 1,
+      "enabled": true,
+      "evidence": "\u8BBE\u8BA1\u5019\u9009\uFF1B\u5F85\u9A8C\u8BC1\u6FC0\u52B1\u5B58\u5728\u6027"
+    },
+    {
+      "id": "604e1ad39cbf43e7a0210e6a7e9d4429",
+      "name": "\u53F6\u7247\u4E8C\u500D\u9891",
+      "kind": "Blade",
+      "multiplier": 2,
+      "enabled": true,
+      "evidence": "\u8BBE\u8BA1\u5019\u9009\uFF1B\u5F85\u9A8C\u8BC1\u6FC0\u52B1\u5B58\u5728\u6027"
+    }
+  ],
+  "modes": [
+    {
+      "id": "bad1c9512f894116bc5f49a83f496954",
+      "name": "\u58F3\u4F53\u9762\u677F M1",
+      "frequencyHz": 600,
+      "dampingRatio": 0.02,
+      "extraBandHz": 0,
+      "enabled": true,
+      "origin": "Simulation",
+      "source": "\u6A21\u62DF\u6A21\u6001\u9891\u7387\uFF1B\u975E\u5B9E\u6D4B",
+      "location": "\u9F13\u98CE\u673A\u58F3\u4F53\u5916\u4FA7"
+    },
+    {
+      "id": "4988502cd6bd4c5aa6571d23fd5c4ebf",
+      "name": "\u98CE\u9053\u5C40\u90E8 M2",
+      "frequencyHz": 1200,
+      "dampingRatio": 0.015,
+      "extraBandHz": 0,
+      "enabled": true,
+      "origin": "Simulation",
+      "source": "\u6A21\u62DF\u6A21\u6001\u9891\u7387\uFF1B\u975E\u5B9E\u6D4B",
+      "location": "\u51FA\u53E3\u98CE\u9053\u8FDE\u63A5\u5904"
+    },
+    {
+      "id": "f4402f81f54341ae82daf82253bfa169",
+      "name": "\u652F\u67B6 M3",
+      "frequencyHz": 90,
+      "dampingRatio": null,
+      "extraBandHz": 0,
+      "enabled": true,
+      "origin": "Simulation",
+      "source": "\u6A21\u62DF\u6A21\u6001\u9891\u7387\uFF1B\u963B\u5C3C\u672A\u77E5",
+      "location": "\u5B89\u88C5\u652F\u67B6"
+    }
+  ],
+  "plans": [
+    {
+      "id": "bac8c37b30dc4ba9b4b4c282539383da",
+      "name": "A \u00B7 \u521D\u59CB\u6321\u4F4D",
+      "notes": "\u6A21\u62DF\u521D\u59CB\u8BBE\u5B9A",
+      "locked": false,
+      "gears": [
+        {
+          "id": "040e3eb3e1b24061b13274c63bf730ec",
+          "name": "1\u6321",
+          "rpm": 900,
+          "fixed": false,
+          "notes": ""
+        },
+        {
+          "id": "e7e90978dddf4ed48caa98d7cb529b0b",
+          "name": "2\u6321",
+          "rpm": 1400,
+          "fixed": false,
+          "notes": ""
+        },
+        {
+          "id": "c745c683a19f4a9b83543df96b679293",
+          "name": "3\u6321",
+          "rpm": 1800,
+          "fixed": false,
+          "notes": ""
+        },
+        {
+          "id": "cea6f27e3dd64173a2c82333245eaadb",
+          "name": "4\u6321",
+          "rpm": 2600,
+          "fixed": false,
+          "notes": ""
+        },
+        {
+          "id": "a3022995dffe4ab2819a2d653943dbfb",
+          "name": "5\u6321",
+          "rpm": 3600,
+          "fixed": false,
+          "notes": ""
+        },
+        {
+          "id": "9d53f9b380264dae9720f48266cd3ed9",
+          "name": "6\u6321",
+          "rpm": 4500,
+          "fixed": false,
+          "notes": ""
+        }
+      ]
+    },
+    {
+      "id": "19c85d998d954b94bfde917b913ecd79",
+      "name": "B \u00B7 \u4EBA\u5DE5\u5019\u9009",
+      "notes": "\u6A21\u62DF\u5019\u9009\uFF1B\u98CE\u91CF\u5F85\u9A8C\u8BC1",
+      "locked": false,
+      "gears": [
+        {
+          "id": "7574f6edcf1f4857984bda0a42580b06",
+          "name": "1\u6321",
+          "rpm": 1000,
+          "fixed": false,
+          "notes": ""
+        },
+        {
+          "id": "685e704787424da49ff982f92d18daea",
+          "name": "2\u6321",
+          "rpm": 1500,
+          "fixed": false,
+          "notes": ""
+        },
+        {
+          "id": "53b34f95e25c4dab90726c7a95f31fd4",
+          "name": "3\u6321",
+          "rpm": 1950,
+          "fixed": false,
+          "notes": ""
+        },
+        {
+          "id": "e3c6ced8f4a94fc0b4f8175b7b533306",
+          "name": "4\u6321",
+          "rpm": 2800,
+          "fixed": false,
+          "notes": ""
+        },
+        {
+          "id": "f611824df455410f96eaa9c0b0084c2d",
+          "name": "5\u6321",
+          "rpm": 3800,
+          "fixed": false,
+          "notes": ""
+        },
+        {
+          "id": "80ad9f97056f45bfb0046a4bd79528fb",
+          "name": "6\u6321",
+          "rpm": 4600,
+          "fixed": false,
+          "notes": ""
+        }
+      ]
+    }
+  ],
+  "checks": [],
+  "audit": [
+    {
+      "time": "2026-11-04T14:56:35.47392+00:00",
+      "action": "\u8F7D\u5165\u6A21\u62DF\u793A\u4F8B",
+      "detail": "40\u53F6\u7247\uFF0C\u4E09\u6A21\u6001\uFF0C\u53CC\u65B9\u6848",
+      "revision": 0
+    }
+  ]
+}

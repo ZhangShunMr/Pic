@@ -1,0 +1,50 @@
+<Application x:Class="Blower.Desktop.App"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ StartupUri="MainWindow.xaml">
+ <Application.Resources>
+  <BooleanToVisibilityConverter x:Key="Visible"/>
+  <SolidColorBrush x:Key="Ink" Color="#263E48"/>
+  <SolidColorBrush x:Key="Accent" Color="#086F78"/>
+  <Style TargetType="Window">
+   <Setter Property="FontFamily" Value="Microsoft YaHei UI"/>
+   <Setter Property="FontSize" Value="13"/>
+   <Setter Property="Foreground" Value="{StaticResource Ink}"/>
+   <Setter Property="Background" Value="#F1F4F4"/>
+  </Style>
+  <Style TargetType="Button">
+   <Setter Property="Padding" Value="12,7"/>
+   <Setter Property="Margin" Value="3"/>
+   <Setter Property="Background" Value="#E4EEEE"/>
+   <Setter Property="Foreground" Value="{StaticResource Ink}"/>
+   <Setter Property="BorderBrush" Value="#B8CDCF"/>
+  </Style>
+  <Style TargetType="TextBox">
+   <Setter Property="Padding" Value="7,5"/>
+   <Setter Property="Margin" Value="0,3,0,3"/>
+   <Setter Property="BorderBrush" Value="#ADBCBF"/>
+   <Setter Property="VerticalContentAlignment" Value="Center"/>
+  </Style>
+  <Style TargetType="ComboBox">
+   <Setter Property="Padding" Value="6,5"/>
+   <Setter Property="Margin" Value="3"/>
+   <Setter Property="MinWidth" Value="135"/>
+  </Style>
+  <Style TargetType="DataGrid">
+   <Setter Property="AutoGenerateColumns" Value="True"/>
+   <Setter Property="IsReadOnly" Value="True"/>
+   <Setter Property="CanUserAddRows" Value="False"/>
+   <Setter Property="CanUserDeleteRows" Value="False"/>
+   <Setter Property="SelectionMode" Value="Single"/>
+   <Setter Property="HeadersVisibility" Value="Column"/>
+   <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+   <Setter Property="HorizontalGridLinesBrush" Value="#DDE5E6"/>
+   <Setter Property="AlternatingRowBackground" Value="#F0F5F4"/>
+   <Setter Property="RowHeight" Value="32"/>
+   <Setter Property="ColumnHeaderHeight" Value="36"/>
+   <Setter Property="BorderThickness" Value="0"/>
+   <Setter Property="EnableRowVirtualization" Value="True"/>
+   <Setter Property="EnableColumnVirtualization" Value="True"/>
+  </Style>
+ </Application.Resources>
+</Application>

@@ -1,0 +1,12 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  Blower.Core -> /workspace/Pic/blower-resonance/src/Blower.Core/bin/Release/net8.0/Blower.Core.dll
+  Blower.WorkflowVerification -> /workspace/Pic/blower-resonance/tests/Blower.WorkflowVerification/bin/Release/net8.0/Blower.WorkflowVerification.dll
+  Blower.Desktop -> /workspace/Pic/blower-resonance/src/Blower.Desktop/bin/Release/net8.0-windows/BlowerResonance.dll
+  Blower.Verification -> /workspace/Pic/blower-resonance/tests/Blower.Verification/bin/Release/net8.0/Blower.Verification.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:02.29

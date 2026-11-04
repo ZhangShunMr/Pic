@@ -1,0 +1,12 @@
+{
+  "archive": "release/BlowerResonance-V2.0-win-x64.zip",
+  "archive_bytes": 70114798,
+  "archive_sha256": "d3d3fb4ab951ae11aacda0cb8629e2a5fe7911d41f093c35d9d0bac5907da552",
+  "file_count": 473,
+  "exe_pe_signature": "MZ",
+  "exe_sha256": "96fa88c6c6f1a97128dde1e169ee3b0cb9c6723e97bd5f4c067d4541cc09c387",
+  "self_contained": true,
+  "target": "win-x64",
+  "packaging_check": "zip CRC and required executable/framework files passed",
+  "windows_runtime_verified": false
+}

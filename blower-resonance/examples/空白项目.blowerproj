@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "id": "413f99de4d8f4a96a5acfa8271ded551",
+  "name": "\u672A\u547D\u540D\u8BBE\u8BA1\u9879\u76EE",
+  "owner": "",
+  "vehicle": "",
+  "notes": "",
+  "origin": "Manual",
+  "source": "\u7528\u6237\u5F55\u5165\uFF1B\u6765\u6E90\u5F85\u8865\u5145",
+  "archived": false,
+  "created": "2026-11-04T14:56:35.6047599+00:00",
+  "modified": "2026-11-04T14:56:35.60476+00:00",
+  "revision": 0,
+  "settings": {
+    "blades": 40,
+    "minRpm": 500,
+    "maxRpm": 5000,
+    "absoluteBandHz": 5,
+    "relativeBandPercent": 3,
+    "useDamping": true,
+    "speedToleranceRpm": 20,
+    "minimumGapRpm": 100,
+    "scanStepRpm": 25,
+    "scanWindowRpm": 250,
+    "shiftWeight": 0.15
+  },
+  "orders": [],
+  "modes": [],
+  "plans": [],
+  "checks": [],
+  "audit": []
+}

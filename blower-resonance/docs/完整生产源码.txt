@@ -1,0 +1,4102 @@
+
+===== src/Blower.Core/Analysis/ChartModel.cs =====
+using System.Globalization;
+using System.Text;
+using Blower.Core.Domain;
+
+namespace Blower.Core.Analysis;
+
+public sealed record PlotLine(string Id, string Name, string Color, double X1, double Y1, double X2, double Y2);
+public sealed record PlotBand(string Id, string Name, double Y, double Height, double LabelY);
+public sealed record PlotGear(string Id, string Name, double X, double Rpm, bool Near);
+public sealed record PlotTick(double Position, string Label);
+
+public sealed class ChartModel
+{
+    public const double Width = 880;
+    public const double Height = 420;
+    public const double Left = 68;
+    public const double Right = 844;
+    public const double Top = 30;
+    public const double Bottom = 358;
+    public List<PlotLine> Lines { get; } = [];
+    public List<PlotBand> Bands { get; } = [];
+    public List<PlotGear> Gears { get; } = [];
+    public List<PlotTick> XTicks { get; } = [];
+    public List<PlotTick> YTicks { get; } = [];
+    public double MaximumHz { get; private set; }
+    public double MinimumRpm { get; private set; }
+    public double MaximumRpm { get; private set; }
+
+    public double X(double rpm)
+    {
+        return Left + (rpm - MinimumRpm) / (MaximumRpm - MinimumRpm) * (Right - Left);
+    }
+
+    public double Y(double frequency)
+    {
+        return Bottom - frequency / MaximumHz * (Bottom - Top);
+    }
+
+    public static string N(double number) => number.ToString("0.###", CultureInfo.InvariantCulture);
+
+    public static ChartModel Create(Project project, AnalysisResult result, string planId, double? ceiling = null)
+    {
+        var orders = project.Orders.Where(x => x.Enabled).ToList();
+        var maximum = Math.Max(100,
+            Math.Max(result.Bands.Select(x => x.UpperHz).DefaultIfEmpty(0).Max(),
+            orders.Select(x => Engine.Frequency(project.Settings.MaxRpm, x.EffectiveOrder(project.Settings.Blades)))
+                .DefaultIfEmpty(0).Max()));
+        var chart = new ChartModel
+        {
+            MaximumHz = ceiling is > 0 ? ceiling.Value : Math.Ceiling(maximum / 100) * 100,
+            MinimumRpm = project.Settings.MinRpm,
+            MaximumRpm = project.Settings.MaxRpm
+        };
+        for (var i = 0; i <= 5; i++)
+        {
+            var rpm = chart.MinimumRpm + (chart.MaximumRpm - chart.MinimumRpm) * i / 5;
+            var hz = chart.MaximumHz * i / 5;
+            chart.XTicks.Add(new(chart.X(rpm), rpm.ToString("0")));
+            chart.YTicks.Add(new(chart.Y(hz), hz.ToString("0")));
+        }
+        var colors = new[] { "#cf5d18", "#197493", "#b87916", "#2a866b", "#5866ad", "#aa4a7a" };
+        for (var i = 0; i < orders.Count; i++)
+        {
+            var order = orders[i];
+            var q = order.EffectiveOrder(project.Settings.Blades);
+            var endRpm = Math.Min(chart.MaximumRpm, chart.MaximumHz * 60 / q);
+            if (endRpm < chart.MinimumRpm)
+            {
+                continue;
+            }
+            chart.Lines.Add(new(order.Id, $"{order.Name} · {q:0.##}阶", colors[i % colors.Length],
+                chart.X(chart.MinimumRpm), chart.Y(Engine.Frequency(chart.MinimumRpm, q)),
+                chart.X(endRpm), chart.Y(Engine.Frequency(endRpm, q))));
+        }
+        foreach (var band in result.Bands.Where(x => x.LowerHz <= chart.MaximumHz))
+        {
+            var top = chart.Y(Math.Min(chart.MaximumHz, band.UpperHz));
+            var bottom = chart.Y(band.LowerHz);
+            chart.Bands.Add(new(band.ModeId, $"{band.Name} {band.CenterHz:0.#}Hz", top,
+                Math.Max(2, bottom - top), Math.Clamp(chart.Y(band.CenterHz) - 5, Top + 10, Bottom - 5)));
+        }
+        var plan = project.Plans.FirstOrDefault(x => x.Id == planId);
+        if (plan != null)
+        {
+            foreach (var gear in plan.Gears)
+            {
+                chart.Gears.Add(new(gear.Id, gear.Name, chart.X(gear.Rpm), gear.Rpm,
+                    result.Contacts.Any(x => x.PlanId == planId && x.GearId == gear.Id && x.Near)));
+            }
+        }
+        return chart;
+    }
+
+    public string ToSvg(string title, string source)
+    {
+        static string E(string value) => System.Net.WebUtility.HtmlEncode(value);
+        var b = new StringBuilder();
+        b.Append($"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 {Width} {Height + 60}\"><rect width=\"100%\" height=\"100%\" fill=\"#fffefa\"/>");
+        b.Append("<g font-family=\"sans-serif\" font-size=\"11\" fill=\"#4c4c52\">");
+        foreach (var tick in XTicks)
+        {
+            b.Append($"<path d=\"M{N(tick.Position)} {Top}V{Bottom}\" stroke=\"#deded9\"/><text x=\"{N(tick.Position)}\" y=\"380\" text-anchor=\"middle\">{E(tick.Label)}</text>");
+        }
+        foreach (var tick in YTicks)
+        {
+            b.Append($"<path d=\"M{Left} {N(tick.Position)}H{Right}\" stroke=\"#deded9\"/><text x=\"60\" y=\"{N(tick.Position + 4)}\" text-anchor=\"end\">{E(tick.Label)}</text>");
+        }
+        foreach (var band in Bands)
+        {
+            b.Append($"<rect x=\"{Left}\" y=\"{N(band.Y)}\" width=\"{Right - Left}\" height=\"{N(band.Height)}\" fill=\"#9b85bb\" opacity=\".25\"/><text x=\"{Right - 4}\" y=\"{N(band.LabelY)}\" text-anchor=\"end\">{E(band.Name)}</text>");
+        }
+        foreach (var line in Lines)
+        {
+            b.Append($"<path d=\"M{N(line.X1)} {N(line.Y1)}L{N(line.X2)} {N(line.Y2)}\" fill=\"none\" stroke=\"{line.Color}\" stroke-width=\"2\"/>");
+        }
+        foreach (var gear in Gears)
+        {
+            b.Append($"<path d=\"M{N(gear.X)} {Top}V{Bottom}\" stroke=\"{(gear.Near ? "#b44932" : "#267b67")}\" stroke-dasharray=\"5 5\"/><text x=\"{N(gear.X)}\" y=\"22\" text-anchor=\"middle\">{E(gear.Name)}</text>");
+        }
+        b.Append($"<text x=\"{Left}\" y=\"405\">转速 rpm →</text><text x=\"10\" y=\"16\">频率 Hz</text><text x=\"{Left}\" y=\"435\">{E(title)}</text><text x=\"{Left}\" y=\"455\">{E(source)} · {E(Software.Boundary)}</text></g></svg>");
+        return b.ToString();
+    }
+}
+
+===== src/Blower.Core/Analysis/Engine.cs =====
+using Blower.Core.Domain;
+
+namespace Blower.Core.Analysis;
+
+public sealed record SensitiveBand(
+    string ModeId,
+    string Name,
+    double CenterHz,
+    double HalfWidthHz,
+    double LowerHz,
+    double UpperHz,
+    string Basis);
+
+public sealed record Crossing(
+    string ModeId,
+    string OrderId,
+    string Mode,
+    string Order,
+    double EffectiveOrder,
+    double ExactRpm,
+    double LowerRpm,
+    double UpperRpm,
+    bool InRange);
+
+public sealed record Contact(
+    string PlanId,
+    string GearId,
+    string OrderId,
+    string ModeId,
+    string Plan,
+    string Gear,
+    string Order,
+    string Mode,
+    double Rpm,
+    double OrderNumber,
+    double FrequencyHz,
+    double LowerHz,
+    double UpperHz,
+    double ModeHz,
+    double HalfWidthHz,
+    double ClearanceHz,
+    bool Near)
+{
+    public string Key => string.Join("/", PlanId, GearId, OrderId, ModeId);
+    public string Status => Near ? "潜在接近" : "范围外";
+}
+
+public sealed record GearSummary(
+    string GearId,
+    string Name,
+    double Rpm,
+    int Contacts,
+    double? MinimumClearanceHz);
+
+public sealed record PlanSummary(
+    string PlanId,
+    string Name,
+    int GearCount,
+    int NearGearCount,
+    int ContactCount,
+    double? MinimumClearanceHz,
+    IReadOnlyList<GearSummary> Gears);
+
+public sealed class AnalysisResult
+{
+    public string InputHash { get; init; } = "";
+    public DateTimeOffset Time { get; init; } = DateTimeOffset.UtcNow;
+    public List<SensitiveBand> Bands { get; init; } = [];
+    public List<Crossing> Crossings { get; init; } = [];
+    public List<Contact> Contacts { get; init; } = [];
+    public List<PlanSummary> Summaries { get; init; } = [];
+}
+
+public static class Engine
+{
+    public static double Frequency(double rpm, double order)
+    {
+        return rpm * order / 60.0;
+    }
+
+    public static SensitiveBand Band(Mode mode, DesignSettings settings)
+    {
+        var absolute = settings.AbsoluteBandHz;
+        var relative = mode.FrequencyHz * settings.RelativeBandPercent / 100.0;
+        var damping = settings.UseDamping ? (mode.DampingRatio ?? 0) * mode.FrequencyHz : 0;
+        var width = Math.Max(Math.Max(absolute, relative), Math.Max(damping, mode.ExtraBandHz));
+        var basis = $"max(绝对{absolute:0.###},百分比{relative:0.###},阻尼近似{damping:0.###},附加{mode.ExtraBandHz:0.###}) Hz";
+        return new(mode.Id, mode.Name, mode.FrequencyHz, width,
+            Math.Max(0, mode.FrequencyHz - width), mode.FrequencyHz + width, basis);
+    }
+
+    public static Contact Evaluate(Project project, SpeedPlan plan, Gear gear, Excitation order, Mode mode)
+    {
+        var q = order.EffectiveOrder(project.Settings.Blades);
+        var band = Band(mode, project.Settings);
+        var center = Frequency(gear.Rpm, q);
+        var tolerance = Frequency(project.Settings.SpeedToleranceRpm, q);
+        var lower = Math.Max(0, center - tolerance);
+        var upper = center + tolerance;
+        var clearance = Math.Max(band.LowerHz - upper, lower - band.UpperHz);
+        return new(plan.Id, gear.Id, order.Id, mode.Id,
+            plan.Name, gear.Name, order.Name, mode.Name,
+            gear.Rpm, q, center, lower, upper, mode.FrequencyHz,
+            band.HalfWidthHz, clearance, clearance <= 1e-8);
+    }
+
+    public static AnalysisResult Run(Project project)
+    {
+        Validation.RequireValid(project, true);
+        var modes = project.Modes.Where(x => x.Enabled).ToList();
+        var orders = project.Orders.Where(x => x.Enabled).ToList();
+        var bands = modes.Select(x => Band(x, project.Settings)).ToList();
+        var crossings = new List<Crossing>();
+        foreach (var order in orders)
+        {
+            var q = order.EffectiveOrder(project.Settings.Blades);
+            foreach (var band in bands)
+            {
+                var exact = 60 * band.CenterHz / q;
+                var lower = 60 * band.LowerHz / q - project.Settings.SpeedToleranceRpm;
+                var upper = 60 * band.UpperHz / q + project.Settings.SpeedToleranceRpm;
+                crossings.Add(new(band.ModeId, order.Id, band.Name, order.Name, q,
+                    exact, Math.Max(0, lower), upper,
+                    upper >= project.Settings.MinRpm && lower <= project.Settings.MaxRpm));
+            }
+        }
+        var contacts = new List<Contact>();
+        var summaries = new List<PlanSummary>();
+        foreach (var plan in project.Plans)
+        {
+            var gearSummaries = new List<GearSummary>();
+            foreach (var gear in plan.Gears)
+            {
+                var current = new List<Contact>();
+                foreach (var order in orders)
+                {
+                    foreach (var mode in modes)
+                    {
+                        current.Add(Evaluate(project, plan, gear, order, mode));
+                    }
+                }
+                contacts.AddRange(current);
+                gearSummaries.Add(new(gear.Id, gear.Name, gear.Rpm,
+                    current.Count(x => x.Near), current.Count == 0 ? null : current.Min(x => x.ClearanceHz)));
+            }
+            var planContacts = contacts.Where(x => x.PlanId == plan.Id).ToList();
+            summaries.Add(new(plan.Id, plan.Name, plan.Gears.Count,
+                gearSummaries.Count(x => x.Contacts > 0), planContacts.Count(x => x.Near),
+                planContacts.Count == 0 ? null : planContacts.Min(x => x.ClearanceHz), gearSummaries));
+        }
+        return new()
+        {
+            InputHash = IO.ProjectCodec.InputHash(project),
+            Bands = bands,
+            Crossings = crossings,
+            Contacts = contacts,
+            Summaries = summaries
+        };
+    }
+}
+
+===== src/Blower.Core/Analysis/PlanComparison.cs =====
+using Blower.Core.Domain;
+
+namespace Blower.Core.Analysis;
+
+public sealed record GearDifference(
+    int Position,
+    string BaselineGear,
+    string TargetGear,
+    double? BaselineRpm,
+    double? TargetRpm,
+    double? DeltaRpm,
+    int? BaselineContacts,
+    int? TargetContacts,
+    string Note);
+
+public sealed record PlanComparison(
+    string Baseline,
+    string Target,
+    int BaselineNear,
+    int TargetNear,
+    int BaselineContacts,
+    int TargetContacts,
+    bool EqualGearCount,
+    IReadOnlyList<GearDifference> Rows);
+
+public static class Comparisons
+{
+    public static PlanComparison Compare(Project project, AnalysisResult result, string baselineId, string targetId)
+    {
+        if (result.InputHash != IO.ProjectCodec.InputHash(project))
+        {
+            throw new InvalidOperationException("输入已变化，请重新计算后比较");
+        }
+        if (baselineId == targetId)
+        {
+            throw new InvalidOperationException("请选择两个不同方案");
+        }
+        var baseline = project.Plans.Single(x => x.Id == baselineId);
+        var target = project.Plans.Single(x => x.Id == targetId);
+        var a = result.Summaries.Single(x => x.PlanId == baselineId);
+        var b = result.Summaries.Single(x => x.PlanId == targetId);
+        var rows = new List<GearDifference>();
+        for (var i = 0; i < Math.Max(baseline.Gears.Count, target.Gears.Count); i++)
+        {
+            var ga = baseline.Gears.ElementAtOrDefault(i);
+            var gb = target.Gears.ElementAtOrDefault(i);
+            rows.Add(new(i + 1, ga?.Name ?? "缺失", gb?.Name ?? "缺失",
+                ga?.Rpm, gb?.Rpm,
+                ga == null || gb == null ? null : gb.Rpm - ga.Rpm,
+                ga == null ? null : a.Gears.Single(x => x.GearId == ga.Id).Contacts,
+                gb == null ? null : b.Gears.Single(x => x.GearId == gb.Id).Contacts,
+                ga == null || gb == null ? "缺挡位，不形成转速差" : "按方案内挡位序号比较"));
+        }
+        return new(baseline.Name, target.Name, a.NearGearCount, b.NearGearCount,
+            a.ContactCount, b.ContactCount, baseline.Gears.Count == target.Gears.Count, rows);
+    }
+}
+
+===== src/Blower.Core/Analysis/QualityReview.cs =====
+using Blower.Core.Domain;
+
+namespace Blower.Core.Analysis;
+
+public sealed record ReviewFinding(string Severity, string Object, string Finding, string Action);
+
+public static class QualityReview
+{
+    public static IReadOnlyList<ReviewFinding> Inspect(Project project)
+    {
+        var findings = new List<ReviewFinding>();
+        void Add(string severity, string obj, string finding, string action)
+        {
+            findings.Add(new(severity, obj, finding, action));
+        }
+        if (project.Origin == Origin.Simulation)
+        {
+            Add("来源", "项目", "当前为模拟设计数据", "只用于流程和公式核对，实际设计前替换来源与参数");
+        }
+        if (string.IsNullOrWhiteSpace(project.Owner))
+        {
+            Add("待补充", "项目", "负责人未填写", "选中项目，在右侧填写负责人并应用");
+        }
+        if (string.IsNullOrWhiteSpace(project.Vehicle))
+        {
+            Add("待补充", "项目", "车辆或平台为空", "补充平台及适用安装边界");
+        }
+        foreach (var mode in project.Modes.Where(x => x.Enabled))
+        {
+            if (mode.DampingRatio == null)
+            {
+                Add("未知", mode.Name, "阻尼比未知，阻尼半宽项未计入", "可保留未知；依据试验或仿真补充后重新计算");
+            }
+            if (mode.Origin != project.Origin)
+            {
+                Add("来源", mode.Name, "模态来源类别与项目不同", "核对模态来源；报告保留每个模态的独立标记");
+            }
+            if (string.IsNullOrWhiteSpace(mode.Location))
+            {
+                Add("待补充", mode.Name, "结构位置为空", "填写安装位置与可复现的模态边界条件");
+            }
+            if (mode.Source.Contains("待补充", StringComparison.Ordinal))
+            {
+                Add("待补充", mode.Name, "模态来源尚未完善", "补充文件编号、工况、安装状态及数据提供方");
+            }
+        }
+        var enabled = project.Modes.Where(x => x.Enabled).OrderBy(x => x.FrequencyHz).ToList();
+        for (var i = 1; i < enabled.Count; i++)
+        {
+            var a = Engine.Band(enabled[i - 1], project.Settings);
+            var b = Engine.Band(enabled[i], project.Settings);
+            if (a.UpperHz >= b.LowerHz)
+            {
+                Add("注意", a.Name + " / " + b.Name, "模态敏感区重叠", "阻尼带宽近似可能不适用；组合计数按模态对象分别计算，不代表独立能量");
+            }
+        }
+        foreach (var plan in project.Plans)
+        {
+            if (plan.Gears.Count == 0)
+            {
+                Add("待补充", plan.Name, "没有挡位", "选中方案后添加挡位或导入CSV");
+            }
+            if (plan.Gears.Count > 0 && plan.Gears.All(x => x.Fixed))
+            {
+                Add("注意", plan.Name, "全部挡位固定", "扫描仅核对原始点，不会产生转速调整");
+            }
+        }
+        foreach (var task in project.Checks.Where(x => x.State == CheckState.Recheck))
+        {
+            Add("需复核", task.Title, "输入变化后原验证证据需要复核", "在验证清单选中任务，核对新输入后更新证据与状态");
+        }
+        if (project.Settings.AbsoluteBandHz == 0 && project.Settings.RelativeBandPercent == 0)
+        {
+            Add("注意", "规则", "绝对和百分比敏感半宽均为零", "确认是否只使用阻尼或附加半宽，避免漏掉参数不确定性");
+        }
+        return findings;
+    }
+}
+
+===== src/Blower.Core/Analysis/RuleStudy.cs =====
+using System.Globalization;
+using Blower.Core.Domain;
+using Blower.Core.IO;
+
+namespace Blower.Core.Analysis;
+
+public sealed record RuleCase(
+    double AbsoluteBandHz,
+    double SpeedToleranceRpm,
+    int NearGears,
+    int Contacts,
+    int ChangedStatuses,
+    double MinimumClearanceHz,
+    string GearNames);
+
+public sealed class RuleStudyResult
+{
+    public string InputHash { get; init; } = "";
+    public string PlanId { get; init; } = "";
+    public string PlanName { get; init; } = "";
+    public DateTimeOffset Time { get; init; } = DateTimeOffset.UtcNow;
+    public List<RuleCase> Cases { get; init; } = [];
+}
+
+public static class RuleStudy
+{
+    public static IReadOnlyList<double> ParseValues(string text, double maximum, string field)
+    {
+        var values = new List<double>();
+        foreach (var cell in text.Split(',', StringSplitOptions.TrimEntries))
+        {
+            if (!double.TryParse(cell, NumberStyles.Float, CultureInfo.InvariantCulture, out var number)
+                || !double.IsFinite(number)
+                || number < 0
+                || number > maximum)
+            {
+                throw new InvalidDataException(field + $"只接受0～{maximum}的数值，用英文逗号分隔");
+            }
+            if (!values.Contains(number))
+            {
+                values.Add(number);
+            }
+        }
+        if (values.Count is < 1 or > 5)
+        {
+            throw new InvalidDataException(field + "需要1～5个不同值");
+        }
+        return values.Order().ToList();
+    }
+
+    public static RuleStudyResult Run(Project project, string planId, string absoluteValues, string toleranceValues)
+    {
+        Validation.RequireValid(project, true);
+        var plan = project.Plans.Single(x => x.Id == planId);
+        if (plan.Gears.Count == 0)
+        {
+            throw new InvalidOperationException("当前方案没有挡位");
+        }
+        var baseline = Engine.Run(project);
+        var original = baseline.Contacts.Where(x => x.PlanId == planId).ToDictionary(x => x.Key);
+        var widths = ParseValues(absoluteValues, 5000, "绝对半宽");
+        var tolerances = ParseValues(toleranceValues, 1000, "转速容差");
+        var cases = new List<RuleCase>();
+        foreach (var width in widths)
+        {
+            foreach (var tolerance in tolerances)
+            {
+                var candidate = ProjectCodec.Clone(project);
+                candidate.Settings.AbsoluteBandHz = width;
+                candidate.Settings.SpeedToleranceRpm = tolerance;
+                var result = Engine.Run(candidate);
+                var summary = result.Summaries.Single(x => x.PlanId == planId);
+                var contacts = result.Contacts.Where(x => x.PlanId == planId).ToList();
+                var changes = contacts.Count(x => x.Near != original[x.Key].Near);
+                var gears = string.Join("、", summary.Gears.Where(x => x.Contacts > 0).Select(x => x.Name));
+                cases.Add(new(width, tolerance, summary.NearGearCount, summary.ContactCount,
+                    changes, summary.MinimumClearanceHz ?? 0, gears.Length == 0 ? "无接近挡位" : gears));
+            }
+        }
+        return new()
+        {
+            InputHash = baseline.InputHash,
+            PlanId = planId,
+            PlanName = plan.Name,
+            Cases = cases
+        };
+    }
+
+    public static string ToCsv(Project project, RuleStudyResult study)
+    {
+        if (study.InputHash != ProjectCodec.InputHash(project))
+        {
+            throw new InvalidOperationException("规则敏感性试算已过期；请重新试算");
+        }
+        var rows = new List<string>
+        {
+            CsvExchange.Row("project", "source", "input_sha256", "plan", "absolute_half_width_hz",
+                "speed_tolerance_rpm", "near_gears", "contacts", "changed_statuses", "minimum_clearance_hz", "gear_names")
+        };
+        foreach (var item in study.Cases)
+        {
+            rows.Add(CsvExchange.Row(project.Name, Labels.Source(project.Origin), study.InputHash,
+                study.PlanName, CsvExchange.Number(item.AbsoluteBandHz), CsvExchange.Number(item.SpeedToleranceRpm),
+                item.NearGears.ToString(), item.Contacts.ToString(), item.ChangedStatuses.ToString(),
+                CsvExchange.Number(item.MinimumClearanceHz), item.GearNames));
+        }
+        return string.Join(Environment.NewLine, rows);
+    }
+}
+
+===== src/Blower.Core/Analysis/SpeedScanner.cs =====
+using Blower.Core.Domain;
+
+namespace Blower.Core.Analysis;
+
+public sealed record ScanChoice(int Position, string Gear, double OriginalRpm, double CandidateRpm, int Contacts, double Cost);
+
+public sealed record ScanResult(
+    bool Feasible,
+    string Message,
+    string InputHash,
+    string PlanId,
+    IReadOnlyList<ScanChoice> Choices,
+    int EvaluatedPoints,
+    double TotalCost);
+
+public static class SpeedScanner
+{
+    private sealed record Node(double Rpm, int Contacts, double LocalCost, double Cost, int Previous);
+
+    public static ScanResult Scan(Project project, string planId)
+    {
+        Validation.RequireValid(project, true);
+        var plan = project.Plans.Single(x => x.Id == planId);
+        var hash = IO.ProjectCodec.InputHash(project);
+        var s = project.Settings;
+        var modes = project.Modes.Where(x => x.Enabled).ToList();
+        var orders = project.Orders.Where(x => x.Enabled).ToList();
+        if (plan.Gears.Count == 0)
+        {
+            return new(false, "当前方案没有挡位", hash, planId, [], 0, 0);
+        }
+        var pointLimit = (int)Math.Ceiling(2 * s.ScanWindowRpm / s.ScanStepRpm) + 3;
+        if (pointLimit > 603)
+        {
+            return new(false, "扫描窗口与步长形成超过603个候选/挡位；请增大步长或缩小窗口", hash, planId, [], 0, 0);
+        }
+        var levels = new List<List<Node>>();
+        var evaluated = 0;
+        for (var i = 0; i < plan.Gears.Count; i++)
+        {
+            var gear = plan.Gears[i];
+            var lower = Math.Max(s.MinRpm, gear.Rpm - s.ScanWindowRpm);
+            var upper = Math.Min(s.MaxRpm, gear.Rpm + s.ScanWindowRpm);
+            var candidates = new SortedSet<double> { gear.Rpm };
+            if (!gear.Fixed)
+            {
+                for (var rpm = Math.Ceiling(lower / s.ScanStepRpm) * s.ScanStepRpm;
+                    rpm <= upper + 1e-8; rpm += s.ScanStepRpm)
+                {
+                    candidates.Add(Math.Round(rpm, 6));
+                }
+            }
+            var level = new List<Node>();
+            foreach (var rpm in candidates)
+            {
+                var probe = new Gear { Id = gear.Id, Name = gear.Name, Rpm = rpm };
+                var count = 0;
+                foreach (var order in orders)
+                {
+                    foreach (var mode in modes)
+                    {
+                        if (Engine.Evaluate(project, plan, probe, order, mode).Near)
+                        {
+                            count++;
+                        }
+                    }
+                }
+                evaluated++;
+                var shift = Math.Abs(rpm - gear.Rpm) / Math.Max(1, s.ScanWindowRpm);
+                var local = count + s.ShiftWeight * shift;
+                var cost = i == 0 ? local : double.PositiveInfinity;
+                var previous = -1;
+                if (i > 0)
+                {
+                    for (var j = 0; j < levels[i - 1].Count; j++)
+                    {
+                        var parent = levels[i - 1][j];
+                        if (rpm - parent.Rpm < s.MinimumGapRpm - 1e-8)
+                        {
+                            continue;
+                        }
+                        if (parent.Cost + local < cost - 1e-10)
+                        {
+                            cost = parent.Cost + local;
+                            previous = j;
+                        }
+                    }
+                }
+                level.Add(new(rpm, count, local, cost, previous));
+            }
+            levels.Add(level);
+        }
+        var last = levels[^1];
+        var selected = Enumerable.Range(0, last.Count).MinBy(x => last[x].Cost);
+        if (!double.IsFinite(last[selected].Cost))
+        {
+            return new(false, "当前窗口、固定挡位与最小间距无法同时满足；请检查约束", hash, planId, [], evaluated, 0);
+        }
+        var total = last[selected].Cost;
+        var choices = new List<ScanChoice>();
+        for (var i = levels.Count - 1; i >= 0; i--)
+        {
+            var node = levels[i][selected];
+            var gear = plan.Gears[i];
+            choices.Add(new(i + 1, gear.Name, gear.Rpm, node.Rpm, node.Contacts, node.LocalCost));
+            selected = node.Previous;
+        }
+        choices.Reverse();
+        return new(true, "约束内离散候选已生成；需验证风量、效率与实际响应", hash, planId, choices, evaluated, total);
+    }
+}
+
+===== src/Blower.Core/Domain/Demo.cs =====
+namespace Blower.Core.Domain;
+
+public static class Demo
+{
+    public static Project Create()
+    {
+        var project = new Project
+        {
+            Name = "模拟 · 40叶片鼓风机挡位设计",
+            Vehicle = "演示平台 HVAC-A",
+            Owner = "演示工程师",
+            Origin = Origin.Simulation,
+            Source = "内置可重复模拟参数，不是试验采集",
+            Notes = "用于核对公式与操作；600Hz模态和40阶在900rpm精确交叉。"
+        };
+        project.Orders =
+        [
+            new() { Name = "轴频 1X", Kind = OrderKind.Shaft, Multiplier = 1 },
+            new() { Name = "轴频 2X", Kind = OrderKind.Shaft, Multiplier = 2 },
+            new() { Name = "叶片通过 BPF", Kind = OrderKind.Blade, Multiplier = 1 },
+            new() { Name = "叶片二倍频", Kind = OrderKind.Blade, Multiplier = 2 }
+        ];
+        project.Modes =
+        [
+            new()
+            {
+                Name = "壳体面板 M1", FrequencyHz = 600, DampingRatio = 0.02,
+                Location = "鼓风机壳体外侧", Origin = Origin.Simulation,
+                Source = "模拟模态频率；非实测"
+            },
+            new()
+            {
+                Name = "风道局部 M2", FrequencyHz = 1200, DampingRatio = 0.015,
+                Location = "出口风道连接处", Origin = Origin.Simulation,
+                Source = "模拟模态频率；非实测"
+            },
+            new()
+            {
+                Name = "支架 M3", FrequencyHz = 90, DampingRatio = null,
+                Location = "安装支架", Origin = Origin.Simulation,
+                Source = "模拟模态频率；阻尼未知"
+            }
+        ];
+        var baseline = new SpeedPlan { Name = "A · 初始挡位", Notes = "模拟初始设定" };
+        var speeds = new double[] { 900, 1400, 1800, 2600, 3600, 4500 };
+        for (var i = 0; i < speeds.Length; i++)
+        {
+            baseline.Gears.Add(new Gear { Name = $"{i + 1}挡", Rpm = speeds[i] });
+        }
+        var alternative = new SpeedPlan { Name = "B · 人工候选", Notes = "模拟候选；风量待验证" };
+        var changed = new double[] { 1000, 1500, 1950, 2800, 3800, 4600 };
+        for (var i = 0; i < changed.Length; i++)
+        {
+            alternative.Gears.Add(new Gear { Name = $"{i + 1}挡", Rpm = changed[i] });
+        }
+        project.Plans = [baseline, alternative];
+        project.Audit.Add(new() { Action = "载入模拟示例", Detail = "40叶片，三模态，双方案" });
+        return project;
+    }
+}
+
+===== src/Blower.Core/Domain/Project.cs =====
+namespace Blower.Core.Domain;
+
+public static class Software
+{
+    public const string Name = "空调鼓风机风量挡位与共振避让设计软件";
+    public const string Version = "V2.0";
+    public const int Schema = 1;
+    public const string Boundary = "频率接近仅表示潜在风险；不代表实测响应、声压或噪声改善。";
+    public static string Id() => Guid.NewGuid().ToString("N");
+}
+
+public enum Origin
+{
+    Manual,
+    Simulation,
+    DeclaredMeasurement
+}
+
+public enum OrderKind
+{
+    Shaft,
+    Blade
+}
+
+public enum CheckState
+{
+    Pending,
+    Scheduled,
+    Completed,
+    Recheck
+}
+
+public sealed class Project
+{
+    public int Schema { get; set; } = Software.Schema;
+    public string Id { get; set; } = Software.Id();
+    public string Name { get; set; } = "未命名设计项目";
+    public string Owner { get; set; } = "";
+    public string Vehicle { get; set; } = "";
+    public string Notes { get; set; } = "";
+    public Origin Origin { get; set; } = Origin.Manual;
+    public string Source { get; set; } = "用户录入；来源待补充";
+    public bool Archived { get; set; }
+    public DateTimeOffset Created { get; set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset Modified { get; set; } = DateTimeOffset.UtcNow;
+    public int Revision { get; set; }
+    public DesignSettings Settings { get; set; } = new();
+    public List<Excitation> Orders { get; set; } = [];
+    public List<Mode> Modes { get; set; } = [];
+    public List<SpeedPlan> Plans { get; set; } = [];
+    public List<VerificationTask> Checks { get; set; } = [];
+    public List<AuditEvent> Audit { get; set; } = [];
+}
+
+public sealed class DesignSettings
+{
+    public int Blades { get; set; } = 40;
+    public double MinRpm { get; set; } = 500;
+    public double MaxRpm { get; set; } = 5000;
+    public double AbsoluteBandHz { get; set; } = 5;
+    public double RelativeBandPercent { get; set; } = 3;
+    public bool UseDamping { get; set; } = true;
+    public double SpeedToleranceRpm { get; set; } = 20;
+    public double MinimumGapRpm { get; set; } = 100;
+    public double ScanStepRpm { get; set; } = 25;
+    public double ScanWindowRpm { get; set; } = 250;
+    public double ShiftWeight { get; set; } = 0.15;
+}
+
+public sealed class Excitation
+{
+    public string Id { get; set; } = Software.Id();
+    public string Name { get; set; } = "旋转阶次";
+    public OrderKind Kind { get; set; }
+    public double Multiplier { get; set; } = 1;
+    public bool Enabled { get; set; } = true;
+    public string Evidence { get; set; } = "设计候选；待验证激励存在性";
+    public double EffectiveOrder(int blades)
+    {
+        return Kind == OrderKind.Blade ? Multiplier * blades : Multiplier;
+    }
+}
+
+public sealed class Mode
+{
+    public string Id { get; set; } = Software.Id();
+    public string Name { get; set; } = "新模态";
+    public double FrequencyHz { get; set; } = 600;
+    public double? DampingRatio { get; set; }
+    public double ExtraBandHz { get; set; }
+    public bool Enabled { get; set; } = true;
+    public Origin Origin { get; set; } = Origin.Manual;
+    public string Source { get; set; } = "待补充模态来源与边界条件";
+    public string Location { get; set; } = "";
+}
+
+public sealed class SpeedPlan
+{
+    public string Id { get; set; } = Software.Id();
+    public string Name { get; set; } = "基准方案";
+    public string Notes { get; set; } = "";
+    public bool Locked { get; set; }
+    public List<Gear> Gears { get; set; } = [];
+}
+
+public sealed class Gear
+{
+    public string Id { get; set; } = Software.Id();
+    public string Name { get; set; } = "新挡位";
+    public double Rpm { get; set; } = 1000;
+    public bool Fixed { get; set; }
+    public string Notes { get; set; } = "";
+}
+
+public sealed class VerificationTask
+{
+    public string Id { get; set; } = Software.Id();
+    public string Key { get; set; } = "";
+    public string PlanId { get; set; } = "";
+    public string GearId { get; set; } = "";
+    public string ModeId { get; set; } = "";
+    public string OrderId { get; set; } = "";
+    public string Title { get; set; } = "";
+    public string Method { get; set; } = "";
+    public string Owner { get; set; } = "";
+    public string Evidence { get; set; } = "";
+    public CheckState State { get; set; }
+    public DateTimeOffset Updated { get; set; } = DateTimeOffset.UtcNow;
+}
+
+public sealed class AuditEvent
+{
+    public DateTimeOffset Time { get; set; } = DateTimeOffset.UtcNow;
+    public string Action { get; set; } = "";
+    public string Detail { get; set; } = "";
+    public int Revision { get; set; }
+}
+
+public static class Labels
+{
+    public static string Source(Origin origin) => origin switch
+    {
+        Origin.Simulation => "模拟设计数据",
+        Origin.DeclaredMeasurement => "用户声明实测（未认证）",
+        _ => "人工设计输入"
+    };
+
+    public static string State(CheckState state) => state switch
+    {
+        CheckState.Scheduled => "已安排",
+        CheckState.Completed => "已记录证据",
+        CheckState.Recheck => "需复核",
+        _ => "待验证"
+    };
+
+    public static string Kind(OrderKind kind)
+    {
+        return kind == OrderKind.Blade ? "叶片通过倍频" : "轴旋转阶次";
+    }
+}
+
+===== src/Blower.Core/Domain/Validation.cs =====
+namespace Blower.Core.Domain;
+
+public sealed record Issue(string Path, string Message, bool Blocks = true);
+
+public static class Validation
+{
+    public static IReadOnlyList<Issue> Inspect(Project project, bool forAnalysis = false)
+    {
+        var issues = new List<Issue>();
+        void Required(string value, string path, int max = 160)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                issues.Add(new(path, "不能为空"));
+            }
+            else if (value.Length > max)
+            {
+                issues.Add(new(path, $"不得超过{max}个字符"));
+            }
+        }
+        void Range(double value, double min, double max, string path)
+        {
+            if (!double.IsFinite(value) || value < min || value > max)
+            {
+                issues.Add(new(path, $"必须在{min}至{max}之间，且为有限数值"));
+            }
+        }
+        if (project.Schema != Software.Schema)
+        {
+            issues.Add(new("格式版本", "仅支持schema=1；请使用对应版本另存"));
+        }
+        Required(project.Id, "项目标识");
+        if (project.Id.Length != 32 || project.Id.Any(x => !Uri.IsHexDigit(x)))
+        {
+            issues.Add(new("项目标识", "必须为32位十六进制"));
+        }
+        Required(project.Name, "项目名称");
+        Required(project.Source, "项目来源", 2000);
+        if (!Enum.IsDefined(project.Origin))
+        {
+            issues.Add(new("数据来源", "未知枚举值"));
+        }
+        var s = project.Settings;
+        Range(s.Blades, 1, 200, "叶片数");
+        Range(s.MinRpm, 0, 50000, "转速下限");
+        Range(s.MaxRpm, 1, 50000, "转速上限");
+        if (s.MaxRpm <= s.MinRpm)
+        {
+            issues.Add(new("转速范围", "上限必须大于下限"));
+        }
+        Range(s.AbsoluteBandHz, 0, 5000, "绝对半宽Hz");
+        Range(s.RelativeBandPercent, 0, 30, "百分比半宽%");
+        Range(s.SpeedToleranceRpm, 0, 1000, "转速容差rpm");
+        Range(s.MinimumGapRpm, 1, 5000, "最小挡位间距rpm");
+        Range(s.ScanStepRpm, 1, 500, "扫描步长rpm");
+        Range(s.ScanWindowRpm, 0, 3000, "扫描窗口±rpm");
+        Range(s.ShiftWeight, 0, 1, "偏移权重");
+        if (project.Orders.Count > 24 || project.Modes.Count > 100 || project.Plans.Count > 20)
+        {
+            issues.Add(new("对象数量", "最多24个阶次、100个模态和20个方案"));
+        }
+        var ids = new HashSet<string>(StringComparer.Ordinal);
+        void Unique(string id, string path)
+        {
+            if (string.IsNullOrWhiteSpace(id) || !ids.Add(id))
+            {
+                issues.Add(new(path, "标识为空或重复"));
+            }
+        }
+        var effectiveOrders = new HashSet<double>();
+        foreach (var order in project.Orders)
+        {
+            var path = $"阶次[{order.Name}]";
+            Unique(order.Id, path);
+            Required(order.Name, path + ".名称");
+            Range(order.Multiplier, 0.1, 100, path + ".倍数");
+            if (!Enum.IsDefined(order.Kind))
+            {
+                issues.Add(new(path + ".类别", "未知阶次类别"));
+            }
+            if (order.Enabled && !effectiveOrders.Add(order.EffectiveOrder(s.Blades)))
+            {
+                issues.Add(new(path, "存在重复的启用有效阶次；请合并或停用其中一项，避免组合重复计数"));
+            }
+        }
+        foreach (var mode in project.Modes)
+        {
+            var path = $"模态[{mode.Name}]";
+            Unique(mode.Id, path);
+            Required(mode.Name, path + ".名称");
+            Required(mode.Source, path + ".来源", 2000);
+            Range(mode.FrequencyHz, 0.1, 50000, path + ".频率Hz");
+            Range(mode.ExtraBandHz, 0, 5000, path + ".附加半宽Hz");
+            if (mode.DampingRatio.HasValue)
+            {
+                Range(mode.DampingRatio.Value, 0, 0.1, path + ".阻尼比ζ");
+            }
+            if (!Enum.IsDefined(mode.Origin))
+            {
+                issues.Add(new(path + ".来源类别", "未知枚举值"));
+            }
+        }
+        foreach (var plan in project.Plans)
+        {
+            var path = $"方案[{plan.Name}]";
+            Unique(plan.Id, path);
+            Required(plan.Name, path + ".名称");
+            if (plan.Gears.Count > 24)
+            {
+                issues.Add(new(path, "最多24个挡位"));
+            }
+            var previous = double.NegativeInfinity;
+            foreach (var gear in plan.Gears)
+            {
+                Unique(gear.Id, path + ".挡位");
+                Required(gear.Name, path + ".挡位名称");
+                Range(gear.Rpm, s.MinRpm, s.MaxRpm, path + $".{gear.Name}.rpm");
+                if (gear.Rpm - previous < s.MinimumGapRpm - 1e-8)
+                {
+                    issues.Add(new(path + $".{gear.Name}", "挡位须按转速递增排列并满足最小间距"));
+                }
+                previous = gear.Rpm;
+            }
+        }
+        if (project.Checks.Count > 2000 || project.Audit.Count > 5000)
+        {
+            issues.Add(new("记录数量", "验证记录最多2000条，审计最多5000条"));
+        }
+        var taskKeys = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var task in project.Checks)
+        {
+            Unique(task.Id, "验证记录");
+            var expectedKey = string.Join("/", task.PlanId, task.GearId, task.OrderId, task.ModeId);
+            if (task.Key != expectedKey || !taskKeys.Add(task.Key))
+            {
+                issues.Add(new("验证记录." + task.Title, "组合标识不一致或重复"));
+            }
+            var plan = project.Plans.FirstOrDefault(x => x.Id == task.PlanId);
+            if (plan == null || !plan.Gears.Any(x => x.Id == task.GearId)
+                || !project.Modes.Any(x => x.Id == task.ModeId)
+                || !project.Orders.Any(x => x.Id == task.OrderId))
+            {
+                issues.Add(new("验证记录." + task.Title, "关联对象缺失；应先移除对应验证记录"));
+            }
+            if (!Enum.IsDefined(task.State))
+            {
+                issues.Add(new("验证状态", "未知枚举值"));
+            }
+            if (task.State == CheckState.Completed && string.IsNullOrWhiteSpace(task.Evidence))
+            {
+                issues.Add(new("验证记录." + task.Title, "已记录证据状态必须填写证据位置或结论"));
+            }
+        }
+        if (forAnalysis)
+        {
+            if (!project.Orders.Any(x => x.Enabled))
+            {
+                issues.Add(new("阶次", "至少启用一个阶次"));
+            }
+            if (!project.Modes.Any(x => x.Enabled))
+            {
+                issues.Add(new("模态", "至少启用一个模态"));
+            }
+            if (!project.Plans.Any(x => x.Gears.Count > 0))
+            {
+                issues.Add(new("挡位方案", "至少建立一个含挡位的方案"));
+            }
+        }
+        if (string.IsNullOrWhiteSpace(project.Owner))
+        {
+            issues.Add(new("负责人", "建议补充以便追溯", false));
+        }
+        return issues;
+    }
+
+    public static void RequireValid(Project project, bool forAnalysis = false)
+    {
+        var errors = Inspect(project, forAnalysis).Where(x => x.Blocks).ToList();
+        if (errors.Count > 0)
+        {
+            throw new InvalidDataException(string.Join("；", errors.Select(x => x.Path + "：" + x.Message)));
+        }
+    }
+}
+
+===== src/Blower.Core/IO/CsvExchange.cs =====
+using System.Globalization;
+using System.Text;
+using Blower.Core.Domain;
+
+namespace Blower.Core.IO;
+
+public sealed record CsvProblem(int Line, string Column, string Message);
+public sealed record CsvPreview(string Kind, string InputHash, IReadOnlyList<CsvProblem> Problems,
+    IReadOnlyList<Gear> Gears, IReadOnlyList<Mode> Modes)
+{
+    public bool Valid => Problems.Count == 0 && Gears.Count + Modes.Count > 0;
+}
+
+public static class CsvExchange
+{
+    public static string Cell(string? value)
+    {
+        value ??= "";
+        var numeric = double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var number)
+            && double.IsFinite(number);
+        if (!numeric && value.Length > 0 && "=+-@\t\r".Contains(value[0]))
+        {
+            value = "'" + value;
+        }
+        return "\"" + value.Replace("\"", "\"\"") + "\"";
+    }
+
+    public static string Number(double value)
+    {
+        return value.ToString("0.########", CultureInfo.InvariantCulture);
+    }
+
+    public static string Row(params string?[] values)
+    {
+        return string.Join(",", values.Select(Cell));
+    }
+
+    public static IReadOnlyList<string> ParseRow(string line)
+    {
+        var cells = new List<string>();
+        var cell = new StringBuilder();
+        var quoted = false;
+        var closed = false;
+        for (var i = 0; i < line.Length; i++)
+        {
+            var c = line[i];
+            if (quoted)
+            {
+                if (c == '"' && i + 1 < line.Length && line[i + 1] == '"')
+                {
+                    cell.Append('"');
+                    i++;
+                }
+                else if (c == '"')
+                {
+                    quoted = false;
+                    closed = true;
+                }
+                else
+                {
+                    cell.Append(c);
+                }
+            }
+            else if (c == ',')
+            {
+                cells.Add(cell.ToString());
+                cell.Clear();
+                closed = false;
+            }
+            else if (c == '"' && cell.Length == 0 && !closed)
+            {
+                quoted = true;
+            }
+            else if (closed || c == '"')
+            {
+                throw new InvalidDataException("引号必须包围整个单元格；不支持跨行单元格");
+            }
+            else
+            {
+                cell.Append(c);
+            }
+        }
+        if (quoted)
+        {
+            throw new InvalidDataException("引号未闭合；不支持跨行单元格");
+        }
+        cells.Add(cell.ToString());
+        return cells;
+    }
+
+    public static CsvPreview Preview(string text, string kind, Project project)
+    {
+        if (kind is not "gears" and not "modes")
+        {
+            throw new InvalidDataException("CSV类型仅支持gears或modes");
+        }
+        var problems = new List<CsvProblem>();
+        var gears = new List<Gear>();
+        var modes = new List<Mode>();
+        var hash = ProjectCodec.InputHash(project);
+        var rows = text.TrimStart('\uFEFF').Replace("\r\n", "\n").Split('\n');
+        var expected = kind == "gears" ? "name,rpm,fixed" : "name,frequency_hz,damping_ratio,source";
+        if (rows.Length == 0 || rows[0].TrimEnd('\r') != expected)
+        {
+            problems.Add(new(1, "表头", "必须为 " + expected));
+            return new(kind, hash, problems, gears, modes);
+        }
+        var limit = kind == "gears" ? 24 : 100;
+        var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        for (var i = 1; i < rows.Length; i++)
+        {
+            if (string.IsNullOrWhiteSpace(rows[i]))
+            {
+                continue;
+            }
+            if (gears.Count + modes.Count >= limit)
+            {
+                problems.Add(new(i + 1, "行数", "超过对象数量上限"));
+                break;
+            }
+            try
+            {
+                var cells = ParseRow(rows[i].TrimEnd('\r'));
+                if (cells.Count != (kind == "gears" ? 3 : 4))
+                {
+                    throw new InvalidDataException("列数不符；使用英文逗号和小数点");
+                }
+                if (string.IsNullOrWhiteSpace(cells[0]) || !names.Add(cells[0]))
+                {
+                    throw new InvalidDataException("名称为空或重复");
+                }
+                if (!double.TryParse(cells[1], NumberStyles.Float, CultureInfo.InvariantCulture, out var value)
+                    || !double.IsFinite(value))
+                {
+                    throw new InvalidDataException("第二列须为有限数值");
+                }
+                if (kind == "gears")
+                {
+                    if (!bool.TryParse(cells[2], out var fixedGear))
+                    {
+                        throw new InvalidDataException("fixed只接受true或false");
+                    }
+                    gears.Add(new() { Name = cells[0], Rpm = value, Fixed = fixedGear });
+                }
+                else
+                {
+                    double? damping = null;
+                    if (!string.IsNullOrWhiteSpace(cells[2]))
+                    {
+                        if (!double.TryParse(cells[2], NumberStyles.Float, CultureInfo.InvariantCulture, out var d)
+                            || !double.IsFinite(d))
+                        {
+                            throw new InvalidDataException("阻尼比须为小数，未知留空");
+                        }
+                        damping = d;
+                    }
+                    modes.Add(new()
+                    {
+                        Name = cells[0], FrequencyHz = value, DampingRatio = damping,
+                        Source = cells[3], Origin = project.Origin
+                    });
+                }
+            }
+            catch (InvalidDataException error)
+            {
+                problems.Add(new(i + 1, "内容", error.Message));
+            }
+        }
+        if (gears.Count + modes.Count == 0 && problems.Count == 0)
+        {
+            problems.Add(new(2, "内容", "至少提供一个对象"));
+        }
+        var candidate = ProjectCodec.Clone(project);
+        if (kind == "gears")
+        {
+            candidate.Plans = [new() { Name = "CSV预检", Gears = gears }];
+            candidate.Checks = [];
+        }
+        else
+        {
+            candidate.Modes = modes;
+            candidate.Checks = [];
+        }
+        foreach (var issue in Validation.Inspect(candidate).Where(x => x.Blocks))
+        {
+            problems.Add(new(0, issue.Path, issue.Message));
+        }
+        return new(kind, hash, problems, gears, modes);
+    }
+}
+
+===== src/Blower.Core/IO/Exports.cs =====
+using System.Net;
+using System.Text;
+using Blower.Core.Analysis;
+using Blower.Core.Domain;
+
+namespace Blower.Core.IO;
+
+public static class Exports
+{
+    private static string E(string? text) => WebUtility.HtmlEncode(text ?? "");
+    private static string N(double value) => CsvExchange.Number(value);
+
+    private static void RequireCurrent(Project project, AnalysisResult result)
+    {
+        if (result.InputHash != ProjectCodec.InputHash(project))
+        {
+            throw new InvalidOperationException("结果已过期；重新计算后导出");
+        }
+    }
+
+    public static string Contacts(Project project, AnalysisResult result)
+    {
+        RequireCurrent(project, result);
+        var b = new StringBuilder();
+        b.AppendLine(CsvExchange.Row("software", "version", "project", "source", "input_sha256", "plan", "gear", "rpm",
+            "order", "effective_order", "frequency_hz", "lower_hz", "upper_hz", "mode", "mode_hz", "mode_source", "half_width_hz", "clearance_hz", "status"));
+        foreach (var c in result.Contacts)
+        {
+            b.AppendLine(CsvExchange.Row(Software.Name, Software.Version, project.Name,
+                Labels.Source(project.Origin) + " / " + project.Source, result.InputHash,
+                c.Plan, c.Gear, N(c.Rpm), c.Order, N(c.OrderNumber), N(c.FrequencyHz), N(c.LowerHz), N(c.UpperHz),
+                c.Mode, N(c.ModeHz), Labels.Source(project.Modes.Single(x => x.Id == c.ModeId).Origin)
+                    + " / " + project.Modes.Single(x => x.Id == c.ModeId).Source,
+                N(c.HalfWidthHz), N(c.ClearanceHz), c.Status));
+        }
+        return b.ToString();
+    }
+
+    public static string Crossings(Project project, AnalysisResult result)
+    {
+        RequireCurrent(project, result);
+        var b = new StringBuilder();
+        b.AppendLine(CsvExchange.Row("project", "source", "input_sha256", "mode", "order", "effective_order", "exact_rpm", "lower_rpm", "upper_rpm", "within_speed_range"));
+        foreach (var c in result.Crossings)
+        {
+            b.AppendLine(CsvExchange.Row(project.Name, Labels.Source(project.Origin), result.InputHash,
+                c.Mode, c.Order, N(c.EffectiveOrder), N(c.ExactRpm), N(c.LowerRpm), N(c.UpperRpm), c.InRange.ToString()));
+        }
+        return b.ToString();
+    }
+
+    public static string Checks(Project project)
+    {
+        var b = new StringBuilder();
+        b.AppendLine(CsvExchange.Row("project", "source", "plan", "title", "method", "owner", "state", "evidence", "updated_utc"));
+        foreach (var task in project.Checks)
+        {
+            b.AppendLine(CsvExchange.Row(project.Name, Labels.Source(project.Origin),
+                project.Plans.Single(x => x.Id == task.PlanId).Name, task.Title, task.Method,
+                task.Owner, Labels.State(task.State), task.Evidence, task.Updated.ToString("O")));
+        }
+        return b.ToString();
+    }
+
+    public static string GearTemplate(SpeedPlan? plan)
+    {
+        var b = new StringBuilder("name,rpm,fixed\n");
+        if (plan != null)
+        {
+            foreach (var gear in plan.Gears)
+            {
+                b.AppendLine(CsvExchange.Row(gear.Name, N(gear.Rpm), gear.Fixed.ToString().ToLowerInvariant()));
+            }
+        }
+        return b.ToString();
+    }
+
+    public static string ModeTemplate(Project project)
+    {
+        var b = new StringBuilder("name,frequency_hz,damping_ratio,source\n");
+        foreach (var mode in project.Modes)
+        {
+            b.AppendLine(CsvExchange.Row(mode.Name, N(mode.FrequencyHz),
+                mode.DampingRatio.HasValue ? N(mode.DampingRatio.Value) : "", mode.Source));
+        }
+        return b.ToString();
+    }
+
+    public static string Report(Project project, AnalysisResult result, string planId)
+    {
+        RequireCurrent(project, result);
+        var b = new StringBuilder();
+        b.Append("<!doctype html><html lang=\"zh-CN\"><meta charset=\"utf-8\"><title>鼓风机设计报告</title>");
+        b.Append("<style>body{font:15px/1.7 sans-serif;color:#303238;max-width:1200px;margin:40px auto;padding:20px}h1{font-size:26px}h2{border-bottom:1px solid #bbb;padding-bottom:8px}table{width:100%;border-collapse:collapse;font-size:12px}td,th{border:1px solid #ccc;padding:7px;text-align:left}th{background:#f2f0e9}.note{padding:16px;background:#fff0db}svg{width:100%}pre{white-space:pre-wrap;overflow-wrap:anywhere}section{margin:28px 0}@media print{body{margin:0}tr{break-inside:avoid}}</style>");
+        b.Append($"<h1>{E(Software.Name)} {Software.Version}</h1><h2>{E(project.Name)}</h2>");
+        b.Append($"<p>修订 {project.Revision} · 项目 {E(project.Id)} · 负责人 {E(project.Owner)} · 平台 {E(project.Vehicle)}</p>");
+        b.Append($"<p class=\"note\">{E(Labels.Source(project.Origin))}：{E(project.Source)}<br>{E(Software.Boundary)}</p>");
+        b.Append($"<p>生成时间 {DateTimeOffset.UtcNow:O} · 输入SHA256 {result.InputHash}</p><p>{E(project.Notes)}</p>");
+        var s = project.Settings;
+        b.Append("<section><h2>计算口径与输入</h2>");
+        b.Append($"<p>叶片数{s.Blades}；范围{N(s.MinRpm)}～{N(s.MaxRpm)}rpm；转速容差±{N(s.SpeedToleranceRpm)}rpm；挡位最小间距{N(s.MinimumGapRpm)}rpm。</p>");
+        b.Append($"<p>扫描窗口±{N(s.ScanWindowRpm)}rpm；步长{N(s.ScanStepRpm)}rpm；偏移权重{N(s.ShiftWeight)}。扫描代价=接近组合数+权重×|转速偏移|/max(1,窗口)，固定挡位保持原转速。</p>");
+        b.Append($"<p>敏感半宽=max({N(s.AbsoluteBandHz)}Hz,模态频率×{N(s.RelativeBandPercent)}%,可选ζfn,单模态附加半宽)。阻尼项{(s.UseDamping ? "启用" : "停用")}；阻尼未知时不补值。该半宽为工程筛查规则，不是标准限值。</p>");
+        b.Append("<p>f=q×n/60；叶片阶次q=叶片数×谐波倍数；精确交叉n=60fn/q。频率区间计入转速容差，与模态敏感区间相交（含边界）为潜在接近。净距为两区间间隔，负值表示重叠深度；不代表幅值。所有方案共用同一组模态、阶次和规则；比较按挡位序号。</p>");
+        b.Append("<table><tr><th>模态</th><th>位置</th><th>Hz</th><th>阻尼比</th><th>启用</th><th>来源</th></tr>");
+        foreach (var mode in project.Modes)
+        {
+            b.Append($"<tr><td>{E(mode.Name)}</td><td>{E(mode.Location)}</td><td>{N(mode.FrequencyHz)}</td><td>{(mode.DampingRatio.HasValue ? N(mode.DampingRatio.Value) : "未知")}</td><td>{mode.Enabled}</td><td>{E(Labels.Source(mode.Origin))} / {E(mode.Source)}</td></tr>");
+        }
+        b.Append("</table><table><tr><th>阶次</th><th>类型</th><th>有效阶次</th><th>启用</th><th>依据</th></tr>");
+        foreach (var order in project.Orders)
+        {
+            b.Append($"<tr><td>{E(order.Name)}</td><td>{E(Labels.Kind(order.Kind))}</td><td>{N(order.EffectiveOrder(s.Blades))}</td><td>{order.Enabled}</td><td>{E(order.Evidence)}</td></tr>");
+        }
+        b.Append("</table></section><section><h2>转速—频率图</h2>");
+        b.Append(ChartModel.Create(project, result, planId).ToSvg(project.Plans.Single(x => x.Id == planId).Name, Labels.Source(project.Origin)));
+        b.Append("<p>彩色斜线为设计阶次；紫色横带为敏感区；红色挡位线表示存在接近组合，绿色表示当前规则内未接近。不是测量频谱。</p></section>");
+        b.Append("<section><h2>方案汇总</h2><table><tr><th>方案</th><th>挡位数</th><th>接近挡位</th><th>接近组合</th><th>最小净距Hz</th></tr>");
+        foreach (var summary in result.Summaries)
+        {
+            b.Append($"<tr><td>{E(summary.Name)}</td><td>{summary.GearCount}</td><td>{summary.NearGearCount}</td><td>{summary.ContactCount}</td><td>{summary.MinimumClearanceHz:0.###}</td></tr>");
+        }
+        b.Append("</table>");
+        foreach (var plan in project.Plans)
+        {
+            b.Append($"<h3>{E(plan.Name)}</h3><p>{E(plan.Notes)}</p><table><tr><th>挡位</th><th>rpm</th><th>固定</th><th>备注</th></tr>");
+            foreach (var gear in plan.Gears)
+            {
+                b.Append($"<tr><td>{E(gear.Name)}</td><td>{N(gear.Rpm)}</td><td>{gear.Fixed}</td><td>{E(gear.Notes)}</td></tr>");
+            }
+            b.Append("</table>");
+        }
+        b.Append("</section><section><h2>敏感范围依据</h2><table><tr><th>模态</th><th>区间Hz</th><th>依据</th></tr>");
+        foreach (var band in result.Bands)
+        {
+            b.Append($"<tr><td>{E(band.Name)}</td><td>{N(band.LowerHz)}～{N(band.UpperHz)}</td><td>{E(band.Basis)}</td></tr>");
+        }
+        b.Append("</table></section><section><h2>潜在接近明细</h2><table><tr><th>方案/挡位</th><th>阶次</th><th>中心频率Hz</th><th>容差区间Hz</th><th>模态</th><th>净距Hz</th></tr>");
+        foreach (var c in result.Contacts.Where(x => x.Near))
+        {
+            b.Append($"<tr><td>{E(c.Plan)} / {E(c.Gear)}</td><td>{E(c.Order)}</td><td>{N(c.FrequencyHz)}</td><td>{N(c.LowerHz)}～{N(c.UpperHz)}</td><td>{E(c.Mode)}</td><td>{N(c.ClearanceHz)}</td></tr>");
+        }
+        b.Append("</table></section><section><h2>交叉转速</h2><table><tr><th>模态</th><th>阶次</th><th>精确交叉rpm</th><th>敏感转速区rpm</th><th>与设定范围相交</th></tr>");
+        foreach (var crossing in result.Crossings)
+        {
+            b.Append($"<tr><td>{E(crossing.Mode)}</td><td>{E(crossing.Order)}</td><td>{N(crossing.ExactRpm)}</td><td>{N(crossing.LowerRpm)}～{N(crossing.UpperRpm)}</td><td>{crossing.InRange}</td></tr>");
+        }
+        b.Append("</table></section><section><h2>验证清单</h2><table><tr><th>任务</th><th>方法</th><th>负责人/状态</th><th>证据</th></tr>");
+        foreach (var task in project.Checks)
+        {
+            b.Append($"<tr><td>{E(task.Title)}</td><td>{E(task.Method)}</td><td>{E(task.Owner)} / {E(Labels.State(task.State))}</td><td>{E(task.Evidence)}</td></tr>");
+        }
+        b.Append("</table></section><section><h2>审计记录</h2><table><tr><th>UTC</th><th>修订</th><th>操作</th><th>说明</th></tr>");
+        foreach (var item in project.Audit)
+        {
+            b.Append($"<tr><td>{item.Time:O}</td><td>{item.Revision}</td><td>{E(item.Action)}</td><td>{E(item.Detail)}</td></tr>");
+        }
+        b.Append("</table></section><section><h2>适用边界</h2><p>未处理波形、实测阶次幅值、风量、效率和声压。阻尼半宽近似仅适于轻阻尼且相互分离的模态。结构条件、温度、边界与来源应由工程师复核。完成验证记录仅代表用户填写，软件不认证证据。扫描网格不覆盖连续最优解，必须验证扫描方案的风量、效率及整车表现。</p></section></html>");
+        return b.ToString();
+    }
+}
+
+===== src/Blower.Core/IO/ProjectCodec.cs =====
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Blower.Core.Domain;
+
+namespace Blower.Core.IO;
+
+public static class ProjectCodec
+{
+    public const int MaximumBytes = 4 * 1024 * 1024;
+    public static readonly JsonSerializerOptions Options = new()
+    {
+        WriteIndented = true,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
+        Converters = { new JsonStringEnumConverter() },
+        MaxDepth = 32
+    };
+
+    public static string Encode(Project project)
+    {
+        Validation.RequireValid(project);
+        var content = JsonSerializer.Serialize(project, Options);
+        if (Encoding.UTF8.GetByteCount(content) > MaximumBytes)
+        {
+            throw new InvalidDataException("项目超过4MiB上限；请拆分项目或精简备注");
+        }
+        return content;
+    }
+
+    public static Project Decode(string json)
+    {
+        if (Encoding.UTF8.GetByteCount(json) > MaximumBytes)
+        {
+            throw new InvalidDataException("项目超过4MiB上限");
+        }
+        try
+        {
+            using var document = JsonDocument.Parse(json, new() { MaxDepth = 32 });
+            SchemaGuard.Inspect(document.RootElement);
+            if (!document.RootElement.TryGetProperty("schema", out var schema)
+                || schema.GetInt32() != Software.Schema)
+            {
+                throw new InvalidDataException("项目格式版本缺失或不支持；需要schema=1");
+            }
+            foreach (var name in new[] { "id", "name", "settings", "orders", "modes", "plans", "checks", "audit", "source" })
+            {
+                if (!document.RootElement.TryGetProperty(name, out var element)
+                    || element.ValueKind == JsonValueKind.Null)
+                {
+                    throw new InvalidDataException("项目缺少必填字段：" + name);
+                }
+            }
+            var project = JsonSerializer.Deserialize<Project>(json, Options)
+                ?? throw new InvalidDataException("项目内容为空");
+            CheckNullMembers(project);
+            Validation.RequireValid(project);
+            return project;
+        }
+        catch (Exception error) when (error is JsonException or InvalidOperationException or NullReferenceException or FormatException or OverflowException)
+        {
+            throw new InvalidDataException("项目JSON损坏或字段类型错误：" + error.Message, error);
+        }
+    }
+
+    private static void CheckNullMembers(Project project)
+    {
+        if (project.Orders.Any(x => x is null)
+            || project.Modes.Any(x => x is null)
+            || project.Plans.Any(x => x is null || x.Gears is null || x.Gears.Any(g => g is null))
+            || project.Checks.Any(x => x is null)
+            || project.Audit.Any(x => x is null))
+        {
+            throw new InvalidDataException("对象列表含null，无法建立完整引用关系");
+        }
+    }
+
+    public static Project Clone(Project project)
+    {
+        return JsonSerializer.Deserialize<Project>(JsonSerializer.Serialize(project, Options), Options)!;
+    }
+
+    public static string Hash(string content)
+    {
+        return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(content))).ToLowerInvariant();
+    }
+
+    public static string InputHash(Project project)
+    {
+        var data = new { project.Settings, project.Orders, project.Modes, project.Plans };
+        return Hash(JsonSerializer.Serialize(data, Options));
+    }
+}
+
+===== src/Blower.Core/IO/ProjectStore.cs =====
+using System.Text;
+using Blower.Core.Domain;
+
+namespace Blower.Core.IO;
+
+public sealed record StoredProject(string Id, string Name, DateTimeOffset Modified, int Revision, bool Archived, string Status);
+public sealed record OpenedProject(Project Project, string Token, string Path);
+public sealed record SavedProject(string Token, string Path);
+
+public sealed class ProjectStore
+{
+    private readonly string root;
+    private static readonly object Gate = new();
+
+    public ProjectStore(string root)
+    {
+        this.root = Path.GetFullPath(root);
+        Directory.CreateDirectory(this.root);
+    }
+
+    private string PathFor(string id)
+    {
+        if (id.Length != 32 || id.Any(c => !Uri.IsHexDigit(c)))
+        {
+            throw new InvalidDataException("项目标识必须为32位十六进制；拒绝路径字符");
+        }
+        return Path.Combine(root, id + ".blowerproj");
+    }
+
+    public IReadOnlyList<StoredProject> List()
+    {
+        var result = new List<StoredProject>();
+        lock (Gate)
+        {
+            foreach (var file in Directory.EnumerateFiles(root, "*.blowerproj"))
+            {
+                try
+                {
+                    var project = ProjectCodec.Decode(File.ReadAllText(file, Encoding.UTF8));
+                    result.Add(new(project.Id, project.Name, project.Modified, project.Revision, project.Archived, "可打开"));
+                }
+                catch (Exception error) when (error is IOException or InvalidDataException or UnauthorizedAccessException)
+                {
+                    result.Add(new(Path.GetFileNameWithoutExtension(file), "损坏文件", File.GetLastWriteTimeUtc(file), 0, false, error.Message));
+                }
+            }
+        }
+        return result.OrderByDescending(x => x.Modified).ToList();
+    }
+
+    public OpenedProject Open(string id, bool backup = false)
+    {
+        lock (Gate)
+        {
+            var path = PathFor(id);
+            var actual = backup ? path + ".bak" : path;
+            var content = File.ReadAllText(actual, Encoding.UTF8);
+            var project = ProjectCodec.Decode(content);
+            if (project.Id != id)
+            {
+                throw new InvalidDataException("文件标识与内容不符；请通过项目导入检查");
+            }
+            var token = File.Exists(path) ? ProjectCodec.Hash(File.ReadAllText(path, Encoding.UTF8)) : "";
+            return new(project, token, actual);
+        }
+    }
+
+    public SavedProject Save(Project project, string expectedToken)
+    {
+        var content = ProjectCodec.Encode(project);
+        var path = PathFor(project.Id);
+        lock (Gate)
+        {
+            var exists = File.Exists(path);
+            var current = exists ? ProjectCodec.Hash(File.ReadAllText(path, Encoding.UTF8)) : "";
+            if (current != expectedToken)
+            {
+                throw new IOException("项目库中此项目已被其他会话修改；请先下载当前草稿，重新打开后比较或复制另存");
+            }
+            var temporary = path + "." + Software.Id() + ".tmp";
+            try
+            {
+                using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+                {
+                    var bytes = Encoding.UTF8.GetBytes(content);
+                    stream.Write(bytes);
+                    stream.Flush(true);
+                }
+                if (exists)
+                {
+                    File.Copy(path, path + ".bak", true);
+                }
+                File.Move(temporary, path, true);
+            }
+            finally
+            {
+                if (File.Exists(temporary))
+                {
+                    File.Delete(temporary);
+                }
+            }
+            return new(ProjectCodec.Hash(content), path);
+        }
+    }
+}
+
+===== src/Blower.Core/IO/SchemaGuard.cs =====
+using System.Text.Json;
+
+namespace Blower.Core.IO;
+
+public static class SchemaGuard
+{
+    private static void Require(JsonElement element, string path, params string[] names)
+    {
+        if (element.ValueKind != JsonValueKind.Object)
+        {
+            throw new InvalidDataException(path + "须为对象");
+        }
+        foreach (var name in names)
+        {
+            if (!element.TryGetProperty(name, out var value) || value.ValueKind == JsonValueKind.Null)
+            {
+                throw new InvalidDataException(path + "." + name + "缺失或为null");
+            }
+        }
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var property in element.EnumerateObject())
+        {
+            if (!seen.Add(property.Name))
+            {
+                throw new InvalidDataException(path + "包含重复字段：" + property.Name);
+            }
+        }
+    }
+
+    private static void Each(JsonElement root, string name, Action<JsonElement, string> inspect)
+    {
+        var list = root.GetProperty(name);
+        if (list.ValueKind != JsonValueKind.Array)
+        {
+            throw new InvalidDataException(name + "须为数组");
+        }
+        var index = 0;
+        foreach (var element in list.EnumerateArray())
+        {
+            inspect(element, name + "[" + index + "]");
+            index++;
+        }
+    }
+
+    public static void Inspect(JsonElement root)
+    {
+        Require(root, "project", "schema", "id", "name", "origin", "source", "settings",
+            "orders", "modes", "plans", "checks", "audit", "revision", "created", "modified", "archived");
+        Require(root.GetProperty("settings"), "settings", "blades", "minRpm", "maxRpm",
+            "absoluteBandHz", "relativeBandPercent", "useDamping", "speedToleranceRpm",
+            "minimumGapRpm", "scanStepRpm", "scanWindowRpm", "shiftWeight");
+        Each(root, "orders", (item, path) =>
+        {
+            Require(item, path, "id", "name", "kind", "multiplier", "enabled", "evidence");
+        });
+        Each(root, "modes", (item, path) =>
+        {
+            Require(item, path, "id", "name", "frequencyHz", "extraBandHz", "enabled", "origin", "source", "location");
+            if (!item.TryGetProperty("dampingRatio", out _))
+            {
+                throw new InvalidDataException(path + ".dampingRatio缺失；未知阻尼请明确写null");
+            }
+        });
+        Each(root, "plans", (item, path) =>
+        {
+            Require(item, path, "id", "name", "notes", "locked", "gears");
+            Each(item, "gears", (gear, gearPath) =>
+            {
+                Require(gear, path + "." + gearPath, "id", "name", "rpm", "fixed", "notes");
+            });
+        });
+        Each(root, "checks", (item, path) =>
+        {
+            Require(item, path, "id", "key", "planId", "gearId", "modeId", "orderId",
+                "title", "method", "owner", "evidence", "state", "updated");
+        });
+        Each(root, "audit", (item, path) =>
+        {
+            Require(item, path, "time", "action", "detail", "revision");
+        });
+    }
+}
+
+===== src/Blower.Core/Operations/ProjectCommands.cs =====
+using Blower.Core.Analysis;
+using Blower.Core.Domain;
+using Blower.Core.IO;
+
+namespace Blower.Core.Operations;
+
+public static class ProjectCommands
+{
+    public static SpeedPlan CopyPlan(SpeedPlan source, string name)
+    {
+        return new()
+        {
+            Name = name,
+            Notes = source.Notes,
+            Gears = source.Gears.Select(x => new Gear
+            {
+                Name = x.Name,
+                Rpm = x.Rpm,
+                Fixed = x.Fixed,
+                Notes = x.Notes
+            }).ToList()
+        };
+    }
+
+    public static Project Duplicate(Project source)
+    {
+        var copy = ProjectCodec.Clone(source);
+        copy.Id = Software.Id();
+        copy.Name += " · 副本";
+        copy.Created = DateTimeOffset.UtcNow;
+        copy.Modified = copy.Created;
+        copy.Archived = false;
+        copy.Revision = 0;
+        copy.Audit = [new() { Action = "复制项目", Detail = source.Id + " / 修订" + source.Revision }];
+        return copy;
+    }
+
+    public static void RemoveObject(Project project, string kind, string id)
+    {
+        var related = project.Checks.Where(x => kind switch
+        {
+            "mode" => x.ModeId == id,
+            "order" => x.OrderId == id,
+            "gear" => x.GearId == id,
+            "plan" => x.PlanId == id,
+            _ => false
+        }).ToList();
+        if (related.Count > 0)
+        {
+            throw new InvalidOperationException($"仍有{related.Count}条验证记录引用此对象；请先移除相关验证记录");
+        }
+        switch (kind)
+        {
+            case "mode":
+                project.Modes.RemoveAll(x => x.Id == id);
+                break;
+            case "order":
+                project.Orders.RemoveAll(x => x.Id == id);
+                break;
+            case "plan":
+                if (project.Plans.Single(x => x.Id == id).Locked)
+                {
+                    throw new InvalidOperationException("先解除方案锁定");
+                }
+                project.Plans.RemoveAll(x => x.Id == id);
+                break;
+            case "gear":
+                var plan = project.Plans.Single(x => x.Gears.Any(g => g.Id == id));
+                if (plan.Locked)
+                {
+                    throw new InvalidOperationException("先解除方案锁定");
+                }
+                plan.Gears.RemoveAll(x => x.Id == id);
+                break;
+            case "check":
+                project.Checks.RemoveAll(x => x.Id == id);
+                break;
+            default:
+                throw new InvalidOperationException("此对象不可删除");
+        }
+    }
+
+    public static SpeedPlan ApplyScan(Project project, ScanResult scan)
+    {
+        if (!scan.Feasible || scan.InputHash != ProjectCodec.InputHash(project))
+        {
+            throw new InvalidOperationException("扫描无可行解或输入已变化，请重新扫描");
+        }
+        var original = project.Plans.Single(x => x.Id == scan.PlanId);
+        var candidate = CopyPlan(original, original.Name + " · 扫描候选");
+        for (var i = 0; i < candidate.Gears.Count; i++)
+        {
+            candidate.Gears[i].Rpm = scan.Choices[i].CandidateRpm;
+        }
+        candidate.Notes = "离散扫描候选；目标=接近组合数+偏移权重×归一化偏移；风量及响应待验证";
+        project.Plans.Add(candidate);
+        return candidate;
+    }
+
+    public static int GenerateChecks(Project project, AnalysisResult result, string planId)
+    {
+        if (result.InputHash != ProjectCodec.InputHash(project))
+        {
+            throw new InvalidOperationException("计算已过期；先重新计算");
+        }
+        var count = 0;
+        foreach (var contact in result.Contacts.Where(x => x.PlanId == planId && x.Near))
+        {
+            if (project.Checks.Any(x => x.Key == contact.Key))
+            {
+                continue;
+            }
+            project.Checks.Add(new()
+            {
+                Key = contact.Key,
+                PlanId = contact.PlanId,
+                GearId = contact.GearId,
+                ModeId = contact.ModeId,
+                OrderId = contact.OrderId,
+                Title = $"{contact.Gear} / {contact.Order} / {contact.Mode}",
+                Method = $"在{contact.Rpm:0.##}rpm附近复核转速与阶次；测量壳体/风道响应和车内声音；记录温度、安装、测点、仪器、频率分辨率及相干性。候选频率{contact.FrequencyHz:0.##}Hz。核对风量与效率。"
+            });
+            count++;
+        }
+        return count;
+    }
+
+    public static void MarkChecksForRecheck(Project project)
+    {
+        foreach (var task in project.Checks.Where(x => x.State == CheckState.Completed))
+        {
+            task.State = CheckState.Recheck;
+            task.Updated = DateTimeOffset.UtcNow;
+        }
+    }
+}
+
+===== src/Blower.Core/Operations/ProjectSession.cs =====
+using Blower.Core.Domain;
+using Blower.Core.IO;
+
+namespace Blower.Core.Operations;
+
+public sealed class ProjectSession
+{
+    private readonly Stack<Project> undo = new();
+    private readonly Stack<Project> redo = new();
+    public Project Current { get; private set; } = new();
+    public string SavedHash { get; private set; } = "";
+    public string StoreToken { get; private set; } = "";
+    public bool CanUndo => undo.Count > 0 && !Current.Archived;
+    public bool CanRedo => redo.Count > 0 && !Current.Archived;
+    public bool Dirty => SavedHash != ProjectCodec.Hash(System.Text.Json.JsonSerializer.Serialize(Current, ProjectCodec.Options));
+
+    public void Load(Project project, string storeToken = "", bool saved = false)
+    {
+        Validation.RequireValid(project);
+        Current = ProjectCodec.Clone(project);
+        undo.Clear();
+        redo.Clear();
+        StoreToken = storeToken;
+        SavedHash = saved ? ProjectCodec.Hash(ProjectCodec.Encode(Current)) : "";
+    }
+
+    public void Change(string action, Action<Project> change, bool analysisChange = true, bool allowArchived = false)
+    {
+        if (Current.Archived && !allowArchived)
+        {
+            throw new InvalidOperationException("项目已归档；先解除归档");
+        }
+        var candidate = ProjectCodec.Clone(Current);
+        change(candidate);
+        if (analysisChange)
+        {
+            ProjectCommands.MarkChecksForRecheck(candidate);
+        }
+        candidate.Revision++;
+        candidate.Modified = DateTimeOffset.UtcNow;
+        candidate.Audit.Add(new()
+        {
+            Action = action,
+            Detail = "已通过完整项目校验" + (analysisChange ? "；计算输入变化，已完成验证标为需复核" : ""),
+            Revision = candidate.Revision
+        });
+        Validation.RequireValid(candidate);
+        if (undo.Count >= 30)
+        {
+            var recent = undo.Take(29).Reverse().ToList();
+            undo.Clear();
+            foreach (var state in recent)
+            {
+                undo.Push(state);
+            }
+        }
+        undo.Push(ProjectCodec.Clone(Current));
+        redo.Clear();
+        Current = candidate;
+    }
+
+    public void Undo()
+    {
+        if (!CanUndo)
+        {
+            throw new InvalidOperationException("没有可撤销操作或项目已归档");
+        }
+        redo.Push(ProjectCodec.Clone(Current));
+        Restore(undo.Pop(), "撤销");
+    }
+
+    public void Redo()
+    {
+        if (!CanRedo)
+        {
+            throw new InvalidOperationException("没有可重做操作或项目已归档");
+        }
+        undo.Push(ProjectCodec.Clone(Current));
+        Restore(redo.Pop(), "重做");
+    }
+
+    private void Restore(Project restored, string action)
+    {
+        var audit = Current.Audit.ToList();
+        var revision = Current.Revision + 1;
+        restored.Revision = revision;
+        restored.Audit = audit;
+        restored.Modified = DateTimeOffset.UtcNow;
+        restored.Audit.Add(new() { Action = action, Detail = "恢复输入快照；保留累计审计", Revision = revision });
+        ProjectCommands.MarkChecksForRecheck(restored);
+        Current = restored;
+    }
+
+    public SavedProject Save(ProjectStore store)
+    {
+        var result = store.Save(Current, StoreToken);
+        StoreToken = result.Token;
+        SavedHash = ProjectCodec.Hash(ProjectCodec.Encode(Current));
+        return result;
+    }
+}
+
+===== src/Blower.Desktop/App.xaml =====
+<Application x:Class="Blower.Desktop.App"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ StartupUri="MainWindow.xaml">
+ <Application.Resources>
+  <BooleanToVisibilityConverter x:Key="Visible"/>
+  <SolidColorBrush x:Key="Ink" Color="#263E48"/>
+  <SolidColorBrush x:Key="Accent" Color="#086F78"/>
+  <Style TargetType="Window">
+   <Setter Property="FontFamily" Value="Microsoft YaHei UI"/>
+   <Setter Property="FontSize" Value="13"/>
+   <Setter Property="Foreground" Value="{StaticResource Ink}"/>
+   <Setter Property="Background" Value="#F1F4F4"/>
+  </Style>
+  <Style TargetType="Button">
+   <Setter Property="Padding" Value="12,7"/>
+   <Setter Property="Margin" Value="3"/>
+   <Setter Property="Background" Value="#E4EEEE"/>
+   <Setter Property="Foreground" Value="{StaticResource Ink}"/>
+   <Setter Property="BorderBrush" Value="#B8CDCF"/>
+  </Style>
+  <Style TargetType="TextBox">
+   <Setter Property="Padding" Value="7,5"/>
+   <Setter Property="Margin" Value="0,3,0,3"/>
+   <Setter Property="BorderBrush" Value="#ADBCBF"/>
+   <Setter Property="VerticalContentAlignment" Value="Center"/>
+  </Style>
+  <Style TargetType="ComboBox">
+   <Setter Property="Padding" Value="6,5"/>
+   <Setter Property="Margin" Value="3"/>
+   <Setter Property="MinWidth" Value="135"/>
+  </Style>
+  <Style TargetType="DataGrid">
+   <Setter Property="AutoGenerateColumns" Value="True"/>
+   <Setter Property="IsReadOnly" Value="True"/>
+   <Setter Property="CanUserAddRows" Value="False"/>
+   <Setter Property="CanUserDeleteRows" Value="False"/>
+   <Setter Property="SelectionMode" Value="Single"/>
+   <Setter Property="HeadersVisibility" Value="Column"/>
+   <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+   <Setter Property="HorizontalGridLinesBrush" Value="#DDE5E6"/>
+   <Setter Property="AlternatingRowBackground" Value="#F0F5F4"/>
+   <Setter Property="RowHeight" Value="32"/>
+   <Setter Property="ColumnHeaderHeight" Value="36"/>
+   <Setter Property="BorderThickness" Value="0"/>
+   <Setter Property="EnableRowVirtualization" Value="True"/>
+   <Setter Property="EnableColumnVirtualization" Value="True"/>
+  </Style>
+ </Application.Resources>
+</Application>
+
+===== src/Blower.Desktop/App.xaml.cs =====
+using System.Windows;
+
+namespace Blower.Desktop;
+
+public partial class App : Application
+{
+}
+
+===== src/Blower.Desktop/Controls/FrequencyCanvas.cs =====
+using System.Globalization;
+using System.Windows;
+using System.Windows.Media;
+using Blower.Core.Analysis;
+
+namespace Blower.Desktop.Controls;
+
+public sealed class FrequencyCanvas : FrameworkElement
+{
+    public static readonly DependencyProperty ModelProperty = DependencyProperty.Register(
+        nameof(Model), typeof(ChartModel), typeof(FrequencyCanvas),
+        new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
+    public static readonly DependencyProperty SourceLabelProperty = DependencyProperty.Register(
+        nameof(SourceLabel), typeof(string), typeof(FrequencyCanvas),
+        new FrameworkPropertyMetadata("", FrameworkPropertyMetadataOptions.AffectsRender));
+    public ChartModel? Model
+    {
+        get => (ChartModel?)GetValue(ModelProperty);
+        set => SetValue(ModelProperty, value);
+    }
+    public string SourceLabel
+    {
+        get => (string)GetValue(SourceLabelProperty);
+        set => SetValue(SourceLabelProperty, value);
+    }
+    protected override void OnRender(DrawingContext dc)
+    {
+        base.OnRender(dc);
+        dc.DrawRectangle(Brushes.White, null, new Rect(RenderSize));
+        var chart = Model;
+        if (chart == null)
+        {
+            DrawText(dc, "尚无有效结果。填写输入后按 F5 计算。", 30, 40, 15, Brushes.SlateGray);
+            return;
+        }
+        if (ActualWidth < 150 || ActualHeight < 150)
+        {
+            return;
+        }
+        var sx = ActualWidth / ChartModel.Width;
+        var sy = ActualHeight / (ChartModel.Height + 60);
+        double X(double x) => x * sx;
+        double Y(double y) => y * sy;
+        var gridPen = new Pen(new SolidColorBrush(Color.FromRgb(220, 230, 230)), 1);
+        foreach (var tick in chart.XTicks)
+        {
+            dc.DrawLine(gridPen, new(X(tick.Position), Y(ChartModel.Top)), new(X(tick.Position), Y(ChartModel.Bottom)));
+            DrawText(dc, tick.Label, X(tick.Position) - 16, Y(ChartModel.Bottom) + 8, 11, Brushes.DimGray);
+        }
+        foreach (var tick in chart.YTicks)
+        {
+            dc.DrawLine(gridPen, new(X(ChartModel.Left), Y(tick.Position)), new(X(ChartModel.Right), Y(tick.Position)));
+            DrawText(dc, tick.Label, 5, Y(tick.Position) - 8, 11, Brushes.DimGray);
+        }
+        foreach (var band in chart.Bands)
+        {
+            var brush = new SolidColorBrush(Color.FromArgb(55, 125, 100, 174));
+            dc.DrawRectangle(brush, null, new Rect(X(ChartModel.Left), Y(band.Y),
+                X(ChartModel.Right - ChartModel.Left), Math.Max(2, Y(band.Height))));
+            DrawText(dc, band.Name, X(ChartModel.Left) + 6, Y(band.LabelY) - 12, 11, Brushes.DarkSlateBlue);
+        }
+        foreach (var line in chart.Lines)
+        {
+            var brush = (Brush)new BrushConverter().ConvertFromString(line.Color)!;
+            dc.DrawLine(new Pen(brush, 2), new(X(line.X1), Y(line.Y1)), new(X(line.X2), Y(line.Y2)));
+        }
+        foreach (var gear in chart.Gears)
+        {
+            var brush = gear.Near ? Brushes.Firebrick : Brushes.Teal;
+            var pen = new Pen(brush, 1) { DashStyle = DashStyles.Dash };
+            dc.DrawLine(pen, new(X(gear.X), Y(ChartModel.Top)), new(X(gear.X), Y(ChartModel.Bottom)));
+            DrawText(dc, gear.Name, X(gear.X) - 15, 5, 11, brush);
+        }
+        DrawText(dc, "频率 Hz", 5, 5, 12, Brushes.DarkSlateGray);
+        DrawText(dc, "转速 rpm →", X(ChartModel.Left), Y(390), 12, Brushes.DarkSlateGray);
+        DrawText(dc, SourceLabel + " · 紫色：模态区间；红虚线：存在接近；绿虚线：未接近", X(ChartModel.Left), Y(413), 11, Brushes.DarkSlateGray);
+        var legendX = X(ChartModel.Left);
+        var legendY = Y(438);
+        foreach (var line in chart.Lines)
+        {
+            var brush = (Brush)new BrushConverter().ConvertFromString(line.Color)!;
+            var text = DrawText(dc, line.Name, legendX, legendY, 11, brush);
+            legendX += text.Width + 22;
+            if (legendX > ActualWidth - 170)
+            {
+                legendX = X(ChartModel.Left);
+                legendY += 16;
+            }
+        }
+    }
+    private FormattedText DrawText(DrawingContext dc, string text, double x, double y, double size, Brush brush)
+    {
+        var formatted = new FormattedText(text, CultureInfo.GetCultureInfo("zh-CN"), FlowDirection.LeftToRight,
+            new Typeface("Microsoft YaHei UI"), size, brush, VisualTreeHelper.GetDpi(this).PixelsPerDip);
+        dc.DrawText(formatted, new Point(x, y));
+        return formatted;
+    }
+}
+
+===== src/Blower.Desktop/MainWindow.xaml =====
+<Window x:Class="Blower.Desktop.MainWindow"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:controls="clr-namespace:Blower.Desktop.Controls"
+ Title="{Binding Title}" Width="1450" Height="940" MinWidth="1040" MinHeight="700"
+ Closing="WindowClosing">
+ <Window.InputBindings>
+  <KeyBinding Key="N" Modifiers="Control" Command="{Binding NewCommand}"/>
+  <KeyBinding Key="O" Modifiers="Control" Command="{Binding OpenCommand}"/>
+  <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveCommand}"/>
+  <KeyBinding Key="Z" Modifiers="Control" Command="{Binding UndoCommand}"/>
+  <KeyBinding Key="Y" Modifiers="Control" Command="{Binding RedoCommand}"/>
+  <KeyBinding Key="F5" Command="{Binding ComputeCommand}"/>
+ </Window.InputBindings>
+ <DockPanel>
+  <Menu DockPanel.Dock="Top" Background="#FFFFFF" Padding="8,3">
+   <MenuItem Header="文件(_F)">
+    <MenuItem Header="新建空白项目" Command="{Binding NewCommand}" InputGestureText="Ctrl+N"/>
+    <MenuItem Header="打开项目…" Command="{Binding OpenCommand}" InputGestureText="Ctrl+O"/>
+    <MenuItem Header="保存" Command="{Binding SaveCommand}" InputGestureText="Ctrl+S"/>
+    <MenuItem Header="另存为…" Command="{Binding SaveAsCommand}"/>
+    <Separator/>
+    <MenuItem Header="载入独立模拟示例" Command="{Binding DemoCommand}"/>
+    <MenuItem Header="复制为独立项目" Command="{Binding DuplicateProjectCommand}"/>
+    <MenuItem Header="归档 / 解除归档" Command="{Binding ArchiveCommand}"/>
+   </MenuItem>
+   <MenuItem Header="编辑(_E)">
+    <MenuItem Header="撤销" Command="{Binding UndoCommand}" InputGestureText="Ctrl+Z"/>
+    <MenuItem Header="重做" Command="{Binding RedoCommand}" InputGestureText="Ctrl+Y"/>
+    <MenuItem Header="新增对象" Command="{Binding AddCommand}"/>
+    <MenuItem Header="删除所选对象" Command="{Binding DeleteCommand}"/>
+   </MenuItem>
+   <MenuItem Header="计算(_R)">
+    <MenuItem Header="计算交叉与挡位接近" Command="{Binding ComputeCommand}" InputGestureText="F5"/>
+    <MenuItem Header="运行约束扫描" Command="{Binding ScanCommand}"/>
+    <MenuItem Header="生成验证清单" Command="{Binding GenerateChecksCommand}"/>
+   </MenuItem>
+   <MenuItem Header="导出(_X)">
+    <MenuItem Header="挡位接近明细 CSV…" Command="{Binding ExportContactsCommand}"/>
+    <MenuItem Header="交叉区间 CSV…" Command="{Binding ExportCrossingsCommand}"/>
+    <MenuItem Header="自包含设计报告 HTML…" Command="{Binding ExportReportCommand}"/>
+    <MenuItem Header="转速频率图 SVG…" Command="{Binding ExportSvgCommand}"/>
+    <MenuItem Header="验证清单 CSV…" Command="{Binding ExportChecksCommand}"/>
+    <MenuItem Header="规则敏感性 CSV…" Command="{Binding ExportStudyCommand}"/>
+    <MenuItem Header="方案比较 CSV…" Command="{Binding ExportComparisonCommand}"/>
+   </MenuItem>
+  </Menu>
+  <Border DockPanel.Dock="Bottom" Background="#FFFFFF" Padding="12,7" BorderThickness="0,1,0,0" BorderBrush="#C9D9DB">
+   <StackPanel>
+    <ProgressBar Height="3" IsIndeterminate="True" Visibility="{Binding Busy, Converter={StaticResource Visible}}"/>
+    <TextBlock Text="{Binding Notice}" TextWrapping="Wrap" AutomationProperties.Name="操作状态">
+     <TextBlock.Style>
+      <Style TargetType="TextBlock">
+       <Setter Property="Foreground" Value="#086F78"/>
+       <Style.Triggers><DataTrigger Binding="{Binding Error}" Value="True"><Setter Property="Foreground" Value="#A22F23"/></DataTrigger></Style.Triggers>
+      </Style>
+     </TextBlock.Style>
+    </TextBlock>
+    <TextBlock Text="{Binding FilePath}" FontSize="11" Foreground="#5E747C" TextTrimming="CharacterEllipsis"/>
+   </StackPanel>
+  </Border>
+  <Border DockPanel.Dock="Left" Width="234" Background="#213D48" Padding="12">
+   <DockPanel>
+    <StackPanel DockPanel.Dock="Top" Margin="7,12,7,18">
+     <TextBlock Text="BLOWER / DESIGN" Foreground="#94CED0" FontSize="12" FontWeight="SemiBold"/>
+     <TextBlock Text="挡位与共振避让" Foreground="White" FontSize="21" Margin="0,8,0,9"/>
+     <TextBlock Text="{Binding SourceLabel}" Foreground="#F7DB97" TextWrapping="Wrap"/>
+     <TextBlock Text="{Binding RevisionLabel}" Foreground="#C7DADC" Margin="0,7,0,0" TextWrapping="Wrap"/>
+    </StackPanel>
+    <Button DockPanel.Dock="Bottom" Content="计算交叉与接近  F5" Command="{Binding ComputeCommand}" Margin="0,10"/>
+    <ListBox ItemsSource="{Binding Nodes}" SelectedItem="{Binding SelectedNode}" Background="Transparent"
+     BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Foreground="White"
+     AutomationProperties.Name="工程导航">
+     <ListBox.ItemContainerStyle>
+      <Style TargetType="ListBoxItem">
+       <Setter Property="Padding" Value="8,6"/>
+       <Setter Property="Margin" Value="0,2"/>
+       <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+      </Style>
+     </ListBox.ItemContainerStyle>
+     <ListBox.ItemTemplate><DataTemplate><StackPanel>
+      <TextBlock Text="{Binding Title}" FontSize="14"/>
+      <TextBlock Text="{Binding Hint}" FontSize="10" Opacity="0.76" TextWrapping="Wrap" Margin="0,3,0,0"/>
+     </StackPanel></DataTemplate></ListBox.ItemTemplate>
+    </ListBox>
+   </DockPanel>
+  </Border>
+  <Grid Margin="18,14">
+   <Grid.RowDefinitions>
+    <RowDefinition Height="Auto"/>
+    <RowDefinition Height="Auto"/>
+    <RowDefinition Height="*"/>
+    <RowDefinition Height="Auto"/>
+   </Grid.RowDefinitions>
+   <StackPanel Margin="0,0,0,12">
+    <TextBlock Text="{Binding SectionTitle}" FontSize="25" FontWeight="SemiBold"/>
+    <TextBlock Text="{Binding SectionHint}" Foreground="#607981" Margin="0,4,0,0"/>
+   </StackPanel>
+   <StackPanel Grid.Row="1" Margin="0,0,0,8">
+    <WrapPanel Visibility="{Binding IsPlans, Converter={StaticResource Visible}}">
+     <TextBlock Text="当前 / 基准方案" VerticalAlignment="Center" Margin="0,0,8,0"/>
+     <ComboBox ItemsSource="{Binding Plans}" SelectedItem="{Binding ActivePlan}" DisplayMemberPath="Name" MinWidth="230"/>
+     <Button Content="复制当前方案" Command="{Binding CopyPlanCommand}"/>
+    </WrapPanel>
+    <WrapPanel Visibility="{Binding IsLibrary, Converter={StaticResource Visible}}">
+     <Button Content="保存到项目库" Command="{Binding LibrarySaveCommand}"/>
+     <Button Content="打开选中项目" Command="{Binding LibraryOpenCommand}"/>
+     <Button Content="恢复选中项目备份" Command="{Binding LibraryBackupCommand}"/>
+    </WrapPanel>
+    <WrapPanel Visibility="{Binding IsPlanEditor, Converter={StaticResource Visible}}">
+     <Button Content="新增方案" Command="{Binding AddPlanCommand}"/>
+     <Button Content="新增挡位" Command="{Binding AddGearCommand}"/>
+     <Button Content="方案属性" Command="{Binding PlanPropertiesCommand}"/>
+    </WrapPanel>
+    <WrapPanel>
+     <Button Content="新增对象" Command="{Binding AddCommand}"/>
+     <Button Content="删除所选" Command="{Binding DeleteCommand}"/>
+     <Button Content="撤销" Command="{Binding UndoCommand}"/>
+     <Button Content="重做" Command="{Binding RedoCommand}"/>
+     <TextBlock Text="{Binding ResultStatus}" VerticalAlignment="Center" Margin="14,0,0,0" TextWrapping="Wrap"/>
+    </WrapPanel>
+    <WrapPanel Visibility="{Binding IsContacts, Converter={StaticResource Visible}}">
+     <CheckBox Content="仅显示潜在接近" IsChecked="{Binding OnlyNear}" VerticalAlignment="Center" Margin="5"/>
+     <TextBox Text="{Binding ContactSearch, UpdateSourceTrigger=PropertyChanged}" Width="220" ToolTip="按挡位、阶次、模态名称筛选"/>
+     <Button Content="导出明细" Command="{Binding ExportContactsCommand}"/>
+    </WrapPanel>
+    <StackPanel Visibility="{Binding IsScan, Converter={StaticResource Visible}}">
+     <WrapPanel><Button Content="运行约束扫描" Command="{Binding ScanCommand}"/><Button Content="接纳为新方案" Command="{Binding AcceptScanCommand}"/></WrapPanel>
+     <TextBlock Text="{Binding ScanStatus}" TextWrapping="Wrap" Margin="4"/>
+    </StackPanel>
+    <StackPanel Visibility="{Binding IsCompare, Converter={StaticResource Visible}}">
+     <WrapPanel><TextBlock Text="目标方案" VerticalAlignment="Center"/><ComboBox ItemsSource="{Binding Plans}" SelectedItem="{Binding ComparePlan}" DisplayMemberPath="Name" MinWidth="230"/><Button Content="比较" Command="{Binding CompareCommand}"/><Button Content="导出比较" Command="{Binding ExportComparisonCommand}"/></WrapPanel>
+     <TextBlock Text="{Binding ComparisonStatus}" TextWrapping="Wrap" Margin="4"/>
+    </StackPanel>
+    <WrapPanel Visibility="{Binding IsStudy, Converter={StaticResource Visible}}">
+     <TextBlock Text="绝对半宽 Hz" VerticalAlignment="Center"/>
+     <TextBox Text="{Binding StudyBands, UpdateSourceTrigger=PropertyChanged}" Width="110"/>
+     <TextBlock Text="转速容差 rpm" VerticalAlignment="Center" Margin="10,0,0,0"/>
+     <TextBox Text="{Binding StudyTolerances, UpdateSourceTrigger=PropertyChanged}" Width="110"/>
+     <Button Content="试算规则组合" Command="{Binding StudyCommand}"/>
+     <Button Content="导出试算" Command="{Binding ExportStudyCommand}"/>
+    </WrapPanel>
+    <WrapPanel Visibility="{Binding IsChecks, Converter={StaticResource Visible}}">
+     <Button Content="为当前方案生成验证任务" Command="{Binding GenerateChecksCommand}"/>
+     <Button Content="导出验证清单" Command="{Binding ExportChecksCommand}"/>
+    </WrapPanel>
+    <StackPanel Visibility="{Binding IsExchange, Converter={StaticResource Visible}}">
+     <WrapPanel>
+      <ComboBox ItemsSource="{Binding CsvKinds}" SelectedItem="{Binding CsvKind}"/>
+      <Button Content="读取 CSV…" Command="{Binding ImportReadCommand}"/>
+      <Button Content="预检" Command="{Binding PreviewCommand}"/>
+      <Button Content="整批应用" Command="{Binding ImportApplyCommand}"/>
+      <Button Content="导出当前模板" Command="{Binding TemplateCommand}"/>
+     </WrapPanel>
+     <TextBox Text="{Binding CsvText, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" AcceptsTab="True" Height="150" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" FontFamily="Consolas"/>
+     <TextBlock Text="{Binding PreviewStatus}" TextWrapping="Wrap" Margin="4"/>
+    </StackPanel>
+   </StackPanel>
+   <Grid Grid.Row="2">
+    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+    <DataGrid ItemsSource="{Binding Rows}" SelectedItem="{Binding SelectedRow}" AutoGeneratingColumn="GenerateColumn"
+     Visibility="{Binding IsTable, Converter={StaticResource Visible}}" AutomationProperties.Name="工程数据表"/>
+    <DockPanel Visibility="{Binding IsPlot, Converter={StaticResource Visible}}" Background="White">
+     <WrapPanel DockPanel.Dock="Top" Margin="10">
+      <TextBlock Text="频率上限 Hz（空白自动）" VerticalAlignment="Center"/>
+      <TextBox Width="130" Text="{Binding ChartCeiling, UpdateSourceTrigger=LostFocus, ValidatesOnExceptions=True}"/>
+      <Button Content="导出 SVG" Command="{Binding ExportSvgCommand}"/>
+     </WrapPanel>
+     <controls:FrequencyCanvas Model="{Binding Chart}" SourceLabel="{Binding SourceLabel}"/>
+    </DockPanel>
+    <ScrollViewer Visibility="{Binding IsHelp, Converter={StaticResource Visible}}" VerticalScrollBarVisibility="Auto" Background="White" Padding="20">
+     <TextBlock Text="{Binding HelpText}" TextWrapping="Wrap" LineHeight="25"/>
+    </ScrollViewer>
+    <GridSplitter Grid.Column="1" Width="6" HorizontalAlignment="Center" Background="#C9D9DB" Visibility="{Binding HasEditor, Converter={StaticResource Visible}}"/>
+    <Border Grid.Column="2" Width="320" Background="White" Padding="14" Visibility="{Binding HasEditor, Converter={StaticResource Visible}}">
+     <DockPanel>
+      <StackPanel DockPanel.Dock="Top"><TextBlock Text="{Binding Form.Title}" FontSize="15" FontWeight="SemiBold"/><TextBlock Text="表格选中对象后在此编辑；未应用草稿会提示。" TextWrapping="Wrap" Foreground="#607981" Margin="0,6,0,10"/></StackPanel>
+      <WrapPanel DockPanel.Dock="Bottom" Margin="0,10,0,0"><Button Content="应用属性" Command="{Binding ApplyCommand}"/><Button Content="还原草稿" Command="{Binding ResetEditorCommand}"/></WrapPanel>
+      <ScrollViewer VerticalScrollBarVisibility="Auto">
+       <ItemsControl ItemsSource="{Binding Form.Fields}">
+        <ItemsControl.ItemTemplate><DataTemplate><StackPanel Margin="0,0,0,12">
+         <TextBlock Text="{Binding Label}" FontWeight="SemiBold" TextWrapping="Wrap"/>
+         <TextBox Text="{Binding Value, UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding IsText, Converter={StaticResource Visible}}" TextWrapping="Wrap" MaxHeight="110" VerticalScrollBarVisibility="Auto"/>
+         <ComboBox ItemsSource="{Binding Choices}" SelectedItem="{Binding Value, UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding IsChoice, Converter={StaticResource Visible}}"/>
+         <TextBlock Text="{Binding Help}" FontSize="11" Foreground="#607981" TextWrapping="Wrap"/>
+        </StackPanel></DataTemplate></ItemsControl.ItemTemplate>
+       </ItemsControl>
+      </ScrollViewer>
+     </DockPanel>
+    </Border>
+   </Grid>
+   <Border Grid.Row="3" Background="#FFF4DA" Padding="10" Margin="0,10,0,0">
+    <TextBlock Text="{Binding Boundary}" TextWrapping="Wrap" Foreground="#775520"/>
+   </Border>
+  </Grid>
+ </DockPanel>
+</Window>
+
+===== src/Blower.Desktop/MainWindow.xaml.cs =====
+using System.ComponentModel;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using Blower.Desktop.Services;
+using Blower.Desktop.ViewModels;
+
+namespace Blower.Desktop;
+
+public partial class MainWindow : Window
+{
+    private readonly WorkspaceViewModel workspace;
+    public MainWindow()
+    {
+        InitializeComponent();
+        workspace = new WorkspaceViewModel(new DesktopDialogs());
+        DataContext = workspace;
+    }
+    private void WindowClosing(object? sender, CancelEventArgs e)
+    {
+        e.Cancel = !workspace.CanClose();
+    }
+    private void GenerateColumn(object? sender, DataGridAutoGeneratingColumnEventArgs e)
+    {
+        if (Hidden.Contains(e.PropertyName))
+        {
+            e.Cancel = true;
+            return;
+        }
+        e.Column.Header = Headers.GetValueOrDefault(e.PropertyName, e.PropertyName);
+        e.Column.MinWidth = 90;
+        e.Column.MaxWidth = e.PropertyType == typeof(string) ? 360 : 180;
+        if (e.PropertyType == typeof(double) || e.PropertyType == typeof(double?))
+        {
+            if (e.Column is DataGridTextColumn text)
+            {
+                text.Binding = new Binding(e.PropertyName) { StringFormat = "0.###" };
+            }
+        }
+        if (e.PropertyType == typeof(DateTimeOffset) && e.Column is DataGridTextColumn date)
+        {
+            date.Binding = new Binding(e.PropertyName) { StringFormat = "yyyy-MM-dd HH:mm:ss zzz" };
+        }
+    }
+    private static readonly HashSet<string> Hidden =
+    [
+        "Id", "PlanId", "GearId", "OrderId", "ModeId", "Key", "Gears", "InputHash"
+    ];
+    private static readonly Dictionary<string, string> Headers = new()
+    {
+        ["Name"] = "名称",
+        ["Kind"] = "类型 Shaft=轴 / Blade=叶片",
+        ["Multiplier"] = "阶次 / 倍数",
+        ["Enabled"] = "启用",
+        ["Evidence"] = "依据 / 证据",
+        ["FrequencyHz"] = "频率 Hz",
+        ["DampingRatio"] = "阻尼比 ζ",
+        ["ExtraBandHz"] = "附加半宽 Hz",
+        ["Origin"] = "来源类别（见帮助）",
+        ["Source"] = "来源说明",
+        ["Location"] = "结构位置 / 边界",
+        ["Notes"] = "备注",
+        ["Rpm"] = "转速 rpm",
+        ["Fixed"] = "扫描固定",
+        ["Mode"] = "模态",
+        ["Order"] = "阶次名称",
+        ["Plan"] = "方案",
+        ["Gear"] = "挡位",
+        ["EffectiveOrder"] = "有效阶次",
+        ["ExactRpm"] = "精确交叉 rpm",
+        ["LowerRpm"] = "敏感下限 rpm",
+        ["UpperRpm"] = "敏感上限 rpm",
+        ["InRange"] = "与分析范围相交",
+        ["OrderNumber"] = "有效阶次",
+        ["LowerHz"] = "激励下限 Hz",
+        ["UpperHz"] = "激励上限 Hz",
+        ["ModeHz"] = "模态频率 Hz",
+        ["HalfWidthHz"] = "敏感半宽 Hz",
+        ["ClearanceHz"] = "区间净距 Hz",
+        ["Near"] = "潜在接近",
+        ["Status"] = "状态",
+        ["Position"] = "挡位序号",
+        ["OriginalRpm"] = "原转速 rpm",
+        ["CandidateRpm"] = "候选转速 rpm",
+        ["Contacts"] = "接近组合数",
+        ["Cost"] = "局部代价",
+        ["BaselineGear"] = "基准挡位",
+        ["TargetGear"] = "目标挡位",
+        ["BaselineRpm"] = "基准 rpm",
+        ["TargetRpm"] = "目标 rpm",
+        ["DeltaRpm"] = "目标减基准 rpm",
+        ["BaselineContacts"] = "基准接近数",
+        ["TargetContacts"] = "目标接近数",
+        ["Note"] = "比较口径",
+        ["AbsoluteBandHz"] = "绝对半宽 Hz",
+        ["SpeedToleranceRpm"] = "转速容差 rpm",
+        ["NearGears"] = "接近挡位数",
+        ["ChangedStatuses"] = "状态变化数",
+        ["MinimumClearanceHz"] = "最小净距 Hz",
+        ["GearNames"] = "接近挡位",
+        ["Title"] = "任务",
+        ["Method"] = "方法与工况",
+        ["Owner"] = "负责人",
+        ["State"] = "验证状态（见帮助）",
+        ["Updated"] = "更新时间",
+        ["Severity"] = "提示级别",
+        ["Object"] = "对象",
+        ["Finding"] = "发现",
+        ["Action"] = "操作 / 建议",
+        ["Time"] = "时间",
+        ["Detail"] = "详情",
+        ["Revision"] = "修订",
+        ["Line"] = "CSV行号",
+        ["Column"] = "字段",
+        ["Message"] = "问题"
+    };
+}
+
+===== src/Blower.Desktop/Services/DesktopDialogs.cs =====
+using System.IO;
+using System.Windows;
+using Microsoft.Win32;
+using Blower.Core.Domain;
+
+namespace Blower.Desktop.Services;
+
+public sealed class DesktopDialogs : IDesktopDialogs
+{
+    public string? OpenProject()
+    {
+        var dialog = new OpenFileDialog
+        {
+            Title = "打开鼓风机项目",
+            Filter = "鼓风机项目 (*.blowerproj)|*.blowerproj|备份文件 (*.bak)|*.bak",
+            CheckFileExists = true
+        };
+        return dialog.ShowDialog() == true ? dialog.FileName : null;
+    }
+
+    public string? SaveProject(string name)
+    {
+        var dialog = new SaveFileDialog
+        {
+            Title = "保存鼓风机项目",
+            Filter = "鼓风机项目 (*.blowerproj)|*.blowerproj",
+            FileName = SafeName(name),
+            DefaultExt = ".blowerproj",
+            AddExtension = true,
+            OverwritePrompt = true
+        };
+        return dialog.ShowDialog() == true ? dialog.FileName : null;
+    }
+
+    public string? OpenCsv()
+    {
+        var dialog = new OpenFileDialog
+        {
+            Title = "读取 UTF-8 CSV 到预检区",
+            Filter = "CSV (*.csv)|*.csv",
+            CheckFileExists = true
+        };
+        return dialog.ShowDialog() == true ? dialog.FileName : null;
+    }
+
+    public string? ExportPath(string name, string extension)
+    {
+        var dialog = new SaveFileDialog
+        {
+            Title = "导出成果",
+            Filter = $"{extension.ToUpperInvariant()} 文件 (*.{extension})|*.{extension}",
+            FileName = SafeName(name),
+            DefaultExt = "." + extension,
+            AddExtension = true,
+            OverwritePrompt = true
+        };
+        return dialog.ShowDialog() == true ? dialog.FileName : null;
+    }
+
+    public bool Confirm(string message)
+    {
+        return MessageBox.Show(message, Software.Name, MessageBoxButton.YesNo,
+            MessageBoxImage.Question) == MessageBoxResult.Yes;
+    }
+
+    public SaveDecision Unsaved(string message)
+    {
+        return MessageBox.Show(message, Software.Name, MessageBoxButton.YesNoCancel,
+            MessageBoxImage.Question) switch
+        {
+            MessageBoxResult.Yes => SaveDecision.Save,
+            MessageBoxResult.No => SaveDecision.Discard,
+            _ => SaveDecision.Cancel
+        };
+    }
+
+    private static string SafeName(string name)
+    {
+        foreach (var character in Path.GetInvalidFileNameChars())
+        {
+            name = name.Replace(character, '_');
+        }
+        return name.Length > 100 ? name[..100] : name;
+    }
+}
+
+
+===== src/Blower.Desktop/Services/DesktopFiles.cs =====
+using System.IO;
+using System.Text;
+using Blower.Core.Domain;
+using Blower.Core.IO;
+
+namespace Blower.Desktop.Services;
+
+public sealed record DiskProject(Project Project, string Path, string Token);
+
+public static class DesktopFiles
+{
+    public static DiskProject Open(string path)
+    {
+        var info = new FileInfo(path);
+        if (info.Length > ProjectCodec.MaximumBytes)
+        {
+            throw new InvalidDataException("文件超过 4MiB 上限");
+        }
+        var content = File.ReadAllText(path, Encoding.UTF8);
+        var project = ProjectCodec.Decode(content);
+        return new(project, Path.GetFullPath(path), ProjectCodec.Hash(content));
+    }
+
+    public static string Save(Project project, string path, string? expectedToken)
+    {
+        var content = ProjectCodec.Encode(project);
+        if (Encoding.UTF8.GetByteCount(content) > ProjectCodec.MaximumBytes)
+        {
+            throw new InvalidDataException("序列化项目超过 4MiB，请拆分项目或精简备注");
+        }
+        var current = File.Exists(path)
+            ? ProjectCodec.Hash(File.ReadAllText(path, Encoding.UTF8)) : "";
+        if (expectedToken != null && expectedToken != current)
+        {
+            throw new IOException("磁盘文件已被其他程序修改或删除。请另存为新文件，再打开原文件核对差异。");
+        }
+        WriteAtomic(path, content, false, true);
+        var reopened = Open(path);
+        if (ProjectCodec.InputHash(reopened.Project) != ProjectCodec.InputHash(project))
+        {
+            throw new IOException("保存后重开核对失败，请保留当前会话并另存");
+        }
+        return reopened.Token;
+    }
+
+    public static void WriteAtomic(string path, string content, bool bom, bool backup = false)
+    {
+        var full = Path.GetFullPath(path);
+        var temporary = full + "." + Guid.NewGuid().ToString("N") + ".tmp";
+        try
+        {
+            using (var stream = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+            {
+                if (bom)
+                {
+                    stream.Write(Encoding.UTF8.GetPreamble());
+                }
+                stream.Write(Encoding.UTF8.GetBytes(content));
+                stream.Flush(true);
+            }
+            if (backup && File.Exists(full))
+            {
+                File.Copy(full, full + ".bak", true);
+            }
+            File.Move(temporary, full, true);
+        }
+        finally
+        {
+            if (File.Exists(temporary))
+            {
+                File.Delete(temporary);
+            }
+        }
+    }
+
+    public static string ReadCsv(string path)
+    {
+        if (new FileInfo(path).Length > 1024 * 1024)
+        {
+            throw new InvalidDataException("CSV 超过 1MiB 预检上限");
+        }
+        return File.ReadAllText(path, new UTF8Encoding(false, true));
+    }
+}
+
+===== src/Blower.Desktop/Services/IDesktopDialogs.cs =====
+namespace Blower.Desktop.Services;
+
+public enum SaveDecision
+{
+    Save,
+    Discard,
+    Cancel
+}
+
+public interface IDesktopDialogs
+{
+    string? OpenProject();
+    string? SaveProject(string name);
+    string? OpenCsv();
+    string? ExportPath(string name, string extension);
+    bool Confirm(string message);
+    SaveDecision Unsaved(string message);
+}
+
+
+===== src/Blower.Desktop/ViewModels/EditorField.cs =====
+using System.IO;
+using System.Collections.ObjectModel;
+using System.Globalization;
+using Blower.Core.Domain;
+
+namespace Blower.Desktop.ViewModels;
+
+public sealed class EditorField : ObservableObject
+{
+    private string value;
+    private readonly Action<string> apply;
+    public string Label { get; }
+    public string Help { get; }
+    public string Original { get; }
+    public IReadOnlyList<string> Choices { get; }
+    public bool IsChoice => Choices.Count > 0;
+    public bool IsText => !IsChoice;
+    public bool Changed => Value != Original;
+
+    public string Value
+    {
+        get => value;
+        set
+        {
+            if (Set(ref this.value, value))
+            {
+                Raise(nameof(Changed));
+            }
+        }
+    }
+
+    public EditorField(string label, string initial, string help, Action<string> apply,
+        IReadOnlyList<string>? choices = null)
+    {
+        Label = label;
+        value = initial;
+        Original = initial;
+        Help = help;
+        this.apply = apply;
+        Choices = choices ?? [];
+    }
+
+    public void Apply()
+    {
+        try
+        {
+            apply(Value);
+        }
+        catch (Exception e) when (e is FormatException or OverflowException)
+        {
+            throw new InvalidDataException(Label + "：" + e.Message);
+        }
+    }
+}
+
+public sealed class EditorForm : ObservableObject
+{
+    public ObservableCollection<EditorField> Fields { get; } = [];
+    public string Title { get; set; } = "属性";
+    public bool Changed => Fields.Any(x => x.Changed);
+
+    public void Clear(string title)
+    {
+        Fields.Clear();
+        Title = title;
+        Raise(nameof(Title));
+        Raise(nameof(Changed));
+    }
+
+    private void Add(EditorField field)
+    {
+        field.PropertyChanged += (_, _) => Raise(nameof(Changed));
+        Fields.Add(field);
+    }
+
+    public void Text(string label, string value, Action<string> setter, string help = "")
+    {
+        Add(new(label, value, help, setter));
+    }
+
+    public void Number(string label, double value, Action<double> setter, string help)
+    {
+        Add(new(label, value.ToString("G", CultureInfo.InvariantCulture), help, text =>
+        {
+            if (!double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var number)
+                || !double.IsFinite(number))
+            {
+                throw new FormatException("请输入有限数值，使用英文小数点");
+            }
+            setter(number);
+        }));
+    }
+
+    public void Integer(string label, int value, Action<int> setter, string help)
+    {
+        Add(new(label, value.ToString(CultureInfo.InvariantCulture), help, text =>
+        {
+            if (!int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var number))
+            {
+                throw new FormatException("请输入整数");
+            }
+            setter(number);
+        }));
+    }
+
+    public void NullableNumber(string label, double? value, Action<double?> setter, string help)
+    {
+        Add(new(label, value?.ToString("G", CultureInfo.InvariantCulture) ?? "", help, text =>
+        {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                setter(null);
+                return;
+            }
+            if (!double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var number)
+                || !double.IsFinite(number))
+            {
+                throw new FormatException("请输入有限数值，未知时留空");
+            }
+            setter(number);
+        }));
+    }
+
+    public void Boolean(string label, bool value, Action<bool> setter, string help = "")
+    {
+        Add(new(label, value ? "是" : "否", help, text => setter(text == "是"), ["否", "是"]));
+    }
+
+    public void Source(string label, Origin value, Action<Origin> setter)
+    {
+        var choices = Enum.GetValues<Origin>().Select(Labels.Source).ToArray();
+        Add(new(label, Labels.Source(value), "声明实测不等于软件认证其测量质量", text =>
+        {
+            setter(Enum.GetValues<Origin>().Single(x => Labels.Source(x) == text));
+        }, choices));
+    }
+
+    public void OrderType(OrderKind value, Action<OrderKind> setter)
+    {
+        var choices = Enum.GetValues<OrderKind>().Select(Labels.Kind).ToArray();
+        Add(new("阶次类型", Labels.Kind(value), "叶片通过倍频的有效阶次为叶片数乘以倍数", text =>
+        {
+            setter(Enum.GetValues<OrderKind>().Single(x => Labels.Kind(x) == text));
+        }, choices));
+    }
+
+    public void CheckStatus(CheckState value, Action<CheckState> setter)
+    {
+        var choices = Enum.GetValues<CheckState>().Select(Labels.State).ToArray();
+        Add(new("验证状态", Labels.State(value), "已记录证据时必须填写证据内容", text =>
+        {
+            setter(Enum.GetValues<CheckState>().Single(x => Labels.State(x) == text));
+        }, choices));
+    }
+
+    public void Apply()
+    {
+        foreach (var field in Fields)
+        {
+            field.Apply();
+        }
+    }
+}
+
+===== src/Blower.Desktop/ViewModels/ObservableObject.cs =====
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows.Input;
+
+namespace Blower.Desktop.ViewModels;
+
+public abstract class ObservableObject : INotifyPropertyChanged
+{
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    protected void Raise([CallerMemberName] string? property = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
+    }
+
+    protected bool Set<T>(ref T storage, T value, [CallerMemberName] string? property = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(storage, value))
+        {
+            return false;
+        }
+        storage = value;
+        Raise(property);
+        return true;
+    }
+}
+
+public sealed class RelayCommand(Action execute, Func<bool>? available = null) : ICommand
+{
+    public event EventHandler? CanExecuteChanged;
+
+    public bool CanExecute(object? parameter)
+    {
+        return available?.Invoke() ?? true;
+    }
+
+    public void Execute(object? parameter)
+    {
+        execute();
+    }
+
+    public void Refresh()
+    {
+        CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+    }
+}
+
+===== src/Blower.Desktop/ViewModels/WorkspaceAnalysis.cs =====
+using System.IO;
+using Blower.Core.Analysis;
+using Blower.Core.Domain;
+using Blower.Core.IO;
+using Blower.Core.Operations;
+using Blower.Desktop.Services;
+
+namespace Blower.Desktop.ViewModels;
+
+public sealed partial class WorkspaceViewModel
+{
+    public string StudyBands { get; set; } = "5,20,40";
+    public string StudyTolerances { get; set; } = "0,20,50";
+    private string csvKind = "gears";
+    private string csvText = "";
+    private string previewText = "";
+    public CsvPreview? Preview { get; private set; }
+    public string[] CsvKinds { get; } = ["gears", "modes"];
+    public string CsvKind
+    {
+        get => csvKind;
+        set
+        {
+            if (Set(ref csvKind, value))
+            {
+                Preview = null;
+                Raise(nameof(PreviewStatus));
+                RefreshRows();
+            }
+        }
+    }
+    public string CsvText
+    {
+        get => csvText;
+        set
+        {
+            if (Set(ref csvText, value))
+            {
+                Preview = null;
+                Raise(nameof(PreviewStatus));
+                RefreshRows();
+            }
+        }
+    }
+    public string PreviewStatus => Preview == null ? "尚未预检。gears 表头：name,rpm,fixed；modes 表头：name,frequency_hz,damping_ratio,source" :
+        Preview.Valid ? $"预检有效：{Preview.Gears.Count} 挡位，{Preview.Modes.Count} 模态。应用时再次核对输入和项目。" :
+        $"预检失败：{Preview.Problems.Count} 项问题；行号 0 表示完整项目约束。";
+
+    private async Task WorkAsync(string title, Func<Project, object> work, Action<object> apply)
+    {
+        if (busy || !LeaveEditor())
+        {
+            return;
+        }
+        busy = true;
+        Raise(nameof(Busy));
+        Message(title + "进行中…");
+        try
+        {
+            var snapshot = ProjectCodec.Clone(Project);
+            var hash = ProjectCodec.InputHash(snapshot);
+            var result = await Task.Run(() => work(snapshot));
+            if (hash != ProjectCodec.InputHash(Project))
+            {
+                throw new InvalidOperationException("计算期间输入变化，结果已丢弃，请重新运行");
+            }
+            apply(result);
+            RefreshRows();
+            RefreshChart();
+            Raise(nameof(ResultStatus));
+            Raise(nameof(ScanStatus));
+            Raise(nameof(ComparisonStatus));
+            Message(title + "完成。" + Software.Boundary);
+        }
+        catch (Exception e) when (e is InvalidOperationException or IOException or ArgumentException)
+        {
+            Message(title + "失败：" + e.Message, true);
+        }
+        finally
+        {
+            busy = false;
+            Raise(nameof(Busy));
+            RefreshCommands();
+        }
+    }
+
+    private Task CalculateAsync()
+    {
+        return WorkAsync("交叉与挡位接近计算", p => Engine.Run(p), x => Result = (AnalysisResult)x);
+    }
+
+    private Task ScanAsync()
+    {
+        var id = ActivePlan?.Id ?? throw new InvalidOperationException("先选择方案");
+        return WorkAsync("约束扫描", p => SpeedScanner.Scan(p, id), x => Scan = (ScanResult)x);
+    }
+
+    private Task StudyAsync()
+    {
+        var id = ActivePlan?.Id ?? throw new InvalidOperationException("先选择方案");
+        var widths = StudyBands;
+        var tolerances = StudyTolerances;
+        return WorkAsync("规则敏感性试算", p => RuleStudy.Run(p, id, widths, tolerances), x => Study = (RuleStudyResult)x);
+    }
+
+    private void AcceptScan()
+    {
+        if (!LeaveEditor())
+        {
+            return;
+        }
+        var scan = Scan ?? throw new InvalidOperationException("先运行扫描");
+        if (dialogs.Confirm("将扫描结果建立为独立候选方案？仍需核对风量、效率和实测响应。"))
+        {
+            Change("接纳扫描候选", p => ProjectCommands.ApplyScan(p, scan));
+        }
+    }
+
+    private AnalysisResult CurrentResult()
+    {
+        if (!LeaveEditor())
+        {
+            throw new InvalidOperationException("请先处理属性草稿");
+        }
+        if (Result == null || Result.InputHash != ProjectCodec.InputHash(Project))
+        {
+            throw new InvalidOperationException("没有有效计算结果，请先执行计算");
+        }
+        return Result;
+    }
+
+    private void Compare()
+    {
+        var result = CurrentResult();
+        var baseline = ActivePlan?.Id ?? throw new InvalidOperationException("请选择基准方案");
+        var target = ComparePlan?.Id ?? throw new InvalidOperationException("请选择目标方案");
+        Comparison = Comparisons.Compare(Project, result, baseline, target);
+        RefreshRows();
+        Raise(nameof(ComparisonStatus));
+        Message(Comparison.EqualGearCount ? "比较完成，差值为目标减基准。" : "比较完成；挡位数量不同，缺失位置不计算差值。");
+    }
+
+    private void GenerateChecks()
+    {
+        var result = CurrentResult();
+        var id = ActivePlan?.Id ?? throw new InvalidOperationException("请选择方案");
+        Change("生成验证清单", p => ProjectCommands.GenerateChecks(p, result, id), false);
+    }
+
+    private void ReadCsv()
+    {
+        var path = dialogs.OpenCsv();
+        if (path != null)
+        {
+            CsvText = DesktopFiles.ReadCsv(path);
+            Message("CSV 已读取到预检区，尚未修改项目：" + path);
+        }
+    }
+
+    private void PreviewCsv()
+    {
+        if (!LeaveEditor())
+        {
+            return;
+        }
+        if (CsvText.Length > 1024 * 1024)
+        {
+            throw new InvalidDataException("CSV 超过 1MiB 预检上限");
+        }
+        Preview = CsvExchange.Preview(CsvText, CsvKind, Project);
+        previewText = CsvText;
+        RefreshRows();
+        Raise(nameof(PreviewStatus));
+        Message(PreviewStatus, !Preview.Valid);
+    }
+
+    private void ApplyCsv()
+    {
+        if (!LeaveEditor())
+        {
+            return;
+        }
+        var preview = Preview;
+        if (preview == null || !preview.Valid || previewText != CsvText || preview.Kind != CsvKind
+            || preview.InputHash != ProjectCodec.InputHash(Project))
+        {
+            throw new InvalidOperationException("预检缺失、无效或已过期，请重新预检");
+        }
+        var checkedAgain = CsvExchange.Preview(CsvText, CsvKind, Project);
+        if (!checkedAgain.Valid)
+        {
+            throw new InvalidOperationException("重新预检失败，请修正数据");
+        }
+        Change("应用CSV", p =>
+        {
+            if (preview.Kind == "gears")
+            {
+                p.Plans.Add(new() { Name = "CSV方案 " + (p.Plans.Count + 1), Gears = checkedAgain.Gears.ToList() });
+            }
+            else
+            {
+                p.Modes.AddRange(checkedAgain.Modes);
+            }
+        });
+        Preview = null;
+        RefreshRows();
+        Raise(nameof(PreviewStatus));
+    }
+
+    private void ExportTemplate()
+    {
+        Export("csv", CsvKind == "gears" ? Exports.GearTemplate(ActivePlan) : Exports.ModeTemplate(Project));
+    }
+
+    private void Export(string extension, string content)
+    {
+        var path = dialogs.ExportPath(Project.Name, extension);
+        if (path == null)
+        {
+            return;
+        }
+        DesktopFiles.WriteAtomic(path, content, extension == "csv");
+        Message("导出成功：" + path);
+    }
+
+    private void ExportResult(string extension, Func<Project, AnalysisResult, string> produce)
+    {
+        var result = CurrentResult();
+        Export(extension, produce(Project, result));
+    }
+
+    private void ExportReport()
+    {
+        var result = CurrentResult();
+        var id = ActivePlan?.Id ?? throw new InvalidOperationException("请选择方案");
+        Export("html", Exports.Report(Project, result, id));
+    }
+
+    private void ExportSvg()
+    {
+        var result = CurrentResult();
+        var chart = ChartModel.Create(Project, result, ActivePlan?.Id ?? "", ChartCeiling);
+        Export("svg", chart.ToSvg(Project.Name, Labels.Source(Project.Origin)));
+    }
+
+    private void ExportStudy()
+    {
+        if (Study == null)
+        {
+            throw new InvalidOperationException("先运行规则敏感性试算");
+        }
+        Export("csv", RuleStudy.ToCsv(Project, Study));
+    }
+
+    private void ExportComparison()
+    {
+        Compare();
+        var comparison = Comparison!;
+        var rows = new List<string>
+        {
+            CsvExchange.Row("software", "version", "project", "source", "input_sha256", "baseline", "target",
+                "position", "baseline_rpm", "target_rpm", "delta_rpm", "baseline_contacts", "target_contacts", "note")
+        };
+        foreach (var row in comparison.Rows)
+        {
+            rows.Add(CsvExchange.Row(Software.Name, Software.Version, Project.Name, Labels.Source(Project.Origin),
+                ProjectCodec.InputHash(Project), comparison.Baseline, comparison.Target, row.Position.ToString(),
+                row.BaselineRpm.HasValue ? CsvExchange.Number(row.BaselineRpm.Value) : "",
+                row.TargetRpm.HasValue ? CsvExchange.Number(row.TargetRpm.Value) : "",
+                row.DeltaRpm.HasValue ? CsvExchange.Number(row.DeltaRpm.Value) : "",
+                row.BaselineContacts?.ToString(), row.TargetContacts?.ToString(), row.Note));
+        }
+        Export("csv", string.Join(Environment.NewLine, rows));
+    }
+}
+
+===== src/Blower.Desktop/ViewModels/WorkspaceCommands.cs =====
+namespace Blower.Desktop.ViewModels;
+
+public sealed partial class WorkspaceViewModel
+{
+    public RelayCommand PlanPropertiesCommand { get; }
+    public RelayCommand AddPlanCommand { get; }
+    public RelayCommand AddGearCommand { get; }
+    public RelayCommand LibrarySaveCommand { get; }
+    public RelayCommand LibraryOpenCommand { get; }
+    public RelayCommand LibraryBackupCommand { get; }
+    public RelayCommand NewCommand { get; }
+    public RelayCommand OpenCommand { get; }
+    public RelayCommand SaveCommand { get; }
+    public RelayCommand SaveAsCommand { get; }
+    public RelayCommand DemoCommand { get; }
+    public RelayCommand DuplicateProjectCommand { get; }
+    public RelayCommand UndoCommand { get; }
+    public RelayCommand RedoCommand { get; }
+    public RelayCommand ApplyCommand { get; }
+    public RelayCommand ResetEditorCommand { get; }
+    public RelayCommand AddCommand { get; }
+    public RelayCommand DeleteCommand { get; }
+    public RelayCommand CopyPlanCommand { get; }
+    public RelayCommand ArchiveCommand { get; }
+    public RelayCommand ComputeCommand { get; }
+    public RelayCommand ScanCommand { get; }
+    public RelayCommand AcceptScanCommand { get; }
+    public RelayCommand CompareCommand { get; }
+    public RelayCommand StudyCommand { get; }
+    public RelayCommand GenerateChecksCommand { get; }
+    public RelayCommand ImportReadCommand { get; }
+    public RelayCommand PreviewCommand { get; }
+    public RelayCommand ImportApplyCommand { get; }
+    public RelayCommand TemplateCommand { get; }
+    public RelayCommand ExportContactsCommand { get; }
+    public RelayCommand ExportCrossingsCommand { get; }
+    public RelayCommand ExportReportCommand { get; }
+    public RelayCommand ExportSvgCommand { get; }
+    public RelayCommand ExportChecksCommand { get; }
+    public RelayCommand ExportStudyCommand { get; }
+    public RelayCommand ExportComparisonCommand { get; }
+}
+
+===== src/Blower.Desktop/ViewModels/WorkspaceEditor.cs =====
+using System.IO;
+using Blower.Core.Domain;
+using Blower.Core.IO;
+using Blower.Core.Operations;
+using Blower.Desktop.Services;
+
+namespace Blower.Desktop.ViewModels;
+
+public sealed partial class WorkspaceViewModel
+{
+    private string editorKind = "";
+    private string editorId = "";
+
+    private void BuildEditor()
+    {
+        draft = ProjectCodec.Clone(Project);
+        editorKind = section;
+        editorId = "";
+        Form.Clear("属性编辑 · 应用后生效");
+        switch (section)
+        {
+            case "project":
+                Form.Text("项目名称", draft.Name, x => draft.Name = x);
+                Form.Text("负责人", draft.Owner, x => draft.Owner = x);
+                Form.Text("车辆 / 平台", draft.Vehicle, x => draft.Vehicle = x);
+                Form.Source("来源性质", draft.Origin, x => draft.Origin = x);
+                Form.Text("来源说明", draft.Source, x => draft.Source = x, "填写文件编号、工况、安装条件及来源单位");
+                Form.Text("项目备注", draft.Notes, x => draft.Notes = x);
+                break;
+            case "settings":
+                SettingsEditor(draft.Settings);
+                break;
+            case "orders" when selectedRow is Excitation order:
+                editorId = order.Id;
+                var o = draft.Orders.Single(x => x.Id == editorId);
+                Form.Text("名称", o.Name, x => o.Name = x);
+                Form.OrderType(o.Kind, x => o.Kind = x);
+                Form.Number("阶次 / 倍数", o.Multiplier, x => o.Multiplier = x, "0.1～100；叶片倍频时乘以叶片数");
+                Form.Boolean("启用", o.Enabled, x => o.Enabled = x);
+                Form.Text("激励存在性依据", o.Evidence, x => o.Evidence = x);
+                break;
+            case "modes" when selectedRow is Mode mode:
+                editorId = mode.Id;
+                var m = draft.Modes.Single(x => x.Id == editorId);
+                Form.Text("名称", m.Name, x => m.Name = x);
+                Form.Number("模态频率 Hz", m.FrequencyHz, x => m.FrequencyHz = x, "0.1～50000Hz");
+                Form.NullableNumber("阻尼比 ζ", m.DampingRatio, x => m.DampingRatio = x, "0～0.1；未知留空，0表示已知为零");
+                Form.Number("附加半宽 Hz", m.ExtraBandHz, x => m.ExtraBandHz = x, "0～5000Hz；不与其他半宽相加");
+                Form.Boolean("启用", m.Enabled, x => m.Enabled = x);
+                Form.Source("来源性质", m.Origin, x => m.Origin = x);
+                Form.Text("来源说明", m.Source, x => m.Source = x);
+                Form.Text("结构位置 / 边界", m.Location, x => m.Location = x);
+                break;
+            case "plans" when selectedRow is Gear gear:
+                editorKind = "gear";
+                editorId = gear.Id;
+                var g = draft.Plans.SelectMany(x => x.Gears).Single(x => x.Id == editorId);
+                Form.Text("挡位名称", g.Name, x => g.Name = x);
+                Form.Number("转速 rpm", g.Rpm, x => g.Rpm = x, "在分析范围内；挡位按转速递增并满足最小间距");
+                Form.Boolean("扫描固定此挡", g.Fixed, x => g.Fixed = x);
+                Form.Text("挡位备注", g.Notes, x => g.Notes = x);
+                break;
+            case "plans" when ActivePlan != null:
+                editorKind = "plan";
+                editorId = ActivePlan.Id;
+                var p = draft.Plans.Single(x => x.Id == editorId);
+                Form.Text("方案名称", p.Name, x => p.Name = x);
+                Form.Text("方案备注", p.Notes, x => p.Notes = x);
+                Form.Boolean("锁定方案", p.Locked, x => p.Locked = x, "锁定后禁止挡位修改；仍可复制为新方案");
+                break;
+            case "checks" when selectedRow is VerificationTask task:
+                editorId = task.Id;
+                var t = draft.Checks.Single(x => x.Id == editorId);
+                Form.Text("验证任务", t.Title, x => t.Title = x);
+                Form.Text("方法与工况", t.Method, x => t.Method = x);
+                Form.Text("负责人", t.Owner, x => t.Owner = x);
+                Form.CheckStatus(t.State, x => t.State = x);
+                Form.Text("证据位置与结论", t.Evidence, x => t.Evidence = x, "写明记录编号、文件位置、测量条件与结论；软件不认证证据真实性");
+                break;
+        }
+        Raise(nameof(HasEditor));
+        Raise(nameof(Title));
+    }
+
+    private void SettingsEditor(DesignSettings s)
+    {
+        Form.Integer("叶片数", s.Blades, x => s.Blades = x, "1～200片");
+        Form.Number("最低转速 rpm", s.MinRpm, x => s.MinRpm = x, "0～50000rpm，低于上限");
+        Form.Number("最高转速 rpm", s.MaxRpm, x => s.MaxRpm = x, "1～50000rpm，高于下限");
+        Form.Number("绝对半宽 Hz", s.AbsoluteBandHz, x => s.AbsoluteBandHz = x, "0～5000Hz；默认5Hz为可修改工程假设");
+        Form.Number("相对半宽 %", s.RelativeBandPercent, x => s.RelativeBandPercent = x, "0～30%，默认3%");
+        Form.Boolean("计入阻尼近似", s.UseDamping, x => s.UseDamping = x, "用 ζ×模态频率作为近似半宽；未知阻尼不计");
+        Form.Number("转速容差 rpm", s.SpeedToleranceRpm, x => s.SpeedToleranceRpm = x, "0～1000rpm，默认±20rpm");
+        Form.Number("最小挡位间距 rpm", s.MinimumGapRpm, x => s.MinimumGapRpm = x, "1～5000rpm；适用于全部方案");
+        Form.Number("扫描步长 rpm", s.ScanStepRpm, x => s.ScanStepRpm = x, "1～500rpm，网格以0rpm为原点");
+        Form.Number("扫描窗口 ±rpm", s.ScanWindowRpm, x => s.ScanWindowRpm = x, "0～3000rpm；不超出分析范围");
+        Form.Number("偏移权重", s.ShiftWeight, x => s.ShiftWeight = x, "0～1；局部代价=接近组合数+权重×归一化偏移");
+    }
+
+    private void ApplyEditor()
+    {
+        if (!Form.Changed)
+        {
+            Message("属性没有变化。");
+            return;
+        }
+        if (Project.Archived)
+        {
+            throw new InvalidOperationException("项目已归档，请先解除归档");
+        }
+        if (editorKind == "gear" && Project.Plans.Single(x => x.Gears.Any(g => g.Id == editorId)).Locked)
+        {
+            throw new InvalidOperationException("方案已锁定；取消选中挡位，解除方案锁定后再编辑");
+        }
+        Form.Apply();
+        Validation.RequireValid(draft);
+        var edited = ProjectCodec.Clone(draft);
+        var id = editorId;
+        var kind = editorKind;
+        Change("编辑" + SectionTitle, p =>
+        {
+            switch (kind)
+            {
+                case "project":
+                    p.Name = edited.Name;
+                    p.Owner = edited.Owner;
+                    p.Vehicle = edited.Vehicle;
+                    p.Origin = edited.Origin;
+                    p.Source = edited.Source;
+                    p.Notes = edited.Notes;
+                    break;
+                case "settings":
+                    p.Settings = edited.Settings;
+                    break;
+                case "orders":
+                    p.Orders[p.Orders.FindIndex(x => x.Id == id)] = edited.Orders.Single(x => x.Id == id);
+                    break;
+                case "modes":
+                    p.Modes[p.Modes.FindIndex(x => x.Id == id)] = edited.Modes.Single(x => x.Id == id);
+                    break;
+                case "gear":
+                    var plan = p.Plans.Single(x => x.Gears.Any(g => g.Id == id));
+                    plan.Gears[plan.Gears.FindIndex(x => x.Id == id)] = edited.Plans.SelectMany(x => x.Gears).Single(x => x.Id == id);
+                    break;
+                case "plan":
+                    var target = p.Plans.Single(x => x.Id == id);
+                    var source = edited.Plans.Single(x => x.Id == id);
+                    target.Name = source.Name;
+                    target.Notes = source.Notes;
+                    target.Locked = source.Locked;
+                    break;
+                case "checks":
+                    var check = edited.Checks.Single(x => x.Id == id);
+                    check.Updated = DateTimeOffset.UtcNow;
+                    p.Checks[p.Checks.FindIndex(x => x.Id == id)] = check;
+                    break;
+            }
+        }, kind is not "project" and not "checks" and not "plan");
+    }
+
+    private bool LeaveEditor()
+    {
+        if (!Form.Changed)
+        {
+            return true;
+        }
+        var decision = dialogs.Unsaved("当前属性有未应用修改。是：校验并应用；否：放弃属性修改；取消：继续编辑。");
+        if (decision == SaveDecision.Cancel)
+        {
+            return false;
+        }
+        if (decision == SaveDecision.Save)
+        {
+            try
+            {
+                ApplyEditor();
+            }
+            catch (Exception e) when (e is InvalidDataException or InvalidOperationException)
+            {
+                Message(e.Message, true);
+                return false;
+            }
+        }
+        else
+        {
+            BuildEditor();
+        }
+        return true;
+    }
+
+    private void ResetEditor()
+    {
+        if (!Form.Changed || dialogs.Confirm("放弃尚未应用的属性修改？"))
+        {
+            BuildEditor();
+        }
+    }
+
+    public bool CanClose()
+    {
+        if (busy)
+        {
+            Message("计算正在进行，请等待结束再关闭。", true);
+            return false;
+        }
+        if (!LeaveEditor())
+        {
+            return false;
+        }
+        if (!Dirty)
+        {
+            return true;
+        }
+        return dialogs.Unsaved("项目有未保存修改。是：保存项目；否：放弃修改；取消：返回工作台。") switch
+        {
+            SaveDecision.Save => Save(false),
+            SaveDecision.Discard => true,
+            _ => false
+        };
+    }
+
+    private void New()
+    {
+        if (CanClose())
+        {
+            Load(new Project());
+            Message("已建立空白项目。示例通过独立入口载入。");
+        }
+    }
+
+    private void Open()
+    {
+        if (!CanClose())
+        {
+            return;
+        }
+        var path = dialogs.OpenProject();
+        if (path == null)
+        {
+            return;
+        }
+        var opened = DesktopFiles.Open(path);
+        Load(opened.Project, opened.Path, opened.Token, true);
+        Message("已打开并校验：" + path);
+    }
+
+    private void LoadDemo()
+    {
+        if (CanClose())
+        {
+            Load(Demo.Create());
+            Message("已载入独立模拟示例；来源、界面和导出持续标明模拟数据。");
+        }
+    }
+
+    private void DuplicateProject()
+    {
+        if (LeaveEditor())
+        {
+            var copy = ProjectCommands.Duplicate(Project);
+            if (CanClose())
+            {
+                Load(copy);
+                Message("已建立独立副本，原文件保持原修订。");
+            }
+        }
+    }
+
+    private void Load(Project project, string path = "", string token = "", bool saved = false)
+    {
+        session.Load(project, saved: saved);
+        filePath = path;
+        diskToken = token;
+        savedContent = saved ? ProjectCodec.Encode(Project) : "";
+        selectedRow = null;
+        activePlan = null;
+        Result = null;
+        Scan = null;
+        Study = null;
+        Comparison = null;
+        Preview = null;
+        previewText = "";
+        Rebuild();
+    }
+
+    private bool Save(bool saveAs)
+    {
+        try
+        {
+            if (!LeaveEditor())
+            {
+                return false;
+            }
+            var path = saveAs || string.IsNullOrEmpty(filePath) ? dialogs.SaveProject(Project.Name) : filePath;
+            if (path == null)
+            {
+                return false;
+            }
+            var sameFile = string.Equals(Path.GetFullPath(path), filePath, StringComparison.OrdinalIgnoreCase);
+            var token = DesktopFiles.Save(Project, path, sameFile ? diskToken : null);
+            filePath = Path.GetFullPath(path);
+            diskToken = token;
+            savedContent = ProjectCodec.Encode(Project);
+            Rebuild();
+            Message("保存成功，已重开核对：" + filePath);
+            return true;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or InvalidOperationException)
+        {
+            Message("保存失败：" + e.Message, true);
+            return false;
+        }
+    }
+
+    private void History(bool redo)
+    {
+        if (!LeaveEditor())
+        {
+            return;
+        }
+        if (redo)
+        {
+            session.Redo();
+        }
+        else
+        {
+            session.Undo();
+        }
+        selectedRow = null;
+        Result = null;
+        Scan = null;
+        Study = null;
+        Comparison = null;
+        Rebuild();
+        Message(redo ? "已重做；累计审计保留。" : "已撤销；累计审计保留。");
+    }
+
+    private void ToggleArchive()
+    {
+        if (LeaveEditor() && dialogs.Confirm(Project.Archived ? "解除项目归档以继续编辑？" : "归档项目将禁止编辑；仍可打开、计算和导出。继续？"))
+        {
+            Change(Project.Archived ? "解除归档" : "归档", p => p.Archived = !p.Archived, false, true);
+        }
+    }
+
+    private void Add()
+    {
+        if (!LeaveEditor())
+        {
+            return;
+        }
+        switch (section)
+        {
+            case "orders":
+                Change("新增阶次", p =>
+                {
+                    var used = p.Orders.Where(x => x.Enabled).Select(x => x.EffectiveOrder(p.Settings.Blades)).ToHashSet();
+                    var q = Enumerable.Range(1, 100).FirstOrDefault(x => !used.Contains(x));
+                    p.Orders.Add(new() { Multiplier = q == 0 ? 1 : q, Enabled = q != 0, Name = "轴阶次 " + q });
+                });
+                break;
+            case "modes":
+                Change("新增模态", p => p.Modes.Add(new() { Origin = p.Origin }));
+                break;
+            case "plans":
+                if (ActivePlan == null || dialogs.Confirm("是：新增独立方案；否：向当前方案增加挡位。"))
+                {
+                    Change("新增方案", p => p.Plans.Add(new() { Name = "方案 " + (p.Plans.Count + 1) }));
+                }
+                else
+                {
+                    var id = ActivePlan.Id;
+                    Change("新增挡位", p =>
+                    {
+                        var plan = p.Plans.Single(x => x.Id == id);
+                        if (plan.Locked)
+                        {
+                            throw new InvalidOperationException("方案已锁定");
+                        }
+                        var rpm = plan.Gears.Count == 0 ? p.Settings.MinRpm : plan.Gears[^1].Rpm + p.Settings.MinimumGapRpm;
+                        plan.Gears.Add(new() { Name = "挡位 " + (plan.Gears.Count + 1), Rpm = rpm });
+                    });
+                }
+                break;
+            default:
+                Message("请在阶次、模态或挡位方案中新增对象。", true);
+                break;
+        }
+    }
+
+    private void Delete()
+    {
+        if (!LeaveEditor())
+        {
+            return;
+        }
+        var kind = selectedRow switch
+        {
+            Excitation => "order",
+            Mode => "mode",
+            Gear => "gear",
+            VerificationTask => "check",
+            _ => section == "plans" && ActivePlan != null ? "plan" : ""
+        };
+        var id = selectedRow switch
+        {
+            Excitation x => x.Id,
+            Mode x => x.Id,
+            Gear x => x.Id,
+            VerificationTask x => x.Id,
+            _ => ActivePlan?.Id ?? ""
+        };
+        if (kind.Length == 0)
+        {
+            Message("先选中需要删除的对象；删除方案时先取消挡位选择。", true);
+            return;
+        }
+        if (dialogs.Confirm("删除所选对象？关联验证记录存在时会阻止删除，可撤销此操作。"))
+        {
+            Change("删除对象", p => ProjectCommands.RemoveObject(p, kind, id), kind != "check");
+        }
+    }
+
+    private void CopyPlan()
+    {
+        if (LeaveEditor() && ActivePlan != null)
+        {
+            var id = ActivePlan.Id;
+            Change("复制方案", p =>
+            {
+                var source = p.Plans.Single(x => x.Id == id);
+                p.Plans.Add(ProjectCommands.CopyPlan(source, source.Name + " · 副本"));
+            });
+        }
+    }
+}
+
+===== src/Blower.Desktop/ViewModels/WorkspaceHelp.cs =====
+namespace Blower.Desktop.ViewModels;
+
+public sealed partial class WorkspaceViewModel
+{
+    public string HelpText => """
+软件介绍
+面向汽车空调鼓风机工程师，用转速、叶片数、候选激励阶次和结构模态，在设计阶段核对挡位是否落入频率接近区域，并形成待验证的避让方案。没有实测信号输入，不计算声压、响应幅值、风量或效率，不提供噪声根因诊断。
+
+完整工作流程
+1. 文件→新建空白项目。普通启动为空白；文件→载入独立模拟示例用于核对流程。替换项目会提示未保存修改。
+2. 项目与来源填写名称、负责人、平台、数据性质和来源，点击应用属性。
+3. 电机与工程规则填写叶片数、分析转速、敏感半宽、容差及扫描约束，应用属性。默认值为可修改工程假设，不是行业限值。
+4. 激励阶次新增对象，选中行后修改属性。轴阶次直接使用倍数；叶片通过倍频的有效阶次=叶片数×倍数。启用有效阶次不可重复。
+5. 模态库新增模态，填写频率、来源和位置；未知阻尼留空，0表示已知为零。阻尼比以小数填写，例如0.02。
+6. 挡位方案新增对象建立方案；点击新增挡位向当前方案追加挡位。挡位按转速递增且满足间距。点击方案属性可编辑方案名称与锁定。复制方案建立新的挡位标识。
+7. 按F5计算。查看转速频率图、交叉区间、接近明细。红虚线表示有接近，绿虚线表示无接近，紫带为模态敏感区。明细同时显示状态文字。
+8. 约束扫描选择方案并运行，核对候选和固定挡，再接纳为新方案。扫描仍需验证风量、效率与响应。
+9. 方案比较选择基准和目标，点击比较。差值为目标减基准；按挡位序号匹配，缺挡位不计算差值。规则敏感性在副本上试算，不改变项目规则。
+10. 生成验证任务，在验证清单填写方法、负责人、证据及状态。已记录证据必须填写内容；输入变化后完成任务变为需复核。
+11. Ctrl+S保存.blowerproj。软件保存后重开核对，覆盖前保留.bak；关闭前处理属性草稿及未保存修改。原始输入内嵌，移动文件即可重开。
+12. 导出菜单输出CSV、SVG或自包含HTML报告，状态栏显示目标路径。HTML为成果文档，程序运行不启动服务或浏览器。
+
+公式与独立核对
+f=q×n/60，n为rpm，q为有效阶次，f为Hz。精确交叉转速=60×模态频率/q。
+B=max(绝对半宽,fn×相对百分比/100,启用阻尼时ζ×fn,附加半宽)。阻尼项为轻阻尼孤立模态近似，不用于估算幅值。
+模态区间[max(0,fn−B),fn+B]；激励区间[max(0,q×(n−T)/60),q×(n+T)/60]。T为转速容差。
+净距C=max(模态下界−激励上界,激励下界−模态上界)。C≤1e−8Hz表示潜在接近；负值为区间重叠，不是风险概率。
+模拟核对：40叶片、1倍叶片频率、900rpm→600Hz。600Hz模态、阻尼0.02、默认5Hz及3%下半宽18Hz；敏感转速853～947rpm。947rpm触边接近，947.01rpm在外。
+扫描局部代价=接近组合数+权重×abs(候选−原rpm)/max(1,窗口rpm)。动态规划满足最小间距；固定挡只有原点，不能保证连续最优。
+
+输入与CSV
+叶片1～200；转速0～50000rpm；倍数0.1～100；模态0.1～50000Hz；阻尼0～0.1或空；半宽0～5000Hz、相对0～30%；容差0～1000rpm；间距1～5000rpm；步长1～500rpm；窗口0～3000rpm；权重0～1。
+最多24阶次、100模态、20方案、每方案24挡位，每挡最多603扫描候选。
+CSV使用UTF-8、英文逗号及小数点。gears表头name,rpm,fixed，fixed为true/false；modes表头name,frequency_hz,damping_ratio,source，未知阻尼留空。先读取、预检，再整批应用。挡位导入新增方案，模态导入追加。行号0表示完整项目约束错误。
+来源：Manual=人工设计；Simulation=模拟；DeclaredMeasurement=用户声明实测（未认证）。验证：Pending=待验证；Scheduled=已安排；Completed=已记录证据；Recheck=需复核。
+
+错误恢复
+属性错误：按提示修正对应字段再应用，或还原草稿。间距错误：检查全部方案相邻转速和最小间距。无结果：确认启用阶次、模态和含挡位方案并计算；关闭仅显示潜在接近可查看范围外组合。
+扫描无解：核对窗口、步长、固定挡和间距。文件冲突：另存为新文件保留当前会话，再打开原文件核对。损坏文件可尝试同目录.bak。删除被阻止：先处理关联验证任务。归档项目先解除归档。
+
+验证范围
+本交付在Linux上进行Windows目标编译及跨平台核心测试。WPF实际启动、窗口缩放、绑定、文件对话框和真实截图须在Windows执行；不能用图形导出冒充桌面截图。工程效果须经试验复核。
+""";
+}
+
+===== src/Blower.Desktop/ViewModels/WorkspaceLibrary.cs =====
+using System.IO;
+using Blower.Core.Domain;
+using Blower.Core.IO;
+using Blower.Desktop.Services;
+
+namespace Blower.Desktop.ViewModels;
+
+public sealed partial class WorkspaceViewModel
+{
+    private ProjectStore? library;
+    private string libraryToken = "";
+    private string libraryId = "";
+    public string LibraryPath => Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "BlowerResonance", "Projects");
+    private ProjectStore Library => library ??= new ProjectStore(LibraryPath);
+
+    private void SaveLibrary()
+    {
+        if (!LeaveEditor())
+        {
+            return;
+        }
+        var saved = Library.Save(Project, libraryId == Project.Id ? libraryToken : "");
+        libraryToken = saved.Token;
+        libraryId = Project.Id;
+        filePath = saved.Path;
+        diskToken = saved.Token;
+        savedContent = ProjectCodec.Encode(Project);
+        Rebuild();
+        Message("项目库保存成功：" + saved.Path);
+    }
+
+    private void OpenLibrary(bool backup)
+    {
+        if (SelectedRow is not StoredProject selected)
+        {
+            throw new InvalidOperationException("先在本地项目库选中项目");
+        }
+        if (!CanClose())
+        {
+            return;
+        }
+        var opened = Library.Open(selected.Id, backup);
+        if (backup)
+        {
+            Load(opened.Project);
+            libraryId = selected.Id;
+            libraryToken = opened.Token;
+            Message("已从真实备份恢复到未保存草稿；原项目仍在磁盘，核对后另存或保存到项目库。");
+        }
+        else
+        {
+            Load(opened.Project, opened.Path, opened.Token, true);
+            libraryId = selected.Id;
+            libraryToken = opened.Token;
+            Message("已打开本地项目库项目：" + opened.Path);
+        }
+    }
+
+    private void AddPlan()
+    {
+        if (!LeaveEditor())
+        {
+            return;
+        }
+        var newId = Software.Id();
+        Change("新增方案", p => p.Plans.Add(new() { Id = newId, Name = "方案 " + (p.Plans.Count + 1) }));
+        ActivePlan = Project.Plans.Single(x => x.Id == newId);
+    }
+
+    private void AddGear()
+    {
+        if (!LeaveEditor())
+        {
+            return;
+        }
+        var id = ActivePlan?.Id ?? throw new InvalidOperationException("先新增或选择方案");
+        Change("新增挡位", p =>
+        {
+            var plan = p.Plans.Single(x => x.Id == id);
+            if (plan.Locked)
+            {
+                throw new InvalidOperationException("方案已锁定，请在方案属性解除锁定");
+            }
+            var rpm = plan.Gears.Count == 0 ? p.Settings.MinRpm : plan.Gears[^1].Rpm + p.Settings.MinimumGapRpm;
+            plan.Gears.Add(new() { Name = "挡位 " + (plan.Gears.Count + 1), Rpm = rpm });
+        });
+    }
+}
+
+===== src/Blower.Desktop/ViewModels/WorkspaceViewModel.cs =====
+using System.Collections;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.IO;
+using Blower.Core.Analysis;
+using Blower.Core.Domain;
+using Blower.Core.IO;
+using Blower.Core.Operations;
+using Blower.Desktop.Services;
+
+namespace Blower.Desktop.ViewModels;
+
+public sealed record WorkspaceNode(string Key, string Title, string Hint);
+public sealed record PropertyRow(string 项目, string 内容);
+
+public sealed partial class WorkspaceViewModel : ObservableObject
+{
+    private readonly IDesktopDialogs dialogs;
+    private readonly ProjectSession session = new();
+    private readonly List<RelayCommand> commands = [];
+    private Project draft = new();
+    private string savedContent = "";
+    private string diskToken = "";
+    private string filePath = "";
+    private string notice = "空白项目：先填写项目来源和规则，再添加阶次、模态与挡位方案。";
+    private bool error;
+    private bool busy;
+    private WorkspaceNode? selectedNode;
+    private object? selectedRow;
+    private SpeedPlan? activePlan;
+    private IEnumerable rows = Array.Empty<object>();
+    private string contactSearch = "";
+    private bool onlyNear = true;
+    private SpeedPlan? comparePlan;
+    private double? chartCeiling;
+    private string section = "project";
+
+    public WorkspaceViewModel(IDesktopDialogs dialogs)
+    {
+        this.dialogs = dialogs;
+        NewCommand = Command(New);
+        OpenCommand = Command(Open);
+        SaveCommand = Command(() => Save(false));
+        SaveAsCommand = Command(() => Save(true));
+        DemoCommand = Command(LoadDemo);
+        DuplicateProjectCommand = Command(DuplicateProject);
+        UndoCommand = Command(() => History(false), () => session.CanUndo && !busy);
+        RedoCommand = Command(() => History(true), () => session.CanRedo && !busy);
+        ApplyCommand = Command(ApplyEditor, () => !Project.Archived && !busy);
+        ResetEditorCommand = Command(ResetEditor);
+        AddCommand = Command(Add, () => !Project.Archived && !busy);
+        DeleteCommand = Command(Delete, () => !Project.Archived && !busy);
+        PlanPropertiesCommand = Command(() => SelectedRow = null);
+        AddPlanCommand = Command(() => AddPlan(), () => !Project.Archived && !busy);
+        AddGearCommand = Command(() => AddGear(), () => ActivePlan != null && !Project.Archived && !busy);
+        LibrarySaveCommand = Command(SaveLibrary);
+        LibraryOpenCommand = Command(() => OpenLibrary(false));
+        LibraryBackupCommand = Command(() => OpenLibrary(true));
+        CopyPlanCommand = Command(CopyPlan, () => ActivePlan != null && !Project.Archived && !busy);
+        ArchiveCommand = Command(ToggleArchive);
+        ComputeCommand = Command(() => _ = CalculateAsync(), () => !busy);
+        ScanCommand = Command(() => _ = ScanAsync(), () => !busy && ActivePlan != null);
+        AcceptScanCommand = Command(AcceptScan, () => !busy && !Project.Archived && Scan?.Feasible == true);
+        CompareCommand = Command(Compare);
+        StudyCommand = Command(() => _ = StudyAsync(), () => !busy && ActivePlan != null);
+        GenerateChecksCommand = Command(GenerateChecks, () => !busy && !Project.Archived);
+        ImportReadCommand = Command(ReadCsv);
+        PreviewCommand = Command(PreviewCsv);
+        ImportApplyCommand = Command(ApplyCsv, () => !busy && !Project.Archived);
+        TemplateCommand = Command(ExportTemplate);
+        ExportContactsCommand = Command(() => ExportResult("csv", Exports.Contacts));
+        ExportCrossingsCommand = Command(() => ExportResult("csv", Exports.Crossings));
+        ExportReportCommand = Command(ExportReport);
+        ExportSvgCommand = Command(ExportSvg);
+        ExportChecksCommand = Command(() => { if (LeaveEditor()) Export("csv", Exports.Checks(Project)); });
+        ExportStudyCommand = Command(ExportStudy);
+        ExportComparisonCommand = Command(ExportComparison);
+        Form.PropertyChanged += (_, _) => Raise(nameof(Title));
+        Nodes = new ObservableCollection<WorkspaceNode>
+        {
+            new("library", "本地项目库", "00 保存项目及恢复备份"),
+            new("project", "项目与来源", "01 设计对象与数据性质"),
+            new("settings", "电机与工程规则", "02 rpm、叶片、半宽与扫描约束"),
+            new("orders", "激励阶次", "03 轴阶次 / 叶片通过倍频"),
+            new("modes", "模态库", "04 结构频率、阻尼及来源"),
+            new("plans", "挡位方案", "05 独立方案及转速表"),
+            new("plot", "转速—频率图", "06 阶次线、模态区间与挡位"),
+            new("crossings", "交叉区间", "07 精确交叉及敏感转速范围"),
+            new("contacts", "接近明细", "08 挡位 / 阶次 / 模态组合"),
+            new("scan", "约束扫描", "09 固定挡位及最小间距"),
+            new("compare", "方案比较", "10 目标减基准，按挡位序号"),
+            new("study", "规则敏感性", "11 在副本上试算规则"),
+            new("checks", "验证清单", "12 证据和复核状态"),
+            new("review", "质量复核", "13 来源、阻尼及重叠提示"),
+            new("exchange", "CSV 预检", "14 先预检，再整批应用"),
+            new("audit", "修订记录", "15 可追溯的会话修改"),
+            new("help", "使用与计算口径", "16 公式、范围与完整示例")
+        };
+        session.Load(new Project());
+        selectedNode = Nodes.Single(x => x.Key == "project");
+        Rebuild();
+    }
+
+    public ObservableCollection<WorkspaceNode> Nodes { get; }
+    public EditorForm Form { get; } = new();
+    public Project Project => session.Current;
+    public IReadOnlyList<SpeedPlan> Plans => Project.Plans;
+    public AnalysisResult? Result { get; private set; }
+    public ScanResult? Scan { get; private set; }
+    public RuleStudyResult? Study { get; private set; }
+    public PlanComparison? Comparison { get; private set; }
+    public ChartModel? Chart { get; private set; }
+    public string Boundary => Software.Boundary;
+    public string SoftwareTitle => Software.Name + " " + Software.Version;
+    public string Title => SoftwareTitle + " — " + Project.Name + (Dirty || Form.Changed ? " *" : "");
+    public string FilePath => string.IsNullOrEmpty(filePath) ? "尚未保存到文件" : filePath;
+    public bool Dirty => ProjectCodec.Encode(Project) != savedContent;
+    public string SourceLabel => Labels.Source(Project.Origin) + (Project.Archived ? " · 已归档" : " · 编辑中");
+    public string RevisionLabel => $"修订 {Project.Revision} · {Project.Plans.Count} 方案 · {Project.Modes.Count} 模态";
+    public string SectionTitle => SelectedNode?.Title ?? "";
+    public string SectionHint => SelectedNode?.Hint ?? "";
+    public bool IsTable => section != "plot" && section != "help";
+    public bool IsPlot => section == "plot";
+    public bool IsHelp => section == "help";
+    public bool IsLibrary => section == "library";
+    public bool IsPlanEditor => section == "plans";
+    public bool IsPlans => section is "plans" or "scan" or "compare" or "study" or "plot" or "contacts";
+    public bool IsContacts => section == "contacts";
+    public bool IsScan => section == "scan";
+    public bool IsCompare => section == "compare";
+    public bool IsStudy => section == "study";
+    public bool IsChecks => section == "checks";
+    public bool IsExchange => section == "exchange";
+    public bool HasEditor => Form.Fields.Count > 0;
+    public bool Busy => busy;
+    public bool Error => error;
+    public string Notice => notice;
+    public string ResultStatus => Result == null ? "尚未计算" :
+        Result.InputHash != ProjectCodec.InputHash(Project) ? "结果已过期，请重新计算" :
+        $"计算有效 · {Result.Time.LocalDateTime:HH:mm:ss} · {Result.Contacts.Count} 组合";
+    public string ScanStatus => Scan?.Message ?? "尚未扫描。先选择包含挡位的方案。";
+    public string ComparisonStatus => Comparison == null ? "基准为当前方案，选择另一目标方案后比较。" :
+        $"{Comparison.Baseline} → {Comparison.Target}：接近组合 {Comparison.BaselineContacts} → {Comparison.TargetContacts}；接近挡位 {Comparison.BaselineNear} → {Comparison.TargetNear}。差异不代表声音改善。";
+    public IEnumerable Rows
+    {
+        get => rows;
+        private set => Set(ref rows, value);
+    }
+    public WorkspaceNode? SelectedNode
+    {
+        get => selectedNode;
+        set
+        {
+            if (value == selectedNode || value == null)
+            {
+                return;
+            }
+            if (!LeaveEditor())
+            {
+                Raise();
+                return;
+            }
+            selectedNode = value;
+            section = value.Key;
+            selectedRow = null;
+            Rebuild();
+        }
+    }
+    public object? SelectedRow
+    {
+        get => selectedRow;
+        set
+        {
+            if (ReferenceEquals(value, selectedRow))
+            {
+                return;
+            }
+            if (!LeaveEditor())
+            {
+                Raise();
+                return;
+            }
+            selectedRow = value;
+            BuildEditor();
+            Raise();
+        }
+    }
+    public SpeedPlan? ActivePlan
+    {
+        get => activePlan;
+        set
+        {
+            if (value?.Id == activePlan?.Id)
+            {
+                return;
+            }
+            if (!LeaveEditor())
+            {
+                Raise();
+                return;
+            }
+            activePlan = value;
+            selectedRow = null;
+            RefreshRows();
+            BuildEditor();
+            RefreshChart();
+            RefreshCommands();
+            Raise();
+        }
+    }
+    public SpeedPlan? ComparePlan
+    {
+        get => comparePlan;
+        set => Set(ref comparePlan, value);
+    }
+    public string ContactSearch
+    {
+        get => contactSearch;
+        set
+        {
+            if (Set(ref contactSearch, value))
+            {
+                RefreshRows();
+            }
+        }
+    }
+    public bool OnlyNear
+    {
+        get => onlyNear;
+        set
+        {
+            if (Set(ref onlyNear, value))
+            {
+                RefreshRows();
+            }
+        }
+    }
+    public double? ChartCeiling
+    {
+        get => chartCeiling;
+        set
+        {
+            if (value is <= 0 || value is > 20000000 || value.HasValue && !double.IsFinite(value.Value))
+            {
+                Message("图表上限须为 0～20000000Hz 范围内的正值；留空自动适配", true);
+                Raise();
+                return;
+            }
+            if (Set(ref chartCeiling, value))
+            {
+                RefreshChart();
+            }
+        }
+    }
+
+    private RelayCommand Command(Action action, Func<bool>? available = null)
+    {
+        var command = new RelayCommand(() => Attempt(action), available);
+        commands.Add(command);
+        return command;
+    }
+    private void Attempt(Action action)
+    {
+        try
+        {
+            action();
+        }
+        catch (Exception e) when (e is InvalidDataException or InvalidOperationException
+            or IOException or UnauthorizedAccessException or ArgumentException)
+        {
+            Message(e.Message, true);
+        }
+    }
+    private void Message(string text, bool failed = false)
+    {
+        notice = text;
+        error = failed;
+        Raise(nameof(Notice));
+        Raise(nameof(Error));
+        Raise(nameof(Title));
+        RefreshCommands();
+    }
+    private void RefreshCommands()
+    {
+        foreach (var command in commands)
+        {
+            command.Refresh();
+        }
+    }
+    private void Rebuild()
+    {
+        var id = activePlan?.Id;
+        activePlan = Project.Plans.FirstOrDefault(x => x.Id == id) ?? Project.Plans.FirstOrDefault();
+        comparePlan = Project.Plans.FirstOrDefault(x => x.Id == comparePlan?.Id);
+        RefreshRows();
+        BuildEditor();
+        RefreshChart();
+        foreach (var property in new[]
+        {
+            nameof(Project), nameof(Plans), nameof(ActivePlan), nameof(ComparePlan), nameof(SelectedNode),
+            nameof(SelectedRow), nameof(SectionTitle), nameof(SectionHint), nameof(IsTable), nameof(IsPlot),
+            nameof(IsHelp), nameof(IsPlans), nameof(IsContacts), nameof(IsScan), nameof(IsCompare),
+            nameof(IsStudy), nameof(IsChecks), nameof(IsLibrary), nameof(IsPlanEditor), nameof(IsExchange), nameof(Title), nameof(Dirty),
+            nameof(SourceLabel), nameof(RevisionLabel), nameof(FilePath), nameof(ResultStatus),
+            nameof(ScanStatus), nameof(ComparisonStatus)
+        })
+        {
+            Raise(property);
+        }
+        RefreshCommands();
+    }
+    private void RefreshRows()
+    {
+        Rows = section switch
+        {
+            "library" => Library.List(),
+            "project" => new[]
+            {
+                new PropertyRow("名称", Project.Name),
+                new PropertyRow("负责人", Project.Owner),
+                new PropertyRow("车辆 / 平台", Project.Vehicle),
+                new PropertyRow("来源性质", Labels.Source(Project.Origin)),
+                new PropertyRow("来源说明", Project.Source),
+                new PropertyRow("项目标识", Project.Id),
+                new PropertyRow("文件", FilePath)
+            },
+            "settings" => new[]
+            {
+                new PropertyRow("叶片数", Project.Settings.Blades.ToString()),
+                new PropertyRow("转速范围 rpm", $"{Project.Settings.MinRpm} ～ {Project.Settings.MaxRpm}"),
+                new PropertyRow("半宽口径", "max(绝对半宽, 相对半宽, 阻尼近似, 附加半宽)"),
+                new PropertyRow("计算边界", Software.Boundary)
+            },
+            "orders" => Project.Orders,
+            "modes" => Project.Modes,
+            "plans" => (IEnumerable?)ActivePlan?.Gears ?? Array.Empty<Gear>(),
+            "contacts" => (Result?.Contacts ?? [])
+                .Where(x => x.PlanId == ActivePlan?.Id)
+                .Where(x => !OnlyNear || x.Near)
+                .Where(x => (x.Gear + x.Order + x.Mode).Contains(ContactSearch, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(x => x.ClearanceHz).ToList(),
+            "crossings" => (IEnumerable?)Result?.Crossings ?? Array.Empty<Crossing>(),
+            "scan" => (IEnumerable?)Scan?.Choices ?? Array.Empty<ScanChoice>(),
+            "compare" => (IEnumerable?)Comparison?.Rows ?? Array.Empty<GearDifference>(),
+            "study" => (IEnumerable?)Study?.Cases ?? Array.Empty<RuleCase>(),
+            "checks" => Project.Checks,
+            "review" => QualityReview.Inspect(Project),
+            "audit" => Project.Audit.AsEnumerable().Reverse().ToList(),
+            "exchange" => (IEnumerable?)Preview?.Problems ?? Array.Empty<CsvProblem>(),
+            _ => Array.Empty<object>()
+        };
+    }
+    private void RefreshChart()
+    {
+        Chart = Result != null && Result.InputHash == ProjectCodec.InputHash(Project)
+            ? ChartModel.Create(Project, Result, ActivePlan?.Id ?? "", ChartCeiling) : null;
+        Raise(nameof(Chart));
+    }
+    private void Change(string action, Action<Project> change, bool analysis = true, bool allowArchived = false)
+    {
+        session.Change(action, change, analysis, allowArchived);
+        selectedRow = null;
+        if (analysis)
+        {
+            Result = null;
+            Scan = null;
+            Study = null;
+            Comparison = null;
+        }
+        Rebuild();
+        Message(action + "已应用；请保存项目。");
+    }
+}

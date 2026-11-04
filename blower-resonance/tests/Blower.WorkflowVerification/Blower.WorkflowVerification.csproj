@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+ <PropertyGroup><OutputType>Exe</OutputType></PropertyGroup>
+ <ItemGroup>
+  <ProjectReference Include="../../src/Blower.Core/Blower.Core.csproj"/>
+  <Compile Include="../../src/Blower.Desktop/ViewModels/*.cs" Link="ViewModels/%(Filename)%(Extension)"/>
+  <Compile Include="../../src/Blower.Desktop/Services/DesktopFiles.cs" Link="DesktopFiles.cs"/>
+  <Compile Include="../../src/Blower.Desktop/Services/IDesktopDialogs.cs" Link="IDesktopDialogs.cs"/>
+ </ItemGroup>
+</Project>

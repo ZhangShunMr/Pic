@@ -1,0 +1,6 @@
+  Determining projects to restore...
+  Restored /workspace/Pic/blower-resonance/src/Blower.Desktop/Blower.Desktop.csproj (in 103 ms).
+  Restored /workspace/Pic/blower-resonance/src/Blower.Core/Blower.Core.csproj (in 100 ms).
+  Blower.Core -> /workspace/Pic/blower-resonance/src/Blower.Core/bin/Release/net8.0/Blower.Core.dll
+  Blower.Desktop -> /workspace/Pic/blower-resonance/src/Blower.Desktop/bin/Release/net8.0-windows/win-x64/BlowerResonance.dll
+  Blower.Desktop -> /workspace/Pic/blower-resonance/release/win-x64/

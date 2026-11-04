@@ -1,0 +1,64 @@
+{
+  "date": "2026-11-04T14:56:36.5905773+00:00",
+  "platform": "Linux; linked production ViewModels and file service, no WPF runtime",
+  "passed": 14,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "startup is blank and dirty",
+      "status": "passed"
+    },
+    {
+      "name": "invalid editor is transactional and stays editable",
+      "status": "passed"
+    },
+    {
+      "name": "invalid numeric text points to field",
+      "status": "passed"
+    },
+    {
+      "name": "valid editor applies and history restores",
+      "status": "passed"
+    },
+    {
+      "name": "blank save reopen uses real file and hash",
+      "status": "passed"
+    },
+    {
+      "name": "demo is explicit and independent",
+      "status": "passed"
+    },
+    {
+      "name": "read only locked plan refuses gear changes",
+      "status": "passed"
+    },
+    {
+      "name": "CSV preview rejects bad data without mutation",
+      "status": "passed"
+    },
+    {
+      "name": "CSV preview apply creates a separate plan",
+      "status": "passed"
+    },
+    {
+      "name": "edited CSV invalidates preview",
+      "status": "passed"
+    },
+    {
+      "name": "atomic desktop save keeps backup and detects conflicts",
+      "status": "passed"
+    },
+    {
+      "name": "completed evidence and archive validation at editor boundary",
+      "status": "passed"
+    },
+    {
+      "name": "unsaved close cancel and discard",
+      "status": "passed"
+    },
+    {
+      "name": "blank native workflow through compute scan compare save reopen export",
+      "status": "passed"
+    }
+  ]
+}
