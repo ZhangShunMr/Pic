@@ -8,7 +8,7 @@
   <KeyBinding Key="N" Modifiers="Control" Command="{Binding NewCommand}"/>
   <KeyBinding Key="O" Modifiers="Control" Command="{Binding OpenCommand}"/>
   <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveCommand}"/>
-  <KeyBinding Key="S" Modifiers="Control,Shift" Command="{Binding SaveAsCommand}"/>
+  <KeyBinding Key="S" Modifiers="Control+Shift" Command="{Binding SaveAsCommand}"/>
   <KeyBinding Key="F5" Command="{Binding CalculateCommand}"/>
  </Window.InputBindings>
  <Grid>
