@@ -20,3 +20,5 @@
 记录应写明Windows版本、.NET版本、屏幕DPI、日期、输入、步骤、预期和实际结果，失败项与未测项单列。最大允许数据量性能需另行负载验证，不能从普通示例推断。
 
 补充原生对话框：`dotnet run --project tests/MotorFrequency.Desktop.Verification -c Release -- docs/windows-dialog-evidence --native-dialogs`。它与基础窗口检查分开，采用本进程自有对话框的UI Automation和Win32捕获，有时间边界。CI将其真实outcome与日志单列；只有native-dialogs.json成功记录才能称已通过，不以基础WPF结果或continue-on-error掩盖失败。
+
+最新补测：运行41871662953已成功执行实际保存、打开和HTML报告导出对话框，中文与空格路径成功，项目重开恢复751个模拟频点；三张实际系统对话框截图已逐图检查并加入手册（图13至15）。这不替代上列目标设备、高DPI和其余人工异常路径。

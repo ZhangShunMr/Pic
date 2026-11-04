@@ -1,0 +1,21 @@
+{
+  "at": "2026-11-04T16:52:18.9780823+00:00",
+  "sourceCommit": "cef719e8609c3c74976a4aad571a0f5213035131",
+  "runId": "41871662953",
+  "os": "Microsoft Windows NT 10.0.26100.0",
+  "result": "passed",
+  "source": "Live shown WPF window, RenderTargetBitmap capture, no browser",
+  "nativeFileDialogs": "Real Windows SaveFileDialog/OpenFileDialog automated in own process; save, reopen, HTML export verified",
+  "pages": [
+    "overview",
+    "motor",
+    "candidates",
+    "bands",
+    "spectrum",
+    "sweep",
+    "compare",
+    "output",
+    "history"
+  ],
+  "bindingErrors": []
+}

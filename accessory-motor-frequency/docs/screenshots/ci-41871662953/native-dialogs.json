@@ -1,0 +1,15 @@
+{
+  "at": "2026-11-04T16:52:18.9720092+00:00",
+  "sourceCommit": "cef719e8609c3c74976a4aad571a0f5213035131",
+  "actualNativeDialogs": true,
+  "scope": "Only dialogs belonging to this verifier process; UI Automation locates filename/accept controls and real keyboard input submits native Save/Open",
+  "projectSave": true,
+  "projectReopenPoints": 751,
+  "reportExport": true,
+  "pathsIncludeSpacesAndChinese": true,
+  "captures": [
+    "dialog-01-save.png",
+    "dialog-02-open.png",
+    "dialog-03-export.png"
+  ]
+}

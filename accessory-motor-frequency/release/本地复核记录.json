@@ -1,35 +1,37 @@
 {
-  "verifiedAt": "2026-11-04T16:21:41.780076+00:00",
-  "producer_run": "https://github.com/ZhangShunMr/Pic/actions/runs/41865185186",
-  "producer_source_commit": "81041c0cbaf01268d9e9d05f9d9f48472c2281a2",
+  "verifiedAt": "2026-11-04T16:59:06.250835+00:00",
+  "producer_run": "https://github.com/ZhangShunMr/Pic/actions/runs/41871662953",
+  "producer_source_commit": "cef719e8609c3c74976a4aad571a0f5213035131",
+  "producer_evidence_commit": "bec847612f85ee7ca378dcb535c4d42e4889829b",
   "archive": "MotorFrequency-V2.0-win-x64.zip",
-  "archive_bytes": 72268479,
-  "archive_sha256": "432b95038e4f0d3a23b0006c58ecfea76e68ff6fdf4c2fb20ee282d2a3a3bf9d",
+  "archive_bytes": 72344806,
+  "archive_sha256": "1058240c944430b16a97198dbc146ad67ba5542aaf74a2c47191c0c3906836ae",
   "zip_integrity": "passed",
-  "all_manifest_file_hashes_verified": 500,
+  "all_manifest_file_hashes_verified": 513,
   "executed_windows_binaries": [
     {
       "file": "MotorFrequency.exe",
-      "sha256": "3400f01a4236a3f5e62a7da1ec605a118615669b33ea5cf957326f25fe595bcb",
+      "sha256": "31e51922301774358334b10aa16902112b0d5fc1a243045809e587486321e975",
       "matches_windows_execution_record": true
     },
     {
       "file": "MotorFrequency.dll",
-      "sha256": "7ba5521107d30e62f19a5d309d1a78108e826d50603a2514ce9e309fb83a6f47",
+      "sha256": "ba2b9b37acc4f19cac13bcf42004479444f6c63a44cee07d6c5b3b8fe52a8b51",
       "matches_windows_execution_record": true
     },
     {
       "file": "MotorFrequency.Application.dll",
-      "sha256": "515b7172c9955146d86b868f2044fe6c355a54b416cfaf905a727d0d5ee6029a",
+      "sha256": "d4f42d9b6609e2b6504c0487079ff80f31f34e71402e77d3b27afd185093e519",
       "matches_windows_execution_record": true
     },
     {
       "file": "MotorFrequency.Core.dll",
-      "sha256": "be96adce4e852cd3d4d5d8c4c2c1a4ab67a74337fc29b92a624c4e88ae003d0a",
+      "sha256": "9a7c1323d9a2c9fd72181029f2b58211bcec28c7b10db526d81e808da410828b",
       "matches_windows_execution_record": true
     }
   ],
-  "scope": "Exact Windows-produced self-contained EXE and three application assemblies; runner Server 2025 native startup/normal exit. No claim for Windows10/11 devices, high DPI or network isolation.",
-  "native_file_dialog_test": "failed separately, not included in passed basic WPF checks",
-  "word_pagination": "not available; COM not registered"
+  "scope": "Exact Windows-produced self-contained EXE and three application assemblies; Server 2025 native startup and normal exit. Windows10/11 devices, DPI and network isolation not verified.",
+  "native_file_dialog_test": "passed separately: actual Save/Open/HTML export, Chinese and space paths, restored 751 embedded spectrum points",
+  "word_pagination": "not available; Microsoft Word COM not registered",
+  "package_documents": "CI-time documentation snapshot; latest expanded standalone manual in docs has three additional native-dialog figures; executable package unchanged."
 }

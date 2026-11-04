@@ -20,6 +20,7 @@ windows_verified = run.get('result') == 'passed' and not run.get('bindingErrors'
 word_path = evidence_dir / 'word-pagination.json'
 word = json.loads(word_path.read_text(encoding='utf-8-sig')) if word_path.exists() else {}
 figures = []
+dialog_record = json.loads((root / 'docs/windows-dialog-evidence/native-dialogs.json').read_text(encoding='utf-8-sig'))
 
 def setup(title, source=False):
     doc = Document()
@@ -85,7 +86,8 @@ for line in manual_text.splitlines():
         caption.paragraph_format.keep_with_next = False
         figures.append({'caption': picture.group(1), 'path': picture.group(2),
             'sha256': hashlib.sha256(path.read_bytes()).hexdigest(), 'document_crop_pixels': rectangle,
-            'raw_png_modified': False, 'sourceCommit': figure_run.get('sourceCommit'), 'runId': figure_run.get('runId')})
+            'raw_png_modified': False, 'sourceCommit': figure_run.get('sourceCommit'), 'runId': figure_run.get('runId'),
+            'capture_method': 'Actual Windows common file dialog, Win32 PrintWindow' if path.name.startswith('dialog-') else 'Live WPF client, RenderTargetBitmap'})
     elif line.startswith('# '):
         manual.add_paragraph(line[2:], 'Title')
     elif line.startswith('### '):
@@ -161,6 +163,8 @@ result = {
     'manual_actual_word_pages': None,
     'word_pagination_verified': False,
     'real_windows_screenshots': len(list(evidence_dir.glob('*.png'))) if windows_verified else 0,
+    'real_native_dialog_screenshots': len([f for f in figures if 'Win32 PrintWindow' in f['capture_method']]),
+    'native_dialog_flow_verified': dialog_record.get('projectSave') is True and dialog_record.get('projectReopenPoints') == 751 and dialog_record.get('reportExport') is True,
     'manual_embedded_native_figures': len(figures),
     'windows_verification_run': run.get('runId'),
     'windows_source_commit': run.get('sourceCommit'),

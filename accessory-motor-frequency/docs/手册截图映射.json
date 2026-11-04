@@ -11,7 +11,8 @@
     ],
     "raw_png_modified": false,
     "sourceCommit": "21e81e15b4c47d1b120b325e84278ef798d48fae",
-    "runId": "41860507345"
+    "runId": "41860507345",
+    "capture_method": "Live WPF client, RenderTargetBitmap"
   },
   {
     "caption": "图2 项目档案与输入核对（工作区局部，模拟）",
@@ -25,7 +26,8 @@
     ],
     "raw_png_modified": false,
     "sourceCommit": "21e81e15b4c47d1b120b325e84278ef798d48fae",
-    "runId": "41860507345"
+    "runId": "41860507345",
+    "capture_method": "Live WPF client, RenderTargetBitmap"
   },
   {
     "caption": "图3 电机拓扑、参数与理想假设（工作区局部，模拟）",
@@ -39,7 +41,8 @@
     ],
     "raw_png_modified": false,
     "sourceCommit": "21e81e15b4c47d1b120b325e84278ef798d48fae",
-    "runId": "41860507345"
+    "runId": "41860507345",
+    "capture_method": "Live WPF client, RenderTargetBitmap"
   },
   {
     "caption": "图4 极对数为零被拒绝，已应用观察条件保留",
@@ -53,7 +56,8 @@
     ],
     "raw_png_modified": false,
     "sourceCommit": "21e81e15b4c47d1b120b325e84278ef798d48fae",
-    "runId": "41860507345"
+    "runId": "41860507345",
+    "capture_method": "Live WPF client, RenderTargetBitmap"
   },
   {
     "caption": "图5 候选轨迹、频带与来源图例（工作区局部，模拟）",
@@ -67,7 +71,8 @@
     ],
     "raw_png_modified": false,
     "sourceCommit": "21e81e15b4c47d1b120b325e84278ef798d48fae",
-    "runId": "41860507345"
+    "runId": "41860507345",
+    "capture_method": "Live WPF client, RenderTargetBitmap"
   },
   {
     "caption": "图6 敏感频带与来源输入（工作区局部，模拟）",
@@ -81,7 +86,8 @@
     ],
     "raw_png_modified": false,
     "sourceCommit": "21e81e15b4c47d1b120b325e84278ef798d48fae",
-    "runId": "41860507345"
+    "runId": "41860507345",
+    "capture_method": "Live WPF client, RenderTargetBitmap"
   },
   {
     "caption": "图7 原始频谱与来源、单位和网格（工作区局部，模拟）",
@@ -95,7 +101,8 @@
     ],
     "raw_png_modified": false,
     "sourceCommit": "21e81e15b4c47d1b120b325e84278ef798d48fae",
-    "runId": "41860507345"
+    "runId": "41860507345",
+    "capture_method": "Live WPF client, RenderTargetBitmap"
   },
   {
     "caption": "图8 参数扫查的实际条件和结果（工作区局部，模拟）",
@@ -109,7 +116,8 @@
     ],
     "raw_png_modified": false,
     "sourceCommit": "21e81e15b4c47d1b120b325e84278ef798d48fae",
-    "runId": "41860507345"
+    "runId": "41860507345",
+    "capture_method": "Live WPF client, RenderTargetBitmap"
   },
   {
     "caption": "图9 三极对快照与统一转速比较（工作区局部，模拟）",
@@ -123,7 +131,8 @@
     ],
     "raw_png_modified": false,
     "sourceCommit": "21e81e15b4c47d1b120b325e84278ef798d48fae",
-    "runId": "41860507345"
+    "runId": "41860507345",
+    "capture_method": "Live WPF client, RenderTargetBitmap"
   },
   {
     "caption": "图10 项目保存和成果导出入口（工作区局部，模拟）",
@@ -137,7 +146,8 @@
     ],
     "raw_png_modified": false,
     "sourceCommit": "21e81e15b4c47d1b120b325e84278ef798d48fae",
-    "runId": "41860507345"
+    "runId": "41860507345",
+    "capture_method": "Live WPF client, RenderTargetBitmap"
   },
   {
     "caption": "图11 输入变更与UTC记录（工作区局部，模拟）",
@@ -151,7 +161,8 @@
     ],
     "raw_png_modified": false,
     "sourceCommit": "21e81e15b4c47d1b120b325e84278ef798d48fae",
-    "runId": "41860507345"
+    "runId": "41860507345",
+    "capture_method": "Live WPF client, RenderTargetBitmap"
   },
   {
     "caption": "图12 最小窗口的滚动布局（1100×720，模拟）",
@@ -165,6 +176,52 @@
     ],
     "raw_png_modified": false,
     "sourceCommit": "21e81e15b4c47d1b120b325e84278ef798d48fae",
-    "runId": "41860507345"
+    "runId": "41860507345",
+    "capture_method": "Live WPF client, RenderTargetBitmap"
+  },
+  {
+    "caption": "图13 项目保存对话框（实际Windows原生窗口，模拟项目）",
+    "path": "screenshots/ci-41871662953/dialog-01-save.png",
+    "sha256": "c410bb0362dd795ca2873f5f83ed24073e7c4bc476120c38710cf742297b3842",
+    "document_crop_pixels": [
+      0,
+      0,
+      625,
+      472
+    ],
+    "raw_png_modified": false,
+    "sourceCommit": "cef719e8609c3c74976a4aad571a0f5213035131",
+    "runId": "41871662953",
+    "capture_method": "Actual Windows common file dialog, Win32 PrintWindow"
+  },
+  {
+    "caption": "图14 项目打开对话框（实际Windows原生窗口，模拟项目）",
+    "path": "screenshots/ci-41871662953/dialog-02-open.png",
+    "sha256": "5e7dd61e57fce36f6143b52f842ab22b73498994ed0f9552ec79705a875f0d34",
+    "document_crop_pixels": [
+      0,
+      0,
+      625,
+      472
+    ],
+    "raw_png_modified": false,
+    "sourceCommit": "cef719e8609c3c74976a4aad571a0f5213035131",
+    "runId": "41871662953",
+    "capture_method": "Actual Windows common file dialog, Win32 PrintWindow"
+  },
+  {
+    "caption": "图15 报告导出对话框（实际Windows原生窗口，HTML静态成果）",
+    "path": "screenshots/ci-41871662953/dialog-03-export.png",
+    "sha256": "4feb3fd178d489ee768e48d36906da88b0a4195df8eeb131d2a6225ac788b98b",
+    "document_crop_pixels": [
+      0,
+      0,
+      625,
+      472
+    ],
+    "raw_png_modified": false,
+    "sourceCommit": "cef719e8609c3c74976a4aad571a0f5213035131",
+    "runId": "41871662953",
+    "capture_method": "Actual Windows common file dialog, Win32 PrintWindow"
   }
 ]

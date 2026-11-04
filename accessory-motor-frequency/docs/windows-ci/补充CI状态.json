@@ -1,13 +1,24 @@
 {
-  "observedAt": "2026-11-04T16:21:41.780521+00:00",
-  "basic_success_run": "https://github.com/ZhangShunMr/Pic/actions/runs/41860507345",
-  "supplementary_native_dialog_run": "https://github.com/ZhangShunMr/Pic/actions/runs/41861404665",
-  "supplementary_observed_state": "completed/cancelled; execution step timed out at16:02:36 and cleanup completed; terminal confirmed from completed-run listing and GitHub page",
-  "bounded_revision_run": "https://github.com/ZhangShunMr/Pic/actions/runs/41862034713",
-  "bounded_revision_observed_state": "completed/failure",
+  "observedAt": "2026-11-04T16:59:06.250835+00:00",
+  "requested_runs": [
+    {
+      "runId": "41861404665",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "reason": "Historical dialog automation timed out; retained as cancelled, never counted as pass"
+    },
+    {
+      "runId": "41865185186",
+      "status": "completed",
+      "conclusion": "success",
+      "supplementary_native_dialog_outcome": "failure; optional step independent from required build checks"
+    }
+  ],
+  "latest_run": "https://github.com/ZhangShunMr/Pic/actions/runs/41871662953",
+  "latest_source_commit": "cef719e8609c3c74976a4aad571a0f5213035131",
+  "latest_status": "completed",
+  "latest_conclusion": "success",
+  "latest_native_dialog_outcome": "success",
   "action_denied": false,
-  "conclusion": "Package and basic WPF verified; supplemental native dialog automation is a failed test, not a passed item. Summary state remains inconsistent with completed worker logs.",
-  "latest_run": "https://github.com/ZhangShunMr/Pic/actions/runs/41865185186",
-  "latest_worker": "all required steps completed; exact Windows package preserved in remote commit7327989; run-summary API still reports queued at observation",
-  "latest_native_dialog_outcome": "failure at Native save automation; base WPF checks passed separately"
+  "conclusion": "Both requested runs terminal. Latest corrected verifier passes actual save/reopen/export dialogs, basic WPF and direct self-contained EXE startup. Windows package replaced and independently rehashed. Word unavailable."
 }

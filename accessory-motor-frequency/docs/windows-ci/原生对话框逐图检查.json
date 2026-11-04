@@ -1,0 +1,26 @@
+{
+  "reviewedAt": "2026-11-04T16:59:06.250835+00:00",
+  "runId": "41871662953",
+  "sourceCommit": "cef719e8609c3c74976a4aad571a0f5213035131",
+  "capture": "Actual owned Windows common file dialog, Win32 PrintWindow; unchanged raw PNG",
+  "figures": [
+    {
+      "file": "dialog-01-save.png",
+      "sha256": "c410bb0362dd795ca2873f5f83ed24073e7c4bc476120c38710cf742297b3842",
+      "visually_reviewed": true,
+      "notes": "保存项目；中文与空格路径、motorproj后缀、项目类型和Save按钮可见。长路径在文件名框内水平滚动，输入完整性由对应JSON记录。"
+    },
+    {
+      "file": "dialog-02-open.png",
+      "sha256": "5e7dd61e57fce36f6143b52f842ab22b73498994ed0f9552ec79705a875f0d34",
+      "visually_reviewed": true,
+      "notes": "打开项目；项目及备份类型、Open按钮与项目文件名可见。长路径字段水平滚动。"
+    },
+    {
+      "file": "dialog-03-export.png",
+      "sha256": "4feb3fd178d489ee768e48d36906da88b0a4195df8eeb131d2a6225ac788b98b",
+      "visually_reviewed": true,
+      "notes": "导出报告；HTML静态成果类型、html后缀与Save按钮可见；完整路径由输入记录核对。"
+    }
+  ]
+}
