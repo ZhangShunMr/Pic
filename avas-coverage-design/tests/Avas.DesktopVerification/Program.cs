@@ -69,6 +69,17 @@ internal static class Program
                 encoder.Save(stream);
             }
             images.Add(new { file = Path.GetFileName(path), sha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(path))).ToLowerInvariant(), width = bitmap.PixelWidth, height = bitmap.PixelHeight, provenance = "live Windows WPF client visual, shown MainWindow" });
+            var inspector = (FrameworkElement)window.FindName("Inspector");
+            var detail = new RenderTargetBitmap((int)Math.Ceiling(inspector.ActualWidth), (int)Math.Ceiling(inspector.ActualHeight), 96, 96, PixelFormats.Pbgra32);
+            detail.Render(inspector);
+            var detailPath = Path.Combine(output, name + "-editor.png");
+            using (var stream = File.Create(detailPath))
+            {
+                var encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(detail));
+                encoder.Save(stream);
+            }
+            images.Add(new { file = Path.GetFileName(detailPath), sha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(detailPath))).ToLowerInvariant(), width = detail.PixelWidth, height = detail.PixelHeight, provenance = "live, visible WPF Inspector panel from the same shown MainWindow; original pixels" });
         }
         async Task Page(string page)
         {
@@ -101,7 +112,8 @@ internal static class Program
                 coordinate.GetBindingExpression(TextBox.TextProperty)!.UpdateSource();
                 Assert(Validation.GetHasError(coordinate) && vm.BindingErrorCount > 0, "原生数值绑定拒绝文字输入");
                 vm.Commands["Apply"].Execute(null);
-                Assert(vm.Errors.Count > 0, "格式错误阻止应用旧数值");
+                Assert(vm.Errors.Count > 0 && vm.BindingErrorCount > 0 && coordinate.Text == "abc",
+                    "格式错误阻止应用旧数值并保留待修正文字");
                 await Capture("04-数值校验");
                 vm.Commands["Discard"].Execute(null);
                 await Layout();

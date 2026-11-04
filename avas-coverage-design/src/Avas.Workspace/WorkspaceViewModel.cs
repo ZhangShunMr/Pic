@@ -128,14 +128,27 @@ public sealed partial class WorkspaceViewModel : INotifyPropertyChanged
 
     public void Notify()
     {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
+        if (BindingErrorCount > 0)
+            NotifyEditorState();
+        else
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
         foreach (var command in commands.Values)
             command.Refresh();
     }
 
+    public void NotifyEditorState()
+    {
+        string[] properties = [nameof(HasDraft), nameof(Dirty), nameof(InputState), nameof(SaveState),
+            nameof(ResultState), nameof(CurrentResult), nameof(CurrentPoint), nameof(PointBands),
+            nameof(SourceRows), nameof(BindingErrorCount), nameof(Status), nameof(Errors), nameof(Busy),
+            nameof(IsReady), nameof(SelectedSection), nameof(SelectedSpeaker), nameof(SelectedListener)];
+        foreach (var property in properties)
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
+    }
+
     public void MarkDraft()
     {
-        Notify();
+        NotifyEditorState();
     }
 
     public void ResetDraft()

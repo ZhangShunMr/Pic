@@ -64,12 +64,12 @@ public sealed class FieldView : FrameworkElement
         if (Project is null || ActualWidth < 100 || ActualHeight < 100)
             return;
         var s = Project.Settings;
-        scale = Math.Min((ActualWidth - 90) / (s.MaxX - s.MinX), (ActualHeight - 125) / (s.MaxY - s.MinY));
+        scale = Math.Min((ActualWidth - 90) / (s.MaxX - s.MinX), (ActualHeight - 145) / (s.MaxY - s.MinY));
         if (!double.IsFinite(scale) || scale <= 0)
             return;
         var width = (s.MaxX - s.MinX) * scale;
         var height = (s.MaxY - s.MinY) * scale;
-        plot = new Rect((ActualWidth - width) / 2 + 10, 45, width, height);
+        plot = new Rect((ActualWidth - width) / 2 + 10, 62, width, height);
         Text(dc, Result?.Metric ?? "已应用布局 · 无当前有效计算结果", new Point(14, 12), 12);
         dc.DrawRectangle(Brush("#F4F7F1"), Outline, plot);
         dc.PushClip(new RectangleGeometry(plot));
@@ -79,6 +79,8 @@ public sealed class FieldView : FrameworkElement
         dc.Pop();
         DrawAxes(dc);
         DrawLegend(dc);
+        if (Result is not null)
+            Text(dc, $"有效节点 {Result.Grid.Count} · 工程目标覆盖 {Result.Coverage:F1}%", new Point(14, 33), 10);
     }
 
     private void DrawField(DrawingContext dc)
@@ -157,20 +159,19 @@ public sealed class FieldView : FrameworkElement
         var y = plot.Bottom + 45;
         if (CoverageOnly)
         {
-            dc.DrawRectangle(Brush("#4E9F76"), null, new Rect(plot.Left, y, 14, 12));
-            Text(dc, "满足工程目标", new Point(plot.Left + 20, y - 2), 10);
-            dc.DrawRectangle(Brush("#E4BD75"), null, new Rect(plot.Left + 120, y, 14, 12));
-            Text(dc, "未满足", new Point(plot.Left + 140, y - 2), 10);
+            dc.DrawRectangle(Brush("#4E9F76"), null, new Rect(14, y, 14, 12));
+            Text(dc, "满足工程目标", new Point(34, y - 2), 10);
+            dc.DrawRectangle(Brush("#E4BD75"), null, new Rect(155, y, 14, 12));
+            Text(dc, "未满足", new Point(175, y - 2), 10);
         }
         else
         {
             var low = Math.Floor(Result.Minimum / 5) * 5;
             var high = Math.Max(low + 5, Math.Ceiling(Result.Maximum / 5) * 5);
             for (var i = 0; i < 100; i++)
-                dc.DrawRectangle(Brush(ChartRenderer.Color(low + (high - low) * i / 99, low, high)), null, new Rect(plot.Left + i, y, 1.5, 10));
-            Text(dc, $"{low:F0}—{high:F0} dB", new Point(plot.Left + 110, y - 2), 10);
+                dc.DrawRectangle(Brush(ChartRenderer.Color(low + (high - low) * i / 99, low, high)), null, new Rect(14 + i, y, 1.5, 10));
+            Text(dc, $"{low:F0}—{high:F0} dB", new Point(124, y - 2), 10);
         }
-        Text(dc, $"节点覆盖 {Result.Coverage:F1}%", new Point(plot.Right - 115, y - 2), 10);
     }
     private void Pick(object sender, MouseButtonEventArgs e)
     {

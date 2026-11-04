@@ -127,7 +127,7 @@
                 </GroupBox>
             </Grid>
             <GridSplitter Grid.Column="3" Width="6" HorizontalAlignment="Center"/>
-            <Border Grid.Column="4" Background="White" BorderBrush="#D5E0DA" BorderThickness="1" CornerRadius="4" Padding="14">
+            <Border x:Name="Inspector" Grid.Column="4" Background="White" BorderBrush="#D5E0DA" BorderThickness="1" CornerRadius="4" Padding="14">
                 <DockPanel>
                     <Border DockPanel.Dock="Bottom" Background="#EEF5F0" Padding="8" Margin="-4,8,-4,-4">
                         <StackPanel>

@@ -36,7 +36,7 @@ public partial class MainWindow : Window
         else
             bindingErrors.Remove(e.Error);
         workspace.BindingErrorCount = bindingErrors.Count;
-        workspace.Notify();
+        workspace.NotifyEditorState();
     }
 
     private void BeforeShortcut(object sender, KeyEventArgs e)
