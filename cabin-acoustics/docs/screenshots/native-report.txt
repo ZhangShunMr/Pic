@@ -1,12 +1,12 @@
 车内低频声学模态与座位声压分布设计软件 V1.0
-离线研究报告 / 2026-11-04T15:23:25.1119654+00:00
+离线研究报告 / 2026-11-04T15:30:21.8136866+00:00
 理想刚性矩形腔；截断非零阶模态叠加；不含000均匀压缩模态；相对响应不等于实车绝对声压。
 以下内容为理想模型计算，不能据此认定实车降噪效果。
 
 
 === 项目与来源 ===
 名称：四座矩形座舱 · 模拟研究
-标识：b201bdc2-fffd-4182-9790-250c76768dcc
+标识：12896c63-c0a4-40a8-a123-c96887a61fcb
 修订：A
 负责人：示例工程师
 来源：可重复模拟；矩形理想几何；非实测
@@ -51,7 +51,7 @@ seat,后排右,2.55,1.2,0.85,,,模拟耳点
 === 基准比较 ===
 # 车内低频声学模态与座位声压分布设计软件 V1.0
 # 理想刚性矩形腔；截断非零阶模态叠加；不含000均匀压缩模态；相对响应不等于实车绝对声压。
-# project=四座矩形座舱 · 模拟研究; id=b201bdc2-fffd-4182-9790-250c76768dcc; revision=A
+# project=四座矩形座舱 · 模拟研究; id=12896c63-c0a4-40a8-a123-c96887a61fcb; revision=A
 # source=可重复模拟；矩形理想几何；非实测; demo=True
 # c_m_s=343; damping=0.03; cutoff_hz=400
 seat,baseline_peak_relative,current_peak_relative,peak_ratio_db,baseline_peak_hz,current_peak_hz,rms_ratio_db
@@ -61,10 +61,10 @@ seat,baseline_peak_relative,current_peak_relative,peak_ratio_db,baseline_peak_hz
 后排右,13.4907529919,13.4907529919,0,50,50,0
 
 === 参数扫描 ===
-# parameter=length; unit=m; seat_id=f948f811-2403-4e75-bac1-8adb9015a1ba; points=5
+# parameter=length; unit=m; seat_id=cf128fce-c456-4954-b442-11f4f4ec2efa; points=5
 # 车内低频声学模态与座位声压分布设计软件 V1.0
 # 理想刚性矩形腔；截断非零阶模态叠加；不含000均匀压缩模态；相对响应不等于实车绝对声压。
-# project=四座矩形座舱 · 模拟研究; id=b201bdc2-fffd-4182-9790-250c76768dcc; revision=A
+# project=四座矩形座舱 · 模拟研究; id=12896c63-c0a4-40a8-a123-c96887a61fcb; revision=A
 # source=可重复模拟；矩形理想几何；非实测; demo=True
 # c_m_s=343; damping=0.03; cutoff_hz=400
 parameter_value,peak_relative,peak_frequency_hz,rms_relative,first_mode_hz,error
@@ -89,4 +89,4 @@ parameter_value,peak_relative,peak_frequency_hz,rms_relative,first_mode_hz,error
 矩形刚壁、常量声速、所有非零模态共用阻尼；未包含柔性板、开口、内饰吸声、流动及真实几何。
 截断及步长会影响数值结果；近零比值采用-120dB显示下限，不能用作物理噪声底。
 扫描以绝对坐标保持点位，几何变小后越界候选不会参与排序。
-2026-11-04T15:23:23.6200426+00:00 | 载入独立示例 | 所有尺寸及点位均为模拟
+2026-11-04T15:30:20.2999938+00:00 | 载入独立示例 | 所有尺寸及点位均为模拟
