@@ -1,0 +1,32 @@
+PASS ordinary startup blank and demo explicit
+PASS draft validation rolls back applied input
+PASS nonfinite draft remains inspectable and rejected
+PASS binding conversion errors block saving and calculation
+PASS draft apply undo redo
+PASS new rectangle blank workflow supports collections
+PASS selected point clears on new blank project
+PASS save reopen preserves applied model and source
+PASS native file overwrite backup and external change protection
+PASS missing native file and corrupt native JSON rejected
+PASS cancel save dialog prevents close
+PASS cancel unsaved prompt preserves project
+PASS invalid draft cannot be silently saved before closing
+PASS archive read only and copied project editable
+PASS copy and delete scheme maintain independent identity
+PASS CSV preview applies transaction and undo restores
+PASS CSV preview text edit cannot apply stale content
+PASS CSV target change blocked after preview
+PASS batch request changes blocked after preview
+PASS batch updates and undo
+PASS calculate valid results and dirty edit hides old output
+PASS valid result exports include actual source hash and units
+PASS generated tasks preserve result freshness
+PASS scan preserves base design and invalidates with input edits
+PASS invalid scan reports error without partial output
+PASS inflight close and cancellation
+PASS reference compare detects shared condition mismatch
+PASS native library store open and backup recovery copies identity
+PASS native library corrupt item remains visible for recovery
+PASS batch target switch requires a fresh preview
+PASS scan ignores unrelated verification task references in its working subset
+RESULT 31/31 passed

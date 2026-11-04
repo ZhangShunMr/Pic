@@ -1,0 +1,20 @@
+<UserControl x:Class="TrimContact.Desktop.Views.LoadView"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:controls="clr-namespace:TrimContact.Desktop.Controls">
+<ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel IsEnabled="{Binding CanEdit}"><GroupBox Header="共用采样设置"><StackPanel><WrapPanel><StackPanel><TextBlock Text="相位数"/><ComboBox ItemsSource="{Binding PhaseCounts}" SelectedItem="{Binding Draft.Settings.Phases, Mode=TwoWay, NotifyOnSourceUpdated=True}"/></StackPanel>
+<CheckBox Content="枚举独立间隙公差的全部正负角点（另含名义）" IsChecked="{Binding Draft.Settings.EnumerateTolerance, NotifyOnSourceUpdated=True}"/></WrapPanel><TextBlock Text="24/48/72等距相位覆盖[0,360°)。公差角点加名义最多65组。采样计数不代表概率或失效率；所有方案共用载荷、饰板和设置。" Style="{StaticResource Note}"/></StackPanel></GroupBox><GroupBox Header="载荷工况（最多6组）"><StackPanel><WrapPanel><Button Content="添加载荷" Command="{Binding AddLoadCommand}"/><Button Content="删除所选载荷" Command="{Binding DeleteLoadCommand}"/></WrapPanel><DataGrid ItemsSource="{Binding Loads}" SelectedItem="{Binding SelectedLoad}" IsReadOnly="False" Height="220">
+<DataGrid.Columns>
+<DataGridTextColumn Header="名称" Binding="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="180"/>
+<DataGridTextColumn Header="法向偏置 g" Binding="{Binding NormalBiasG, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="110"/>
+<DataGridTextColumn Header="法向幅值 g" Binding="{Binding NormalAmplitudeG, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="110"/>
+<DataGridTextColumn Header="切向偏置 g" Binding="{Binding TangentialBiasG, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="110"/>
+<DataGridTextColumn Header="切向幅值 g" Binding="{Binding TangentialAmplitudeG, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="110"/>
+<DataGridTextColumn Header="相差 °" Binding="{Binding PhaseDegrees, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="85"/>
+<DataGridTextColumn Header="频率标签 Hz" Binding="{Binding FrequencyHz, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="110"/>
+</DataGrid.Columns>
+</DataGrid><StackPanel>
+ <TextBlock Text="所选载荷来源（必填）"/>
+ <TextBox Text="{Binding SelectedLoad.Source, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="60"/>
+</StackPanel><TextBlock Text="g=9.80665m/s²。法向正向朝支撑，切向为单一方向。偏置±20g、幅值0–20g、相差±360°。频率0–1000Hz只作标签，不计算共振或动态放大。" Style="{StaticResource Note}"/></StackPanel></GroupBox><GroupBox Header="处理口径"><StackPanel><TextBlock Text="法向：刚性平面三个自由度，卡扣双向弹簧、接触仅受压；同时平衡预紧反力及惯性力。切向：一个平移自由度，按库仑摩擦限幅，接触脱离时不承担摩擦。" Style="{StaticResource Note}"/><TextBlock Text="加速度采用正弦离散相位，法向=偏置+幅值·sin(φ)，切向=偏置+幅值·sin(φ+相差)。这不是时域动力学；载荷无需填写真实频率来“改善”结果。" Style="{StaticResource Note}"/><Button Content="应用并求解全部方案" Command="{Binding CalculateCommand}"/></StackPanel></GroupBox></StackPanel></ScrollViewer>
+</UserControl>

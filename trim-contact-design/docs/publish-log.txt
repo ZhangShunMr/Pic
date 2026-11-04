@@ -1,0 +1,6 @@
+  Determining projects to restore...
+  Restored /workspace/Pic/trim-contact-design/src/TrimContact.Core/TrimContact.Core.csproj (in 334 ms).
+  Restored /workspace/Pic/trim-contact-design/src/TrimContact.Desktop/TrimContact.Desktop.csproj (in 333 ms).
+  TrimContact.Core -> /workspace/Pic/trim-contact-design/src/TrimContact.Core/bin/Release/net10.0/TrimContact.Core.dll
+  TrimContact.Desktop -> /workspace/Pic/trim-contact-design/src/TrimContact.Desktop/bin/Release/net10.0-windows/win-x64/TrimContact.Desktop.dll
+  TrimContact.Desktop -> /workspace/Pic/trim-contact-design/artifacts/win-x64/

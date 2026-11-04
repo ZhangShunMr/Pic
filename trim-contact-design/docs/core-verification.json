@@ -1,0 +1,344 @@
+{
+  "utc": "2026-11-04T15:01:43.5056405+00:00",
+  "environment": ".NET 10.0.14 / Debian GNU/Linux 13 (trixie)",
+  "count": 84,
+  "failures": 0,
+  "checks": [
+    {
+      "name": "empty project may save but cannot calculate",
+      "passed": true
+    },
+    {
+      "name": "fixed demonstration validates",
+      "passed": true
+    },
+    {
+      "name": "independent symmetric static 1g displacement",
+      "passed": true
+    },
+    {
+      "name": "independent symmetric clip force",
+      "passed": true
+    },
+    {
+      "name": "zero load zero deflection without contacts",
+      "passed": true
+    },
+    {
+      "name": "normal load sign reversal",
+      "passed": true
+    },
+    {
+      "name": "mass scaling",
+      "passed": true
+    },
+    {
+      "name": "preload equilibrium center displacement",
+      "passed": true
+    },
+    {
+      "name": "preload equilibrium compression",
+      "passed": true
+    },
+    {
+      "name": "preload equilibrium reaction force",
+      "passed": true
+    },
+    {
+      "name": "preload clip reaction balance",
+      "passed": true
+    },
+    {
+      "name": "open contact zero force",
+      "passed": true
+    },
+    {
+      "name": "positive gap tolerance reduces compression",
+      "passed": true
+    },
+    {
+      "name": "negative gap tolerance increases compression",
+      "passed": true
+    },
+    {
+      "name": "contact cannot pull",
+      "passed": true
+    },
+    {
+      "name": "independent tangential displacement for 10N",
+      "passed": true
+    },
+    {
+      "name": "negative tangential symmetry",
+      "passed": true
+    },
+    {
+      "name": "sticking contact shares shear force",
+      "passed": true
+    },
+    {
+      "name": "Coulomb cap and shear closure",
+      "passed": true
+    },
+    {
+      "name": "zero friction accepted and no contact shear",
+      "passed": true
+    },
+    {
+      "name": "detached contact has no reported slip",
+      "passed": true
+    },
+    {
+      "name": "asymmetric offset contact includes rotations",
+      "passed": true
+    },
+    {
+      "name": "rotation and force independently balanced",
+      "passed": true
+    },
+    {
+      "name": "24 phases include 90 degrees",
+      "passed": true
+    },
+    {
+      "name": "zero tolerances not duplicated",
+      "passed": true
+    },
+    {
+      "name": "single nonzero tolerance gives nominal and 2 corners",
+      "passed": true
+    },
+    {
+      "name": "six tolerances give nominal and 64 corners",
+      "passed": true
+    },
+    {
+      "name": "all states residual bounded",
+      "passed": true
+    },
+    {
+      "name": "cancellation honored",
+      "passed": true
+    },
+    {
+      "name": "parameter sweep independently changes outcomes and preserves input",
+      "passed": true
+    },
+    {
+      "name": "sweep invalid range rejected",
+      "passed": true
+    },
+    {
+      "name": "source change invalidates results",
+      "passed": true
+    },
+    {
+      "name": "task edits do not change input hash",
+      "passed": true
+    },
+    {
+      "name": "unknown schema rejected",
+      "passed": true
+    },
+    {
+      "name": "unknown field rejected",
+      "passed": true
+    },
+    {
+      "name": "missing field rejected",
+      "passed": true
+    },
+    {
+      "name": "duplicate JSON field rejected",
+      "passed": true
+    },
+    {
+      "name": "null arrays rejected",
+      "passed": true
+    },
+    {
+      "name": "truncated JSON rejected",
+      "passed": true
+    },
+    {
+      "name": "oversize project rejected",
+      "passed": true
+    },
+    {
+      "name": "duplicate point IDs rejected",
+      "passed": true
+    },
+    {
+      "name": "nonfinite mass rejected",
+      "passed": true
+    },
+    {
+      "name": "zero mass rejected",
+      "passed": true
+    },
+    {
+      "name": "zero stiffness rejected",
+      "passed": true
+    },
+    {
+      "name": "out of panel point rejected",
+      "passed": true
+    },
+    {
+      "name": "self intersection rejected",
+      "passed": true
+    },
+    {
+      "name": "collinear clips rejected",
+      "passed": true
+    },
+    {
+      "name": "too many contacts rejected",
+      "passed": true
+    },
+    {
+      "name": "polygon boundary accepted",
+      "passed": true
+    },
+    {
+      "name": "completed task needs evidence",
+      "passed": true
+    },
+    {
+      "name": "invalid task reference rejected",
+      "passed": true
+    },
+    {
+      "name": "task generation deduplicates",
+      "passed": true
+    },
+    {
+      "name": "delete contact retains task detached",
+      "passed": true
+    },
+    {
+      "name": "copy variant creates fresh identities",
+      "passed": true
+    },
+    {
+      "name": "session edit rollback on validation error",
+      "passed": true
+    },
+    {
+      "name": "undo redo applied edit",
+      "passed": true
+    },
+    {
+      "name": "archive blocks subsequent edit but copy allows",
+      "passed": true
+    },
+    {
+      "name": "disk save reopen content and IDs",
+      "passed": true
+    },
+    {
+      "name": "overwrite backs up prior file",
+      "passed": true
+    },
+    {
+      "name": "external file change blocks overwrite",
+      "passed": true
+    },
+    {
+      "name": "same ID import does not overwrite",
+      "passed": true
+    },
+    {
+      "name": "portable embedded project opens in different library",
+      "passed": true
+    },
+    {
+      "name": "corrupt library item visible as error",
+      "passed": true
+    },
+    {
+      "name": "project Unicode round trip",
+      "passed": true
+    },
+    {
+      "name": "CSV template preflight replace",
+      "passed": true
+    },
+    {
+      "name": "CSV quoted multiline and escaped quote",
+      "passed": true
+    },
+    {
+      "name": "CSV malformed quoting rejected",
+      "passed": true
+    },
+    {
+      "name": "CSV header mismatch rejected",
+      "passed": true
+    },
+    {
+      "name": "CSV invalid row rolls back",
+      "passed": true
+    },
+    {
+      "name": "CSV expired preview blocked",
+      "passed": true
+    },
+    {
+      "name": "batch preview and apply preserve original",
+      "passed": true
+    },
+    {
+      "name": "batch out of outline rejects all changes",
+      "passed": true
+    },
+    {
+      "name": "batch no change rejected",
+      "passed": true
+    },
+    {
+      "name": "batch request changed after preview rejected",
+      "passed": true
+    },
+    {
+      "name": "revision difference identifies common load change",
+      "passed": true
+    },
+    {
+      "name": "revision difference identifies only design change",
+      "passed": true
+    },
+    {
+      "name": "quality review source and tolerance sensitivity",
+      "passed": true
+    },
+    {
+      "name": "HTML escapes user content",
+      "passed": true
+    },
+    {
+      "name": "CSV formula injection neutralized",
+      "passed": true
+    },
+    {
+      "name": "CSV negative physical numbers remain numeric",
+      "passed": true
+    },
+    {
+      "name": "exports preserve source units method and input hash",
+      "passed": true
+    },
+    {
+      "name": "frequency is label only",
+      "passed": true
+    },
+    {
+      "name": "layout exchange CSV round trip preserves parameter values",
+      "passed": true
+    },
+    {
+      "name": "randomized asymmetric contact states satisfy equilibrium and unilateral laws",
+      "passed": true
+    }
+  ]
+}

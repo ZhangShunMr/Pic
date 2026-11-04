@@ -1,0 +1,55 @@
+<UserControl x:Class="TrimContact.Desktop.Views.ResultView"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:controls="clr-namespace:TrimContact.Desktop.Controls">
+<Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions><WrapPanel>
+<ComboBox ItemsSource="{Binding Variants}" SelectedItem="{Binding SelectedVariant}" DisplayMemberPath="Name" Width="250"/>
+<Button Content="求解全部方案" Command="{Binding CalculateCommand}"/><Button Content="导出报告" Command="{Binding ExportReportCommand}"/><Button Content="导出包络" Command="{Binding ExportCsvCommand}"/><Button Content="生成验证任务" Command="{Binding GenerateTasksCommand}"/></WrapPanel>
+<TabControl Grid.Row="1">
+<TabItem Header="逐点包络"><DockPanel><TextBlock DockPanel.Dock="Top" Text="压缩与滑移为mm，反力为N，限值比无量纲。分离/滑移计数只针对采样集合；请横向滚动查看控制工况。" Style="{StaticResource Note}"/><DataGrid ItemsSource="{Binding Envelopes}"  IsReadOnly="True" >
+<DataGrid.Columns>
+<DataGridTextColumn Header="点位" Binding="{Binding Name, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="150"/>
+<DataGridTextColumn Header="类型" Binding="{Binding Kind, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="80"/>
+<DataGridTextColumn Header="接触/限值状态" Binding="{Binding State, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="150"/>
+<DataGridTextColumn Header="最小压缩 mm" Binding="{Binding MinCompressionMm, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="115"/>
+<DataGridTextColumn Header="最大压缩 mm" Binding="{Binding MaxCompressionMm, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="115"/>
+<DataGridTextColumn Header="最小法向 N" Binding="{Binding MinNormalN, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="110"/>
+<DataGridTextColumn Header="最大法向 N" Binding="{Binding MaxNormalN, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="110"/>
+<DataGridTextColumn Header="最大切向|N|" Binding="{Binding MaxAbsShearN, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="110"/>
+<DataGridTextColumn Header="最大滑移 mm" Binding="{Binding MaxSlipMm, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="110"/>
+<DataGridTextColumn Header="最大限值比" Binding="{Binding MaxUtilization, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="105"/>
+<DataGridTextColumn Header="分离样本" Binding="{Binding DetachedSamples, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="90"/>
+<DataGridTextColumn Header="滑移样本" Binding="{Binding SlidingSamples, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="90"/>
+<DataGridTextColumn Header="总样本" Binding="{Binding TotalSamples, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="85"/>
+<DataGridTextColumn Header="压缩控制工况" Binding="{Binding CompressionCase, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="280"/>
+<DataGridTextColumn Header="滑移控制工况" Binding="{Binding SlipCase, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="280"/>
+<DataGridTextColumn Header="限值控制工况" Binding="{Binding GoverningCase, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="280"/>
+</DataGrid.Columns>
+</DataGrid></DockPanel></TabItem>
+<TabItem Header="名义相位曲线"><DockPanel><TextBlock DockPanel.Dock="Top" Text="仅名义公差的压缩量曲线。横轴为载荷相位角，不是时间；折线不代表连续极值。" Style="{StaticResource Note}"/><ScrollViewer VerticalScrollBarVisibility="Auto"><controls:PhasePlot Workspace="{Binding}" Height="{Binding PlotHeight}"/></ScrollViewer></DockPanel></TabItem>
+<TabItem Header="独立力/力矩核查"><DockPanel><Button DockPanel.Dock="Top" Content="导出平衡核查" Command="{Binding ExportBalanceCommand}"/><DataGrid ItemsSource="{Binding BalanceRows}"  IsReadOnly="True" >
+<DataGrid.Columns>
+<DataGridTextColumn Header="方案" Binding="{Binding Variant, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="150"/>
+<DataGridTextColumn Header="载荷" Binding="{Binding Load, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="170"/>
+<DataGridTextColumn Header="相位 °" Binding="{Binding PhaseDegrees, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="90"/>
+<DataGridTextColumn Header="法向外力 N" Binding="{Binding AppliedNormalN, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="115"/>
+<DataGridTextColumn Header="法向反力 N" Binding="{Binding ReactionNormalN, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="115"/>
+<DataGridTextColumn Header="切向外力 N" Binding="{Binding AppliedShearN, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="115"/>
+<DataGridTextColumn Header="切向反力 N" Binding="{Binding ReactionShearN, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="115"/>
+<DataGridTextColumn Header="法向差 N" Binding="{Binding NormalErrorN, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="100"/>
+<DataGridTextColumn Header="切向差 N" Binding="{Binding ShearErrorN, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="100"/>
+<DataGridTextColumn Header="X力矩差 Nmm" Binding="{Binding MomentXErrorNmm, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="130"/>
+<DataGridTextColumn Header="Y力矩差 Nmm" Binding="{Binding MomentYErrorNmm, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="130"/>
+<DataGridTextColumn Header="弹性能 Nmm" Binding="{Binding ElasticEnergyNmm, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="120"/>
+</DataGrid.Columns>
+</DataGrid></DockPanel></TabItem>
+<TabItem Header="工程复核"><DockPanel><TextBlock DockPanel.Dock="Top" Text="来源、几何、公差与小位移提醒需工程复核。提醒阈值属于未标定的工程初值，不是标准。" Style="{StaticResource Note}"/><DataGrid ItemsSource="{Binding QualityRows}"  IsReadOnly="True" >
+<DataGrid.Columns>
+<DataGridTextColumn Header="类别" Binding="{Binding Severity, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="95"/>
+<DataGridTextColumn Header="对象" Binding="{Binding Target, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="170"/>
+<DataGridTextColumn Header="发现" Binding="{Binding Finding, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="340"/>
+<DataGridTextColumn Header="建议行动" Binding="{Binding Action, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="450"/>
+</DataGrid.Columns>
+</DataGrid></DockPanel></TabItem>
+</TabControl></Grid>
+</UserControl>

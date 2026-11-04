@@ -1,0 +1,71 @@
+<UserControl x:Class="TrimContact.Desktop.Views.ProjectView"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:controls="clr-namespace:TrimContact.Desktop.Controls">
+<ScrollViewer VerticalScrollBarVisibility="Auto"><Grid>
+<Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+<StackPanel><GroupBox IsEnabled="{Binding CanEdit}" Header="项目身份与参数来源"><StackPanel><StackPanel>
+ <TextBlock Text="项目名称（必填，最多100字）"/>
+ <TextBox Text="{Binding Draft.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
+</StackPanel><WrapPanel><StackPanel Width="120">
+ <TextBlock Text="修订"/>
+ <TextBox Text="{Binding Draft.Revision, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
+</StackPanel><StackPanel Width="220">
+ <TextBlock Text="负责人"/>
+ <TextBox Text="{Binding Draft.Owner, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
+</StackPanel></WrapPanel>
+<TextBlock Text="来源类型"/><ComboBox ItemsSource="{Binding Origins}" DisplayMemberPath="Label" SelectedValuePath="Value" SelectedValue="{Binding Draft.Origin, Mode=TwoWay, NotifyOnSourceUpdated=True}"/>
+<StackPanel>
+ <TextBlock Text="参数依据（必填，记录试验编号/估算条件）"/>
+ <TextBox Text="{Binding Draft.Source, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="60"/>
+</StackPanel><StackPanel>
+ <TextBlock Text="设计目标"/>
+ <TextBox Text="{Binding Draft.Goal, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="60"/>
+</StackPanel></StackPanel></GroupBox><GroupBox IsEnabled="{Binding CanEdit}" Header="饰板物性 · 线性刚性平面模型"><StackPanel><StackPanel>
+ <TextBlock Text="饰板名称"/>
+ <TextBox Text="{Binding Draft.Panel.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
+</StackPanel><WrapPanel><StackPanel Width="150">
+ <TextBlock Text="质量 kg"/>
+ <TextBox Text="{Binding Draft.Panel.MassKg, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
+</StackPanel><StackPanel Width="150">
+ <TextBlock Text="质心X mm"/>
+ <TextBox Text="{Binding Draft.Panel.CenterXmm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
+</StackPanel><StackPanel Width="150">
+ <TextBlock Text="质心Y mm"/>
+ <TextBox Text="{Binding Draft.Panel.CenterYmm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
+</StackPanel></WrapPanel><TextBlock Text="质量0.001–100kg；质心须在轮廓内。轮廓与点位坐标±10000mm。刚性平面不包含饰板柔性和动态共振。" Style="{StaticResource Note}"/></StackPanel></GroupBox></StackPanel><StackPanel Grid.Column="1"><GroupBox IsEnabled="{Binding CanEdit}" Header="轮廓工具"><StackPanel><WrapPanel><StackPanel Width="160">
+ <TextBlock Text="矩形宽 mm"/>
+ <TextBox Text="{Binding RectangleWidth, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
+</StackPanel><StackPanel Width="160">
+ <TextBlock Text="矩形高 mm"/>
+ <TextBox Text="{Binding RectangleHeight, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
+</StackPanel></WrapPanel><Button Content="建立/替换矩形" Command="{Binding RectangleCommand}"/><TextBlock Text="矩形原点(0,0)，质心移至中心。自定义轮廓按边界顺序编辑顶点，3–24点，须无自交。" Style="{StaticResource Note}"/><WrapPanel><StackPanel Width="140">
+ <TextBlock Text="新增X mm"/>
+ <TextBox Text="{Binding PlacementX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
+</StackPanel><StackPanel Width="140">
+ <TextBlock Text="新增Y mm"/>
+ <TextBox Text="{Binding PlacementY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
+</StackPanel></WrapPanel><WrapPanel><Button Content="追加顶点" Command="{Binding AddVertexCommand}"/><Button Content="删除所选顶点" Command="{Binding DeleteVertexCommand}"/></WrapPanel><DataGrid ItemsSource="{Binding Vertices}" SelectedItem="{Binding SelectedVertex}" IsReadOnly="False" Height="250">
+<DataGrid.Columns>
+<DataGridTextColumn Header="X mm" Binding="{Binding Xmm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="*"/>
+<DataGridTextColumn Header="Y mm" Binding="{Binding Ymm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="*"/>
+</DataGrid.Columns>
+</DataGrid></StackPanel></GroupBox><controls:LayoutCanvas Workspace="{Binding}" Height="260"/>
+<GroupBox Header="本机项目库（独立于任意位置保存）"><StackPanel>
+<TextBlock Text="{Binding LibraryDirectory}" Style="{StaticResource Note}"/>
+<WrapPanel>
+<Button Content="刷新项目库" Command="{Binding RefreshLibraryCommand}"/>
+<Button Content="存入项目库" Command="{Binding SaveLibraryCommand}"/>
+<Button Content="打开所选项目" Command="{Binding OpenLibraryCommand}"/>
+<Button Content="从.bak复制恢复" Command="{Binding RecoverLibraryCommand}"/>
+</WrapPanel>
+<DataGrid ItemsSource="{Binding LibraryRows}" SelectedItem="{Binding SelectedLibraryItem}" IsReadOnly="True" Height="160">
+<DataGrid.Columns>
+<DataGridTextColumn Header="项目" Binding="{Binding Name}" Width="180"/>
+<DataGridTextColumn Header="修订" Binding="{Binding Revision}" Width="80"/>
+<DataGridTextColumn Header="来源" Binding="{Binding Origin}" Width="110"/>
+<DataGridTextColumn Header="读取错误" Binding="{Binding Error}" Width="250"/>
+</DataGrid.Columns></DataGrid>
+</StackPanel></GroupBox>
+</StackPanel></Grid></ScrollViewer>
+</UserControl>

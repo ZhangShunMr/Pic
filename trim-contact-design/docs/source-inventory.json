@@ -1,0 +1,319 @@
+{
+  "scope": "handwritten production .cs and .xaml actually compiled by Core/Desktop; excludes tests, tools, docs, bin, obj, dependencies and artifacts",
+  "minimum": 3500,
+  "totalNonempty": 3882,
+  "files": [
+    {
+      "path": "src/TrimContact.Core/Analysis/AnalysisEngine.cs",
+      "nonempty": 129,
+      "physical": 135,
+      "sha256": "c4c5eb77b68152c5cfe7cb5bf6bc5f374ff79dc125b43d220c222005a89ba74f"
+    },
+    {
+      "path": "src/TrimContact.Core/Analysis/BalanceAudit.cs",
+      "nonempty": 61,
+      "physical": 64,
+      "sha256": "f063b4f9271ca43d7664f66874b2448e38ac2cbbb552683839a9ea90fcbe0835"
+    },
+    {
+      "path": "src/TrimContact.Core/Analysis/ContactSolver.cs",
+      "nonempty": 129,
+      "physical": 137,
+      "sha256": "af00e9a412b11869d85d44617be73dddad7186d1691915507a60e3bfce8b2ba2"
+    },
+    {
+      "path": "src/TrimContact.Core/Analysis/LinearAlgebra.cs",
+      "nonempty": 71,
+      "physical": 77,
+      "sha256": "9c88686a1219e8754a72a37ba188a37d7b85f184fa5b0ebdac6d5842e7496a4c"
+    },
+    {
+      "path": "src/TrimContact.Core/Analysis/ProjectDifference.cs",
+      "nonempty": 93,
+      "physical": 99,
+      "sha256": "46b16d7d25ef34277c4c0b9cdbeb4c32afbd78a4169f95dc7d91bf0b22fb8990"
+    },
+    {
+      "path": "src/TrimContact.Core/Analysis/QualityInspector.cs",
+      "nonempty": 99,
+      "physical": 104,
+      "sha256": "03c55d4ec9534b6ed59c8dd6e043abeeade1accb3239b0170eb0b505faf645a2"
+    },
+    {
+      "path": "src/TrimContact.Core/Analysis/Results.cs",
+      "nonempty": 87,
+      "physical": 94,
+      "sha256": "c304a9e2b0a24cb95a339db053452671952a6c604f443c3ceccc6e64e5997c31"
+    },
+    {
+      "path": "src/TrimContact.Core/Domain/Demonstration.cs",
+      "nonempty": 49,
+      "physical": 51,
+      "sha256": "619773166c1aa7d0f20c14a415fec1c4062afc737978d412d81be83f9c0f916a"
+    },
+    {
+      "path": "src/TrimContact.Core/Domain/Geometry.cs",
+      "nonempty": 96,
+      "physical": 105,
+      "sha256": "4e2244b10edf9af622949f7593a7c700cb188bb205a231131b3c199b11b59b86"
+    },
+    {
+      "path": "src/TrimContact.Core/Domain/Project.cs",
+      "nonempty": 127,
+      "physical": 140,
+      "sha256": "e6392ba00309e432b26c9769214fb318f59f66b6e8d3ec813e4ab3c6a974efa5"
+    },
+    {
+      "path": "src/TrimContact.Core/Domain/Validation.cs",
+      "nonempty": 185,
+      "physical": 188,
+      "sha256": "69b0a012d7fe9491b2c46cf43087445949a00f5c45e71b6eb005a41a40999497"
+    },
+    {
+      "path": "src/TrimContact.Core/IO/BalanceExport.cs",
+      "nonempty": 38,
+      "physical": 43,
+      "sha256": "b0c803ce7e0a334234e119a0a90e9f1ca99541eacba93d652ca7bae2b9bb0df0"
+    },
+    {
+      "path": "src/TrimContact.Core/IO/CsvTable.cs",
+      "nonempty": 96,
+      "physical": 99,
+      "sha256": "6f76a617ded5017a8d5f920c2464610320c019119abb6bbc44d54a4e84a9a86b"
+    },
+    {
+      "path": "src/TrimContact.Core/IO/DesktopFiles.cs",
+      "nonempty": 66,
+      "physical": 72,
+      "sha256": "8ccef383d4aaa5f9e103a5a69f236a80a479f3e4ed89db65942d55d3b2aa04f4"
+    },
+    {
+      "path": "src/TrimContact.Core/IO/LayoutCsv.cs",
+      "nonempty": 149,
+      "physical": 156,
+      "sha256": "376a1e4f691c60560a87dbe6f9d1a083b698837d01de3b1e5dde7f2aef765dd4"
+    },
+    {
+      "path": "src/TrimContact.Core/IO/ProjectCodec.cs",
+      "nonempty": 91,
+      "physical": 99,
+      "sha256": "ba5d255dab02a6df62b055e824ac11c9c06efc7c878ed7c4c8d7c13f01a2ad51"
+    },
+    {
+      "path": "src/TrimContact.Core/IO/ProjectStore.cs",
+      "nonempty": 94,
+      "physical": 105,
+      "sha256": "3a89e937766e37704b41283c9b4014feec916a15921d4cf1d67c1631648d379b"
+    },
+    {
+      "path": "src/TrimContact.Core/IO/ResultExport.cs",
+      "nonempty": 119,
+      "physical": 128,
+      "sha256": "1d06acd9d2d9c3719a83dcc476b1e557afd3920e46792694ae2c669be564c0f7"
+    },
+    {
+      "path": "src/TrimContact.Core/Operations/BatchLayout.cs",
+      "nonempty": 88,
+      "physical": 95,
+      "sha256": "07438c1eabf02856411d41fcb953790552e2a87b1cb3c7d06921f4cd02d59ac7"
+    },
+    {
+      "path": "src/TrimContact.Core/Operations/DesignOperations.cs",
+      "nonempty": 78,
+      "physical": 83,
+      "sha256": "6367d3e927fdccbedbf7c804e5f250ed7a90eb7977c823fc20ce5614c7c5c8ed"
+    },
+    {
+      "path": "src/TrimContact.Core/Operations/ProjectSession.cs",
+      "nonempty": 88,
+      "physical": 98,
+      "sha256": "d6d4bef412b7facbb1de3a990a335f49eb226355960b28268e65f6881904fda3"
+    },
+    {
+      "path": "src/TrimContact.Desktop/App.xaml",
+      "nonempty": 65,
+      "physical": 65,
+      "sha256": "f06e479529f57131203fb739b0ca505a1fabc3acdcfa6d8a7c5061973d6b9050"
+    },
+    {
+      "path": "src/TrimContact.Desktop/App.xaml.cs",
+      "nonempty": 15,
+      "physical": 17,
+      "sha256": "1a4c9230bbcca12a5ac4ba62d33ceedfaa4380c1e3f2e888bed2bf8226c0f6fb"
+    },
+    {
+      "path": "src/TrimContact.Desktop/Controls/LayoutCanvas.cs",
+      "nonempty": 101,
+      "physical": 107,
+      "sha256": "8205e90595e99e24ae02be208bf39dd2e8f301beb386021d1f5ee557a78239eb"
+    },
+    {
+      "path": "src/TrimContact.Desktop/Controls/PhasePlot.cs",
+      "nonempty": 63,
+      "physical": 66,
+      "sha256": "e03528461014066223dc5c0b56fb2027fa2ee192c8220c10b0dafc86f8ca938f"
+    },
+    {
+      "path": "src/TrimContact.Desktop/Controls/WorkspaceDrawing.cs",
+      "nonempty": 51,
+      "physical": 61,
+      "sha256": "8d57073c6b5303829b20e36b74e984ef2f2e3394ef4e6e2e681ab0478daa4199"
+    },
+    {
+      "path": "src/TrimContact.Desktop/DesktopInteraction.cs",
+      "nonempty": 37,
+      "physical": 44,
+      "sha256": "5ae1cec85cf3c821d0c6ab20b845ff01713341926d5beca79c8326d8e702b431"
+    },
+    {
+      "path": "src/TrimContact.Desktop/MainWindow.xaml",
+      "nonempty": 110,
+      "physical": 110,
+      "sha256": "9f56787eb2e7b1795f5d0a4d5a2bc4c2cd4ebc1c41da5fdc1bedc3f6eac5411f"
+    },
+    {
+      "path": "src/TrimContact.Desktop/MainWindow.xaml.cs",
+      "nonempty": 62,
+      "physical": 70,
+      "sha256": "9dfb65e9de0481b9dae390b4881b038875ef8901a8877664ee668e836206125b"
+    },
+    {
+      "path": "src/TrimContact.Desktop/ViewModels/AnalysisCommands.cs",
+      "nonempty": 154,
+      "physical": 160,
+      "sha256": "5ffcf420a37beb91b0c77579b1874a9b21fbe3370a9534d34bc4dc2202d2dc47"
+    },
+    {
+      "path": "src/TrimContact.Desktop/ViewModels/ExchangeCommands.cs",
+      "nonempty": 93,
+      "physical": 95,
+      "sha256": "bc7436dc8f92e19f7357ea7bdc028126f9d23ed4abcae360fc0c2ecee40bd2b6"
+    },
+    {
+      "path": "src/TrimContact.Desktop/ViewModels/IDesktopInteraction.cs",
+      "nonempty": 11,
+      "physical": 13,
+      "sha256": "3bb046418dd998e9ba57b31a99ec4e301a60f4767721a582113e7584b275a187"
+    },
+    {
+      "path": "src/TrimContact.Desktop/ViewModels/LibraryCommands.cs",
+      "nonempty": 67,
+      "physical": 72,
+      "sha256": "c9c0065c76545dc36c3e5fbaabe8ac21db4d0da0cca23e9ea5a9e2076b4fe381"
+    },
+    {
+      "path": "src/TrimContact.Desktop/ViewModels/ObservableObject.cs",
+      "nonempty": 53,
+      "physical": 60,
+      "sha256": "77ea73458bd5b3d3f51af8e7b2c2d61714986467ec00508bbc1760d32d559d4e"
+    },
+    {
+      "path": "src/TrimContact.Desktop/ViewModels/WorkspaceCommands.cs",
+      "nonempty": 354,
+      "physical": 376,
+      "sha256": "68ae7c45c339aaedb7618294ea83246eafced9838e6e9899d8c7a6a358cfc4d9"
+    },
+    {
+      "path": "src/TrimContact.Desktop/ViewModels/WorkspaceViewModel.cs",
+      "nonempty": 254,
+      "physical": 268,
+      "sha256": "6c8b42d8d2f4037fb531fb43a9d64588e45dc971ce874291043d9199c0fe5208"
+    },
+    {
+      "path": "src/TrimContact.Desktop/Views/CompareView.xaml",
+      "nonempty": 36,
+      "physical": 36,
+      "sha256": "3b2f56ac12c1f05853bfe074cb6b89e636cfa9600c7cedf8052496b8edb47002"
+    },
+    {
+      "path": "src/TrimContact.Desktop/Views/CompareView.xaml.cs",
+      "nonempty": 6,
+      "physical": 8,
+      "sha256": "642ac772c815e1d9931a140cacb62d4742d5b94c6ca8f0c38255875a16324f38"
+    },
+    {
+      "path": "src/TrimContact.Desktop/Views/ExchangeView.xaml",
+      "nonempty": 35,
+      "physical": 35,
+      "sha256": "41381963fbda92e0aac308544ad699d401b672e0336498702b3b94a6f6197134"
+    },
+    {
+      "path": "src/TrimContact.Desktop/Views/ExchangeView.xaml.cs",
+      "nonempty": 6,
+      "physical": 8,
+      "sha256": "a64919d531efcee0019008d75de3df75cb5e66ccfefb048235d43a4632951164"
+    },
+    {
+      "path": "src/TrimContact.Desktop/Views/HelpView.xaml",
+      "nonempty": 6,
+      "physical": 6,
+      "sha256": "7d37d5ee2f51b98b6aa282e75db370c0e4e4a87d03ba435a4f63c7fd619c1404"
+    },
+    {
+      "path": "src/TrimContact.Desktop/Views/HelpView.xaml.cs",
+      "nonempty": 6,
+      "physical": 8,
+      "sha256": "0cd0ab3bdc70f68c35a6d2876089b6f9b3fb75d71847d724dbde70edaab81def"
+    },
+    {
+      "path": "src/TrimContact.Desktop/Views/LayoutView.xaml",
+      "nonempty": 52,
+      "physical": 52,
+      "sha256": "580d42dfc0a1b88bd0712fd90d6e70314a735baf334e819f4ed8fa23ea769808"
+    },
+    {
+      "path": "src/TrimContact.Desktop/Views/LayoutView.xaml.cs",
+      "nonempty": 6,
+      "physical": 8,
+      "sha256": "7afe676e3efe9077e1abc4a9d7230db49af36ea2358581a344f2862e11ef38ff"
+    },
+    {
+      "path": "src/TrimContact.Desktop/Views/LoadView.xaml",
+      "nonempty": 20,
+      "physical": 20,
+      "sha256": "4956269c973904f4a0b382085e7344862ea0eb170ed930466c0fcc01170def23"
+    },
+    {
+      "path": "src/TrimContact.Desktop/Views/LoadView.xaml.cs",
+      "nonempty": 6,
+      "physical": 8,
+      "sha256": "fda2d3a49fe9ceda1ad7a07ce7989c12cc866107a0913734753cc2841b4c2a39"
+    },
+    {
+      "path": "src/TrimContact.Desktop/Views/ProjectView.xaml",
+      "nonempty": 71,
+      "physical": 71,
+      "sha256": "cdd594fe11c86df24f0b851db515ec000230a742d3735a15adf23ba0fbca45ea"
+    },
+    {
+      "path": "src/TrimContact.Desktop/Views/ProjectView.xaml.cs",
+      "nonempty": 6,
+      "physical": 8,
+      "sha256": "fedbb64aec674fddca284b6f79428c83dd3fd95f67bb90d01d85d2403ad6567a"
+    },
+    {
+      "path": "src/TrimContact.Desktop/Views/ResultView.xaml",
+      "nonempty": 55,
+      "physical": 55,
+      "sha256": "72f396cfabbc0deb1c345fa09ef74f10a8e5a94cb9b9d6a2f4cf8b7314d458cb"
+    },
+    {
+      "path": "src/TrimContact.Desktop/Views/ResultView.xaml.cs",
+      "nonempty": 6,
+      "physical": 8,
+      "sha256": "65d7a25c41198cfaa25499832aa6b00659e5657c6b60c500017df52e7f8b51e7"
+    },
+    {
+      "path": "src/TrimContact.Desktop/Views/ReviewView.xaml",
+      "nonempty": 36,
+      "physical": 36,
+      "sha256": "d1406084c56879c5f341f6dac0f9054b472acf07710f54ca033615cd9863cc80"
+    },
+    {
+      "path": "src/TrimContact.Desktop/Views/ReviewView.xaml.cs",
+      "nonempty": 6,
+      "physical": 8,
+      "sha256": "de5d5bf1660e2b98af048ea0ade50fb186ec29400f2f1c5e5780df23a1bf6b0f"
+    }
+  ]
+}

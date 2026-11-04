@@ -1,0 +1,18 @@
+{
+  "utc": "2026-11-04T15:07:05.416350+00:00",
+  "rid": "win-x64",
+  "selfContained": true,
+  "singleFile": true,
+  "compression": true,
+  "exeSha256": "5f292d1fc61b4ea50d3dbe06a1f33d0c3da1ce15763a02cffe09534b312531fc",
+  "exeBytes": 64960251,
+  "zipSha256": "a974997eff69cfcdaed52d4c4274cc96d045f9d328a3d3e730b8199dc479746f",
+  "zipBytes": 59356381,
+  "nativeFile": "/workspace/Pic/trim-contact-design/artifacts/win-x64/TrimContact.Desktop.exe: PE32+ executable for MS Windows 6.00 (GUI), x86-64, 9 sections",
+  "crossCompiledOn": "Linux x64",
+  "windowsRuntimeVerified": false,
+  "realWpfScreenshots": 0,
+  "zipCrcVerified": true,
+  "coreChecks": 84,
+  "workflowChecks": 31
+}

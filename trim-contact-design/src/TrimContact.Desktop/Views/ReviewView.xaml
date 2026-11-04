@@ -1,0 +1,36 @@
+<UserControl x:Class="TrimContact.Desktop.Views.ReviewView"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:controls="clr-namespace:TrimContact.Desktop.Controls">
+<ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel><GroupBox Header="样件验证任务 · 完成状态由用户记录"><StackPanel><WrapPanel><Button Content="添加任务" Command="{Binding AddTaskCommand}"/><Button Content="删除所选任务" Command="{Binding DeleteTaskCommand}"/><Button Content="从有效结果生成任务" Command="{Binding GenerateTasksCommand}"/><Button Content="导出任务" Command="{Binding ExportTasksCommand}"/></WrapPanel><Grid IsEnabled="{Binding CanEdit}"><Grid.ColumnDefinitions><ColumnDefinition Width="320"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions><DataGrid ItemsSource="{Binding Tasks}" SelectedItem="{Binding SelectedTask}" IsReadOnly="False" Height="300">
+<DataGrid.Columns>
+<DataGridTextColumn Header="任务" Binding="{Binding Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="*"/>
+</DataGrid.Columns>
+</DataGrid><StackPanel Grid.Column="1"><StackPanel>
+ <TextBlock Text="任务标题"/>
+ <TextBox Text="{Binding SelectedTask.Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
+</StackPanel><WrapPanel><StackPanel Width="200">
+ <TextBlock Text="负责人"/>
+ <TextBox Text="{Binding SelectedTask.Owner, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
+</StackPanel><CheckBox Content="已完成（需填写证据）" IsChecked="{Binding SelectedTask.Completed, NotifyOnSourceUpdated=True}"/></WrapPanel><StackPanel>
+ <TextBlock Text="验证方法"/>
+ <TextBox Text="{Binding SelectedTask.Method, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="60"/>
+</StackPanel><StackPanel>
+ <TextBlock Text="约定判据（不是软件认证）"/>
+ <TextBox Text="{Binding SelectedTask.Acceptance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="60"/>
+</StackPanel><StackPanel>
+ <TextBlock Text="证据文字/编号（不自动嵌入外部文件）"/>
+ <TextBox Text="{Binding SelectedTask.Evidence, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="60"/>
+</StackPanel></StackPanel></Grid></StackPanel></GroupBox><GroupBox Header="参考项目输入核对"><StackPanel><Button Content="选择参考项目并核对" Command="{Binding CompareFileCommand}"/><TextBlock Text="{Binding DifferenceSummary}" Style="{StaticResource Note}"/><DataGrid ItemsSource="{Binding Differences}"  IsReadOnly="True" Height="200">
+<DataGrid.Columns>
+<DataGridTextColumn Header="字段路径（按ID匹配）" Binding="{Binding Path, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="380"/>
+<DataGridTextColumn Header="当前值" Binding="{Binding Current, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="250"/>
+<DataGridTextColumn Header="参考值" Binding="{Binding Reference, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="250"/>
+</DataGrid.Columns>
+</DataGrid></StackPanel></GroupBox><GroupBox Header="操作追溯"><StackPanel><TextBlock Text="应用编辑、批量事务、归档与任务生成被记录。最多保留500项。此记录辅助追溯，不是不可篡改审计。" Style="{StaticResource Note}"/><DataGrid ItemsSource="{Binding Draft.Audit}"  IsReadOnly="True" Height="160">
+<DataGrid.Columns>
+<DataGridTextColumn Header="UTC时间" Binding="{Binding Utc, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="230"/>
+<DataGridTextColumn Header="操作" Binding="{Binding Action, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="*"/>
+</DataGrid.Columns>
+</DataGrid></StackPanel></GroupBox></StackPanel></ScrollViewer>
+</UserControl>

@@ -1,0 +1,122 @@
+{
+  "schema": 1,
+  "id": "4a3df4c0-60fb-4aa3-9def-a66a08142425",
+  "name": "\u95E8\u677F\u56DB\u5361\u6263\u63A5\u89E6\u5E03\u7F6E\u6F14\u793A",
+  "revision": "A",
+  "owner": "\u6F14\u793A\u5DE5\u7A0B\u5E08",
+  "goal": "\u6BD4\u8F83\u7F13\u51B2\u5757\u9884\u7D27\u91CF\u5BF9\u63A5\u89E6\u4FDD\u6301\u548C\u5361\u6263\u53CD\u529B\u7684\u5F71\u54CD",
+  "origin": "Simulation",
+  "source": "\u5185\u7F6E\u56FA\u5B9A\u6A21\u62DF\u53C2\u6570\uFF1B\u975E\u5B9E\u6D4B\uFF0C\u4E0D\u8BC1\u660E\u5B9E\u8F66\u6548\u679C",
+  "archived": false,
+  "createdUtc": "2026-11-04T15:01:43.5101498+00:00",
+  "modifiedUtc": "2026-11-04T15:01:43.5101499+00:00",
+  "panel": {
+    "name": "400\u00D7300 mm\u521A\u6027\u9970\u677F\u793A\u4F8B",
+    "massKg": 1,
+    "centerXmm": 200,
+    "centerYmm": 150,
+    "outline": [
+      {
+        "xmm": 0,
+        "ymm": 0
+      },
+      {
+        "xmm": 400,
+        "ymm": 0
+      },
+      {
+        "xmm": 400,
+        "ymm": 300
+      },
+      {
+        "xmm": 0,
+        "ymm": 300
+      }
+    ]
+  },
+  "settings": {
+    "phases": 24,
+    "enumerateTolerance": true
+  },
+  "variants": [
+    {
+      "id": "99c0179c-3377-4def-8124-b4869629e195",
+      "name": "A \u57FA\u51C6\u63A5\u89E6\u5E03\u7F6E",
+      "note": "",
+      "clips": [
+        {
+          "id": "e6ba0cca-a1df-4371-acc4-e48d8e7a48f9",
+          "name": "\u5DE6\u4E0B\u5361\u6263",
+          "xmm": 40,
+          "ymm": 40,
+          "normalStiffness": 100,
+          "tangentialStiffness": 50,
+          "forceLimitN": 80
+        },
+        {
+          "id": "27a65971-750c-4801-b6a6-2bb5b3e4f997",
+          "name": "\u53F3\u4E0B\u5361\u6263",
+          "xmm": 360,
+          "ymm": 40,
+          "normalStiffness": 100,
+          "tangentialStiffness": 50,
+          "forceLimitN": 80
+        },
+        {
+          "id": "4413e545-bf5d-418c-aa6c-96ac02183434",
+          "name": "\u53F3\u4E0A\u5361\u6263",
+          "xmm": 360,
+          "ymm": 260,
+          "normalStiffness": 100,
+          "tangentialStiffness": 50,
+          "forceLimitN": 80
+        },
+        {
+          "id": "8e3c8b69-01d0-40b0-8311-aedf385242c5",
+          "name": "\u5DE6\u4E0A\u5361\u6263",
+          "xmm": 40,
+          "ymm": 260,
+          "normalStiffness": 100,
+          "tangentialStiffness": 50,
+          "forceLimitN": 80
+        }
+      ],
+      "contacts": [
+        {
+          "id": "4cdee66a-1149-4202-8827-f967bd146b28",
+          "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
+          "material": "\u7F13\u51B2\u5757\uFF08\u5F85\u6807\u5B9A\uFF09",
+          "xmm": 200,
+          "ymm": 150,
+          "gapMm": 0.1,
+          "toleranceMm": 0.15,
+          "preloadMm": 0.2,
+          "normalStiffness": 100,
+          "tangentialStiffness": 40,
+          "friction": 0.3,
+          "compressionLimitMm": 0.8
+        }
+      ]
+    }
+  ],
+  "loads": [
+    {
+      "id": "1ad4ed6a-2075-42b3-958e-90c80625bcc5",
+      "name": "\u4E00\u500D\u91CD\u529B\u5468\u671F\u6F14\u793A",
+      "normalBiasG": 0,
+      "normalAmplitudeG": 1,
+      "tangentialBiasG": 0,
+      "tangentialAmplitudeG": 0.5,
+      "phaseDegrees": 90,
+      "frequencyHz": 10,
+      "source": "\u6A21\u62DF\u6B63\u5F26\u60EF\u6027\u8F7D\u8377"
+    }
+  ],
+  "tasks": [],
+  "audit": [
+    {
+      "utc": "2026-11-04T15:01:43.5101583+00:00",
+      "action": "\u8F7D\u5165\u5185\u7F6E\u6A21\u62DF\u6F14\u793A"
+    }
+  ]
+}

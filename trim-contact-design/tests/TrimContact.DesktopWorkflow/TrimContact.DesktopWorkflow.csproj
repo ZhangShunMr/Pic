@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+ <PropertyGroup><OutputType>Exe</OutputType></PropertyGroup>
+ <ItemGroup>
+  <ProjectReference Include="../../src/TrimContact.Core/TrimContact.Core.csproj"/>
+  <Compile Include="../../src/TrimContact.Desktop/ViewModels/*.cs" Link="ViewModels/%(Filename)%(Extension)"/>
+ </ItemGroup>
+</Project>

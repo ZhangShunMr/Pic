@@ -1,0 +1,110 @@
+<Window x:Class="TrimContact.Desktop.MainWindow"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:views="clr-namespace:TrimContact.Desktop.Views"
+ Title="{Binding Title}" Width="1460" Height="940" MinWidth="1060" MinHeight="720">
+ <Window.Resources>
+  <DataTemplate x:Key="ProjectTemplate"><views:ProjectView/></DataTemplate>
+  <DataTemplate x:Key="LayoutTemplate"><views:LayoutView/></DataTemplate>
+  <DataTemplate x:Key="LoadTemplate"><views:LoadView/></DataTemplate>
+  <DataTemplate x:Key="ResultTemplate"><views:ResultView/></DataTemplate>
+  <DataTemplate x:Key="CompareTemplate"><views:CompareView/></DataTemplate>
+  <DataTemplate x:Key="ExchangeTemplate"><views:ExchangeView/></DataTemplate>
+  <DataTemplate x:Key="ReviewTemplate"><views:ReviewView/></DataTemplate>
+  <DataTemplate x:Key="HelpTemplate"><views:HelpView/></DataTemplate>
+ </Window.Resources>
+ <Window.InputBindings>
+  <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveCommand}"/>
+  <KeyBinding Key="O" Modifiers="Control" Command="{Binding OpenCommand}"/>
+  <KeyBinding Key="N" Modifiers="Control" Command="{Binding NewCommand}"/>
+  <KeyBinding Key="Z" Modifiers="Control" Command="{Binding UndoCommand}"/>
+  <KeyBinding Key="Y" Modifiers="Control" Command="{Binding RedoCommand}"/>
+  <KeyBinding Key="F5" Command="{Binding CalculateCommand}"/>
+ </Window.InputBindings>
+ <DockPanel>
+  <Menu DockPanel.Dock="Top" Background="White" Padding="8,4">
+   <MenuItem Header="文件(_F)">
+    <MenuItem Header="新建空白项目" Command="{Binding NewCommand}" InputGestureText="Ctrl+N"/>
+    <MenuItem Header="打开项目…" Command="{Binding OpenCommand}" InputGestureText="Ctrl+O"/>
+    <MenuItem Header="保存" Command="{Binding SaveCommand}" InputGestureText="Ctrl+S"/>
+    <MenuItem Header="另存为…" Command="{Binding SaveAsCommand}"/>
+    <Separator/>
+    <MenuItem Header="载入独立模拟示例…" Command="{Binding DemoCommand}"/>
+    <MenuItem Header="复制为新项目" Command="{Binding CopyProjectCommand}"/>
+    <MenuItem Header="归档项目…" Command="{Binding ArchiveCommand}"/>
+   </MenuItem>
+   <MenuItem Header="编辑(_E)">
+    <MenuItem Header="应用草稿" Command="{Binding ApplyCommand}"/>
+    <MenuItem Header="放弃草稿" Command="{Binding DiscardDraftCommand}"/>
+    <MenuItem Header="撤销上次应用" Command="{Binding UndoCommand}" InputGestureText="Ctrl+Z"/>
+    <MenuItem Header="重做" Command="{Binding RedoCommand}" InputGestureText="Ctrl+Y"/>
+   </MenuItem>
+   <MenuItem Header="成果(_R)">
+    <MenuItem Header="导出报告 HTML…" Command="{Binding ExportReportCommand}"/>
+    <MenuItem Header="导出包络 CSV…" Command="{Binding ExportCsvCommand}"/>
+    <MenuItem Header="导出名义相位 CSV…" Command="{Binding ExportTraceCommand}"/>
+    <MenuItem Header="导出分析 JSON…" Command="{Binding ExportJsonCommand}"/>
+    <MenuItem Header="导出平衡 CSV…" Command="{Binding ExportBalanceCommand}"/>
+    <MenuItem Header="导出扫描 CSV…" Command="{Binding ExportSweepCommand}"/>
+    <MenuItem Header="导出验证任务 CSV…" Command="{Binding ExportTasksCommand}"/>
+   </MenuItem>
+  </Menu>
+  <StatusBar DockPanel.Dock="Bottom" Background="#DFE9E8">
+   <StatusBarItem><TextBlock Text="{Binding Status}" TextWrapping="Wrap" MaxWidth="1000"/></StatusBarItem>
+   <StatusBarItem><ProgressBar Value="{Binding Progress}" Width="100" Height="12"/></StatusBarItem>
+   <StatusBarItem><Button Content="取消计算" Command="{Binding CancelCommand}"/></StatusBarItem>
+  </StatusBar>
+  <Border DockPanel.Dock="Bottom" Background="#FFF1D9" Padding="12,5">
+   <TextBlock Text="{Binding Boundary}" TextWrapping="Wrap"/>
+  </Border>
+  <Grid>
+   <Grid.ColumnDefinitions><ColumnDefinition Width="230"/><ColumnDefinition Width="5"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+   <Border Background="#203B43" Padding="16,20">
+    <DockPanel>
+     <StackPanel DockPanel.Dock="Top" Margin="0,0,0,20">
+      <TextBlock Text="接触设计工作台" FontSize="23" Foreground="White"/>
+      <TextBlock Text="TRIM / CONTACT · V2.0" Foreground="#8BCDC3" Margin="0,7,0,12"/>
+      <TextBlock Text="{Binding SourceLabel}" Foreground="#D9E7E8" TextWrapping="Wrap" MaxHeight="120"/>
+     </StackPanel>
+     <StackPanel DockPanel.Dock="Bottom" Margin="0,15,0,0">
+      <TextBlock Text="{Binding ProjectState}" Foreground="#FFE0A5" TextWrapping="Wrap" Margin="0,0,0,10"/>
+      <Button Content="应用草稿" Command="{Binding ApplyCommand}"/>
+      <Button Content="求解全部方案  F5" Command="{Binding CalculateCommand}"/>
+      <Button Content="保存项目  Ctrl+S" Command="{Binding SaveCommand}"/>
+      <TextBlock Text="{Binding FileLocation}" Foreground="#C5D9DB" TextWrapping="Wrap" Margin="0,10,0,0"/>
+     </StackPanel>
+     <ListBox ItemsSource="{Binding Sections}" SelectedIndex="{Binding SectionIndex}" IsEnabled="{Binding CanNavigate}"
+      Background="Transparent" BorderThickness="0" Foreground="White" HorizontalContentAlignment="Stretch">
+      <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem"><Setter Property="Padding" Value="8,11"/><Setter Property="Margin" Value="0,2"/></Style></ListBox.ItemContainerStyle>
+      <ListBox.ItemTemplate><DataTemplate>
+       <StackPanel><TextBlock Text="{Binding Title}" FontSize="16"/><TextBlock Text="{Binding Description}" FontSize="11" Margin="0,5,0,0"/></StackPanel>
+      </DataTemplate></ListBox.ItemTemplate>
+     </ListBox>
+    </DockPanel>
+   </Border>
+   <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch"/>
+   <DockPanel Grid.Column="2" Margin="18,12,8,8">
+    <StackPanel DockPanel.Dock="Top">
+     <TextBlock Text="{Binding Section.Title}" FontSize="25" FontWeight="SemiBold" Margin="0,0,0,3"/>
+     <TextBlock Text="{Binding ResultState}" Style="{StaticResource Note}"/>
+    </StackPanel>
+    <ContentControl Content="{Binding}">
+     <ContentControl.Style>
+      <Style TargetType="ContentControl">
+       <Setter Property="ContentTemplate" Value="{StaticResource ProjectTemplate}"/>
+       <Style.Triggers>
+        <DataTrigger Binding="{Binding SectionIndex}" Value="1"><Setter Property="ContentTemplate" Value="{StaticResource LayoutTemplate}"/></DataTrigger>
+        <DataTrigger Binding="{Binding SectionIndex}" Value="2"><Setter Property="ContentTemplate" Value="{StaticResource LoadTemplate}"/></DataTrigger>
+        <DataTrigger Binding="{Binding SectionIndex}" Value="3"><Setter Property="ContentTemplate" Value="{StaticResource ResultTemplate}"/></DataTrigger>
+        <DataTrigger Binding="{Binding SectionIndex}" Value="4"><Setter Property="ContentTemplate" Value="{StaticResource CompareTemplate}"/></DataTrigger>
+        <DataTrigger Binding="{Binding SectionIndex}" Value="5"><Setter Property="ContentTemplate" Value="{StaticResource ExchangeTemplate}"/></DataTrigger>
+        <DataTrigger Binding="{Binding SectionIndex}" Value="6"><Setter Property="ContentTemplate" Value="{StaticResource ReviewTemplate}"/></DataTrigger>
+        <DataTrigger Binding="{Binding SectionIndex}" Value="7"><Setter Property="ContentTemplate" Value="{StaticResource HelpTemplate}"/></DataTrigger>
+       </Style.Triggers>
+      </Style>
+     </ContentControl.Style>
+    </ContentControl>
+   </DockPanel>
+  </Grid>
+ </DockPanel>
+</Window>
