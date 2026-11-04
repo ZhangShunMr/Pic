@@ -1,0 +1,143 @@
+{
+  "utc": "2026-11-04T16:17:02.869577+00:00",
+  "sourceCommit": "e1bc5bceb56de25cfdbf39b240d0e20c7b4643a1",
+  "ciTriggerCommit": "e1bc5bceb56de25cfdbf39b240d0e20c7b4643a1",
+  "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41865483714",
+  "renderer": "LibreOffice 26.2.6.3 620(Build:3)",
+  "wordPaginationVerified": false,
+  "note": "Actual LibreOffice DOCX-to-PDF pagination and per-page renders; does not establish Microsoft Word pagination. Human inspection is recorded separately.",
+  "documents": [
+    {
+      "document": "操作说明书-待Windows核验.docx",
+      "sourceSha256": "00414f363d5cca955280567a8c85df8a23548b06b015d4afffd2d9334778e287",
+      "pdfSha256": "5f1e0296b3f4155151fb69fe14632a1856be734c5d8aa678357290fa23c9bd53",
+      "actualLibreOfficePdfPages": 17,
+      "pageChecks": [
+        {
+          "page": 1,
+          "textCharacters": 840,
+          "embeddedImages": 14,
+          "nonempty": true
+        },
+        {
+          "page": 2,
+          "textCharacters": 862,
+          "embeddedImages": 14,
+          "nonempty": true
+        },
+        {
+          "page": 3,
+          "textCharacters": 690,
+          "embeddedImages": 14,
+          "nonempty": true
+        },
+        {
+          "page": 4,
+          "textCharacters": 100,
+          "embeddedImages": 14,
+          "nonempty": true
+        },
+        {
+          "page": 5,
+          "textCharacters": 740,
+          "embeddedImages": 14,
+          "nonempty": true
+        },
+        {
+          "page": 6,
+          "textCharacters": 704,
+          "embeddedImages": 14,
+          "nonempty": true
+        },
+        {
+          "page": 7,
+          "textCharacters": 644,
+          "embeddedImages": 14,
+          "nonempty": true
+        },
+        {
+          "page": 8,
+          "textCharacters": 712,
+          "embeddedImages": 14,
+          "nonempty": true
+        },
+        {
+          "page": 9,
+          "textCharacters": 746,
+          "embeddedImages": 14,
+          "nonempty": true
+        },
+        {
+          "page": 10,
+          "textCharacters": 181,
+          "embeddedImages": 14,
+          "nonempty": true
+        },
+        {
+          "page": 11,
+          "textCharacters": 65,
+          "embeddedImages": 14,
+          "nonempty": true
+        },
+        {
+          "page": 12,
+          "textCharacters": 681,
+          "embeddedImages": 14,
+          "nonempty": true
+        },
+        {
+          "page": 13,
+          "textCharacters": 767,
+          "embeddedImages": 14,
+          "nonempty": true
+        },
+        {
+          "page": 14,
+          "textCharacters": 104,
+          "embeddedImages": 14,
+          "nonempty": true
+        },
+        {
+          "page": 15,
+          "textCharacters": 651,
+          "embeddedImages": 14,
+          "nonempty": true
+        },
+        {
+          "page": 16,
+          "textCharacters": 746,
+          "embeddedImages": 14,
+          "nonempty": true
+        },
+        {
+          "page": 17,
+          "textCharacters": 796,
+          "embeddedImages": 14,
+          "nonempty": true
+        }
+      ],
+      "humanPerPageInspection": false
+    },
+    {
+      "document": "软著信息采集表-草稿.docx",
+      "sourceSha256": "991b9611f4686da6d4ad0154e4c15ae46c2b3f2c92f64b78ce6eb89be0146487",
+      "pdfSha256": "31099cac0abea2adc4691d338d8edf318a63e79a2a2c26024c31817545461a88",
+      "actualLibreOfficePdfPages": 2,
+      "pageChecks": [
+        {
+          "page": 1,
+          "textCharacters": 1157,
+          "embeddedImages": 0,
+          "nonempty": true
+        },
+        {
+          "page": 2,
+          "textCharacters": 734,
+          "embeddedImages": 0,
+          "nonempty": true
+        }
+      ],
+      "humanPerPageInspection": false
+    }
+  ]
+}
