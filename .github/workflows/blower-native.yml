@@ -36,6 +36,10 @@ jobs:
           dotnet publish src/Blower.Desktop -c Release -r win-x64 --self-contained true -o release/win-x64
           if ($LASTEXITCODE -ne 0) { throw 'Publish failed' }
           ./tools/smoke-published.ps1
+          Copy-Item README.md release/win-x64/使用说明.md
+          Copy-Item examples release/win-x64/examples -Recurse -Force
+          Compress-Archive -Path release/win-x64/* -DestinationPath release/BlowerResonance-V2.0-win-x64.zip -Force
+          @{ sourceCommit=$env:GITHUB_SHA; target='win-x64'; archiveSha256=(Get-FileHash release/BlowerResonance-V2.0-win-x64.zip -Algorithm SHA256).Hash; archiveBytes=(Get-Item release/BlowerResonance-V2.0-win-x64.zip).Length; exeSha256=(Get-FileHash release/win-x64/BlowerResonance.exe -Algorithm SHA256).Hash; actualNativeLaunch=$true } | ConvertTo-Json | Set-Content docs/release-windows.json -Encoding utf8
       - name: Check whether Microsoft Word is actually installed
         if: always()
         run: |
@@ -56,6 +60,7 @@ jobs:
           git config user.name 'Blower Windows verification'
           git config user.email 'codex@openai.com'
           git add docs/screenshots docs/*-windows.json docs/word-availability.json
+          git add -f release/BlowerResonance-V2.0-win-x64.zip
           git diff --cached --quiet
           if ($LASTEXITCODE -eq 1) {
             git commit -m 'Record actual Windows blower WPF verification [skip ci]'

@@ -86,6 +86,7 @@ internal static class Program
         Check("Real TextBox binding and bound Apply reject zero blades",vm.Error && vm.Project.Settings.Blades==40);
         await Capture(w,"16-invalid-input");
         Click(w,"还原草稿");
+        Check("Discarding invalid editor clears obsolete error notice",!vm.Error && !vm.Form.Changed);
         Navigate(w,vm,"orders"); await Capture(w,"04-orders");
         Navigate(w,vm,"modes");
         var grid=Descendants<DataGrid>(w).Single(x=>x.IsVisible);

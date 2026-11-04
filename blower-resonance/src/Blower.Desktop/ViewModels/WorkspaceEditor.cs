@@ -193,6 +193,7 @@ public sealed partial class WorkspaceViewModel
         if (!Form.Changed || dialogs.Confirm("放弃尚未应用的属性修改？"))
         {
             BuildEditor();
+            Message("已还原属性草稿；当前项目数据保持原值。");
         }
     }
 

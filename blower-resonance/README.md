@@ -4,7 +4,7 @@ C# / WPF / MVVM 的 Windows 原生桌面程序。启动入口为 `BlowerResonanc
 
 ## 运行
 
-Windows 10/11 x64：解压自包含包，双击其中 `BlowerResonance.exe`。整个目录须一起保留；无需安装 .NET。发布包以跨平台生成的真实 Windows PE 程序及 WindowsDesktop 运行时组成，尚未在 Windows 上运行验收。
+Windows 10/11 x64：解压自包含包，双击其中 `BlowerResonance.exe`。整个目录须一起保留；无需安装 .NET。发布包包含真实 Windows PE 程序及 WindowsDesktop 运行时。已在 Windows Server 2025 GitHub runner 实际显示WPF窗口、检查绑定并直接启动自包含exe；Windows 10/11硬件与高DPI仍需目标环境补验。
 
 源码运行：安装 .NET 8 SDK，用 Visual Studio 2022 打开解决方案，将 `Blower.Desktop` 设为启动项目，或在本目录执行 `dotnet run --project src/Blower.Desktop -c Release`。也可双击 `run.bat`。首次源码还原需要 NuGet；发布后的程序完全离线运行。
 
@@ -20,6 +20,6 @@ Windows 10/11 x64：解压自包含包，双击其中 `BlowerResonance.exe`。�
 
 ## 验证与材料
 
-见 `docs/验证记录.md`、`docs/要求符合性矩阵.md` 和实际日志。操作说明书与软著采集表为待 Windows 验收的材料草稿，真实 WPF 截图和 Microsoft Word 实际分页尚未完成。没有使用旧 Web 截图或模拟截图。
+见 `docs/验证记录.md`、`docs/要求符合性矩阵.md` 和实际日志。操作说明书与软著采集表包含真实Windows WPF截图和验证记录；Microsoft Word实际分页尚未完成，仍标为待分页验收稿。没有使用旧Web截图或模拟截图。
 
 `docs/Windows验收步骤.md` 给出必须补验的界面步骤；`tools/capture-windows.ps1` 仅在 Windows 上捕获真实运行窗口。生产源码统计及完整打印稿由 `tools/build-materials.py` 根据实际构建文件生成。
