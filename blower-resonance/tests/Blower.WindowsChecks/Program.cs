@@ -25,7 +25,7 @@ internal static class Program
         Directory.CreateDirectory(folder);
         var app = new App();
         app.InitializeComponent();
-        app.StartupUri = null;
+        app.StartMainWindow = false;
         app.ShutdownMode = ShutdownMode.OnExplicitShutdown;
         var services = new TestDialogs(folder);
         var window = new MainWindow(services);
