@@ -162,9 +162,15 @@ internal static class Program
         var visual = window.Content as FrameworkElement ?? window;
         var bitmap = new RenderTargetBitmap((int)Math.Ceiling(visual.ActualWidth),
             (int)Math.Ceiling(visual.ActualHeight), 96, 96, PixelFormats.Pbgra32);
+        var background = new DrawingVisual();
+        using (var drawing = background.RenderOpen())
+            drawing.DrawRectangle(window.Background ?? Brushes.White, null,
+                new Rect(0, 0, visual.ActualWidth, visual.ActualHeight));
+        bitmap.Render(background);
         bitmap.Render(visual);
         var pixels = new byte[bitmap.PixelWidth * bitmap.PixelHeight * 4];
         bitmap.CopyPixels(pixels, bitmap.PixelWidth * 4, 0);
+        Record(name + " has opaque native window background", pixels.Where((_, i) => i % 4 == 3).All(alpha => alpha == 255));
         Record(name + " contains rendered pixels", pixels.Where((_, i) => i % 4 != 3).Distinct().Count() > 20);
         var encoder = new PngBitmapEncoder();
         encoder.Frames.Add(BitmapFrame.Create(bitmap));
