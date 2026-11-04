@@ -105,7 +105,7 @@
       <TextBlock Grid.Column="1" Text="{Binding Editor.SourceBadge}" Foreground="#856029" FontSize="11" Margin="8,0,0,0"/>
      </Grid>
     </Border>
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <ScrollViewer x:Name="WorkspaceScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
      <StackPanel IsEnabled="{Binding NotBusy}">
       <Border Style="{StaticResource Card}" Visibility="{Binding HasProject, Converter={StaticResource BoolVisibility}, ConverterParameter=invert}">
        <StackPanel>

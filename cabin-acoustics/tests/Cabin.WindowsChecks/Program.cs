@@ -58,7 +58,7 @@ internal static class Program
                     sourceCommit = Environment.GetEnvironmentVariable("GITHUB_SHA"),
                     platform = Environment.OSVersion.ToString(),
                     framework = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,
-                    rendering = "Actual WPF MainWindow shown on Windows. PNG files captured from the rendered native Window using RenderTargetBitmap; not browser or mock-up images.",
+                    rendering = "Actual WPF MainWindow shown on Windows. PNG files captured from the actual rendered native Window client content using RenderTargetBitmap; not browser or mock-up images.",
                     failed = failures,
                     checks = Results
                 }, new JsonSerializerOptions { WriteIndented = true }));
@@ -86,10 +86,13 @@ internal static class Program
         vm.CalculateCommand.Execute(null);
         await Wait(vm);
         Record("WPF calculate populates field and spectrum", vm.Field is not null && vm.Spectrum is not null);
+        await Render(window, "04a-field-settings");
+        window.ShowFullField();
         await Render(window, "04-response-field");
         vm.ShowShape = true;
         vm.UpdateFieldCommand.Execute(null);
         await Wait(vm);
+        window.ShowFullField();
         await Render(window, "05-mode-shape");
         vm.Section = "spectrum";
         await Render(window, "06-seat-spectrum");
@@ -155,9 +158,10 @@ internal static class Program
         window.UpdateLayout();
         await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Render);
         await Task.Delay(150);
-        var bitmap = new RenderTargetBitmap((int)Math.Ceiling(window.ActualWidth),
-            (int)Math.Ceiling(window.ActualHeight), 96, 96, PixelFormats.Pbgra32);
-        bitmap.Render(window);
+        var visual = window.Content as FrameworkElement ?? window;
+        var bitmap = new RenderTargetBitmap((int)Math.Ceiling(visual.ActualWidth),
+            (int)Math.Ceiling(visual.ActualHeight), 96, 96, PixelFormats.Pbgra32);
+        bitmap.Render(visual);
         var pixels = new byte[bitmap.PixelWidth * bitmap.PixelHeight * 4];
         bitmap.CopyPixels(pixels, bitmap.PixelWidth * 4, 0);
         Record(name + " contains rendered pixels", pixels.Where((_, i) => i % 4 != 3).Distinct().Count() > 20);

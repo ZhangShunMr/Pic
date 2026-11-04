@@ -20,7 +20,10 @@ public partial class MainWindow : Window
         vm.PropertyChanged += (_, args) =>
         {
             if (args.PropertyName == nameof(WorkspaceViewModel.Section))
+            {
                 SelectSection(Navigation.Items, vm.Section);
+                WorkspaceScroll.ScrollToTop();
+            }
         };
     }
 
@@ -35,6 +38,12 @@ public partial class MainWindow : Window
     }
 
     public FrameworkElement FieldVisual => FieldDrawing;
+
+    public void ShowFullField()
+    {
+        WorkspaceScroll.UpdateLayout();
+        WorkspaceScroll.ScrollToBottom();
+    }
 
     private void Navigate(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
