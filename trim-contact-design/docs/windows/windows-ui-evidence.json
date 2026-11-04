@@ -1,7 +1,7 @@
 {
-  "executedUtc": "2026-11-04T16:01:16.1968113+00:00",
-  "sourceCommit": "d8a6f694d02d5627932e2b441e0d23f529d2bb82",
-  "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41863273737",
+  "executedUtc": "2026-11-04T16:13:17.3028975+00:00",
+  "sourceCommit": "30ad8ddb57e71881dbc621cbf4967b5780b30682",
+  "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41864792756",
   "platform": "Microsoft Windows NT 10.0.26100.0",
   "framework": ".NET 10.0.14",
   "rendering": "Actual production WPF MainWindow shown on Windows; client visual captured with RenderTargetBitmap after layout/render. Not browser or mock-up images.",
@@ -125,6 +125,11 @@
       "detail": ""
     },
     {
+      "name": "rendered result uses six significant digits",
+      "passed": true,
+      "detail": "expected 0.100387; actual 0.100387"
+    },
+    {
       "name": "07-nominal-traces rendered with opaque background",
       "passed": true,
       "detail": ""
@@ -170,6 +175,11 @@
       "detail": ""
     },
     {
+      "name": "actual scan count binding matches four values",
+      "passed": true,
+      "detail": ""
+    },
+    {
       "name": "native scan completes without altering model",
       "passed": true,
       "detail": ""
@@ -191,6 +201,11 @@
     },
     {
       "name": "12a-csv-preview contains native rendered content",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "actual batch increment binding matches preview request",
       "passed": true,
       "detail": ""
     },

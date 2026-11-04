@@ -6,8 +6,8 @@
     "sha256": "43a2df474823e7e69bd8f56894cc1085c7d0808c9802dac7e487c3151c534904",
     "width": 1044,
     "height": 749,
-    "sourceCommit": "d8a6f694d02d5627932e2b441e0d23f529d2bb82",
-    "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41863273737"
+    "sourceCommit": "30ad8ddb57e71881dbc621cbf4967b5780b30682",
+    "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41864792756"
   },
   {
     "figure": 2,
@@ -16,18 +16,18 @@
     "sha256": "9cf077be214730940af445da711b471206d4047074f159974f6a84d2c888f46d",
     "width": 373,
     "height": 373,
-    "sourceCommit": "d8a6f694d02d5627932e2b441e0d23f529d2bb82",
-    "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41863273737"
+    "sourceCommit": "30ad8ddb57e71881dbc621cbf4967b5780b30682",
+    "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41864792756"
   },
   {
     "figure": 3,
     "file": "docs/windows/screenshots/04-layout.png",
     "caption": "饰板、卡扣和中心接触点布置（模拟）",
-    "sha256": "42a94bbb2f99841b20cb683664792da63ffd35fd2804c7ff158ae5a99b83a2ed",
+    "sha256": "4c4290cf2252480dffe596720badef91881d7128da912532301c978e4cec1948",
     "width": 1044,
     "height": 749,
-    "sourceCommit": "d8a6f694d02d5627932e2b441e0d23f529d2bb82",
-    "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41863273737"
+    "sourceCommit": "30ad8ddb57e71881dbc621cbf4967b5780b30682",
+    "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41864792756"
   },
   {
     "figure": 4,
@@ -36,8 +36,8 @@
     "sha256": "26ac82a8af044d866da2d3c4dfb607c05f9cf4c29d157e540797816fca412ac1",
     "width": 756,
     "height": 248,
-    "sourceCommit": "d8a6f694d02d5627932e2b441e0d23f529d2bb82",
-    "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41863273737"
+    "sourceCommit": "30ad8ddb57e71881dbc621cbf4967b5780b30682",
+    "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41864792756"
   },
   {
     "figure": 5,
@@ -46,8 +46,8 @@
     "sha256": "7da0752f5dbe0cc55b500b661fafd42f68edab3ec4665bfc6cef76173637e510",
     "width": 1044,
     "height": 749,
-    "sourceCommit": "d8a6f694d02d5627932e2b441e0d23f529d2bb82",
-    "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41863273737"
+    "sourceCommit": "30ad8ddb57e71881dbc621cbf4967b5780b30682",
+    "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41864792756"
   },
   {
     "figure": 6,
@@ -56,48 +56,48 @@
     "sha256": "2d6e69aabdac55665f1274fc54927b071089566e6d800668b522f527729a3269",
     "width": 1044,
     "height": 749,
-    "sourceCommit": "d8a6f694d02d5627932e2b441e0d23f529d2bb82",
-    "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41863273737"
+    "sourceCommit": "30ad8ddb57e71881dbc621cbf4967b5780b30682",
+    "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41864792756"
   },
   {
     "figure": 7,
     "file": "docs/windows/screenshots/06-envelope.png",
     "caption": "逐点结果包络（模拟）",
-    "sha256": "32851735da1b7623ca6e68850df30ef82b77787dd508a34bd3aa25354e19197c",
+    "sha256": "4a8f80242f802798ca1619c7502feab9c67bcc46f92d4778d1c37778e13b4c74",
     "width": 1044,
     "height": 749,
-    "sourceCommit": "d8a6f694d02d5627932e2b441e0d23f529d2bb82",
-    "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41863273737"
+    "sourceCommit": "30ad8ddb57e71881dbc621cbf4967b5780b30682",
+    "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41864792756"
   },
   {
     "figure": 8,
     "file": "docs/windows/screenshots/07-nominal-traces.png",
     "caption": "名义公差接触压缩量曲线（模拟）",
-    "sha256": "57a10485cacf0ecfd0398fd313ad23f9c7148860a0b8215e4686b7cfef4f9737",
+    "sha256": "839381ea7fd17d1e6d2c9dd7f49cfc289120742e5fa91e1f44394c00d23fecae",
     "width": 1044,
     "height": 749,
-    "sourceCommit": "d8a6f694d02d5627932e2b441e0d23f529d2bb82",
-    "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41863273737"
+    "sourceCommit": "30ad8ddb57e71881dbc621cbf4967b5780b30682",
+    "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41864792756"
   },
   {
     "figure": 9,
     "file": "docs/windows/screenshots/08-force-balance.png",
     "caption": "独立力与力矩核查（模拟）",
-    "sha256": "1201775eac7495a8b5e99fc3f8e7019717ade7974bb3a0fabe8de74397084b71",
+    "sha256": "1dac9dd55e545bb8be44fdc6752a8787e053d47a46e5349454629c510d16260a",
     "width": 1044,
     "height": 749,
-    "sourceCommit": "d8a6f694d02d5627932e2b441e0d23f529d2bb82",
-    "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41863273737"
+    "sourceCommit": "30ad8ddb57e71881dbc621cbf4967b5780b30682",
+    "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41864792756"
   },
   {
     "figure": 10,
     "file": "docs/windows/screenshots/11-scan.png",
     "caption": "方案比较和四值预紧扫描（模拟）",
-    "sha256": "b4890d0f7ac31f823ef7e247be7c451b6b35718ebd3492c7ed959cf85fa8d831",
+    "sha256": "c6f54a216cb3c26bea328b0b6f0443e0e2719ff535ee11546feecfe75cd9cbbb",
     "width": 1044,
     "height": 749,
-    "sourceCommit": "d8a6f694d02d5627932e2b441e0d23f529d2bb82",
-    "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41863273737"
+    "sourceCommit": "30ad8ddb57e71881dbc621cbf4967b5780b30682",
+    "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41864792756"
   },
   {
     "figure": 11,
@@ -106,28 +106,28 @@
     "sha256": "84e635e43229407bec0e879a9a85e2e1efc903c2ffd1e26fd658567410be4712",
     "width": 756,
     "height": 395,
-    "sourceCommit": "d8a6f694d02d5627932e2b441e0d23f529d2bb82",
-    "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41863273737"
+    "sourceCommit": "30ad8ddb57e71881dbc621cbf4967b5780b30682",
+    "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41864792756"
   },
   {
     "figure": 12,
     "file": "docs/windows/screenshots/12-batch.png",
     "caption": "批量预览的字段、单位和前后值",
-    "sha256": "2e8446ef64e1d237e06ef42b44622b105689a83ee37cbd6f4905075d791cbad3",
+    "sha256": "f271c2135ebbe753a380e58befad875f4f237728236dbd3f2501bac8b0d03d07",
     "width": 756,
     "height": 467,
-    "sourceCommit": "d8a6f694d02d5627932e2b441e0d23f529d2bb82",
-    "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41863273737"
+    "sourceCommit": "30ad8ddb57e71881dbc621cbf4967b5780b30682",
+    "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41864792756"
   },
   {
     "figure": 13,
     "file": "docs/windows/screenshots/13-verification-tasks.png",
     "caption": "由模拟结果生成的验证任务",
-    "sha256": "38ffe5f18abada11b1cee8229e4981439e55ae19f9ef6c482a8b4415a7ebe9ff",
+    "sha256": "be5497af210a1925c2ed67584af92984a7fd5b8b60a2dd797106abb5f30a856c",
     "width": 1044,
     "height": 749,
-    "sourceCommit": "d8a6f694d02d5627932e2b441e0d23f529d2bb82",
-    "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41863273737"
+    "sourceCommit": "30ad8ddb57e71881dbc621cbf4967b5780b30682",
+    "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41864792756"
   },
   {
     "figure": 14,
@@ -136,7 +136,7 @@
     "sha256": "ac13487366c3ab020026b6521dc01414e300f1412d702ca1dd9c15a84da00a51",
     "width": 373,
     "height": 319,
-    "sourceCommit": "d8a6f694d02d5627932e2b441e0d23f529d2bb82",
-    "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41863273737"
+    "sourceCommit": "30ad8ddb57e71881dbc621cbf4967b5780b30682",
+    "runUrl": "https://github.com/ZhangShunMr/Pic/actions/runs/41864792756"
   }
 ]

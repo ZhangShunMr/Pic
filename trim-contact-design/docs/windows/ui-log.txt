@@ -21,6 +21,7 @@ PASS 05-loads contains native rendered content
 PASS native background calculation populates two schemes
 PASS 06-envelope rendered with opaque background
 PASS 06-envelope contains native rendered content
+PASS rendered result uses six significant digits
 PASS 07-nominal-traces rendered with opaque background
 PASS 07-nominal-traces contains native rendered content
 PASS 08-force-balance rendered with opaque background
@@ -30,11 +31,13 @@ PASS 09-quality-review rendered with opaque background
 PASS 09-quality-review contains native rendered content
 PASS 10-comparison rendered with opaque background
 PASS 10-comparison contains native rendered content
+PASS actual scan count binding matches four values
 PASS native scan completes without altering model
 PASS 11-scan rendered with opaque background
 PASS 11-scan contains native rendered content
 PASS 12a-csv-preview rendered with opaque background
 PASS 12a-csv-preview contains native rendered content
+PASS actual batch increment binding matches preview request
 PASS native batch preview lists proposed edits
 PASS 12-batch rendered with opaque background
 PASS 12-batch contains native rendered content

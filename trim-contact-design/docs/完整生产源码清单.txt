@@ -2391,7 +2391,7 @@
 0061         dc.DrawGeometry(new SolidColorBrush(Color.FromArgb(65, 164, 204, 199)), new Pen(Ink, 1.5), geometry);
 0062         Text(dc, "X → mm / Y ↑ mm · " + Workspace.Draft.Origin.Label(), 10, 7, Ink);
 0063         Text(dc, N(minimumX) + ", " + N(minimumY), left, bottom + 5);
-0064         Text(dc, N(width) + " × " + N(height) + " mm", left + 20, bottom - height * scale + 5);
+0064         Text(dc, N(width) + " × " + N(height) + " mm", left + 90, bottom + 5);
 0065         if (Finite(panel.CenterXmm, panel.CenterYmm))
 0066         {
 0067             var center = Pixel(panel.CenterXmm, panel.CenterYmm);
@@ -2475,7 +2475,7 @@
 0035             maximum = Math.Max(0.01, maximum * 1.1);
 0036             dc.DrawLine(new Pen(Brushes.Gray, 1), chart.BottomLeft, chart.TopLeft);
 0037             dc.DrawLine(new Pen(Brushes.Gray, 1), chart.BottomLeft, chart.BottomRight);
-0038             Text(dc, "压缩 mm", 5, chart.Top);
+0038             Text(dc, "压缩 mm", chart.Left, top + 20);
 0039             for (int tick = 0; tick <= 4; tick++)
 0040             {
 0041                 var y = chart.Bottom - chart.Height * tick / 4;
@@ -3881,8 +3881,8 @@
 0008 <DataGridTextColumn Header="分离点数" Binding="{Binding SeparationPoints, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="110"/>
 0009 <DataGridTextColumn Header="滑移点数" Binding="{Binding SlidingPoints, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="110"/>
 0010 <DataGridTextColumn Header="超用户限值点数" Binding="{Binding OverLimitPoints, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="150"/>
-0011 <DataGridTextColumn Header="最大卡扣限值比" Binding="{Binding MaxClipUtilization, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="150"/>
-0012 <DataGridTextColumn Header="最大滑移 mm" Binding="{Binding MaxSlipMm, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="135"/>
+0011 <DataGridTextColumn Header="最大卡扣限值比" Binding="{Binding MaxClipUtilization, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="150"/>
+0012 <DataGridTextColumn Header="最大滑移 mm" Binding="{Binding MaxSlipMm, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="135"/>
 0013 </DataGrid.Columns>
 0014 </DataGrid></StackPanel></GroupBox><GroupBox Header="单接触点参数扫描"><StackPanel><WrapPanel><StackPanel><TextBlock Text="方案"/><ComboBox ItemsSource="{Binding Variants}" SelectedItem="{Binding SelectedVariant}" DisplayMemberPath="Name" Width="240"/></StackPanel>
 0015 <StackPanel><TextBlock Text="接触点"/><ComboBox ItemsSource="{Binding Contacts}" SelectedItem="{Binding SelectedContact}" DisplayMemberPath="Name" Width="220"/></StackPanel>
@@ -3897,13 +3897,13 @@
 0024  <TextBox Text="{Binding SweepSteps, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
 0025 </StackPanel><Button Content="计算扫描副本" Command="{Binding SweepCommand}"/><Button Content="导出扫描" Command="{Binding ExportSweepCommand}"/></WrapPanel><TextBlock Text="{Binding SweepDescription}" Style="{StaticResource Note}"/><DataGrid ItemsSource="{Binding SweepRows}"  IsReadOnly="True" Height="260">
 0026 <DataGrid.Columns>
-0027 <DataGridTextColumn Header="参数值" Binding="{Binding Value, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="130"/>
+0027 <DataGridTextColumn Header="参数值" Binding="{Binding Value, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="130"/>
 0028 <DataGridTextColumn Header="分离点数" Binding="{Binding SeparationPoints, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="100"/>
 0029 <DataGridTextColumn Header="滑移点数" Binding="{Binding SlidingPoints, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="100"/>
 0030 <DataGridTextColumn Header="超限点数" Binding="{Binding OverLimitPoints, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="100"/>
-0031 <DataGridTextColumn Header="最大卡扣限值比" Binding="{Binding MaxClipUtilization, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="150"/>
-0032 <DataGridTextColumn Header="最大压缩 mm" Binding="{Binding MaxCompressionMm, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="135"/>
-0033 <DataGridTextColumn Header="最大滑移 mm" Binding="{Binding MaxSlipMm, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="135"/>
+0031 <DataGridTextColumn Header="最大卡扣限值比" Binding="{Binding MaxClipUtilization, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="150"/>
+0032 <DataGridTextColumn Header="最大压缩 mm" Binding="{Binding MaxCompressionMm, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="135"/>
+0033 <DataGridTextColumn Header="最大滑移 mm" Binding="{Binding MaxSlipMm, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="135"/>
 0034 </DataGrid.Columns>
 0035 </DataGrid><TextBlock Text="范围递增且每个值满足原字段限制。扫描保留其他输入不变；不会自动应用最优值，也不承诺降低真实异响。修改模型输入后旧扫描失效，必须重新运行。" Style="{StaticResource Note}"/></StackPanel></GroupBox></StackPanel></ScrollViewer>
 0036 </UserControl>
@@ -3951,8 +3951,8 @@
 0028 <DataGridTextColumn Header="点位" Binding="{Binding Point, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="180"/>
 0029 <DataGridTextColumn Header="字段" Binding="{Binding Field, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="160"/>
 0030 <DataGridTextColumn Header="单位" Binding="{Binding Unit, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="90"/>
-0031 <DataGridTextColumn Header="修改前" Binding="{Binding Before, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="140"/>
-0032 <DataGridTextColumn Header="修改后" Binding="{Binding After, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="140"/>
+0031 <DataGridTextColumn Header="修改前" Binding="{Binding Before, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="140"/>
+0032 <DataGridTextColumn Header="修改后" Binding="{Binding After, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="140"/>
 0033 </DataGrid.Columns>
 0034 </DataGrid><TextBlock Text="平移单次±1000mm，刚度倍率&gt;0且≤100，间隙与预紧增量±20mm；最终点位仍须在轮廓内，所有字段满足原范围。预览后修改输入或请求会阻止应用。" Style="{StaticResource Note}"/></StackPanel></GroupBox></StackPanel></ScrollViewer>
 0035 </UserControl>
@@ -4188,13 +4188,13 @@
 0011 <DataGridTextColumn Header="点位" Binding="{Binding Name, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="150"/>
 0012 <DataGridTextColumn Header="类型" Binding="{Binding Kind, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="80"/>
 0013 <DataGridTextColumn Header="接触/限值状态" Binding="{Binding State, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="150"/>
-0014 <DataGridTextColumn Header="最小压缩 mm" Binding="{Binding MinCompressionMm, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="115"/>
-0015 <DataGridTextColumn Header="最大压缩 mm" Binding="{Binding MaxCompressionMm, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="115"/>
-0016 <DataGridTextColumn Header="最小法向 N" Binding="{Binding MinNormalN, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="110"/>
-0017 <DataGridTextColumn Header="最大法向 N" Binding="{Binding MaxNormalN, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="110"/>
-0018 <DataGridTextColumn Header="最大切向|N|" Binding="{Binding MaxAbsShearN, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="110"/>
-0019 <DataGridTextColumn Header="最大滑移 mm" Binding="{Binding MaxSlipMm, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="110"/>
-0020 <DataGridTextColumn Header="最大限值比" Binding="{Binding MaxUtilization, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="105"/>
+0014 <DataGridTextColumn Header="最小压缩 mm" Binding="{Binding MinCompressionMm, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="115"/>
+0015 <DataGridTextColumn Header="最大压缩 mm" Binding="{Binding MaxCompressionMm, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="115"/>
+0016 <DataGridTextColumn Header="最小法向 N" Binding="{Binding MinNormalN, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="110"/>
+0017 <DataGridTextColumn Header="最大法向 N" Binding="{Binding MaxNormalN, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="110"/>
+0018 <DataGridTextColumn Header="最大切向|N|" Binding="{Binding MaxAbsShearN, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="110"/>
+0019 <DataGridTextColumn Header="最大滑移 mm" Binding="{Binding MaxSlipMm, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="110"/>
+0020 <DataGridTextColumn Header="最大限值比" Binding="{Binding MaxUtilization, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="105"/>
 0021 <DataGridTextColumn Header="分离样本" Binding="{Binding DetachedSamples, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="90"/>
 0022 <DataGridTextColumn Header="滑移样本" Binding="{Binding SlidingSamples, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="90"/>
 0023 <DataGridTextColumn Header="总样本" Binding="{Binding TotalSamples, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="85"/>
@@ -4208,16 +4208,16 @@
 0031 <DataGrid.Columns>
 0032 <DataGridTextColumn Header="方案" Binding="{Binding Variant, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="150"/>
 0033 <DataGridTextColumn Header="载荷" Binding="{Binding Load, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="170"/>
-0034 <DataGridTextColumn Header="相位 °" Binding="{Binding PhaseDegrees, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="90"/>
-0035 <DataGridTextColumn Header="法向外力 N" Binding="{Binding AppliedNormalN, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="115"/>
-0036 <DataGridTextColumn Header="法向反力 N" Binding="{Binding ReactionNormalN, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="115"/>
-0037 <DataGridTextColumn Header="切向外力 N" Binding="{Binding AppliedShearN, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="115"/>
-0038 <DataGridTextColumn Header="切向反力 N" Binding="{Binding ReactionShearN, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="115"/>
-0039 <DataGridTextColumn Header="法向差 N" Binding="{Binding NormalErrorN, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="100"/>
-0040 <DataGridTextColumn Header="切向差 N" Binding="{Binding ShearErrorN, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="100"/>
-0041 <DataGridTextColumn Header="X力矩差 Nmm" Binding="{Binding MomentXErrorNmm, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="130"/>
-0042 <DataGridTextColumn Header="Y力矩差 Nmm" Binding="{Binding MomentYErrorNmm, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="130"/>
-0043 <DataGridTextColumn Header="弹性能 Nmm" Binding="{Binding ElasticEnergyNmm, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="120"/>
+0034 <DataGridTextColumn Header="相位 °" Binding="{Binding PhaseDegrees, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="90"/>
+0035 <DataGridTextColumn Header="法向外力 N" Binding="{Binding AppliedNormalN, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="115"/>
+0036 <DataGridTextColumn Header="法向反力 N" Binding="{Binding ReactionNormalN, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="115"/>
+0037 <DataGridTextColumn Header="切向外力 N" Binding="{Binding AppliedShearN, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="115"/>
+0038 <DataGridTextColumn Header="切向反力 N" Binding="{Binding ReactionShearN, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="115"/>
+0039 <DataGridTextColumn Header="法向差 N" Binding="{Binding NormalErrorN, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="100"/>
+0040 <DataGridTextColumn Header="切向差 N" Binding="{Binding ShearErrorN, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="100"/>
+0041 <DataGridTextColumn Header="X力矩差 Nmm" Binding="{Binding MomentXErrorNmm, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="130"/>
+0042 <DataGridTextColumn Header="Y力矩差 Nmm" Binding="{Binding MomentYErrorNmm, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="130"/>
+0043 <DataGridTextColumn Header="弹性能 Nmm" Binding="{Binding ElasticEnergyNmm, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="120"/>
 0044 </DataGrid.Columns>
 0045 </DataGrid></DockPanel></TabItem>
 0046 <TabItem Header="工程复核"><DockPanel><TextBlock DockPanel.Dock="Top" Text="来源、几何、公差与小位移提醒需工程复核。提醒阈值属于未标定的工程初值，不是标准。" Style="{StaticResource Note}"/><DataGrid ItemsSource="{Binding QualityRows}"  IsReadOnly="True" >
