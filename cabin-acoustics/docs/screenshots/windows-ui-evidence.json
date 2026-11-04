@@ -1,0 +1,170 @@
+{
+  "executedUtc": "2026-11-04T15:11:23.8451161+00:00",
+  "sourceCommit": "fb862cf66f96b554738745ea982a94488d77e576",
+  "platform": "Microsoft Windows NT 10.0.26100.0",
+  "framework": ".NET 8.0.33",
+  "rendering": "Actual WPF MainWindow shown on Windows. PNG files captured from the rendered native Window using RenderTargetBitmap; not browser or mock-up images.",
+  "failed": 0,
+  "checks": [
+    {
+      "name": "01-empty contains rendered pixels",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "ordinary native startup is empty",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "blank project has no points",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "blank save is a real reopenable file",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "02-project contains rendered pixels",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "03-points contains rendered pixels",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "WPF calculate populates field and spectrum",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "04-response-field contains rendered pixels",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "05-mode-shape contains rendered pixels",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "06-seat-spectrum contains rendered pixels",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "07-modes contains rendered pixels",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "08-coupling contains rendered pixels",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "native baseline comparison populated",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "09-comparison contains rendered pixels",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "native scan completed",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "10-scan contains rendered pixels",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "native truncation study populated",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "11-diagnostics contains rendered pixels",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "12-reviews contains rendered pixels",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "native report contains model limitation",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "saved project reopened in native VM",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "13-minimum-window contains rendered pixels",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "minimum native window rendered",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "14-invalid-input contains rendered pixels",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "edit invalidates native results",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "native interactions have no service errors",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "15-help contains rendered pixels",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "16-invalid-csv-dialog contains rendered pixels",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "native import dialog is rendered",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "17-example-dialog contains rendered pixels",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "native example dialog rendered",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "WPF binding errors absent",
+      "status": "passed",
+      "detail": ""
+    }
+  ]
+}
