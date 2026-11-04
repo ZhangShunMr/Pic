@@ -1,0 +1,274 @@
+{
+  "date": "2026-11-04T15:40:53.8866761+00:00",
+  "environment": ".NET 10.0.14",
+  "os": "Microsoft Windows 10.0.26100",
+  "total": 66,
+  "passed": 66,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "\u5355\u6E902m\u51E0\u4F55\u6269\u6563\u89E3\u6790\u503C",
+      "status": "passed"
+    },
+    {
+      "name": "\u4E03\u5E26\u975E\u8BA1\u6743\u5408\u6210",
+      "status": "passed"
+    },
+    {
+      "name": "\u53CC\u6E90\u975E\u76F8\u5E72\u589E\u52A03.0103dB",
+      "status": "passed"
+    },
+    {
+      "name": "\u9AD8\u5EA6\u5DEE\u6309\u4E09\u7EF4\u8DDD\u79BB",
+      "status": "passed"
+    },
+    {
+      "name": "\u8DDD\u79BB\u622A\u65AD\u4E0E\u6807\u8BB0",
+      "status": "passed"
+    },
+    {
+      "name": "\u6307\u5411\u6027\u8F74\u5411\u4E0E\u80CC\u5411",
+      "status": "passed"
+    },
+    {
+      "name": "\u5168\u5411\u6307\u6570\u96F6",
+      "status": "passed"
+    },
+    {
+      "name": "\u53C2\u8003\u8DDD\u79BB\u4E0E\u9891\u54CD\u589E\u76CA\u53E0\u52A0",
+      "status": "passed"
+    },
+    {
+      "name": "\u80CC\u666F\u4E0E\u58F0\u6E90\u6B63\u786E\u80FD\u91CF\u5408\u6210",
+      "status": "passed"
+    },
+    {
+      "name": "A\u8BA1\u6743\u53EA\u4F5C\u7528\u5408\u6210",
+      "status": "passed"
+    },
+    {
+      "name": "\u96F6\u5206\u8D1D\u662F\u6709\u6548\u8F93\u5165",
+      "status": "passed"
+    },
+    {
+      "name": "\u7A7A\u6E90\u8BA1\u7B97\u62D2\u7EDD",
+      "status": "passed"
+    },
+    {
+      "name": "\u7F3A\u9891\u5E26\u62D2\u7EDD",
+      "status": "passed"
+    },
+    {
+      "name": "\u91CD\u590D\u9891\u7387\u62D2\u7EDD",
+      "status": "passed"
+    },
+    {
+      "name": "\u975E\u6709\u9650\u6570\u62D2\u7EDD",
+      "status": "passed"
+    },
+    {
+      "name": "\u8D1F\u6B65\u957F\u62D2\u7EDD",
+      "status": "passed"
+    },
+    {
+      "name": "\u7F51\u683C\u4E0A\u9650\u62D2\u7EDD",
+      "status": "passed"
+    },
+    {
+      "name": "\u91CD\u590D\u5BF9\u8C61\u6807\u8BC6\u62D2\u7EDD",
+      "status": "passed"
+    },
+    {
+      "name": "\u5DE5\u7A0B\u76EE\u6807\u4E24\u9879\u540C\u65F6\u6EE1\u8DB3",
+      "status": "passed"
+    },
+    {
+      "name": "\u8F66\u8F86\u5185\u90E8\u7F51\u683C\u6392\u9664",
+      "status": "passed"
+    },
+    {
+      "name": "\u5168\u90E8\u8282\u70B9\u88AB\u6392\u9664\u62D2\u7EDD",
+      "status": "passed"
+    },
+    {
+      "name": "\u9879\u76EE\u5B8C\u6574\u7F16\u7801\u91CD\u5F00\u54C8\u5E0C\u4E00\u81F4",
+      "status": "passed"
+    },
+    {
+      "name": "\u672A\u77E5\u683C\u5F0F\u62D2\u7EDD",
+      "status": "passed"
+    },
+    {
+      "name": "\u635F\u574FJSON\u62D2\u7EDD",
+      "status": "passed"
+    },
+    {
+      "name": "\u672A\u77E5\u5B57\u6BB5\u62D2\u7EDD",
+      "status": "passed"
+    },
+    {
+      "name": "CSV\u6A21\u677F\u4E0E\u96F6\u58F0\u7EA7",
+      "status": "passed"
+    },
+    {
+      "name": "CSV\u9519\u8BEF\u5E26\u884C\u53F7\u5E76\u62D2\u7EDD\u7F3A\u5E26",
+      "status": "passed"
+    },
+    {
+      "name": "\u80CC\u666FCSV\u62D2\u7EDD\u975E\u96F6\u4FEE\u6B63",
+      "status": "passed"
+    },
+    {
+      "name": "CSV\u5BFC\u51FA\u518D\u5BFC\u5165",
+      "status": "passed"
+    },
+    {
+      "name": "\u70B9CSV\u5F15\u53F7\u8F6C\u4E49\u4E0E\u9017\u53F7",
+      "status": "passed"
+    },
+    {
+      "name": "\u70B9CSV\u975E\u6CD5\u5750\u6807\u62D2\u7EDD",
+      "status": "passed"
+    },
+    {
+      "name": "\u70B9CSV\u4EA4\u6362\u91CD\u5F00",
+      "status": "passed"
+    },
+    {
+      "name": "\u65B9\u6848\u5FEB\u7167\u6DF1\u62F7\u8D1D",
+      "status": "passed"
+    },
+    {
+      "name": "\u76F8\u540C\u6761\u4EF6\u4E0D\u540C\u589E\u76CA\u53EF\u6BD4",
+      "status": "passed"
+    },
+    {
+      "name": "\u4E0D\u540C\u80CC\u666F\u963B\u65AD\u6BD4\u8F83",
+      "status": "passed"
+    },
+    {
+      "name": "\u91CD\u5EFA\u540C\u540D\u70B9\u4E0D\u80FD\u6BD4\u8F83",
+      "status": "passed"
+    },
+    {
+      "name": "\u626B\u63CF\u4E0D\u4FEE\u6539\u8F93\u5165",
+      "status": "passed"
+    },
+    {
+      "name": "\u626B\u63CF\u8D85\u8303\u56F4\u62D2\u7EDD",
+      "status": "passed"
+    },
+    {
+      "name": "\u5256\u9762\u89E3\u6790\u503C\u4E0E\u8BA1\u6570",
+      "status": "passed"
+    },
+    {
+      "name": "\u5256\u9762\u65E0\u6548\u6B65\u957F\u62D2\u7EDD",
+      "status": "passed"
+    },
+    {
+      "name": "\u8FC7\u671F\u7ED3\u679C\u7981\u6B62\u5BFC\u51FA",
+      "status": "passed"
+    },
+    {
+      "name": "\u62A5\u544AHTML\u8F6C\u4E49\u4E14\u6765\u6E90\u5B58\u5728",
+      "status": "passed"
+    },
+    {
+      "name": "CSV\u516C\u5F0F\u6CE8\u5165\u9632\u62A4",
+      "status": "passed"
+    },
+    {
+      "name": "\u8F93\u51FA\u7F51\u683C\u9010\u884C\u8BA1\u6570",
+      "status": "passed"
+    },
+    {
+      "name": "WAV\u7F16\u7801\u8BFB\u53D6\u5F80\u8FD4",
+      "status": "passed"
+    },
+    {
+      "name": "\u6570\u5B57\u9891\u8C311kHz\u4E3B\u5E26",
+      "status": "passed"
+    },
+    {
+      "name": "FFT\u6B63\u9006\u53D8\u6362",
+      "status": "passed"
+    },
+    {
+      "name": "\u9759\u97F3\u4E0D\u80FD\u63A8\u5BFC\u7269\u7406\u9891\u5E26",
+      "status": "passed"
+    },
+    {
+      "name": "\u975EWAV\u62D2\u7EDD",
+      "status": "passed"
+    },
+    {
+      "name": "WAV\u957F\u5EA6\u635F\u574F\u62D2\u7EDD",
+      "status": "passed"
+    },
+    {
+      "name": "\u5185\u5D4C\u97F3\u9891\u642C\u8FC1\u91CD\u5F00",
+      "status": "passed"
+    },
+    {
+      "name": "\u97F3\u9891\u54C8\u5E0C\u635F\u574F\u62D2\u7EDD",
+      "status": "passed"
+    },
+    {
+      "name": "\u8BD5\u542C\u53EF\u7F16\u7801\u4E14\u542B\u8FB9\u754C\u8BF4\u660E",
+      "status": "passed"
+    },
+    {
+      "name": "\u9AD8\u5CF0\u503C\u8BD5\u542C\u62D2\u7EDD\u800C\u975E\u5F52\u4E00\u5316",
+      "status": "passed"
+    },
+    {
+      "name": "\u672C\u673A\u4FDD\u5B58\u5907\u4EFD\u4E0E\u5916\u90E8\u51B2\u7A81",
+      "status": "passed"
+    },
+    {
+      "name": "\u56FA\u5B9A\u6A21\u62DF\u4F8B\u53EF\u8BA1\u7B97\u4E14\u6301\u7EED\u6807\u8BB0",
+      "status": "passed"
+    },
+    {
+      "name": "\u590D\u6838\u63D0\u793A\u5305\u542B\u56FA\u5B9A\u5047\u8BBE",
+      "status": "passed"
+    },
+    {
+      "name": "\u7F3A\u5C11\u7ED3\u6784\u5B57\u6BB5\u4E0D\u9759\u9ED8\u8865\u9ED8\u8BA4",
+      "status": "passed"
+    },
+    {
+      "name": "\u6570\u7EC4\u7A7A\u5BF9\u8C61\u62D2\u7EDD\u4E14\u4E0D\u4E2D\u65AD\u4F1A\u8BDD",
+      "status": "passed"
+    },
+    {
+      "name": "\u5FEB\u7167\u54C8\u5E0C\u635F\u574F\u62D2\u7EDD",
+      "status": "passed"
+    },
+    {
+      "name": "\u5E26\u5236\u4F5C\u5143\u6570\u636EWAV\u53EF\u91CD\u8BFB",
+      "status": "passed"
+    },
+    {
+      "name": "\u626B\u63CFCSV\u9644\u6765\u6E90\u6761\u4EF6\u4E0E\u6A21\u578B",
+      "status": "passed"
+    },
+    {
+      "name": "\u6A21\u578B\u6761\u4EF6\u6458\u8981\u4E0D\u5185\u5D4C\u539F\u59CB\u80CC\u666F\u97F3\u9891",
+      "status": "passed"
+    },
+    {
+      "name": "\u683C\u5F0F\u6807\u8BB0\u4E3A\u5B57\u7B26\u4E32\u65F6\u62D2\u7EDD",
+      "status": "passed"
+    },
+    {
+      "name": "\u6839\u5BF9\u8C61\u4E3A\u6570\u7EC4\u65F6\u62D2\u7EDD",
+      "status": "passed"
+    },
+    {
+      "name": "\u683C\u5F0F\u6807\u8BB0\u5C0F\u6570\u65F6\u62D2\u7EDD",
+      "status": "passed"
+    }
+  ]
+}

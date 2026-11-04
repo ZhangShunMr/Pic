@@ -1,0 +1,19 @@
+  Determining projects to restore...
+  Restored D:\a\Pic\Pic\avas-coverage-design\src\Avas.Core\Avas.Core.csproj (in 187 ms).
+  Restored D:\a\Pic\Pic\avas-coverage-design\src\Avas.Workspace\Avas.Workspace.csproj (in 222 ms).
+  Restored D:\a\Pic\Pic\avas-coverage-design\tests\Avas.WorkspaceVerification\Avas.WorkspaceVerification.csproj (in 132 ms).
+  Restored D:\a\Pic\Pic\avas-coverage-design\tests\Avas.Verification\Avas.Verification.csproj (in 3 ms).
+  Restored D:\a\Pic\Pic\avas-coverage-design\src\Avas.Desktop\Avas.Desktop.csproj (in 19 ms).
+  Restored D:\a\Pic\Pic\avas-coverage-design\tests\Avas.DesktopVerification\Avas.DesktopVerification.csproj (in 21 ms).
+  Avas.Core -> D:\a\Pic\Pic\avas-coverage-design\src\Avas.Core\bin\Release\net10.0\Avas.Core.dll
+  Avas.Verification -> D:\a\Pic\Pic\avas-coverage-design\tests\Avas.Verification\bin\Release\net10.0\Avas.Verification.dll
+  Avas.Workspace -> D:\a\Pic\Pic\avas-coverage-design\src\Avas.Workspace\bin\Release\net10.0\Avas.Workspace.dll
+  Avas.WorkspaceVerification -> D:\a\Pic\Pic\avas-coverage-design\tests\Avas.WorkspaceVerification\bin\Release\net10.0\Avas.WorkspaceVerification.dll
+  Avas.Desktop -> D:\a\Pic\Pic\avas-coverage-design\src\Avas.Desktop\bin\Release\net10.0-windows\AvasCoverage.dll
+  Avas.DesktopVerification -> D:\a\Pic\Pic\avas-coverage-design\tests\Avas.DesktopVerification\bin\Release\net10.0-windows\Avas.DesktopVerification.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:19.65
