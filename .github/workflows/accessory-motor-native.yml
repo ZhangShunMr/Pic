@@ -1,0 +1,60 @@
+name: Accessory motor Windows native verification
+on:
+  push:
+    branches: ['desktop/accessory-motor-frequency-wpf-20261104']
+    paths:
+      - 'accessory-motor-frequency/src/**'
+      - 'accessory-motor-frequency/tests/**'
+      - 'accessory-motor-frequency/tools/**'
+      - 'accessory-motor-frequency/*.props'
+      - 'accessory-motor-frequency/*.sln'
+      - '.github/workflows/accessory-motor-native.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: accessory-motor-frequency
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build, core, MVVM and live native WPF window verification
+        run: ./tools/verify-windows.ps1
+      - name: Publish Windows self-contained folder
+        run: |
+          dotnet publish src/MotorFrequency.Desktop -c Release -r win-x64 --self-contained true -o artifacts/win-x64
+          if ($LASTEXITCODE -ne 0) { throw 'Publish failed' }
+      - name: Start actual published executable and close native window
+        run: ./tools/smoke-published.ps1
+      - name: Check whether Microsoft Word pagination is available
+        run: ./tools/verify-word.ps1
+      - name: Retain native captures and verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: accessory-motor-windows-native
+          retention-days: 7
+          path: |
+            accessory-motor-frequency/docs/windows-evidence
+            accessory-motor-frequency/docs/core-evidence.json
+            accessory-motor-frequency/docs/application-evidence.json
+            accessory-motor-frequency/artifacts/win-x64
+      - name: Preserve successful native evidence on this software branch
+        if: success() && github.ref == 'refs/heads/desktop/accessory-motor-frequency-wpf-20261104'
+        run: |
+          git config user.name 'Accessory motor Windows verification'
+          git config user.email 'codex@openai.com'
+          git add docs/windows-evidence
+          git diff --cached --quiet
+          if ($LASTEXITCODE -eq 1) {
+            git commit -m 'Record actual Windows WPF verification and native captures [skip ci]'
+            git push origin HEAD:desktop/accessory-motor-frequency-wpf-20261104
+            if ($LASTEXITCODE -ne 0) { throw 'Could not preserve native evidence on independent branch' }
+          }

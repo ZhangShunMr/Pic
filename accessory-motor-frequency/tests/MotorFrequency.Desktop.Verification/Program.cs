@@ -73,6 +73,8 @@ internal static class Program
             File.WriteAllText(Path.Combine(output, "result.json"), System.Text.Json.JsonSerializer.Serialize(new
             {
                 at = DateTimeOffset.UtcNow,
+                sourceCommit = Environment.GetEnvironmentVariable("GITHUB_SHA"),
+                runId = Environment.GetEnvironmentVariable("GITHUB_RUN_ID"),
                 os = Environment.OSVersion.ToString(),
                 result = "passed",
                 source = "Live shown WPF window, RenderTargetBitmap capture, no browser",
