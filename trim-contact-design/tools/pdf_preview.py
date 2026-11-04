@@ -12,6 +12,8 @@ rows = []
 for kind, name in [('manual', '操作说明书-待Windows核验'), ('collection', '软著信息采集表-草稿')]:
     pdf = OUT / (name + '.pdf')
     source = ROOT / 'docs' / (name + '.docx')
+    committed_source = subprocess.check_output(['git', 'show', 'HEAD:trim-contact-design/docs/' + source.name], cwd=ROOT)
+    assert source.read_bytes() == committed_source, 'Renderer changed the committed input DOCX: ' + source.name
     document = fitz.open(pdf)
     checks = []
     for index, page in enumerate(document):
@@ -29,7 +31,8 @@ for kind, name in [('manual', '操作说明书-待Windows核验'), ('collection'
                  'actualLibreOfficePdfPages': len(document), 'pageChecks': checks,
                  'humanPerPageInspection': False})
 result = {'utc': datetime.datetime.now(datetime.timezone.utc).isoformat(),
-          'sourceCommit': os.environ.get('GITHUB_SHA'),
+          'sourceCommit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
+          'ciTriggerCommit': os.environ.get('GITHUB_SHA'),
           'runUrl': 'https://github.com/' + os.environ.get('GITHUB_REPOSITORY', '') + '/actions/runs/' + os.environ.get('GITHUB_RUN_ID', ''),
           'renderer': subprocess.check_output(['libreoffice', '--version'], text=True).strip(),
           'wordPaginationVerified': False,
