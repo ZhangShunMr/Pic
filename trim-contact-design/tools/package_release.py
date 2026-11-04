@@ -47,7 +47,9 @@ with zipfile.ZipFile(package, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as z:
         if path.exists(): z.write(path, 'TrimContact-V2.0/docs/windows/' + name)
     for name in ['source-inventory.json', 'materials-check.json', 'screenshot-inventory.json']:
         z.write(DOCS / name, 'TrimContact-V2.0/docs/' + name)
-    assert z.testzip() is None
+with zipfile.ZipFile(package, 'r') as verification:
+    bad_entry = verification.testzip()
+    assert bad_entry is None, bad_entry
 assert package.stat().st_size < 100 * 1024**2
 info = {
     'utc': datetime.datetime.now(datetime.timezone.utc).isoformat(),

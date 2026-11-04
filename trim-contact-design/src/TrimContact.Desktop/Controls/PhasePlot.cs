@@ -35,7 +35,7 @@ public sealed class PhasePlot : WorkspaceDrawing
             maximum = Math.Max(0.01, maximum * 1.1);
             dc.DrawLine(new Pen(Brushes.Gray, 1), chart.BottomLeft, chart.TopLeft);
             dc.DrawLine(new Pen(Brushes.Gray, 1), chart.BottomLeft, chart.BottomRight);
-            Text(dc, "压缩 mm", 5, chart.Top);
+            Text(dc, "压缩 mm", chart.Left, top + 20);
             for (int tick = 0; tick <= 4; tick++)
             {
                 var y = chart.Bottom - chart.Height * tick / 4;

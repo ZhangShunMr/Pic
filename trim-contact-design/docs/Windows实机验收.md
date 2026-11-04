@@ -1,6 +1,6 @@
 # Windows运行与人工验收范围
 
-已在 GitHub Actions Windows Server 2025 x64 runner实际运行生产WPF窗口，55项窗口检查通过，保留19张窗口/控件图；另直接启动自包含EXE，观察真实原生窗口、截图并正常退出，合计20张真实图。当前证据见 `windows/windows-ui-evidence.json` 和 `windows/published-exe-evidence.json`，不是浏览器图片或模拟绘制图。
+已在 GitHub Actions Windows Server 2025 x64 runner实际运行生产WPF窗口，窗口检查通过（检查项实测数见JSON），保留19张窗口/控件图；另直接启动自包含EXE，观察真实原生窗口、截图并正常退出，合计20张真实图。当前证据见 `windows/windows-ui-evidence.json` 和 `windows/published-exe-evidence.json`，不是浏览器图片或模拟绘制图。
 
 自动窗口流程使用真实WPF视觉树、输入绑定和部分按钮UI自动化；文件选择与确认接口由确定性替身提供。因此它证明原生窗口及相应业务能够运行，不证明所有鼠标动作、系统对话框、Windows10/11和DPI组合已通过人工检查。
 

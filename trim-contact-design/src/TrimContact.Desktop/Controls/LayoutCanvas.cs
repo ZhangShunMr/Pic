@@ -61,7 +61,7 @@ public sealed class LayoutCanvas : WorkspaceDrawing
         dc.DrawGeometry(new SolidColorBrush(Color.FromArgb(65, 164, 204, 199)), new Pen(Ink, 1.5), geometry);
         Text(dc, "X → mm / Y ↑ mm · " + Workspace.Draft.Origin.Label(), 10, 7, Ink);
         Text(dc, N(minimumX) + ", " + N(minimumY), left, bottom + 5);
-        Text(dc, N(width) + " × " + N(height) + " mm", left + 20, bottom - height * scale + 5);
+        Text(dc, N(width) + " × " + N(height) + " mm", left + 90, bottom + 5);
         if (Finite(panel.CenterXmm, panel.CenterYmm))
         {
             var center = Pixel(panel.CenterXmm, panel.CenterYmm);

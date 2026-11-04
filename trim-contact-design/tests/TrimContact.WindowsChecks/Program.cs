@@ -113,6 +113,11 @@ internal static class Program
         await Wait(vm);
         Record("native background calculation populates two schemes", vm.ResultsCurrent && vm.VariantResults.Count == 2 && vm.Envelopes.Count == 5);
         await Capture(window, "06-envelope");
+        var envelopeGrid = Descendants<DataGrid>(window).Single(g => g.Columns.OfType<DataGridTextColumn>().Any(c => c.Binding is Binding b && b.Path.Path == "MinCompressionMm"));
+        var numericColumn = envelopeGrid.Columns.OfType<DataGridTextColumn>().Single(c => c.Binding is Binding b && b.Path.Path == "MinCompressionMm");
+        var renderedNumber = (numericColumn.GetCellContent(envelopeGrid.Items[0]) as TextBlock)?.Text;
+        var expectedNumber = vm.Envelopes[0].MinCompressionMm.ToString("G6", System.Globalization.CultureInfo.CurrentCulture);
+        Record("rendered result uses six significant digits", renderedNumber == expectedNumber, $"expected {expectedNumber}; actual {renderedNumber}");
         var resultTabs = Descendants<TabControl>(window).Single();
         resultTabs.SelectedIndex = 1;
         await Capture(window, "07-nominal-traces");
@@ -123,7 +128,8 @@ internal static class Program
         await Capture(window, "09-quality-review");
         vm.SectionIndex = 4;
         await Capture(window, "10-comparison");
-        vm.SweepSteps = 4;
+        await SetText(window, "SweepSteps", "4");
+        Record("actual scan count binding matches four values", vm.SweepSteps == 4);
         vm.SweepCommand.Execute(null);
         await Wait(vm);
         Record("native scan completes without altering model", vm.SweepCurrent && vm.SweepRows.Count == 4);
@@ -134,7 +140,8 @@ internal static class Program
         await Render(window);
         vm.PreviewImportCommand.Execute(null);
         await Capture(window, "12a-csv-preview", Descendants<GroupBox>(window).Single(g => (g.Header as string)?.StartsWith("CSV布置交换") == true));
-        vm.BatchRequest.PreloadDeltaMm = 0.05;
+        await SetText(window, "BatchRequest.PreloadDeltaMm", "0.05");
+        Record("actual batch increment binding matches preview request", Math.Abs(vm.BatchRequest.PreloadDeltaMm - 0.05) < 1e-12);
         vm.PreviewBatchCommand.Execute(null);
         Record("native batch preview lists proposed edits", vm.BatchChanges.Count > 0);
         await Capture(window, "12-batch", Descendants<GroupBox>(window).Single(g => (g.Header as string)?.StartsWith("批量布置修改") == true));
@@ -161,6 +168,14 @@ internal static class Program
         await Capture(window, "15-minimum-window");
         Record("minimum window has visible layout controls", Descendants<DataGrid>(window).Count() == 2);
         Record("no desktop interaction errors", ui.Errors.Count == 0, string.Join("\n", ui.Errors));
+    }
+
+    private static async Task SetText(MainWindow window, string path, string value)
+    {
+        await Render(window);
+        var editor = Descendants<TextBox>(window).Single(t => t.GetBindingExpression(TextBox.TextProperty)?.ParentBinding.Path?.Path == path);
+        editor.Text = value;
+        await Render(window);
     }
 
     private static async Task Invoke(MainWindow window, string label)

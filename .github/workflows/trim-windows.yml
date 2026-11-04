@@ -42,6 +42,7 @@ jobs:
         if: always()
         run: ./tools/check-word.ps1
       - name: Build illustrated materials and package the tested executable
+        id: package
         if: success()
         run: |
           python -m pip install -r requirements-dev.txt
@@ -56,15 +57,21 @@ jobs:
             trim-contact-design/docs/windows
             trim-contact-design/artifacts/win-x64
       - name: Preserve evidence on the existing independent branch
+        env:
+          PACKAGE_RESULT: ${{ steps.package.outcome }}
         if: always() && github.ref == 'refs/heads/windows-native/trim-contact-design-20261104'
         run: |
           git config user.name 'Trim Windows verification'
           git config user.email 'codex@openai.com'
-          git add docs/windows docs/materials-check.json docs/screenshot-inventory.json docs/source-inventory.json docs/源码清单.md docs/完整生产源码清单.txt docs/完整生产源码打印稿.docx docs/操作说明书-待Windows核验.docx docs/操作说明书.md docs/软著信息采集表-草稿.docx docs/软著信息采集表.md dist
+          git add docs
+          if ($env:PACKAGE_RESULT -eq 'success') { git add dist }
           git diff --cached --quiet
           if ($LASTEXITCODE -eq 1) {
             git commit -m 'Record actual Windows verification evidence [skip ci]'
+            git diff --quiet
+            if ($LASTEXITCODE -ne 0) { git status --short; throw 'Unexpected unstaged changes outside evidence outputs' }
             git pull --rebase origin windows-native/trim-contact-design-20261104
+            if ($LASTEXITCODE -ne 0) { throw 'Could not synchronize the independent branch' }
             git push origin HEAD:windows-native/trim-contact-design-20261104
             if ($LASTEXITCODE -ne 0) { throw 'Could not preserve evidence on the independent branch' }
           }

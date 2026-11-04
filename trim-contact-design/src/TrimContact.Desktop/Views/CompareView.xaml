@@ -8,8 +8,8 @@
 <DataGridTextColumn Header="分离点数" Binding="{Binding SeparationPoints, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="110"/>
 <DataGridTextColumn Header="滑移点数" Binding="{Binding SlidingPoints, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="110"/>
 <DataGridTextColumn Header="超用户限值点数" Binding="{Binding OverLimitPoints, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="150"/>
-<DataGridTextColumn Header="最大卡扣限值比" Binding="{Binding MaxClipUtilization, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="150"/>
-<DataGridTextColumn Header="最大滑移 mm" Binding="{Binding MaxSlipMm, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="135"/>
+<DataGridTextColumn Header="最大卡扣限值比" Binding="{Binding MaxClipUtilization, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="150"/>
+<DataGridTextColumn Header="最大滑移 mm" Binding="{Binding MaxSlipMm, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="135"/>
 </DataGrid.Columns>
 </DataGrid></StackPanel></GroupBox><GroupBox Header="单接触点参数扫描"><StackPanel><WrapPanel><StackPanel><TextBlock Text="方案"/><ComboBox ItemsSource="{Binding Variants}" SelectedItem="{Binding SelectedVariant}" DisplayMemberPath="Name" Width="240"/></StackPanel>
 <StackPanel><TextBlock Text="接触点"/><ComboBox ItemsSource="{Binding Contacts}" SelectedItem="{Binding SelectedContact}" DisplayMemberPath="Name" Width="220"/></StackPanel>
@@ -24,13 +24,13 @@
  <TextBox Text="{Binding SweepSteps, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" />
 </StackPanel><Button Content="计算扫描副本" Command="{Binding SweepCommand}"/><Button Content="导出扫描" Command="{Binding ExportSweepCommand}"/></WrapPanel><TextBlock Text="{Binding SweepDescription}" Style="{StaticResource Note}"/><DataGrid ItemsSource="{Binding SweepRows}"  IsReadOnly="True" Height="260">
 <DataGrid.Columns>
-<DataGridTextColumn Header="参数值" Binding="{Binding Value, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="130"/>
+<DataGridTextColumn Header="参数值" Binding="{Binding Value, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="130"/>
 <DataGridTextColumn Header="分离点数" Binding="{Binding SeparationPoints, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="100"/>
 <DataGridTextColumn Header="滑移点数" Binding="{Binding SlidingPoints, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="100"/>
 <DataGridTextColumn Header="超限点数" Binding="{Binding OverLimitPoints, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="100"/>
-<DataGridTextColumn Header="最大卡扣限值比" Binding="{Binding MaxClipUtilization, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="150"/>
-<DataGridTextColumn Header="最大压缩 mm" Binding="{Binding MaxCompressionMm, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="135"/>
-<DataGridTextColumn Header="最大滑移 mm" Binding="{Binding MaxSlipMm, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="135"/>
+<DataGridTextColumn Header="最大卡扣限值比" Binding="{Binding MaxClipUtilization, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="150"/>
+<DataGridTextColumn Header="最大压缩 mm" Binding="{Binding MaxCompressionMm, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="135"/>
+<DataGridTextColumn Header="最大滑移 mm" Binding="{Binding MaxSlipMm, StringFormat=G6, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, NotifyOnSourceUpdated=True, ValidatesOnExceptions=True, NotifyOnValidationError=True}" Width="135"/>
 </DataGrid.Columns>
 </DataGrid><TextBlock Text="范围递增且每个值满足原字段限制。扫描保留其他输入不变；不会自动应用最优值，也不承诺降低真实异响。修改模型输入后旧扫描失效，必须重新运行。" Style="{StaticResource Note}"/></StackPanel></GroupBox></StackPanel></ScrollViewer>
 </UserControl>
