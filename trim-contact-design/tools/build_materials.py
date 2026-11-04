@@ -1,8 +1,10 @@
 from pathlib import Path
 import json
 import unicodedata
+import hashlib
+import struct
 from docx import Document
-from docx.shared import Pt, Emu
+from docx.shared import Pt, Emu, Inches
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from manual_content import CHAPTERS, MAIN_FUNCTIONS
@@ -11,6 +13,27 @@ from source_inventory import ROOT, inventory, production_files
 NAME = '汽车内饰卡扣与防异响接触设计软件'
 VERSION = 'V2.0'
 DOCS = ROOT / 'docs'
+WINDOWS = DOCS / 'windows'
+def evidence(name):
+    path = WINDOWS / name
+    return json.loads(path.read_text(encoding='utf-8-sig')) if path.exists() else {}
+ui = evidence('windows-ui-evidence.json')
+word = evidence('word-pagination.json')
+native_ok = bool(ui) and ui.get('failed') == 0
+figures = {
+    1: [('01-empty', '空白项目的真实WPF工作台')],
+    2: [('02a-project-fields', '项目身份、来源与依据字段')],
+    3: [('04-layout', '饰板、卡扣和中心接触点布置（模拟）')],
+    4: [('04a-contact-fields', '单边接触点的原生参数表（模拟）')],
+    5: [('05-loads', '共用载荷与相位、公差设置（模拟）')],
+    6: [('03-invalid-number', '真实数值转换错误的红框和阻断状态')],
+    7: [('06-envelope', '逐点结果包络（模拟）'), ('07-nominal-traces', '名义公差接触压缩量曲线（模拟）'), ('08-force-balance', '独立力与力矩核查（模拟）')],
+    8: [('11-scan', '方案比较和四值预紧扫描（模拟）')],
+    9: [('12a-csv-preview', 'CSV整批预检与模式'), ('12-batch', '批量预览的字段、单位和前后值')],
+    10: [('13-verification-tasks', '由模拟结果生成的验证任务')],
+    11: [('13a-project-library', '本机项目库、存储位置与恢复入口')]
+}
+figure_records = []
 
 def font(run, name='Microsoft YaHei', size=10.5):
     run.font.name = name
@@ -48,14 +71,33 @@ def paragraph(d, text):
     return p
 
 report = inventory()
-manual = document('操作说明 · 待Windows核验草稿')
-markdown = '# 操作说明书 V2.0（待Windows核验草稿）\n\n'
+manual = document('操作说明 · 待Microsoft Word核验草稿')
+markdown = '# 操作说明书 V2.0（待Microsoft Word核验草稿）\n\n'
 for i, (title, body) in enumerate(CHAPTERS):
     if i: manual.add_page_break()
     manual.add_heading(f'{i+1} {title}', 1)
+    if native_ok:
+        body = body.replace('当前版本完成Linux交叉编译和自动化业务测试，尚未取得真实WPF运行截图，原生界面绑定、布局和对话框仍须在Windows验证。本文没有用浏览器截图或绘制图代替桌面证据，不能直接作为已完成验收的申报终稿。',
+            '当前版本已在Windows Server 2025 runner实际显示WPF窗口并执行输入、命令和业务流程，截图来自该真实原生窗口及其控件。原生文件与确认接口在自动流程中使用替身，真实系统对话框、高DPI及Windows10/11人工兼容检查仍待完成。runner没有Microsoft Word，本文仍需Word实际分页和版式核验，不能直接作为申报终稿。')
     for text in body.splitlines():
         if text.strip(): paragraph(manual, text)
     markdown += f'## {i+1} {title}\n\n' + body + '\n\n'
+    if native_ok:
+        for filename, caption in figures.get(i, []):
+            image = WINDOWS / 'screenshots' / (filename + '.png')
+            if not image.exists():
+                continue
+            number = len(figure_records) + 1
+            paragraph(manual, f'图{number}对应上述操作。图内参数均为模拟；若列未完全显示，可在程序中横向或纵向滚动。')
+            picture = manual.add_paragraph()
+            picture.paragraph_format.keep_with_next = True
+            picture.add_run().add_picture(str(image), width=Inches(6.3))
+            paragraph(manual, f'图{number} {caption}（真实Windows WPF运行界面）').style = 'Caption'
+            width, height = struct.unpack('>II', image.read_bytes()[16:24])
+            figure_records.append({'figure': number, 'file': image.relative_to(ROOT).as_posix(), 'caption': caption,
+                                   'sha256': hashlib.sha256(image.read_bytes()).hexdigest(), 'width': width, 'height': height,
+                                   'sourceCommit': ui.get('sourceCommit'), 'runUrl': ui.get('runUrl')})
+            markdown += f'![图{number} {caption}](windows/screenshots/{filename}.png)\n\n'
 manual.save(DOCS / '操作说明书-待Windows核验.docx')
 (DOCS / '操作说明书.md').write_text(markdown.rstrip()+"\n", encoding='utf-8')
 
@@ -68,12 +110,12 @@ fields = [
 ('开发完成日期', '待申请人核实/填写；不以本次生成或验证日期代替'),
 ('首次发表状态、日期、地点', '待申请人核实/填写；代码推送与法定发表事实分别核实'),
 ('语言与工程', 'C#、WPF XAML；TrimContact.sln；MVVM；Windows原生桌面应用'),
-('运行环境', 'Windows10/11 x64，自包含.NET10离线发布；Linux交叉编译及业务测试已执行，Windows原生界面实机验证待完成'),
+('运行环境', '目标Windows10/11 x64，自包含.NET10离线发布；' + ('Windows Server 2025 runner真实WPF运行已验证，Windows10/11、高DPI和系统对话框人工复核待完成' if native_ok else 'Linux交叉编译及业务测试已执行，Windows原生界面验证待完成')),
 ('开发工具与依赖', '.NET SDK10.0.403；生产无第三方NuGet代码依赖；官方WindowsDesktop框架；Python仅用于开发材料工具'),
 ('主要功能', MAIN_FUNCTIONS),
 ('源程序量', f"{report['totalNonempty']}行手写生产C#与XAML非空行；测试、工具、生成文件、依赖、产物、文档不计。逐文件SHA256见源码清单。"),
 ('文件格式', '.trimproj（schema1，2MB上限）；布置CSV；HTML、CSV及分析JSON；备份.bak'),
-('模板与申报范围', '沿用备份版采集表字段顺序、A4页幅与边框；未收到申请人专用模板。Word跨页版式、签章、正式源码范围与页数待申请人核实。材料为草稿，尚无真实WPF截图。')]
+('模板与申报范围', '沿用备份版采集表字段顺序、A4页幅与边框；未收到申请人专用模板。Word跨页版式、签章、正式源码范围与页数待申请人核实。材料为待Word核验草稿，真实截图状态以同目录Windows证据和材料检查表为准。')]
 collection = document('软著信息采集表 · 草稿')
 collection.add_heading(NAME + ' ' + VERSION, 1)
 paragraph(collection, '以下程序事实可由代码与证据核对；申请人事实必须本人核实。Windows实机与Word分页尚未完成。')
@@ -112,8 +154,10 @@ assert han > 500
 checks = {'majorFunctionsHanCount': han, 'minimumExclusive': 500,
           'introFirst': CHAPTERS[0][0] == '软件介绍', 'manualChapters': len(CHAPTERS),
           'actualWordPageCount': None, 'actualWordPdfPageCount': None,
-          'wordLayoutVerified': False, 'wpfScreenshots': 0,
-          'status': 'Draft; genuine Windows screenshots, Windows UI workflow and Microsoft Word pagination/layout verification pending',
+          'wordLayoutVerified': False, 'wpfScreenshots': len(list((WINDOWS / 'screenshots').glob('*.png'))),
+          'windowsUIVerified': native_ok, 'windowsEvidenceRun': ui.get('runUrl'), 'manualFigures': len(figure_records),
+          'status': 'Draft; Microsoft Word pagination/layout and Windows 10/11, DPI and shell-dialog human checks pending',
           'productionNonempty': report['totalNonempty'], 'sourceFileCount': len(report['files'])}
+(DOCS / 'screenshot-inventory.json').write_text(json.dumps(figure_records, ensure_ascii=False, indent=2), encoding='utf-8')
 (DOCS / 'materials-check.json').write_text(json.dumps(checks, ensure_ascii=False, indent=2), encoding='utf-8')
 print(json.dumps(checks, ensure_ascii=False))

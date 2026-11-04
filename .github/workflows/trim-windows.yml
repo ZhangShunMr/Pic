@@ -2,7 +2,21 @@ name: Trim contact Windows native verification
 on:
   push:
     branches: ['windows-native/trim-contact-design-20261104']
-    paths: ['trim-contact-design/**', '.github/workflows/trim-windows.yml']
+    paths:
+      - 'trim-contact-design/src/**'
+      - 'trim-contact-design/tests/**'
+      - 'trim-contact-design/TrimContact.sln'
+      - 'trim-contact-design/Directory.Build.props'
+      - 'trim-contact-design/global.json'
+      - 'trim-contact-design/tools/verify-windows.ps1'
+      - 'trim-contact-design/tools/smoke-published.ps1'
+      - 'trim-contact-design/tools/capture-windows.ps1'
+      - 'trim-contact-design/tools/check-word.ps1'
+      - 'trim-contact-design/tools/build_materials.py'
+      - 'trim-contact-design/tools/manual_content.py'
+      - 'trim-contact-design/tools/source_inventory.py'
+      - 'trim-contact-design/tools/package_release.py'
+      - '.github/workflows/trim-windows.yml'
   workflow_dispatch:
 permissions:
   contents: write
@@ -27,6 +41,12 @@ jobs:
       - name: Check actual Microsoft Word availability
         if: always()
         run: ./tools/check-word.ps1
+      - name: Build illustrated materials and package the tested executable
+        if: success()
+        run: |
+          python -m pip install -r requirements-dev.txt
+          python tools/build_materials.py
+          python tools/package_release.py
       - name: Retain actual evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -40,7 +60,7 @@ jobs:
         run: |
           git config user.name 'Trim Windows verification'
           git config user.email 'codex@openai.com'
-          git add docs/windows
+          git add docs/windows docs/materials-check.json docs/screenshot-inventory.json docs/source-inventory.json docs/源码清单.md docs/完整生产源码清单.txt docs/完整生产源码打印稿.docx docs/操作说明书-待Windows核验.docx docs/操作说明书.md docs/软著信息采集表-草稿.docx docs/软著信息采集表.md dist
           git diff --cached --quiet
           if ($LASTEXITCODE -eq 1) {
             git commit -m 'Record actual Windows verification evidence [skip ci]'
