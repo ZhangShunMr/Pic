@@ -1,0 +1,113 @@
+<Application x:Class="Cabin.Desktop.App"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:infra="clr-namespace:Cabin.Desktop.Infrastructure"
+ StartupUri="Views/MainWindow.xaml">
+ <Application.Resources>
+  <infra:SectionVisibilityConverter x:Key="SectionVisibility"/>
+  <infra:BooleanVisibilityConverter x:Key="BoolVisibility"/>
+  <SolidColorBrush x:Key="Ink" Color="#19313F"/>
+  <SolidColorBrush x:Key="Accent" Color="#157D8D"/>
+  <Style TargetType="Window">
+   <Setter Property="FontFamily" Value="Microsoft YaHei UI, Segoe UI"/>
+   <Setter Property="FontSize" Value="13"/>
+   <Setter Property="Foreground" Value="{StaticResource Ink}"/>
+   <Setter Property="Background" Value="#F4F3EE"/>
+  </Style>
+  <Style TargetType="TextBlock">
+   <Setter Property="TextWrapping" Value="Wrap"/>
+   <Setter Property="VerticalAlignment" Value="Center"/>
+  </Style>
+  <Style TargetType="Button">
+   <Setter Property="Padding" Value="12,7"/>
+   <Setter Property="Margin" Value="0,0,8,6"/>
+   <Setter Property="Background" Value="#E3EEF0"/>
+   <Setter Property="Foreground" Value="{StaticResource Ink}"/>
+   <Setter Property="BorderBrush" Value="#B8CCD0"/>
+   <Setter Property="Cursor" Value="Hand"/>
+  </Style>
+  <Style x:Key="Primary" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+   <Setter Property="Background" Value="#157D8D"/>
+   <Setter Property="Foreground" Value="White"/>
+   <Setter Property="FontWeight" Value="SemiBold"/>
+  </Style>
+  <Style TargetType="TextBox">
+   <Setter Property="Padding" Value="7,5"/>
+   <Setter Property="BorderBrush" Value="#BDCDD1"/>
+   <Setter Property="VerticalContentAlignment" Value="Center"/>
+   <Setter Property="Margin" Value="0,3,0,3"/>
+   <Setter Property="MinHeight" Value="29"/>
+   <Style.Triggers>
+    <Trigger Property="Validation.HasError" Value="True">
+     <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}"/>
+    </Trigger>
+   </Style.Triggers>
+  </Style>
+  <Style TargetType="ComboBox">
+   <Setter Property="Padding" Value="5"/>
+   <Setter Property="Margin" Value="0,3,0,8"/>
+   <Setter Property="MinHeight" Value="30"/>
+  </Style>
+  <Style TargetType="DataGrid">
+   <Setter Property="AutoGenerateColumns" Value="False"/>
+   <Setter Property="CanUserAddRows" Value="False"/>
+   <Setter Property="CanUserDeleteRows" Value="False"/>
+   <Setter Property="CanUserReorderColumns" Value="True"/>
+   <Setter Property="SelectionMode" Value="Single"/>
+   <Setter Property="HeadersVisibility" Value="Column"/>
+   <Setter Property="RowHeaderWidth" Value="0"/>
+   <Setter Property="RowHeight" Value="34"/>
+   <Setter Property="ColumnHeaderHeight" Value="36"/>
+   <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+   <Setter Property="HorizontalGridLinesBrush" Value="#E3E8E8"/>
+   <Setter Property="BorderBrush" Value="#D1DDDE"/>
+   <Setter Property="AlternatingRowBackground" Value="#F3F7F7"/>
+   <Setter Property="Background" Value="White"/>
+   <Setter Property="EnableRowVirtualization" Value="True"/>
+   <Setter Property="EnableColumnVirtualization" Value="True"/>
+   <Setter Property="Margin" Value="0,8,0,12"/>
+  </Style>
+  <Style TargetType="DataGridColumnHeader">
+   <Setter Property="Padding" Value="8"/>
+   <Setter Property="Background" Value="#E7EFF0"/>
+   <Setter Property="Foreground" Value="#234551"/>
+  </Style>
+  <Style x:Key="Heading" TargetType="TextBlock">
+   <Setter Property="FontSize" Value="24"/>
+   <Setter Property="FontWeight" Value="SemiBold"/>
+   <Setter Property="Margin" Value="0,0,0,8"/>
+  </Style>
+  <Style x:Key="Subheading" TargetType="TextBlock">
+   <Setter Property="FontSize" Value="16"/>
+   <Setter Property="FontWeight" Value="SemiBold"/>
+   <Setter Property="Margin" Value="0,16,0,8"/>
+  </Style>
+  <Style x:Key="Hint" TargetType="TextBlock">
+   <Setter Property="Foreground" Value="#596F77"/>
+   <Setter Property="Margin" Value="0,3,0,8"/>
+   <Setter Property="LineHeight" Value="21"/>
+  </Style>
+  <Style x:Key="Card" TargetType="Border">
+   <Setter Property="Background" Value="White"/>
+   <Setter Property="BorderBrush" Value="#D6E0E0"/>
+   <Setter Property="BorderThickness" Value="1"/>
+   <Setter Property="CornerRadius" Value="6"/>
+   <Setter Property="Padding" Value="16"/>
+   <Setter Property="Margin" Value="0,0,0,12"/>
+  </Style>
+  <Style TargetType="GroupBox">
+   <Setter Property="Padding" Value="10"/>
+   <Setter Property="Margin" Value="0,0,0,12"/>
+   <Setter Property="BorderBrush" Value="#CCDBDD"/>
+  </Style>
+  <DataTemplate x:Key="FieldTemplate">
+   <StackPanel Margin="0,0,0,10">
+    <TextBlock Text="{Binding Label}" FontWeight="SemiBold"/>
+    <TextBox Text="{Binding Text, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" ToolTip="{Binding Hint}"/>
+    <TextBlock Text="{Binding Hint}" FontSize="11" Foreground="#6C7F86"/>
+    <TextBlock Text="{Binding Error}" Foreground="#B13D35" FontSize="11"
+      Visibility="{Binding HasErrors, Converter={StaticResource BoolVisibility}}"/>
+   </StackPanel>
+  </DataTemplate>
+ </Application.Resources>
+</Application>

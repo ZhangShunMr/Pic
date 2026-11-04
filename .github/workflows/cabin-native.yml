@@ -1,0 +1,35 @@
+name: Cabin Windows native verification
+on:
+  push:
+    branches: ['windows-native/cabin-acoustics']
+    paths: ['cabin-acoustics/**', '.github/workflows/cabin-native.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: cabin-acoustics
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Core, shared MVVM and actual WPF window checks
+        run: ./tools/verify-windows.ps1
+      - name: Publish offline self contained Windows folder
+        if: success()
+        run: ./tools/publish-windows.ps1
+      - name: Retain actual evidence and runnable Windows package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cabin-windows-native
+          path: |
+            cabin-acoustics/docs/screenshots
+            cabin-acoustics/docs/test-windows.json
+            cabin-acoustics/artifacts/win-x64

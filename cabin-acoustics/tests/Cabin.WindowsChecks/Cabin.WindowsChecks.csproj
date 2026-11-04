@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+ <PropertyGroup>
+  <TargetFramework>net8.0-windows</TargetFramework>
+  <OutputType>Exe</OutputType>
+  <UseWPF>true</UseWPF>
+  <EnableWindowsTargeting>true</EnableWindowsTargeting>
+  <StartupObject>Cabin.WindowsChecks.Program</StartupObject>
+ </PropertyGroup>
+ <ItemGroup><ProjectReference Include="../../src/Cabin.Desktop/Cabin.Desktop.csproj"/></ItemGroup>
+</Project>

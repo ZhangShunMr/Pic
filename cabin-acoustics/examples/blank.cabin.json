@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "id": "9603c682-167d-4788-9ece-49ea8b3ef671",
+  "name": "\u672A\u547D\u540D\u5EA7\u8231",
+  "revision": "A",
+  "owner": "",
+  "dataSource": "\u4EBA\u5DE5\u8F93\u5165 / \u7406\u60F3\u5316\u51E0\u4F55",
+  "isDemo": false,
+  "notes": "",
+  "created": "2026-11-04T14:58:48.5585367+00:00",
+  "modified": "2026-11-04T14:58:48.5585367+00:00",
+  "model": {
+    "length": 3.4,
+    "width": 1.6,
+    "height": 1.2,
+    "soundSpeed": 343,
+    "damping": 0.03,
+    "minimumFrequency": 20,
+    "maximumFrequency": 200,
+    "frequencyStep": 1,
+    "cutoff": 400,
+    "volume": 6.5280000000000005
+  },
+  "sources": [],
+  "seats": [],
+  "baselines": [],
+  "reviews": [],
+  "journal": []
+}

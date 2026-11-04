@@ -1,0 +1,70 @@
+PASS rectangular axial analytic frequency
+PASS tangential analytic frequency
+PASS enumeration excludes 000 and sorts
+PASS cubic first eigenfrequency triple degeneracy
+PASS axial center node and rigid wall extrema
+PASS rigid boundary normal derivative zero
+PASS mode normalization factors
+PASS modal resonance analytic damping value
+PASS modal resonance inversely scales with damping
+PASS source on axial node has zero coupling
+PASS coincident anti-phase sources cancel
+PASS doubling all source amplitudes doubles response
+PASS source receiver reciprocity
+PASS symmetric left right ears give identical response
+PASS frequency grid includes nondivisible endpoint exactly
+PASS complex contributions sum to total
+PASS field maps each plane correctly
+PASS field values agree with direct point evaluation
+PASS invalid field plane and fraction rejected
+PASS dB relative ratios and finite zero display
+PASS empty project saves but cannot calculate
+PASS nonfinite geometry rejected
+PASS zero damping rejected
+PASS cutoff below band rejected
+PASS equal reversed frequency band rejected
+PASS out of bounds ear rejected with point name
+PASS points exactly on walls accepted
+PASS duplicate point identity rejected
+PASS all disabled sources cannot calculate
+PASS null point and null collection rejected
+PASS unknown schema rejected
+PASS missing geometry field rejected
+PASS unknown JSON field rejected
+PASS duplicate JSON property rejected
+PASS broken JSON and oversized file rejected
+PASS native save open retains full project
+PASS atomic overwrite saves latest revision
+PASS invalid save preserves existing file
+PASS CSV point roundtrip retains positions and names
+PASS CSV invalid cell has line-specific issue and is atomic
+PASS CSV wrong header and malformed quotes rejected
+PASS CSV point limits enforced
+PASS multiline point labels rejected before export
+PASS same baseline comparison is zero ratio
+PASS comparison disallows incompatible frequency grid
+PASS comparison disallows mixed demonstration provenance
+PASS comparison warns changed ear location
+PASS comparison rejects no matching ear identity
+PASS scan has inclusive endpoints and leaves source unchanged
+PASS scan records invalid geometries instead of ranking them
+PASS scan invalid settings rejected
+PASS cancellation token interrupts computation
+PASS density bands conserve mode count
+PASS truncation extension preserves input and adds modes
+PASS response exports retain identity provenance units complex parts
+PASS scan export leaves invalid numeric cells empty
+PASS research report includes actual conditions and limitation
+PASS blank MVVM state does not auto load data
+PASS numeric draft rejects malformed text without silent fallback
+PASS new project cancellation preserves current draft
+PASS save invalid draft does not close project
+PASS MVVM save reopen and stable source provenance
+PASS MVVM calculate input change invalidates stale results
+PASS MVVM baseline capture and scan apply use current computed inputs
+PASS MVVM fractional scan count rejected
+PASS field rejects invalid resolution and frequency
+PASS density rejects unbounded number of bands
+PASS CSV apply revalidates mutable preview before mutation
+PASS scan cancellation interrupts candidate calculation
+69/69 passed

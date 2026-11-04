@@ -1,0 +1,18 @@
+<Window x:Class="Cabin.Desktop.Views.ExampleWindow"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ Title="独立模拟示例" Width="570" Height="390" ResizeMode="NoResize"
+ WindowStartupLocation="CenterOwner" ShowInTaskbar="False">
+ <StackPanel Margin="24">
+  <TextBlock Text="选择独立模拟研究" Style="{StaticResource Heading}"/>
+  <TextBlock Text="示例仅用于核对理想模型。载入前将处理当前项目的未保存内容。所有输入及结果均保留模拟标记。" Style="{StaticResource Hint}"/>
+  <RadioButton x:Name="FourSeats" IsChecked="True" Margin="0,14,0,4" Content="四座矩形座舱 · 单源激励" FontWeight="SemiBold"/>
+  <TextBlock Margin="22,0,0,8" Text="3.4 × 1.6 × 1.2m，声速343m/s。首阶纵向模态约50.441Hz；比较前后排及左右对称耳点。" Style="{StaticResource Hint}"/>
+  <RadioButton x:Name="Cancellation" Margin="0,8,0,4" Content="双源反相抵消 · 数值核对" FontWeight="SemiBold"/>
+  <TextBlock Margin="22,0,0,10" Text="两个同点、同幅、反相声源。理想响应接近浮点零，不代表实车降噪效果。" Style="{StaticResource Hint}"/>
+  <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+   <Button Content="取消" IsCancel="True"/>
+   <Button Content="载入所选示例" IsDefault="True" Click="Accept" Style="{StaticResource Primary}"/>
+  </StackPanel>
+ </StackPanel>
+</Window>

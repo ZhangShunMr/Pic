@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+ <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework></PropertyGroup>
+ <ItemGroup>
+  <ProjectReference Include="../../src/Cabin.Core/Cabin.Core.csproj"/>
+  <Compile Include="../../src/Cabin.Desktop/ViewModels/*.cs" Link="ViewModels/%(Filename)%(Extension)"/>
+  <Compile Include="../../src/Cabin.Desktop/Infrastructure/ObservableObject.cs" Link="ObservableObject.cs"/>
+  <Compile Include="../../src/Cabin.Desktop/Infrastructure/Commands.cs" Link="Commands.cs"/>
+  <Compile Include="../../src/Cabin.Desktop/Services/IDesktopServices.cs" Link="IDesktopServices.cs"/>
+ </ItemGroup>
+</Project>

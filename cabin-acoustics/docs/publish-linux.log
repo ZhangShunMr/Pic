@@ -1,0 +1,6 @@
+  Determining projects to restore...
+  Restored /workspace/cabin-native/cabin-acoustics/src/Cabin.Core/Cabin.Core.csproj (in 2.84 sec).
+  Restored /workspace/cabin-native/cabin-acoustics/src/Cabin.Desktop/Cabin.Desktop.csproj (in 2.94 sec).
+  Cabin.Core -> /workspace/cabin-native/cabin-acoustics/src/Cabin.Core/bin/Release/net8.0/Cabin.Core.dll
+  Cabin.Desktop -> /workspace/cabin-native/cabin-acoustics/src/Cabin.Desktop/bin/Release/net8.0-windows/win-x64/CabinAcoustics.dll
+  Cabin.Desktop -> /workspace/cabin-native/cabin-acoustics/artifacts/win-x64/

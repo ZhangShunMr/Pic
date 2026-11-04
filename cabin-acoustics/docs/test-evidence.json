@@ -1,0 +1,286 @@
+{
+  "executedUtc": "2026-11-04T14:58:48.5788511+00:00",
+  "framework": ".NET 8.0.33",
+  "platform": "Debian GNU/Linux 13 (trixie)",
+  "note": "Core and shared MVVM logic executed on Linux. CommandManager shim is test-only. WPF bindings, dialogs, rendering and Windows executable were not executed by this suite.",
+  "total": 69,
+  "failed": 0,
+  "results": [
+    {
+      "name": "rectangular axial analytic frequency",
+      "status": "passed"
+    },
+    {
+      "name": "tangential analytic frequency",
+      "status": "passed"
+    },
+    {
+      "name": "enumeration excludes 000 and sorts",
+      "status": "passed"
+    },
+    {
+      "name": "cubic first eigenfrequency triple degeneracy",
+      "status": "passed"
+    },
+    {
+      "name": "axial center node and rigid wall extrema",
+      "status": "passed"
+    },
+    {
+      "name": "rigid boundary normal derivative zero",
+      "status": "passed"
+    },
+    {
+      "name": "mode normalization factors",
+      "status": "passed"
+    },
+    {
+      "name": "modal resonance analytic damping value",
+      "status": "passed"
+    },
+    {
+      "name": "modal resonance inversely scales with damping",
+      "status": "passed"
+    },
+    {
+      "name": "source on axial node has zero coupling",
+      "status": "passed"
+    },
+    {
+      "name": "coincident anti-phase sources cancel",
+      "status": "passed"
+    },
+    {
+      "name": "doubling all source amplitudes doubles response",
+      "status": "passed"
+    },
+    {
+      "name": "source receiver reciprocity",
+      "status": "passed"
+    },
+    {
+      "name": "symmetric left right ears give identical response",
+      "status": "passed"
+    },
+    {
+      "name": "frequency grid includes nondivisible endpoint exactly",
+      "status": "passed"
+    },
+    {
+      "name": "complex contributions sum to total",
+      "status": "passed"
+    },
+    {
+      "name": "field maps each plane correctly",
+      "status": "passed"
+    },
+    {
+      "name": "field values agree with direct point evaluation",
+      "status": "passed"
+    },
+    {
+      "name": "invalid field plane and fraction rejected",
+      "status": "passed"
+    },
+    {
+      "name": "dB relative ratios and finite zero display",
+      "status": "passed"
+    },
+    {
+      "name": "empty project saves but cannot calculate",
+      "status": "passed"
+    },
+    {
+      "name": "nonfinite geometry rejected",
+      "status": "passed"
+    },
+    {
+      "name": "zero damping rejected",
+      "status": "passed"
+    },
+    {
+      "name": "cutoff below band rejected",
+      "status": "passed"
+    },
+    {
+      "name": "equal reversed frequency band rejected",
+      "status": "passed"
+    },
+    {
+      "name": "out of bounds ear rejected with point name",
+      "status": "passed"
+    },
+    {
+      "name": "points exactly on walls accepted",
+      "status": "passed"
+    },
+    {
+      "name": "duplicate point identity rejected",
+      "status": "passed"
+    },
+    {
+      "name": "all disabled sources cannot calculate",
+      "status": "passed"
+    },
+    {
+      "name": "null point and null collection rejected",
+      "status": "passed"
+    },
+    {
+      "name": "unknown schema rejected",
+      "status": "passed"
+    },
+    {
+      "name": "missing geometry field rejected",
+      "status": "passed"
+    },
+    {
+      "name": "unknown JSON field rejected",
+      "status": "passed"
+    },
+    {
+      "name": "duplicate JSON property rejected",
+      "status": "passed"
+    },
+    {
+      "name": "broken JSON and oversized file rejected",
+      "status": "passed"
+    },
+    {
+      "name": "native save open retains full project",
+      "status": "passed"
+    },
+    {
+      "name": "atomic overwrite saves latest revision",
+      "status": "passed"
+    },
+    {
+      "name": "invalid save preserves existing file",
+      "status": "passed"
+    },
+    {
+      "name": "CSV point roundtrip retains positions and names",
+      "status": "passed"
+    },
+    {
+      "name": "CSV invalid cell has line-specific issue and is atomic",
+      "status": "passed"
+    },
+    {
+      "name": "CSV wrong header and malformed quotes rejected",
+      "status": "passed"
+    },
+    {
+      "name": "CSV point limits enforced",
+      "status": "passed"
+    },
+    {
+      "name": "multiline point labels rejected before export",
+      "status": "passed"
+    },
+    {
+      "name": "same baseline comparison is zero ratio",
+      "status": "passed"
+    },
+    {
+      "name": "comparison disallows incompatible frequency grid",
+      "status": "passed"
+    },
+    {
+      "name": "comparison disallows mixed demonstration provenance",
+      "status": "passed"
+    },
+    {
+      "name": "comparison warns changed ear location",
+      "status": "passed"
+    },
+    {
+      "name": "comparison rejects no matching ear identity",
+      "status": "passed"
+    },
+    {
+      "name": "scan has inclusive endpoints and leaves source unchanged",
+      "status": "passed"
+    },
+    {
+      "name": "scan records invalid geometries instead of ranking them",
+      "status": "passed"
+    },
+    {
+      "name": "scan invalid settings rejected",
+      "status": "passed"
+    },
+    {
+      "name": "cancellation token interrupts computation",
+      "status": "passed"
+    },
+    {
+      "name": "density bands conserve mode count",
+      "status": "passed"
+    },
+    {
+      "name": "truncation extension preserves input and adds modes",
+      "status": "passed"
+    },
+    {
+      "name": "response exports retain identity provenance units complex parts",
+      "status": "passed"
+    },
+    {
+      "name": "scan export leaves invalid numeric cells empty",
+      "status": "passed"
+    },
+    {
+      "name": "research report includes actual conditions and limitation",
+      "status": "passed"
+    },
+    {
+      "name": "blank MVVM state does not auto load data",
+      "status": "passed"
+    },
+    {
+      "name": "numeric draft rejects malformed text without silent fallback",
+      "status": "passed"
+    },
+    {
+      "name": "new project cancellation preserves current draft",
+      "status": "passed"
+    },
+    {
+      "name": "save invalid draft does not close project",
+      "status": "passed"
+    },
+    {
+      "name": "MVVM save reopen and stable source provenance",
+      "status": "passed"
+    },
+    {
+      "name": "MVVM calculate input change invalidates stale results",
+      "status": "passed"
+    },
+    {
+      "name": "MVVM baseline capture and scan apply use current computed inputs",
+      "status": "passed"
+    },
+    {
+      "name": "MVVM fractional scan count rejected",
+      "status": "passed"
+    },
+    {
+      "name": "field rejects invalid resolution and frequency",
+      "status": "passed"
+    },
+    {
+      "name": "density rejects unbounded number of bands",
+      "status": "passed"
+    },
+    {
+      "name": "CSV apply revalidates mutable preview before mutation",
+      "status": "passed"
+    },
+    {
+      "name": "scan cancellation interrupts candidate calculation",
+      "status": "passed"
+    }
+  ]
+}
