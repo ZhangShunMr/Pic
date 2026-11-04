@@ -1,0 +1,8 @@
+  Determining projects to restore...
+  Restored D:\a\Pic\Pic\avas-coverage-design\src\Avas.Desktop\Avas.Desktop.csproj (in 6.26 sec).
+  Restored D:\a\Pic\Pic\avas-coverage-design\src\Avas.Core\Avas.Core.csproj (in 6.26 sec).
+  Restored D:\a\Pic\Pic\avas-coverage-design\src\Avas.Workspace\Avas.Workspace.csproj (in 6.26 sec).
+  Avas.Core -> D:\a\Pic\Pic\avas-coverage-design\src\Avas.Core\bin\Release\net10.0\Avas.Core.dll
+  Avas.Workspace -> D:\a\Pic\Pic\avas-coverage-design\src\Avas.Workspace\bin\Release\net10.0\Avas.Workspace.dll
+  Avas.Desktop -> D:\a\Pic\Pic\avas-coverage-design\src\Avas.Desktop\bin\Release\net10.0-windows\win-x64\AvasCoverage.dll
+  Avas.Desktop -> D:\a\Pic\Pic\avas-coverage-design\artifacts\AvasCoverage-win-x64\

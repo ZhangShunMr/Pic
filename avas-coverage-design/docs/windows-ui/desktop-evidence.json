@@ -1,8 +1,8 @@
 {
-  "at": "2026-11-04T15:48:58.1574241+00:00",
+  "at": "2026-11-04T15:52:10.6431972+00:00",
   "os": "Microsoft Windows 10.0.26100",
   "runtime": ".NET 10.0.14",
-  "status": "failed",
+  "status": "passed",
   "limitations": [
     "File picker and confirmation host replaced for deterministic automation",
     "Audio playback and perceived audibility not verified",
@@ -13,30 +13,74 @@
     "\u771F\u5B9E\u7A97\u53E3\u7A7A\u767D\u542F\u52A8",
     "01-\u7A7A\u767D\u9879\u76EE\uFF1A\u539F\u751F\u80CC\u666F\u4E0D\u900F\u660E",
     "01-\u7A7A\u767D\u9879\u76EE\uFF1A\u5305\u542B\u5B9E\u9645\u6E32\u67D3\u5185\u5BB9",
+    "01-\u7A7A\u767D\u9879\u76EE\uFF1A\u5C40\u90E8\u56FE\u5305\u542B\u5B9E\u9645\u53EF\u89C1\u63A7\u4EF6",
     "WPF\u6587\u672C\u7ED1\u5B9A\u5199\u5165\u8349\u7A3F",
     "\u539F\u751F\u547D\u4EE4\u5E94\u7528\u5B57\u6BB5",
     "\u72EC\u7ACB\u6A21\u62DF\u793A\u4F8B\u5B8C\u6210\u58F0\u573A\u8BA1\u7B97",
     "02-\u6A21\u62DF\u58F0\u573A\uFF1A\u539F\u751F\u80CC\u666F\u4E0D\u900F\u660E",
     "02-\u6A21\u62DF\u58F0\u573A\uFF1A\u5305\u542B\u5B9E\u9645\u6E32\u67D3\u5185\u5BB9",
+    "02-\u6A21\u62DF\u58F0\u573A\uFF1A\u5C40\u90E8\u56FE\u5305\u542B\u5B9E\u9645\u53EF\u89C1\u63A7\u4EF6",
     "\u8FDB\u5165\u5DE5\u4F5C\u533A\uFF1A\u626C\u58F0\u5668",
     "03-\u626C\u58F0\u5668\u9891\u5E26\uFF1A\u539F\u751F\u80CC\u666F\u4E0D\u900F\u660E",
     "03-\u626C\u58F0\u5668\u9891\u5E26\uFF1A\u5305\u542B\u5B9E\u9645\u6E32\u67D3\u5185\u5BB9",
+    "03-\u626C\u58F0\u5668\u9891\u5E26\uFF1A\u5C40\u90E8\u56FE\u5305\u542B\u5B9E\u9645\u53EF\u89C1\u63A7\u4EF6",
+    "03b-\u4E03\u5E26\u4E0E\u6765\u6E90\uFF1A\u539F\u751F\u80CC\u666F\u4E0D\u900F\u660E",
+    "03b-\u4E03\u5E26\u4E0E\u6765\u6E90\uFF1A\u5305\u542B\u5B9E\u9645\u6E32\u67D3\u5185\u5BB9",
+    "03b-\u4E03\u5E26\u4E0E\u6765\u6E90\uFF1A\u5C40\u90E8\u56FE\u5305\u542B\u5B9E\u9645\u53EF\u89C1\u63A7\u4EF6",
     "\u6B63\u5E38\u8F93\u5165\u9636\u6BB5\u6CA1\u6709WPF\u7ED1\u5B9A\u9519\u8BEF",
     "\u539F\u751F\u6570\u503C\u7ED1\u5B9A\u62D2\u7EDD\u6587\u5B57\u8F93\u5165",
     "\u683C\u5F0F\u9519\u8BEF\u963B\u6B62\u5E94\u7528\u65E7\u6570\u503C\u5E76\u4FDD\u7559\u5F85\u4FEE\u6B63\u6587\u5B57",
     "04-\u6570\u503C\u6821\u9A8C\uFF1A\u539F\u751F\u80CC\u666F\u4E0D\u900F\u660E",
     "04-\u6570\u503C\u6821\u9A8C\uFF1A\u5305\u542B\u5B9E\u9645\u6E32\u67D3\u5185\u5BB9",
+    "04-\u6570\u503C\u6821\u9A8C\uFF1A\u5C40\u90E8\u56FE\u5305\u542B\u5B9E\u9645\u53EF\u89C1\u63A7\u4EF6",
     "\u653E\u5F03\u7F16\u8F91\u6062\u590D\u6709\u6548\u6570\u503C",
     "\u8FDB\u5165\u5DE5\u4F5C\u533A\uFF1A\u80CC\u666F\u4E0E\u7F51\u683C",
     "05-\u80CC\u666F\u7F51\u683C\uFF1A\u539F\u751F\u80CC\u666F\u4E0D\u900F\u660E",
     "05-\u80CC\u666F\u7F51\u683C\uFF1A\u5305\u542B\u5B9E\u9645\u6E32\u67D3\u5185\u5BB9",
+    "05-\u80CC\u666F\u7F51\u683C\uFF1A\u5C40\u90E8\u56FE\u5305\u542B\u5B9E\u9645\u53EF\u89C1\u63A7\u4EF6",
+    "05b-\u5DE5\u7A0B\u76EE\u6807\uFF1A\u539F\u751F\u80CC\u666F\u4E0D\u900F\u660E",
+    "05b-\u5DE5\u7A0B\u76EE\u6807\uFF1A\u5305\u542B\u5B9E\u9645\u6E32\u67D3\u5185\u5BB9",
+    "05b-\u5DE5\u7A0B\u76EE\u6807\uFF1A\u5C40\u90E8\u56FE\u5305\u542B\u5B9E\u9645\u53EF\u89C1\u63A7\u4EF6",
     "\u8FDB\u5165\u5DE5\u4F5C\u533A\uFF1A\u89C2\u5BDF\u70B9",
     "06-\u89C2\u5BDF\u70B9\u9891\u8C31\uFF1A\u539F\u751F\u80CC\u666F\u4E0D\u900F\u660E",
     "06-\u89C2\u5BDF\u70B9\u9891\u8C31\uFF1A\u5305\u542B\u5B9E\u9645\u6E32\u67D3\u5185\u5BB9",
+    "06-\u89C2\u5BDF\u70B9\u9891\u8C31\uFF1A\u5C40\u90E8\u56FE\u5305\u542B\u5B9E\u9645\u53EF\u89C1\u63A7\u4EF6",
+    "06b-\u70B9\u9891\u8C31\u8D21\u732E\uFF1A\u539F\u751F\u80CC\u666F\u4E0D\u900F\u660E",
+    "06b-\u70B9\u9891\u8C31\u8D21\u732E\uFF1A\u5305\u542B\u5B9E\u9645\u6E32\u67D3\u5185\u5BB9",
+    "06b-\u70B9\u9891\u8C31\u8D21\u732E\uFF1A\u5C40\u90E8\u56FE\u5305\u542B\u5B9E\u9645\u53EF\u89C1\u63A7\u4EF6",
     "\u8FDB\u5165\u5DE5\u4F5C\u533A\uFF1A\u65B9\u6848\u6BD4\u8F83",
-    "FAILED: System.FormatException: Unrecognized Guid format.\r\n   at System.Guid.GuidResult.SetFailure(ParseFailure failureKind)\r\n   at System.Guid.TryParseGuid[TChar](ReadOnlySpan\u00601 guidString, GuidResult\u0026 result)\r\n   at System.Guid..ctor(String g)\r\n   at System.ComponentModel.GuidConverter.ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, Object value)\r\n   at MS.Internal.Data.DefaultValueConverter.ConvertHelper(Object o, Type destinationType, DependencyObject targetElement, CultureInfo culture, Boolean isForward)\r\n   at MS.Internal.Data.TargetDefaultValueConverter.Convert(Object o, Type type, Object parameter, CultureInfo culture)\r\n   at MS.Internal.Data.DynamicValueConverter.Convert(Object value, Type targetType, Object parameter, CultureInfo culture)\r\n   at System.Windows.Controls.Primitives.Selector.VerifyEqual(Object knownValue, Type knownType, Object itemValue, DynamicValueConverter converter)\r\n   at System.Windows.Controls.Primitives.Selector.FindItemWithValue(Object value, Int32\u0026 index)\r\n   at System.Windows.Controls.Primitives.Selector.SelectItemWithValue(Object value, Boolean selectNow)\r\n   at System.Windows.Controls.Primitives.Selector.OnItemsChanged(NotifyCollectionChangedEventArgs e)\r\n   at System.Windows.Data.CollectionView.OnCollectionChanged(NotifyCollectionChangedEventArgs args)\r\n   at System.Windows.Controls.ItemCollection.SetCollectionView(CollectionView view)\r\n   at System.Windows.Controls.ItemsControl.OnItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)\r\n   at System.Windows.FrameworkElement.OnPropertyChanged(DependencyPropertyChangedEventArgs e)\r\n   at System.Windows.DependencyObject.NotifyPropertyChange(DependencyPropertyChangedEventArgs args)\r\n   at System.Windows.DependencyObject.UpdateEffectiveValue(EntryIndex entryIndex, DependencyProperty dp, PropertyMetadata metadata, EffectiveValueEntry oldEntry, EffectiveValueEntry\u0026 newEntry, Boolean coerceWithDeferredReference, Boolean coerceWithCurrentValue, OperationType operationType)\r\n   at System.Windows.Data.BindingExpression.TransferValue(Object newValue, Boolean isASubPropertyChange)\r\n   at MS.Internal.Data.PropertyPathWorker.UpdateSourceValueState(Int32 k, ICollectionView collectionView, Object newValue, Boolean isASubPropertyChange)\r\n   at MS.Internal.Data.ClrBindingWorker.OnSourcePropertyChanged(Object o, String propName)\r\n   at MS.Internal.Data.PropertyPathWorker.OnPropertyChanged(Object sender, PropertyChangedEventArgs e)\r\n   at System.Windows.WeakEventManager.ListenerList\u00601.DeliverEvent(Object sender, EventArgs e, Type managerType)\r\n   at System.ComponentModel.PropertyChangedEventManager.OnPropertyChanged(Object sender, PropertyChangedEventArgs args)\r\n   at Avas.Workspace.WorkspaceViewModel.Notify() in D:\\a\\Pic\\Pic\\avas-coverage-design\\src\\Avas.Workspace\\WorkspaceViewModel.cs:line 134\r\n   at Avas.Workspace.WorkspaceViewModel.Execute(Action action) in D:\\a\\Pic\\Pic\\avas-coverage-design\\src\\Avas.Workspace\\WorkspaceViewModel.cs:line 365\r\n   at Avas.Workspace.WorkspaceViewModel.CaptureSnapshot() in D:\\a\\Pic\\Pic\\avas-coverage-design\\src\\Avas.Workspace\\ObjectCommands.cs:line 132\r\n   at Program.\u003C\u003Ec__DisplayClass0_0.\u003C\u003CMain\u003Eb__4\u003Ed.MoveNext() in D:\\a\\Pic\\Pic\\avas-coverage-design\\tests\\Avas.DesktopVerification\\Program.cs:line 126",
-    "failure\uFF1A\u539F\u751F\u80CC\u666F\u4E0D\u900F\u660E",
-    "failure\uFF1A\u5305\u542B\u5B9E\u9645\u6E32\u67D3\u5185\u5BB9"
+    "\u771F\u5B9E\u7A97\u53E3\u65B9\u6848\u6BD4\u8F83",
+    "07-\u65B9\u6848\u6BD4\u8F83\uFF1A\u539F\u751F\u80CC\u666F\u4E0D\u900F\u660E",
+    "07-\u65B9\u6848\u6BD4\u8F83\uFF1A\u5305\u542B\u5B9E\u9645\u6E32\u67D3\u5185\u5BB9",
+    "07-\u65B9\u6848\u6BD4\u8F83\uFF1A\u5C40\u90E8\u56FE\u5305\u542B\u5B9E\u9645\u53EF\u89C1\u63A7\u4EF6",
+    "07b-\u65B9\u6848\u5DEE\u503C\uFF1A\u539F\u751F\u80CC\u666F\u4E0D\u900F\u660E",
+    "07b-\u65B9\u6848\u5DEE\u503C\uFF1A\u5305\u542B\u5B9E\u9645\u6E32\u67D3\u5185\u5BB9",
+    "07b-\u65B9\u6848\u5DEE\u503C\uFF1A\u5C40\u90E8\u56FE\u5305\u542B\u5B9E\u9645\u53EF\u89C1\u63A7\u4EF6",
+    "\u8FDB\u5165\u5DE5\u4F5C\u533A\uFF1A\u626B\u63CF\u4E0E\u5256\u9762",
+    "\u771F\u5B9E\u7A97\u53E3\u626B\u63CF\u4E0E\u5256\u9762",
+    "08-\u626B\u63CF\u5256\u9762\uFF1A\u539F\u751F\u80CC\u666F\u4E0D\u900F\u660E",
+    "08-\u626B\u63CF\u5256\u9762\uFF1A\u5305\u542B\u5B9E\u9645\u6E32\u67D3\u5185\u5BB9",
+    "08-\u626B\u63CF\u5256\u9762\uFF1A\u5C40\u90E8\u56FE\u5305\u542B\u5B9E\u9645\u53EF\u89C1\u63A7\u4EF6",
+    "08b-\u65B9\u5411\u5256\u9762\uFF1A\u539F\u751F\u80CC\u666F\u4E0D\u900F\u660E",
+    "08b-\u65B9\u5411\u5256\u9762\uFF1A\u5305\u542B\u5B9E\u9645\u6E32\u67D3\u5185\u5BB9",
+    "08b-\u65B9\u5411\u5256\u9762\uFF1A\u5C40\u90E8\u56FE\u5305\u542B\u5B9E\u9645\u53EF\u89C1\u63A7\u4EF6",
+    "\u8FDB\u5165\u5DE5\u4F5C\u533A\uFF1A\u97F3\u9891\u8BD5\u542C",
+    "\u8BD5\u542C\u6CE2\u5F62\u5236\u4F5C\u5B8C\u6210\uFF1B\u4E0D\u9A8C\u8BC1\u542C\u611F",
+    "09-\u76F8\u5BF9\u8BD5\u542C\uFF1A\u539F\u751F\u80CC\u666F\u4E0D\u900F\u660E",
+    "09-\u76F8\u5BF9\u8BD5\u542C\uFF1A\u5305\u542B\u5B9E\u9645\u6E32\u67D3\u5185\u5BB9",
+    "09-\u76F8\u5BF9\u8BD5\u542C\uFF1A\u5C40\u90E8\u56FE\u5305\u542B\u5B9E\u9645\u53EF\u89C1\u63A7\u4EF6",
+    "09b-\u76F8\u5BF9\u8BD5\u542C\u7ED3\u679C\uFF1A\u539F\u751F\u80CC\u666F\u4E0D\u900F\u660E",
+    "09b-\u76F8\u5BF9\u8BD5\u542C\u7ED3\u679C\uFF1A\u5305\u542B\u5B9E\u9645\u6E32\u67D3\u5185\u5BB9",
+    "09b-\u76F8\u5BF9\u8BD5\u542C\u7ED3\u679C\uFF1A\u5C40\u90E8\u56FE\u5305\u542B\u5B9E\u9645\u53EF\u89C1\u63A7\u4EF6",
+    "\u8FDB\u5165\u5DE5\u4F5C\u533A\uFF1A\u6210\u679C\u4E0E\u590D\u6838",
+    "\u771F\u5B9E\u547D\u4EE4\u4FDD\u5B58\u5E76\u8F93\u51FA\u62A5\u544A\uFF1B\u6587\u4EF6\u9009\u62E9\u5668\u7531\u6D4B\u8BD5\u5BBF\u4E3B\u66FF\u4EE3",
+    "10-\u6210\u679C\u590D\u6838\uFF1A\u539F\u751F\u80CC\u666F\u4E0D\u900F\u660E",
+    "10-\u6210\u679C\u590D\u6838\uFF1A\u5305\u542B\u5B9E\u9645\u6E32\u67D3\u5185\u5BB9",
+    "10-\u6210\u679C\u590D\u6838\uFF1A\u5C40\u90E8\u56FE\u5305\u542B\u5B9E\u9645\u53EF\u89C1\u63A7\u4EF6",
+    "11-\u6700\u5C0F\u7A97\u53E3\uFF1A\u539F\u751F\u80CC\u666F\u4E0D\u900F\u660E",
+    "11-\u6700\u5C0F\u7A97\u53E3\uFF1A\u5305\u542B\u5B9E\u9645\u6E32\u67D3\u5185\u5BB9",
+    "11-\u6700\u5C0F\u7A97\u53E3\uFF1A\u5C40\u90E8\u56FE\u5305\u542B\u5B9E\u9645\u53EF\u89C1\u63A7\u4EF6",
+    "\u6CA1\u6709WPF\u6570\u636E\u7ED1\u5B9A\u8DEF\u5F84\u9519\u8BEF"
   ],
   "bindingErrors": [],
   "expectedInvalidNumericValidationTrace": [],
@@ -50,7 +94,7 @@
     },
     {
       "file": "01-\u7A7A\u767D\u9879\u76EE-editor.png",
-      "sha256": "b1e56f23934fa7ab3e65959b31bf53b4e444562d1e10f2de5b1454b3c2d17145",
+      "sha256": "437eae7b5a11421e89b766e74803cbf0802344e76855230f6ca34c986e4d3a93",
       "width": 470,
       "height": 632,
       "provenance": "live, visible WPF Inspector panel from the same shown MainWindow; original pixels"
@@ -64,7 +108,7 @@
     },
     {
       "file": "02-\u6A21\u62DF\u58F0\u573A-editor.png",
-      "sha256": "b1e56f23934fa7ab3e65959b31bf53b4e444562d1e10f2de5b1454b3c2d17145",
+      "sha256": "bc256da112670adf08d2ab910f21906610002f917f967092bf028def21a89b9f",
       "width": 470,
       "height": 632,
       "provenance": "live, visible WPF Inspector panel from the same shown MainWindow; original pixels"
@@ -78,7 +122,21 @@
     },
     {
       "file": "03-\u626C\u58F0\u5668\u9891\u5E26-editor.png",
-      "sha256": "b1e56f23934fa7ab3e65959b31bf53b4e444562d1e10f2de5b1454b3c2d17145",
+      "sha256": "72010e6258d91bf9f61429b13d447dabac508fe97b72f6c57e2be6c92b1dc850",
+      "width": 470,
+      "height": 632,
+      "provenance": "live, visible WPF Inspector panel from the same shown MainWindow; original pixels"
+    },
+    {
+      "file": "03b-\u4E03\u5E26\u4E0E\u6765\u6E90.png",
+      "sha256": "81c8c9000757149a81371027ac10ce9288a16b7750cb26c1357e99e1810cefc2",
+      "width": 1104,
+      "height": 749,
+      "provenance": "live Windows WPF client visual, shown MainWindow"
+    },
+    {
+      "file": "03b-\u4E03\u5E26\u4E0E\u6765\u6E90-editor.png",
+      "sha256": "217b1e57f2a0d20e69018f519796c3253520234f3c2191cf580d7a7497c23734",
       "width": 470,
       "height": 632,
       "provenance": "live, visible WPF Inspector panel from the same shown MainWindow; original pixels"
@@ -92,7 +150,7 @@
     },
     {
       "file": "04-\u6570\u503C\u6821\u9A8C-editor.png",
-      "sha256": "53943e6f504a2ae76c38b780a43e1dc765b8809f4bd842a8c8b15f8285b1e656",
+      "sha256": "195659fd475aa3e341f5c60b1379304b42de1bbdb7a5a7e6ac49d86d52ff59c2",
       "width": 470,
       "height": 612,
       "provenance": "live, visible WPF Inspector panel from the same shown MainWindow; original pixels"
@@ -106,7 +164,21 @@
     },
     {
       "file": "05-\u80CC\u666F\u7F51\u683C-editor.png",
-      "sha256": "b1e56f23934fa7ab3e65959b31bf53b4e444562d1e10f2de5b1454b3c2d17145",
+      "sha256": "88d61f2d2ef8ded37113e5b1547bb9b0f84df0aab386dfecf5408b83ba9d1095",
+      "width": 470,
+      "height": 632,
+      "provenance": "live, visible WPF Inspector panel from the same shown MainWindow; original pixels"
+    },
+    {
+      "file": "05b-\u5DE5\u7A0B\u76EE\u6807.png",
+      "sha256": "c25ab0bb084e093709d6fc8549331b3844611eaa2d5a0f04fde2e3fd5a8dd291",
+      "width": 1104,
+      "height": 749,
+      "provenance": "live Windows WPF client visual, shown MainWindow"
+    },
+    {
+      "file": "05b-\u5DE5\u7A0B\u76EE\u6807-editor.png",
+      "sha256": "6612103fc70b6f44a7d178b29f4974b9232c40d9479eb8680949b2d3494e9a26",
       "width": 470,
       "height": 632,
       "provenance": "live, visible WPF Inspector panel from the same shown MainWindow; original pixels"
@@ -120,23 +192,135 @@
     },
     {
       "file": "06-\u89C2\u5BDF\u70B9\u9891\u8C31-editor.png",
-      "sha256": "b1e56f23934fa7ab3e65959b31bf53b4e444562d1e10f2de5b1454b3c2d17145",
+      "sha256": "72b1caa7eb4264f3589b511df22e0cd0623bacc8ba3103181de28dc4816d58ca",
       "width": 470,
       "height": 632,
       "provenance": "live, visible WPF Inspector panel from the same shown MainWindow; original pixels"
     },
     {
-      "file": "failure.png",
-      "sha256": "65929f0cae7b2788feac18dd0a824ac4c2f7e2f6700dc12942337722d322dbec",
+      "file": "06b-\u70B9\u9891\u8C31\u8D21\u732E.png",
+      "sha256": "109db47114297ccb807f2c0e83dd0dae500fe72d4a40a29ba70ef79fe6997269",
       "width": 1104,
       "height": 749,
       "provenance": "live Windows WPF client visual, shown MainWindow"
     },
     {
-      "file": "failure-editor.png",
-      "sha256": "b1e56f23934fa7ab3e65959b31bf53b4e444562d1e10f2de5b1454b3c2d17145",
+      "file": "06b-\u70B9\u9891\u8C31\u8D21\u732E-editor.png",
+      "sha256": "7ed828fe9059d8bb1377642ed9bd4aac68f0d7085fab6e01c53cafedb420df53",
       "width": 470,
       "height": 632,
+      "provenance": "live, visible WPF Inspector panel from the same shown MainWindow; original pixels"
+    },
+    {
+      "file": "07-\u65B9\u6848\u6BD4\u8F83.png",
+      "sha256": "283c7c7d3654a4ea5bfafdad28a7e7e4f83bb33ba055aa3907b15a519ac61078",
+      "width": 1104,
+      "height": 749,
+      "provenance": "live Windows WPF client visual, shown MainWindow"
+    },
+    {
+      "file": "07-\u65B9\u6848\u6BD4\u8F83-editor.png",
+      "sha256": "1788d1d76541e3673ecbce3183c298f0b02cf6bb2fc100b22299d63fbb286c0f",
+      "width": 470,
+      "height": 632,
+      "provenance": "live, visible WPF Inspector panel from the same shown MainWindow; original pixels"
+    },
+    {
+      "file": "07b-\u65B9\u6848\u5DEE\u503C.png",
+      "sha256": "d17c0376bc1dc69d2c47c2f5336e6084b29f2a88eb0394c22a6a89650867151a",
+      "width": 1104,
+      "height": 749,
+      "provenance": "live Windows WPF client visual, shown MainWindow"
+    },
+    {
+      "file": "07b-\u65B9\u6848\u5DEE\u503C-editor.png",
+      "sha256": "661855c74e8ae62e5e70ade5555eae23191cd5cff1c3a25b89a6764312acc06e",
+      "width": 470,
+      "height": 632,
+      "provenance": "live, visible WPF Inspector panel from the same shown MainWindow; original pixels"
+    },
+    {
+      "file": "08-\u626B\u63CF\u5256\u9762.png",
+      "sha256": "628b5e623d18b823a22684fa0f6a0d2849afa39985b9f83d65e6cc07456f66ed",
+      "width": 1104,
+      "height": 749,
+      "provenance": "live Windows WPF client visual, shown MainWindow"
+    },
+    {
+      "file": "08-\u626B\u63CF\u5256\u9762-editor.png",
+      "sha256": "c39d3337120db9ec6a8884713a97b24e6c56891479d705b98002b80e14dac817",
+      "width": 470,
+      "height": 632,
+      "provenance": "live, visible WPF Inspector panel from the same shown MainWindow; original pixels"
+    },
+    {
+      "file": "08b-\u65B9\u5411\u5256\u9762.png",
+      "sha256": "932a00a0b907cad4771d85631dc6dd3dbccdda50feb2b99f2ae9909222eaa3c7",
+      "width": 1104,
+      "height": 749,
+      "provenance": "live Windows WPF client visual, shown MainWindow"
+    },
+    {
+      "file": "08b-\u65B9\u5411\u5256\u9762-editor.png",
+      "sha256": "166c6d859ddc59cc0b67f3811931c3f53c016313457f91cc7725930f09154457",
+      "width": 470,
+      "height": 632,
+      "provenance": "live, visible WPF Inspector panel from the same shown MainWindow; original pixels"
+    },
+    {
+      "file": "09-\u76F8\u5BF9\u8BD5\u542C.png",
+      "sha256": "c47a1974ae6c962e0ca48e5f83ec605f5507988259df9cb2f8be92d9b55a9475",
+      "width": 1104,
+      "height": 749,
+      "provenance": "live Windows WPF client visual, shown MainWindow"
+    },
+    {
+      "file": "09-\u76F8\u5BF9\u8BD5\u542C-editor.png",
+      "sha256": "188e7eb35afa3798cc4cad4c201af0ad7254ad33b38027e502ad850f013cfb3f",
+      "width": 470,
+      "height": 632,
+      "provenance": "live, visible WPF Inspector panel from the same shown MainWindow; original pixels"
+    },
+    {
+      "file": "09b-\u76F8\u5BF9\u8BD5\u542C\u7ED3\u679C.png",
+      "sha256": "1424f0b573a12b9e4e3f321ad4904c5318ea71eebe97bac12265cf47c8ab2ae2",
+      "width": 1104,
+      "height": 749,
+      "provenance": "live Windows WPF client visual, shown MainWindow"
+    },
+    {
+      "file": "09b-\u76F8\u5BF9\u8BD5\u542C\u7ED3\u679C-editor.png",
+      "sha256": "0486c8dcb3a9751fa8f94a2a62bbb331dd275c2ba4b560ef2060d4e66f68b70d",
+      "width": 470,
+      "height": 632,
+      "provenance": "live, visible WPF Inspector panel from the same shown MainWindow; original pixels"
+    },
+    {
+      "file": "10-\u6210\u679C\u590D\u6838.png",
+      "sha256": "b8aa14cf423a3b1c4986e93a0807565d025ebc5922e40c881c92a94b8f990fc4",
+      "width": 1104,
+      "height": 749,
+      "provenance": "live Windows WPF client visual, shown MainWindow"
+    },
+    {
+      "file": "10-\u6210\u679C\u590D\u6838-editor.png",
+      "sha256": "42f67ba3af854a167f219251a570b984ed2b8e841f0c50dbb748e9f1c6ea14a0",
+      "width": 470,
+      "height": 632,
+      "provenance": "live, visible WPF Inspector panel from the same shown MainWindow; original pixels"
+    },
+    {
+      "file": "11-\u6700\u5C0F\u7A97\u53E3.png",
+      "sha256": "2d0d02eb381a8d89a4c4bef18210a29cdf4e1b6fae4a0450dab21fde3faf84fa",
+      "width": 1104,
+      "height": 661,
+      "provenance": "live Windows WPF client visual, shown MainWindow"
+    },
+    {
+      "file": "11-\u6700\u5C0F\u7A97\u53E3-editor.png",
+      "sha256": "c3debbe5a10b737eef63b188b6c9a4f97dee479c119c361e845534a496d1e427",
+      "width": 470,
+      "height": 544,
       "provenance": "live, visible WPF Inspector panel from the same shown MainWindow; original pixels"
     }
   ]

@@ -1,0 +1,637 @@
+{
+  "Schema": 1,
+  "SoftwareVersion": "2.0",
+  "Id": "27568898-66df-4be6-b737-1e51997b6279",
+  "Name": "\u524D\u90E8\u53CC\u626C\u58F0\u5668\u5E03\u7F6E\u793A\u4F8B",
+  "Owner": "\u6F14\u793A\u64CD\u4F5C\u5458",
+  "Vehicle": "\u6A21\u62DF\u8F66\u8F86 EV-01",
+  "Purpose": "\u6BD4\u8F83\u524D\u90E8\u626C\u58F0\u5668\u671D\u5411\u5BF9\u8F66\u524D\u53CA\u4FA7\u524D\u533A\u57DF\u5DE5\u7A0B\u8986\u76D6\u7684\u5F71\u54CD",
+  "Note": "\u56FA\u5B9A\u4EBA\u5DE5\u6A21\u62DF\u9891\u8C31\uFF1B\u4E0D\u4EE3\u8868\u771F\u5B9E\u8F66\u8F86\uFF0C\u4E0D\u7528\u4E8E\u5408\u89C4\u7ED3\u8BBA",
+  "Archived": false,
+  "Revision": 3,
+  "Created": "2026-11-04T15:51:59.5113785+00:00",
+  "Settings": {
+    "MinX": -10,
+    "MaxX": 10,
+    "MinY": -8,
+    "MaxY": 8,
+    "Step": 0.5,
+    "ReceiverHeight": 1.5,
+    "MinimumDistance": 0.5,
+    "VehicleLength": 4.6,
+    "VehicleWidth": 1.8,
+    "ExcludeVehicle": true,
+    "SelectedHz": 0,
+    "AWeighted": false,
+    "LevelTarget": 45,
+    "MarginTarget": 3,
+    "BackgroundSource": "\u8F6F\u4EF6\u56FA\u5B9A\u6A21\u62DF\u80CC\u666F\uFF0C\u5404\u9891\u5E2635dB",
+    "BackgroundOrigin": "Simulation",
+    "Background": [
+      {
+        "Hz": 125,
+        "Level": 35,
+        "Correction": 0
+      },
+      {
+        "Hz": 250,
+        "Level": 35,
+        "Correction": 0
+      },
+      {
+        "Hz": 500,
+        "Level": 35,
+        "Correction": 0
+      },
+      {
+        "Hz": 1000,
+        "Level": 35,
+        "Correction": 0
+      },
+      {
+        "Hz": 2000,
+        "Level": 35,
+        "Correction": 0
+      },
+      {
+        "Hz": 4000,
+        "Level": 35,
+        "Correction": 0
+      },
+      {
+        "Hz": 8000,
+        "Level": 35,
+        "Correction": 0
+      }
+    ],
+    "BackgroundAudio": null
+  },
+  "Speakers": [
+    {
+      "Id": "577758c6-6951-4ac7-90a0-fc23bb8bdfec",
+      "Name": "\u524D\u5DE6\u626C\u58F0\u5668",
+      "Enabled": true,
+      "X": 2.4,
+      "Y": 0.65,
+      "Height": 0.5,
+      "Heading": 25,
+      "ReferenceDistance": 1,
+      "Gain": 3,
+      "Exponent": 1,
+      "RearFloor": 0.2,
+      "Origin": "Simulation",
+      "Source": "\u56FA\u5B9A\u6A21\u62DF\u8F74\u54111m\u58F0\u538B\u7EA7\uFF1B\u4E0D\u542B\u8F66\u8EAB\u4F5C\u7528",
+      "Note": "",
+      "Bands": [
+        {
+          "Hz": 125,
+          "Level": 49,
+          "Correction": 0
+        },
+        {
+          "Hz": 250,
+          "Level": 54,
+          "Correction": 0
+        },
+        {
+          "Hz": 500,
+          "Level": 60,
+          "Correction": 0
+        },
+        {
+          "Hz": 1000,
+          "Level": 63,
+          "Correction": 0
+        },
+        {
+          "Hz": 2000,
+          "Level": 61,
+          "Correction": 0
+        },
+        {
+          "Hz": 4000,
+          "Level": 55,
+          "Correction": 0
+        },
+        {
+          "Hz": 8000,
+          "Level": 47,
+          "Correction": 0
+        }
+      ],
+      "Audio": null
+    },
+    {
+      "Id": "3c4f8386-9a2a-4ff9-8f84-6f6412c61222",
+      "Name": "\u524D\u53F3\u626C\u58F0\u5668",
+      "Enabled": true,
+      "X": 2.4,
+      "Y": -0.65,
+      "Height": 0.5,
+      "Heading": -25,
+      "ReferenceDistance": 1,
+      "Gain": 0,
+      "Exponent": 1,
+      "RearFloor": 0.2,
+      "Origin": "Simulation",
+      "Source": "\u56FA\u5B9A\u6A21\u62DF\u8F74\u54111m\u58F0\u538B\u7EA7\uFF1B\u4E0D\u542B\u8F66\u8EAB\u4F5C\u7528",
+      "Note": "",
+      "Bands": [
+        {
+          "Hz": 125,
+          "Level": 49,
+          "Correction": 0
+        },
+        {
+          "Hz": 250,
+          "Level": 54,
+          "Correction": 0
+        },
+        {
+          "Hz": 500,
+          "Level": 60,
+          "Correction": 0
+        },
+        {
+          "Hz": 1000,
+          "Level": 63,
+          "Correction": 0
+        },
+        {
+          "Hz": 2000,
+          "Level": 61,
+          "Correction": 0
+        },
+        {
+          "Hz": 4000,
+          "Level": 55,
+          "Correction": 0
+        },
+        {
+          "Hz": 8000,
+          "Level": 47,
+          "Correction": 0
+        }
+      ],
+      "Audio": null
+    }
+  ],
+  "Listeners": [
+    {
+      "Id": "a383e02f-aca8-48df-aeea-03bf23679536",
+      "Name": "\u8F66\u524D5m",
+      "X": 7.3,
+      "Y": 0,
+      "Note": ""
+    },
+    {
+      "Id": "817b6106-aba9-4c63-9c99-4c50a4281faa",
+      "Name": "\u5DE6\u524D\u89C2\u5BDF\u70B9",
+      "X": 5,
+      "Y": 4,
+      "Note": ""
+    },
+    {
+      "Id": "915bb8f0-e403-41dd-8c02-21884746fb43",
+      "Name": "\u53F3\u524D\u89C2\u5BDF\u70B9",
+      "X": 5,
+      "Y": -4,
+      "Note": ""
+    },
+    {
+      "Id": "d42b943e-7870-47bd-9b89-35bb4ecaa984",
+      "Name": "\u8F66\u540E\u89C2\u5BDF\u70B9",
+      "X": -5,
+      "Y": 0,
+      "Note": ""
+    }
+  ],
+  "Snapshots": [
+    {
+      "Id": "aa7a3b34-2b06-4c48-8b26-c7b844d44a57",
+      "Name": "\u57FA\u7EBF",
+      "Created": "2026-11-04T15:52:05.7951032+00:00",
+      "InputHash": "244dad091c781f805ec214a5497fd61c9f159462c4758350fcbc0955ffba6921",
+      "Settings": {
+        "MinX": -10,
+        "MaxX": 10,
+        "MinY": -8,
+        "MaxY": 8,
+        "Step": 0.5,
+        "ReceiverHeight": 1.5,
+        "MinimumDistance": 0.5,
+        "VehicleLength": 4.6,
+        "VehicleWidth": 1.8,
+        "ExcludeVehicle": true,
+        "SelectedHz": 0,
+        "AWeighted": false,
+        "LevelTarget": 45,
+        "MarginTarget": 3,
+        "BackgroundSource": "\u8F6F\u4EF6\u56FA\u5B9A\u6A21\u62DF\u80CC\u666F\uFF0C\u5404\u9891\u5E2635dB",
+        "BackgroundOrigin": "Simulation",
+        "Background": [
+          {
+            "Hz": 125,
+            "Level": 35,
+            "Correction": 0
+          },
+          {
+            "Hz": 250,
+            "Level": 35,
+            "Correction": 0
+          },
+          {
+            "Hz": 500,
+            "Level": 35,
+            "Correction": 0
+          },
+          {
+            "Hz": 1000,
+            "Level": 35,
+            "Correction": 0
+          },
+          {
+            "Hz": 2000,
+            "Level": 35,
+            "Correction": 0
+          },
+          {
+            "Hz": 4000,
+            "Level": 35,
+            "Correction": 0
+          },
+          {
+            "Hz": 8000,
+            "Level": 35,
+            "Correction": 0
+          }
+        ],
+        "BackgroundAudio": null
+      },
+      "Speakers": [
+        {
+          "Id": "577758c6-6951-4ac7-90a0-fc23bb8bdfec",
+          "Name": "\u524D\u5DE6\u626C\u58F0\u5668",
+          "Enabled": true,
+          "X": 2.4,
+          "Y": 0.65,
+          "Height": 0.5,
+          "Heading": 25,
+          "ReferenceDistance": 1,
+          "Gain": 0,
+          "Exponent": 1,
+          "RearFloor": 0.2,
+          "Origin": "Simulation",
+          "Source": "\u56FA\u5B9A\u6A21\u62DF\u8F74\u54111m\u58F0\u538B\u7EA7\uFF1B\u4E0D\u542B\u8F66\u8EAB\u4F5C\u7528",
+          "Note": "",
+          "Bands": [
+            {
+              "Hz": 125,
+              "Level": 49,
+              "Correction": 0
+            },
+            {
+              "Hz": 250,
+              "Level": 54,
+              "Correction": 0
+            },
+            {
+              "Hz": 500,
+              "Level": 60,
+              "Correction": 0
+            },
+            {
+              "Hz": 1000,
+              "Level": 63,
+              "Correction": 0
+            },
+            {
+              "Hz": 2000,
+              "Level": 61,
+              "Correction": 0
+            },
+            {
+              "Hz": 4000,
+              "Level": 55,
+              "Correction": 0
+            },
+            {
+              "Hz": 8000,
+              "Level": 47,
+              "Correction": 0
+            }
+          ],
+          "Audio": null
+        },
+        {
+          "Id": "3c4f8386-9a2a-4ff9-8f84-6f6412c61222",
+          "Name": "\u524D\u53F3\u626C\u58F0\u5668",
+          "Enabled": true,
+          "X": 2.4,
+          "Y": -0.65,
+          "Height": 0.5,
+          "Heading": -25,
+          "ReferenceDistance": 1,
+          "Gain": 0,
+          "Exponent": 1,
+          "RearFloor": 0.2,
+          "Origin": "Simulation",
+          "Source": "\u56FA\u5B9A\u6A21\u62DF\u8F74\u54111m\u58F0\u538B\u7EA7\uFF1B\u4E0D\u542B\u8F66\u8EAB\u4F5C\u7528",
+          "Note": "",
+          "Bands": [
+            {
+              "Hz": 125,
+              "Level": 49,
+              "Correction": 0
+            },
+            {
+              "Hz": 250,
+              "Level": 54,
+              "Correction": 0
+            },
+            {
+              "Hz": 500,
+              "Level": 60,
+              "Correction": 0
+            },
+            {
+              "Hz": 1000,
+              "Level": 63,
+              "Correction": 0
+            },
+            {
+              "Hz": 2000,
+              "Level": 61,
+              "Correction": 0
+            },
+            {
+              "Hz": 4000,
+              "Level": 55,
+              "Correction": 0
+            },
+            {
+              "Hz": 8000,
+              "Level": 47,
+              "Correction": 0
+            }
+          ],
+          "Audio": null
+        }
+      ],
+      "Listeners": [
+        {
+          "Id": "a383e02f-aca8-48df-aeea-03bf23679536",
+          "Name": "\u8F66\u524D5m",
+          "X": 7.3,
+          "Y": 0,
+          "Note": ""
+        },
+        {
+          "Id": "817b6106-aba9-4c63-9c99-4c50a4281faa",
+          "Name": "\u5DE6\u524D\u89C2\u5BDF\u70B9",
+          "X": 5,
+          "Y": 4,
+          "Note": ""
+        },
+        {
+          "Id": "915bb8f0-e403-41dd-8c02-21884746fb43",
+          "Name": "\u53F3\u524D\u89C2\u5BDF\u70B9",
+          "X": 5,
+          "Y": -4,
+          "Note": ""
+        },
+        {
+          "Id": "d42b943e-7870-47bd-9b89-35bb4ecaa984",
+          "Name": "\u8F66\u540E\u89C2\u5BDF\u70B9",
+          "X": -5,
+          "Y": 0,
+          "Note": ""
+        }
+      ]
+    },
+    {
+      "Id": "49565a4d-e533-4e80-a6ec-4a9968c4b629",
+      "Name": "\u589E\u76CA\u65B9\u6848",
+      "Created": "2026-11-04T15:52:05.8393259+00:00",
+      "InputHash": "e3a7e58989912df9e8959c0a937fea2e285ae09f419dbf1b8855c5324d0ea079",
+      "Settings": {
+        "MinX": -10,
+        "MaxX": 10,
+        "MinY": -8,
+        "MaxY": 8,
+        "Step": 0.5,
+        "ReceiverHeight": 1.5,
+        "MinimumDistance": 0.5,
+        "VehicleLength": 4.6,
+        "VehicleWidth": 1.8,
+        "ExcludeVehicle": true,
+        "SelectedHz": 0,
+        "AWeighted": false,
+        "LevelTarget": 45,
+        "MarginTarget": 3,
+        "BackgroundSource": "\u8F6F\u4EF6\u56FA\u5B9A\u6A21\u62DF\u80CC\u666F\uFF0C\u5404\u9891\u5E2635dB",
+        "BackgroundOrigin": "Simulation",
+        "Background": [
+          {
+            "Hz": 125,
+            "Level": 35,
+            "Correction": 0
+          },
+          {
+            "Hz": 250,
+            "Level": 35,
+            "Correction": 0
+          },
+          {
+            "Hz": 500,
+            "Level": 35,
+            "Correction": 0
+          },
+          {
+            "Hz": 1000,
+            "Level": 35,
+            "Correction": 0
+          },
+          {
+            "Hz": 2000,
+            "Level": 35,
+            "Correction": 0
+          },
+          {
+            "Hz": 4000,
+            "Level": 35,
+            "Correction": 0
+          },
+          {
+            "Hz": 8000,
+            "Level": 35,
+            "Correction": 0
+          }
+        ],
+        "BackgroundAudio": null
+      },
+      "Speakers": [
+        {
+          "Id": "577758c6-6951-4ac7-90a0-fc23bb8bdfec",
+          "Name": "\u524D\u5DE6\u626C\u58F0\u5668",
+          "Enabled": true,
+          "X": 2.4,
+          "Y": 0.65,
+          "Height": 0.5,
+          "Heading": 25,
+          "ReferenceDistance": 1,
+          "Gain": 3,
+          "Exponent": 1,
+          "RearFloor": 0.2,
+          "Origin": "Simulation",
+          "Source": "\u56FA\u5B9A\u6A21\u62DF\u8F74\u54111m\u58F0\u538B\u7EA7\uFF1B\u4E0D\u542B\u8F66\u8EAB\u4F5C\u7528",
+          "Note": "",
+          "Bands": [
+            {
+              "Hz": 125,
+              "Level": 49,
+              "Correction": 0
+            },
+            {
+              "Hz": 250,
+              "Level": 54,
+              "Correction": 0
+            },
+            {
+              "Hz": 500,
+              "Level": 60,
+              "Correction": 0
+            },
+            {
+              "Hz": 1000,
+              "Level": 63,
+              "Correction": 0
+            },
+            {
+              "Hz": 2000,
+              "Level": 61,
+              "Correction": 0
+            },
+            {
+              "Hz": 4000,
+              "Level": 55,
+              "Correction": 0
+            },
+            {
+              "Hz": 8000,
+              "Level": 47,
+              "Correction": 0
+            }
+          ],
+          "Audio": null
+        },
+        {
+          "Id": "3c4f8386-9a2a-4ff9-8f84-6f6412c61222",
+          "Name": "\u524D\u53F3\u626C\u58F0\u5668",
+          "Enabled": true,
+          "X": 2.4,
+          "Y": -0.65,
+          "Height": 0.5,
+          "Heading": -25,
+          "ReferenceDistance": 1,
+          "Gain": 0,
+          "Exponent": 1,
+          "RearFloor": 0.2,
+          "Origin": "Simulation",
+          "Source": "\u56FA\u5B9A\u6A21\u62DF\u8F74\u54111m\u58F0\u538B\u7EA7\uFF1B\u4E0D\u542B\u8F66\u8EAB\u4F5C\u7528",
+          "Note": "",
+          "Bands": [
+            {
+              "Hz": 125,
+              "Level": 49,
+              "Correction": 0
+            },
+            {
+              "Hz": 250,
+              "Level": 54,
+              "Correction": 0
+            },
+            {
+              "Hz": 500,
+              "Level": 60,
+              "Correction": 0
+            },
+            {
+              "Hz": 1000,
+              "Level": 63,
+              "Correction": 0
+            },
+            {
+              "Hz": 2000,
+              "Level": 61,
+              "Correction": 0
+            },
+            {
+              "Hz": 4000,
+              "Level": 55,
+              "Correction": 0
+            },
+            {
+              "Hz": 8000,
+              "Level": 47,
+              "Correction": 0
+            }
+          ],
+          "Audio": null
+        }
+      ],
+      "Listeners": [
+        {
+          "Id": "a383e02f-aca8-48df-aeea-03bf23679536",
+          "Name": "\u8F66\u524D5m",
+          "X": 7.3,
+          "Y": 0,
+          "Note": ""
+        },
+        {
+          "Id": "817b6106-aba9-4c63-9c99-4c50a4281faa",
+          "Name": "\u5DE6\u524D\u89C2\u5BDF\u70B9",
+          "X": 5,
+          "Y": 4,
+          "Note": ""
+        },
+        {
+          "Id": "915bb8f0-e403-41dd-8c02-21884746fb43",
+          "Name": "\u53F3\u524D\u89C2\u5BDF\u70B9",
+          "X": 5,
+          "Y": -4,
+          "Note": ""
+        },
+        {
+          "Id": "d42b943e-7870-47bd-9b89-35bb4ecaa984",
+          "Name": "\u8F66\u540E\u89C2\u5BDF\u70B9",
+          "X": -5,
+          "Y": 0,
+          "Note": ""
+        }
+      ]
+    }
+  ],
+  "Audit": [
+    {
+      "At": "2026-11-04T15:51:59.5126217+00:00",
+      "Action": "\u8F7D\u5165\u56FA\u5B9A\u6A21\u62DF\u793A\u4F8B",
+      "Revision": 0
+    },
+    {
+      "At": "2026-11-04T15:52:05.7961994+00:00",
+      "Action": "\u4FDD\u5B58\u65B9\u6848\u5FEB\u7167 \u57FA\u7EBF",
+      "Revision": 1
+    },
+    {
+      "At": "2026-11-04T15:52:05.8024205+00:00",
+      "Action": "\u5E94\u7528\u65B9\u6848\u6BD4\u8F83\u7F16\u8F91",
+      "Revision": 2
+    },
+    {
+      "At": "2026-11-04T15:52:05.8399064+00:00",
+      "Action": "\u4FDD\u5B58\u65B9\u6848\u5FEB\u7167 \u589E\u76CA\u65B9\u6848",
+      "Revision": 3
+    }
+  ]
+}
