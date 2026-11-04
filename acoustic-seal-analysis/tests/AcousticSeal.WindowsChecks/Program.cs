@@ -29,7 +29,7 @@ internal static class Program
     {
         root = Path.GetFullPath(args.FirstOrDefault() ?? "docs/screenshots");
         Directory.CreateDirectory(root);
-        var app = new App(); app.InitializeComponent(); app.StartupUri = null;
+        var app = new App(); app.InitializeComponent(); app.StartMainWindow = false;
         app.ShutdownMode = ShutdownMode.OnExplicitShutdown;
         dialogs = new TestDialogs(root);
         window = new MainWindow(dialogs);
