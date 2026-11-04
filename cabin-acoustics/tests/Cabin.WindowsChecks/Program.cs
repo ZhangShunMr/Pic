@@ -86,6 +86,7 @@ internal static class Program
         vm.CalculateCommand.Execute(null);
         await Wait(vm);
         Record("WPF calculate populates field and spectrum", vm.Field is not null && vm.Spectrum is not null);
+        window.ShowFieldSettings();
         await Render(window, "04a-field-settings");
         window.ShowFullField();
         await Render(window, "04-response-field");

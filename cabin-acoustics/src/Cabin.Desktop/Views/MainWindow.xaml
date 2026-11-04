@@ -175,9 +175,11 @@
       </StackPanel>
       <StackPanel Visibility="{Binding Section, Converter={StaticResource SectionVisibility}, ConverterParameter=field}">
        <TextBlock Text="空间声场剖面" Style="{StaticResource Heading}"/>
-       <TextBlock Text="选择显示量与剖面，再更新画布。振型与响应幅值含义不同；改变选择后旧画布立即清空。" Style="{StaticResource Hint}"/>
+       <TextBlock Text="展开“剖面与显示设置”调整研究量，再更新画布。振型与响应幅值含义不同；改变选择后旧画布立即清空。" Style="{StaticResource Hint}"/>
        <Border Style="{StaticResource Card}">
         <StackPanel>
+         <Expander x:Name="FieldSettings" Header="剖面与显示设置（点击展开）" IsExpanded="False" Margin="0,0,0,10">
+          <StackPanel Margin="0,12,0,0">
          <Grid>
           <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
           <StackPanel Margin="0,0,12,0">
@@ -197,6 +199,8 @@
          </ComboBox>
          <TextBlock Text="研究频率 / Hz（响应幅值使用此频率）"/>
          <Slider Minimum="5" Maximum="500" Value="{Binding Frequency}" Margin="0,7"/>
+          </StackPanel>
+         </Expander>
          <TextBlock Text="{Binding SelectionHint}" FontWeight="SemiBold" Margin="0,4,0,10"/>
          <WrapPanel>
           <Button Content="更新剖面与贡献" Command="{Binding UpdateFieldCommand}" Style="{StaticResource Primary}"/>
@@ -206,7 +210,7 @@
         </StackPanel>
        </Border>
        <Border BorderBrush="#CDDCDD" BorderThickness="1" Margin="0,0,0,12">
-        <controls:FieldCanvas x:Name="FieldDrawing" Field="{Binding Field}" Project="{Binding ComputedProject}" Height="420"/>
+        <controls:FieldCanvas x:Name="FieldDrawing" Field="{Binding Field}" Project="{Binding ComputedProject}" Height="360"/>
        </Border>
        <TextBlock Text="{Binding FieldHint}" Style="{StaticResource Hint}"/>
        <TextBlock Text="图形保持实际长宽比例。声源和耳点标记为向该剖面的投影，不代表均位于该切面。鼠标移至图内可查看网格坐标和相对量。" Style="{StaticResource Hint}"/>

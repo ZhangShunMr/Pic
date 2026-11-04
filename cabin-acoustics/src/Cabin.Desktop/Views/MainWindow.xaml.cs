@@ -39,8 +39,15 @@ public partial class MainWindow : Window
 
     public FrameworkElement FieldVisual => FieldDrawing;
 
+    public void ShowFieldSettings()
+    {
+        FieldSettings.IsExpanded = true;
+        WorkspaceScroll.ScrollToTop();
+    }
+
     public void ShowFullField()
     {
+        FieldSettings.IsExpanded = false;
         WorkspaceScroll.UpdateLayout();
         WorkspaceScroll.ScrollToBottom();
     }
