@@ -19,8 +19,10 @@ internal static class Program
     {
         var output = Path.GetFullPath(args.FirstOrDefault() ?? "docs/windows-ui");
         Directory.CreateDirectory(output);
-        var app = new VerificationApp();
-        app.InitializeComponent();
+        var app = new Application
+        {
+            Resources = (ResourceDictionary)Application.LoadComponent(new Uri("/AvasCoverage;component/Theme.xaml", UriKind.Relative))
+        };
         var files = new VerificationFiles(Path.Combine(output, "files"));
         var vm = new WorkspaceViewModel(new ProjectStore(Path.Combine(output, "project-library")), files);
         var window = new MainWindow(vm);
@@ -30,6 +32,7 @@ internal static class Program
         var checks = new List<string>();
         var images = new List<object>();
         var failed = false;
+        var expectedValidationTrace = new List<string>();
         void Assert(bool value, string message)
         {
             if (!value) throw new InvalidOperationException(message);
@@ -39,6 +42,7 @@ internal static class Program
         {
             window.UpdateLayout();
             await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
+            await Task.Delay(120);
         }
         async Task Capture(string name)
         {
@@ -46,7 +50,17 @@ internal static class Program
             // This renders the live, shown WPF visual tree. It is not a generated mockup.
             var view = (FrameworkElement)window.Content;
             var bitmap = new RenderTargetBitmap((int)Math.Ceiling(view.ActualWidth), (int)Math.Ceiling(view.ActualHeight), 96, 96, PixelFormats.Pbgra32);
-            bitmap.Render(view);
+            var client = new DrawingVisual();
+            using (var drawing = client.RenderOpen())
+            {
+                drawing.DrawRectangle(window.Background ?? Brushes.White, null, new Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
+                drawing.DrawRectangle(new VisualBrush(view), null, new Rect(0, 0, view.ActualWidth, view.ActualHeight));
+            }
+            bitmap.Render(client);
+            var pixels = new byte[bitmap.PixelWidth * bitmap.PixelHeight * 4];
+            bitmap.CopyPixels(pixels, bitmap.PixelWidth * 4, 0);
+            Assert(pixels.Where((_, i) => i % 4 == 3).All(alpha => alpha == 255), name + "：原生背景不透明");
+            Assert(pixels.Where((_, i) => i % 4 != 3).Distinct().Count() > 20, name + "：包含实际渲染内容");
             var path = Path.Combine(output, name + ".png");
             using (var stream = File.Create(path))
             {
@@ -82,6 +96,7 @@ internal static class Program
                 await Page("扬声器");
                 await Capture("03-扬声器频带");
                 var coordinate = Descendants<TextBox>(window).First(x => x.Name == "SpeakerX");
+                Assert(errors.Errors.Count == 0, "正常输入阶段没有WPF绑定错误");
                 coordinate.Text = "abc";
                 coordinate.GetBindingExpression(TextBox.TextProperty)!.UpdateSource();
                 Assert(Validation.GetHasError(coordinate) && vm.BindingErrorCount > 0, "原生数值绑定拒绝文字输入");
@@ -91,6 +106,8 @@ internal static class Program
                 vm.Commands["Discard"].Execute(null);
                 await Layout();
                 Assert(vm.BindingErrorCount == 0 && !vm.HasDraft, "放弃编辑恢复有效数值");
+                expectedValidationTrace.AddRange(errors.Errors);
+                errors.Errors.Clear();
                 await Page("背景与网格"); await Capture("05-背景网格");
                 await Page("观察点"); await Capture("06-观察点频谱");
                 await Page("方案比较");
@@ -130,6 +147,7 @@ internal static class Program
                     limitations = new[] { "File picker and confirmation host replaced for deterministic automation", "Audio playback and perceived audibility not verified", "Client area captures exclude operating-system window chrome", "Manual keyboard, scaling and screen-reader checks still required" },
                     checks,
                     bindingErrors = errors.Errors,
+                    expectedInvalidNumericValidationTrace = expectedValidationTrace,
                     images
                 }));
                 vm.DisposeServices();
@@ -147,10 +165,6 @@ internal static class Program
             foreach (var descendant in Descendants<T>(child)) yield return descendant;
         }
     }
-}
-internal sealed class VerificationApp : Avas.Desktop.App
-{
-    protected override void OnStartup(StartupEventArgs e) { }
 }
 internal sealed class BindingTrace : TraceListener
 {
