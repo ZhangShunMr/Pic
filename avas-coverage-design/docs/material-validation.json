@@ -1,0 +1,29 @@
+{
+  "status": "draft-windows-screenshots-and-word-pagination-pending",
+  "manual_sections": 15,
+  "manual_actual_word_pages": null,
+  "source_actual_word_pages": null,
+  "word_pagination_verified": false,
+  "screenshots_in_manual": 0,
+  "reason": "Linux cannot execute WPF; no actual Windows images provided. No browser or mock screenshots substituted.",
+  "major_function_unicode_han": 947,
+  "minimum_han_exclusive": 500,
+  "production_nonempty_lines": 4216,
+  "files": [
+    {
+      "file": "全部生产源码排印稿.docx",
+      "sha256": "6ade595b6e1a45d75126cfea696445b849d5403017076fcf0424d1a5a56f731b",
+      "bytes": 96800
+    },
+    {
+      "file": "操作说明书-草稿.docx",
+      "sha256": "f36eb1b37a53178025c22eb8668d01bab5f76ed788ef72889bd538ee188e047f",
+      "bytes": 48727
+    },
+    {
+      "file": "软著信息采集表.docx",
+      "sha256": "53ce00903e0b403db7bd500c9570a27a121909cd276f34f0aa902f10a6d8e93d",
+      "bytes": 41133
+    }
+  ]
+}

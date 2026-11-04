@@ -1,0 +1,57 @@
+<UserControl x:Class="Avas.Desktop.Views.AudioView" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ui="clr-namespace:Avas.Desktop">
+    <StackPanel>
+        <TextBlock Text="数字音频与相对试听" Style="{StaticResource Heading}"/>
+        <TextBlock Text="数字录音并非声压标定。dBFS以数字幅值1为RMS参考，不能直接当作 dB re 20 µPa。设备音量、声卡和耳机没有校准。" Style="{StaticResource Hint}"/>
+        <GroupBox Header="内嵌 WAV 和数字频谱">
+            <StackPanel>
+                <TextBlock Text="音频目标"/>
+                <ComboBox SelectedValuePath="Tag" SelectedValue="{Binding AudioTarget, Mode=TwoWay}">
+                    <ComboBoxItem Content="当前扬声器" Tag="speaker"/>
+                    <ComboBoxItem Content="均匀背景" Tag="background"/>
+                </ComboBox>
+                <ComboBox ItemsSource="{Binding Draft.Speakers}" SelectedItem="{Binding SelectedSpeaker, Mode=TwoWay}" DisplayMemberPath="Name"/>
+                <TextBlock Text="{Binding AudioAssetSummary}" Style="{StaticResource Hint}"/>
+                <WrapPanel>
+                    <Button Content="导入 WAV…" Command="{Binding Commands[ImportAudio]}"/>
+                    <Button Content="分析数字频谱" Command="{Binding Commands[AnalyzeAudio]}"/>
+                    <Button Content="移除音频" Command="{Binding Commands[RemoveAudio]}"/>
+                </WrapPanel>
+                <TextBlock Text="仅支持 PCM16 WAV，16～96kHz，1或2声道，0.001～30秒，最大10MiB。导入只内嵌声音，不自动修改声压级。" Style="{StaticResource Hint}"/>
+                <TextBlock Text="{Binding AudioAnalysisLabel}"/>
+                <TextBlock Text="{Binding DigitalRmsDbfs, StringFormat=数字 RMS：{0:F2} dBFS}"/>
+                <TextBlock Text="{Binding AudioSpectrum.Note}" Style="{StaticResource Hint}"/>
+                <DataGrid ItemsSource="{Binding DigitalBands}" IsReadOnly="True">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="中心频率 Hz" Binding="{Binding Hz}" Width="*"/>
+                        <DataGridTextColumn Header="数字频带 dBFS" Binding="{Binding Dbfs, StringFormat=F2}" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <TextBlock Text="人工声明七带合成参考 / dB（0～120）"/>
+                <TextBox Text="{ui:Edit AudioReference}"/>
+                <Button Content="以相对频谱构建估算频带" Command="{Binding Commands[MapAudio]}"/>
+                <TextBlock Text="仅在七带均有有效数字能量时允许映射。映射将来源改为 Estimate，记录文件哈希和人工参考；不能用于自动标定，不能凭空补充缺能量频带。" Style="{StaticResource Hint}"/>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Header="接收点相对试听">
+            <StackPanel>
+                <TextBlock Text="观察点（先建立、应用并计算）"/>
+                <ComboBox ItemsSource="{Binding Draft.Listeners}" SelectedItem="{Binding SelectedListener, Mode=TwoWay}" DisplayMemberPath="Name"/>
+                <UniformGrid Columns="2">
+                    <StackPanel Margin="0,0,8,0"><TextBlock Text="长度 / s（1～8）"/><TextBox Text="{ui:Edit AuditionSeconds}"/></StackPanel>
+                    <StackPanel><TextBlock Text="数字播放参考 / dB（60～140）"/><TextBox Text="{ui:Edit PlaybackReference}"/></StackPanel>
+                </UniformGrid>
+                <CheckBox Content="包含均匀背景" IsChecked="{Binding IncludeBackground}"/>
+                <WrapPanel>
+                    <Button Content="制作相对试听" Style="{StaticResource Primary}" Command="{Binding Commands[Audition]}"/>
+                    <Button Content="播放试听" Command="{Binding Commands[Play]}"/>
+                    <Button Content="停止" Command="{Binding Commands[Stop]}"/>
+                    <Button Content="保存试听 WAV…" Command="{Binding Commands[ExportAudio]}"/>
+                </WrapPanel>
+                <TextBlock Text="{Binding Audition.Peak, StringFormat=制作峰值：{0:F4}}"/>
+                <TextBlock Text="{Binding Audition.Description}" Style="{StaticResource Hint}"/>
+                <TextBlock Text="24kHz单声道，七带整形、50ms淡入淡出；未导入音频时使用固定种子噪声。短录音尾部补静音，不循环。数字幅值参考统一，不自动归一化；预计峰值超过0.98时拒绝制作并给出提高参考值的建议。" Style="{StaticResource Hint}"/>
+                <TextBlock Text="不模拟传播到达时间、双耳线索或车身影响，瞬态波形混合也不等同非相干能量模型。试听只用于比较相对频谱与量级，不证明实车效果或法规符合性。" Style="{StaticResource Hint}"/>
+            </StackPanel>
+        </GroupBox>
+    </StackPanel>
+</UserControl>

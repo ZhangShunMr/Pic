@@ -1,0 +1,17 @@
+  Determining projects to restore...
+  Restored /workspace/Pic/avas-coverage-design/src/Avas.Workspace/Avas.Workspace.csproj (in 62 ms).
+  Restored /workspace/Pic/avas-coverage-design/src/Avas.Core/Avas.Core.csproj (in 88 ms).
+  Restored /workspace/Pic/avas-coverage-design/src/Avas.Desktop/Avas.Desktop.csproj (in 141 ms).
+  3 of 6 projects are up-to-date for restore.
+  Avas.Core -> /workspace/Pic/avas-coverage-design/src/Avas.Core/bin/Release/net10.0/Avas.Core.dll
+  Avas.Verification -> /workspace/Pic/avas-coverage-design/tests/Avas.Verification/bin/Release/net10.0/Avas.Verification.dll
+  Avas.Workspace -> /workspace/Pic/avas-coverage-design/src/Avas.Workspace/bin/Release/net10.0/Avas.Workspace.dll
+  Avas.WorkspaceVerification -> /workspace/Pic/avas-coverage-design/tests/Avas.WorkspaceVerification/bin/Release/net10.0/Avas.WorkspaceVerification.dll
+  Avas.Desktop -> /workspace/Pic/avas-coverage-design/src/Avas.Desktop/bin/Release/net10.0-windows/AvasCoverage.dll
+  Avas.DesktopVerification -> /workspace/Pic/avas-coverage-design/tests/Avas.DesktopVerification/bin/Release/net10.0-windows/Avas.DesktopVerification.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:03.87

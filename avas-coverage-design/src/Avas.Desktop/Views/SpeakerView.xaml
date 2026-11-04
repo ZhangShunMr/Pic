@@ -1,0 +1,60 @@
+<UserControl x:Class="Avas.Desktop.Views.SpeakerView" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ui="clr-namespace:Avas.Desktop">
+    <StackPanel>
+        <TextBlock Text="扬声器与轴向频带" Style="{StaticResource Heading}"/>
+        <WrapPanel>
+            <Button Content="添加扬声器" Command="{Binding Commands[AddSpeaker]}"/>
+            <Button Content="复制当前" Command="{Binding Commands[CopySpeaker]}"/>
+            <Button Content="删除当前" Command="{Binding Commands[DeleteSpeaker]}"/>
+        </WrapPanel>
+        <TextBlock Text="先添加声源，再选择编辑。最多8个；切换对象前请应用或放弃草稿。" Style="{StaticResource Hint}"/>
+        <ComboBox ItemsSource="{Binding Draft.Speakers}" SelectedItem="{Binding SelectedSpeaker, Mode=TwoWay}" DisplayMemberPath="Name"/>
+        <StackPanel>
+            <StackPanel.Style><Style TargetType="StackPanel"><Setter Property="IsEnabled" Value="True"/><Style.Triggers><DataTrigger Binding="{Binding SpeakerDraft}" Value="{x:Null}"><Setter Property="IsEnabled" Value="False"/></DataTrigger></Style.Triggers></Style></StackPanel.Style>
+            <TextBlock Text="扬声器名称（必填，最多100字符）"/>
+            <TextBox Text="{ui:Edit SpeakerDraft.Name}"/>
+            <CheckBox Content="启用，参与计算与试听" IsChecked="{ui:Edit SpeakerDraft.Enabled}"/>
+            <UniformGrid Columns="2">
+                <StackPanel Margin="0,0,8,0"><TextBlock Text="X / m（-100～100）"/><TextBox x:Name="SpeakerX" Text="{ui:Edit SpeakerDraft.X}"/></StackPanel>
+                <StackPanel><TextBlock Text="Y / m（-100～100）"/><TextBox Text="{ui:Edit SpeakerDraft.Y}"/></StackPanel>
+                <StackPanel Margin="0,0,8,0"><TextBlock Text="高度 / m（0～10）"/><TextBox Text="{ui:Edit SpeakerDraft.Height}"/></StackPanel>
+                <StackPanel><TextBlock Text="朝向 / °（-360～360）"/><TextBox Text="{ui:Edit SpeakerDraft.Heading}"/></StackPanel>
+                <StackPanel Margin="0,0,8,0"><TextBlock Text="轴向参考距离 / m（0.1～10）"/><TextBox Text="{ui:Edit SpeakerDraft.ReferenceDistance}"/></StackPanel>
+                <StackPanel><TextBlock Text="增益 / dB（-40～40）"/><TextBox Text="{ui:Edit SpeakerDraft.Gain}"/></StackPanel>
+                <StackPanel Margin="0,0,8,0"><TextBlock Text="指向指数 n（0～8）"/><TextBox Text="{ui:Edit SpeakerDraft.Exponent}"/></StackPanel>
+                <StackPanel><TextBlock Text="背向幅值下限（0.01～1）"/><TextBox Text="{ui:Edit SpeakerDraft.RearFloor}"/></StackPanel>
+            </UniformGrid>
+            <TextBlock Text="X正向为车前，Y正向为车左；0°沿X正向，正角向Y正向旋转。n=0为全向，其余为水平余弦幂近似。高度差参与三维距离；指向性仅用水平角。" Style="{StaticResource Hint}"/>
+            <TextBlock Text="参考声压级 / dB re 20 µPa，修正 / dB"/>
+            <DataGrid x:Name="BandGrid" ItemsSource="{Binding SpeakerDraft.Bands}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Hz" Binding="{Binding Hz}" IsReadOnly="True" Width="65"/>
+                    <DataGridTextColumn Header="轴向声级 [-60,140]" Binding="{ui:Edit Level}" Width="*"/>
+                    <DataGridTextColumn Header="修正 [-40,40]" Binding="{ui:Edit Correction}" Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <TextBlock Text="数据来源类别"/>
+            <ComboBox ItemsSource="{Binding Origins}" SelectedItem="{ui:Edit SpeakerDraft.Origin}"/>
+            <TextBlock Text="Manual=人工，Simulation=模拟，MeasurementDeclared=用户声明实测，Estimate=估算。软件不认证用户声明的测量或校准。" Style="{StaticResource Hint}"/>
+            <TextBlock Text="轴向频谱来源与测量条件（必填，最多2000字符）"/>
+            <TextBox Text="{ui:Edit SpeakerDraft.Source}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="65"/>
+            <TextBlock Text="声源备注"/>
+            <TextBox Text="{ui:Edit SpeakerDraft.Note}" TextWrapping="Wrap"/>
+        </StackPanel>
+        <Expander Header="七频带 CSV 预检与整体替换" Margin="0,10">
+            <StackPanel>
+                <CheckBox Content="导入目标为背景（否则为当前扬声器）" IsChecked="{Binding ImportBackground}"/>
+                <TextBlock Text="UTF-8，列 FrequencyHz,LevelDb,CorrectionDb；七频带各出现一次。背景修正必须为0。预检通过后才能整体应用；文本或目标变化须重新预检。" Style="{StaticResource Hint}"/>
+                <Button Content="读取 CSV…" Command="{Binding Commands[ReadSpectrum]}"/>
+                <TextBox Text="{Binding CsvText, UpdateSourceTrigger=LostFocus}" AcceptsReturn="True" Height="155" VerticalScrollBarVisibility="Auto" FontFamily="Consolas"/>
+                <WrapPanel>
+                    <Button Content="预检频谱" Command="{Binding Commands[SpectrumPreview]}"/>
+                    <Button Content="应用频谱导入" Command="{Binding Commands[SpectrumApply]}"/>
+                    <Button Content="导出模板…" Command="{Binding Commands[Export]}" CommandParameter="template"/>
+                    <Button Content="导出当前频带…" Command="{Binding Commands[Export]}" CommandParameter="input"/>
+                </WrapPanel>
+                <TextBlock Text="{Binding Preview.Valid, StringFormat=预检通过：{0}}"/>
+                <ItemsControl ItemsSource="{Binding Preview.Errors}"/>
+            </StackPanel>
+        </Expander>
+    </StackPanel>
+</UserControl>

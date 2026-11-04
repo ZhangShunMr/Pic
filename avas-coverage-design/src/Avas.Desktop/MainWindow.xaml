@@ -1,0 +1,164 @@
+<Window x:Class="Avas.Desktop.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="clr-namespace:Avas.Desktop.Views"
+        xmlns:controls="clr-namespace:Avas.Desktop.Controls"
+        Title="车外行人警示声音传播与覆盖设计软件 V2.0" Width="1480" Height="940"
+        MinWidth="1120" MinHeight="700" Closing="WindowClosing">
+    <Window.Resources>
+        <DataTemplate x:Key="ProjectView"><views:ProjectView/></DataTemplate>
+        <DataTemplate x:Key="SpeakerView"><views:SpeakerView/></DataTemplate>
+        <DataTemplate x:Key="SettingsView"><views:SettingsView/></DataTemplate>
+        <DataTemplate x:Key="ListenerView"><views:ListenerView/></DataTemplate>
+        <DataTemplate x:Key="ComparisonView"><views:ComparisonView/></DataTemplate>
+        <DataTemplate x:Key="ScanView"><views:ScanView/></DataTemplate>
+        <DataTemplate x:Key="AudioView"><views:AudioView/></DataTemplate>
+        <DataTemplate x:Key="DeliveryView"><views:DeliveryView/></DataTemplate>
+    </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Key="S" Modifiers="Control" Command="{Binding Commands[Save]}"/>
+        <KeyBinding Key="N" Modifiers="Control" Command="{Binding Commands[New]}"/>
+        <KeyBinding Key="O" Modifiers="Control" Command="{Binding Commands[OpenFile]}"/>
+        <KeyBinding Key="F5" Command="{Binding Commands[Calculate]}"/>
+    </Window.InputBindings>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top" IsEnabled="{Binding IsReady}">
+            <MenuItem Header="文件(_F)">
+                <MenuItem Header="新建空白项目" InputGestureText="Ctrl+N" Command="{Binding Commands[New]}"/>
+                <MenuItem Header="导入项目文件…" InputGestureText="Ctrl+O" Command="{Binding Commands[OpenFile]}"/>
+                <MenuItem Header="保存到项目库" InputGestureText="Ctrl+S" Command="{Binding Commands[Save]}"/>
+                <MenuItem Header="导出完整项目…" Command="{Binding Commands[Export]}" CommandParameter="project"/>
+                <Separator/>
+                <MenuItem Header="载入模拟示例" Command="{Binding Commands[Demo]}"/>
+                <MenuItem Header="复制为独立项目" Command="{Binding Commands[CopyProject]}"/>
+                <MenuItem Header="切换归档状态" Command="{Binding Commands[Archive]}"/>
+            </MenuItem>
+            <MenuItem Header="编辑(_E)">
+                <MenuItem Header="应用编辑" Command="{Binding Commands[Apply]}"/>
+                <MenuItem Header="放弃编辑" Command="{Binding Commands[Discard]}"/>
+                <Separator/>
+                <MenuItem Header="撤销" Command="{Binding Commands[Undo]}"/>
+                <MenuItem Header="重做" Command="{Binding Commands[Redo]}"/>
+            </MenuItem>
+            <MenuItem Header="计算(_C)">
+                <MenuItem Header="计算当前输入" InputGestureText="F5" Command="{Binding Commands[Calculate]}"/>
+                <MenuItem Header="保存方案快照" Command="{Binding Commands[Capture]}"/>
+            </MenuItem>
+            <MenuItem Header="输出(_X)">
+                <MenuItem Header="工程报告 HTML…" Command="{Binding Commands[Export]}" CommandParameter="report"/>
+                <MenuItem Header="网格 CSV…" Command="{Binding Commands[Export]}" CommandParameter="grid"/>
+                <MenuItem Header="观察点结果 CSV…" Command="{Binding Commands[Export]}" CommandParameter="points"/>
+                <MenuItem Header="声场图 SVG…" Command="{Binding Commands[Export]}" CommandParameter="svg"/>
+                <MenuItem Header="计算依据 JSON…" Command="{Binding Commands[Export]}" CommandParameter="json"/>
+            </MenuItem>
+            <MenuItem Header="帮助(_H)">
+                <MenuItem Header="计算口径与操作帮助" Click="ShowHelp"/>
+            </MenuItem>
+        </Menu>
+        <StatusBar DockPanel.Dock="Bottom" Padding="10,6" Background="#DDE8E2">
+            <StatusBarItem><TextBlock Text="{Binding SaveState}" FontWeight="SemiBold"/></StatusBarItem>
+            <Separator/>
+            <StatusBarItem><TextBlock Text="{Binding InputState}"/></StatusBarItem>
+            <Separator/>
+            <StatusBarItem><TextBlock Text="{Binding ResultState}"/></StatusBarItem>
+        </StatusBar>
+        <Border DockPanel.Dock="Bottom" Padding="12,8" Background="#FFF7E1" BorderBrush="#DED4B6" BorderThickness="0,1,0,0">
+            <StackPanel>
+                <TextBlock Text="{Binding Status}" FontWeight="SemiBold"/>
+                <ItemsControl ItemsSource="{Binding Errors}">
+                    <ItemsControl.ItemTemplate><DataTemplate><TextBlock Foreground="#AC3825" Text="{Binding}" Margin="0,4,0,0"/></DataTemplate></ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <ProgressBar Height="3" IsIndeterminate="{Binding Busy}" Margin="0,6,0,0"/>
+            </StackPanel>
+        </Border>
+        <Grid IsEnabled="{Binding IsReady}" Margin="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="160"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="*" MinWidth="360"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="470" MinWidth="340"/>
+            </Grid.ColumnDefinitions>
+            <Border Background="#203E3D" Padding="8" CornerRadius="4">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top" Margin="6,10,6,20">
+                        <TextBlock Text="AVAS" FontSize="26" FontWeight="Bold" Foreground="#E8F8D6"/>
+                        <TextBlock Text="传播 · 覆盖工作台" Foreground="White" Margin="0,7,0,0"/>
+                        <TextBlock Text="V2.0 / 原生桌面" Foreground="#AACBC3" Margin="0,4,0,0"/>
+                    </StackPanel>
+                    <StackPanel DockPanel.Dock="Bottom" Margin="6,14">
+                        <TextBlock Text="模型估算" Foreground="#E8F8D6" FontWeight="Bold"/>
+                        <TextBlock Text="自由场 · 非相干叠加。工程目标由用户设置，不判断法规符合性、实车声压或真实可听性。" Foreground="#D6E4DE" Margin="0,6,0,0"/>
+                    </StackPanel>
+                    <ListBox ItemsSource="{Binding Sections}" SelectedItem="{Binding SelectedSection, Mode=TwoWay}" Background="Transparent" BorderThickness="0" Foreground="White"/>
+                </DockPanel>
+            </Border>
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*" MinHeight="230"/>
+                    <RowDefinition Height="6"/>
+                    <RowDefinition Height="220" MinHeight="130"/>
+                </Grid.RowDefinitions>
+                <StackPanel Margin="4,0,4,8">
+                    <TextBlock Text="{Binding Project.Name}" FontSize="22" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding SourceState}" Foreground="#526969" MaxHeight="54" TextTrimming="CharacterEllipsis" Margin="0,5,0,0"/>
+                    <WrapPanel Margin="0,7,0,0">
+                        <Button Content="计算当前输入  F5" Style="{StaticResource Primary}" Command="{Binding Commands[Calculate]}"/>
+                        <CheckBox Content="仅显示工程目标覆盖" IsChecked="{Binding CoverageOnly}" Checked="CoverageChanged" Unchecked="CoverageChanged" Margin="8,6"/>
+                    </WrapPanel>
+                </StackPanel>
+                <Border Grid.Row="1" BorderBrush="#C2D5CC" BorderThickness="1" Background="White" CornerRadius="4">
+                    <controls:FieldView x:Name="Field" Project="{Binding Project}" Result="{Binding CurrentResult}" CoverageOnly="{Binding CoverageOnly}" SelectedListenerId="{Binding SelectedListenerId}" PointPicked="PointPicked"/>
+                </Border>
+                <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" Height="6"/>
+                <GroupBox Grid.Row="3" Header="观察点核对 · 点击表格选择，地图支持点击附近点" Padding="8" Margin="0,0,0,0">
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Top" Text="{Binding MetricLabel}" Foreground="#526969"/>
+                        <DataGrid ItemsSource="{Binding CurrentResult.Listeners}" IsReadOnly="True" SelectionChanged="ResultSelectionChanged" MaxHeight="180">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="点名称" Binding="{Binding Name}" Width="*"/>
+                                <DataGridTextColumn Header="警示声 dB" Binding="{Binding Signal, StringFormat=F2}" Width="90"/>
+                                <DataGridTextColumn Header="背景差 dB" Binding="{Binding Margin, StringFormat=F2}" Width="90"/>
+                                <DataGridCheckBoxColumn Header="目标满足" Binding="{Binding Covered}" Width="75"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </DockPanel>
+                </GroupBox>
+            </Grid>
+            <GridSplitter Grid.Column="3" Width="6" HorizontalAlignment="Center"/>
+            <Border Grid.Column="4" Background="White" BorderBrush="#D5E0DA" BorderThickness="1" CornerRadius="4" Padding="14">
+                <DockPanel>
+                    <Border DockPanel.Dock="Bottom" Background="#EEF5F0" Padding="8" Margin="-4,8,-4,-4">
+                        <StackPanel>
+                            <TextBlock Text="{Binding InputState}" Margin="0,0,0,4"/>
+                            <WrapPanel>
+                                <Button Content="应用编辑" Style="{StaticResource Primary}" Command="{Binding Commands[Apply]}"/>
+                                <Button Content="放弃编辑" Command="{Binding Commands[Discard]}"/>
+                                <Button Content="保存项目" Command="{Binding Commands[Save]}"/>
+                            </WrapPanel>
+                        </StackPanel>
+                    </Border>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <ContentControl Content="{Binding}">
+                            <ContentControl.Style>
+                                <Style TargetType="ContentControl">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource ProjectView}"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Tab}" Value="扬声器"><Setter Property="ContentTemplate" Value="{StaticResource SpeakerView}"/></DataTrigger>
+                                        <DataTrigger Binding="{Binding Tab}" Value="背景与网格"><Setter Property="ContentTemplate" Value="{StaticResource SettingsView}"/></DataTrigger>
+                                        <DataTrigger Binding="{Binding Tab}" Value="观察点"><Setter Property="ContentTemplate" Value="{StaticResource ListenerView}"/></DataTrigger>
+                                        <DataTrigger Binding="{Binding Tab}" Value="方案比较"><Setter Property="ContentTemplate" Value="{StaticResource ComparisonView}"/></DataTrigger>
+                                        <DataTrigger Binding="{Binding Tab}" Value="扫描与剖面"><Setter Property="ContentTemplate" Value="{StaticResource ScanView}"/></DataTrigger>
+                                        <DataTrigger Binding="{Binding Tab}" Value="音频试听"><Setter Property="ContentTemplate" Value="{StaticResource AudioView}"/></DataTrigger>
+                                        <DataTrigger Binding="{Binding Tab}" Value="成果与复核"><Setter Property="ContentTemplate" Value="{StaticResource DeliveryView}"/></DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ContentControl.Style>
+                        </ContentControl>
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
+        </Grid>
+    </DockPanel>
+</Window>

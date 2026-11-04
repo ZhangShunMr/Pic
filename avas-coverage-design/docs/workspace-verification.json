@@ -1,0 +1,80 @@
+{
+  "date": "2026-11-04T15:01:50.964824+00:00",
+  "os": "Debian GNU/Linux 13 (trixie)",
+  "total": 18,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "\u666E\u901A\u542F\u52A8\u7A7A\u767D\u4E14\u53EF\u76F4\u63A5\u5173\u95ED",
+      "status": "passed"
+    },
+    {
+      "name": "\u7A7A\u6E90\u8BA1\u7B97\u62D2\u7EDD\u800C\u4E0D\u5236\u9020\u7ED3\u679C",
+      "status": "passed"
+    },
+    {
+      "name": "\u5B8C\u6574\u7A7A\u767D\u5230\u89E3\u6790\u6848\u4F8B\u4FDD\u5B58\u91CD\u5F00\u5BFC\u51FA",
+      "status": "passed"
+    },
+    {
+      "name": "\u65E0\u6548\u5E94\u7528\u4E0D\u635F\u574F\u9879\u76EE\u4E14\u8349\u7A3F\u4FDD\u7559",
+      "status": "passed"
+    },
+    {
+      "name": "\u7ED1\u5B9A\u683C\u5F0F\u9519\u8BEF\u963B\u6B62\u65E7\u6570\u503C\u88AB\u8BA1\u7B97\u4FDD\u5B58",
+      "status": "passed"
+    },
+    {
+      "name": "\u6709\u8349\u7A3F\u65F6\u5BFC\u822A\u4E0E\u5207\u6362\u5BF9\u8C61\u62D2\u7EDD",
+      "status": "passed"
+    },
+    {
+      "name": "\u66FF\u6362\u786E\u8BA4\u53D6\u6D88\u4FDD\u5168\u8349\u7A3F",
+      "status": "passed"
+    },
+    {
+      "name": "\u6A21\u62DF\u5165\u53E3\u3001\u5F52\u6863\u3001\u64A4\u9500\u548C\u91CD\u505A",
+      "status": "passed"
+    },
+    {
+      "name": "\u4FEE\u6539\u540E\u9690\u85CF\u8FC7\u671F\u7ED3\u679C\u5E76\u963B\u6B62\u5BFC\u51FA",
+      "status": "passed"
+    },
+    {
+      "name": "\u5FEB\u7167\u6BD4\u8F83\u5DEE\u503C\u53CA\u4E0D\u4E00\u81F4\u6761\u4EF6\u963B\u65AD",
+      "status": "passed"
+    },
+    {
+      "name": "\u626B\u63CF\u5E94\u7528\u53EA\u5728\u6709\u6548\u7ED3\u679C\u65F6\u53EF\u7528",
+      "status": "passed"
+    },
+    {
+      "name": "\u89C2\u5BDF\u70B9\u4E0E\u9891\u8C31CSV\u9884\u68C0\u539F\u5B50\u5E94\u7528",
+      "status": "passed"
+    },
+    {
+      "name": "\u65B0\u589E\u52A0\u58F0\u6E90\u548C\u73AF\u70B9\u4E0A\u9650\u4FDD\u5168\u5DF2\u6709\u6570\u636E",
+      "status": "passed"
+    },
+    {
+      "name": "\u4FDD\u5B58\u5907\u4EFD\u91CD\u5F00\u3001\u78C1\u76D8\u51B2\u7A81\u4E0E\u590D\u5236\u89E3\u9664\u51B2\u7A81",
+      "status": "passed"
+    },
+    {
+      "name": "\u6587\u4EF6\u53D6\u6D88\u53CD\u9988\u4E0D\u58F0\u79F0\u4FDD\u5B58\u6210\u529F",
+      "status": "passed"
+    },
+    {
+      "name": "\u8BD5\u542C\u914D\u7F6E\u53D8\u5316\u7ACB\u5373\u4F7F\u65E7\u8BD5\u542C\u65E0\u6548",
+      "status": "passed"
+    },
+    {
+      "name": "\u5E76\u884C\u547D\u4EE4\u5FD9\u72B6\u6001\u88AB\u7981\u7528\u5E76\u6062\u590D",
+      "status": "passed"
+    },
+    {
+      "name": "\u635F\u574F\u6587\u4EF6\u5BFC\u5165\u4FDD\u5168\u73B0\u6709\u5DE5\u7A0B",
+      "status": "passed"
+    }
+  ]
+}

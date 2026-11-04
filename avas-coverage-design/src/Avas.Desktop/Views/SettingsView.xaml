@@ -1,0 +1,49 @@
+<UserControl x:Class="Avas.Desktop.Views.SettingsView" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ui="clr-namespace:Avas.Desktop">
+    <StackPanel>
+        <TextBlock Text="背景、网格与工程目标" Style="{StaticResource Heading}"/>
+        <TextBlock Text="背景假定在区域中均匀。网格最多20000个节点；覆盖率为排除车内节点后的离散节点比例。" Style="{StaticResource Hint}"/>
+        <GroupBox Header="均匀背景频谱 / dB re 20 µPa">
+            <StackPanel>
+                <DataGrid ItemsSource="{Binding Draft.Settings.Background}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="中心频率 Hz" Binding="{Binding Hz}" IsReadOnly="True" Width="*"/>
+                        <DataGridTextColumn Header="声级 [-60,140]" Binding="{ui:Edit Level}" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <TextBlock Text="背景来源类别"/>
+                <ComboBox ItemsSource="{Binding Origins}" SelectedItem="{ui:Edit Draft.Settings.BackgroundOrigin}"/>
+                <TextBlock Text="背景来源（必填，最多2000字符）"/>
+                <TextBox Text="{ui:Edit Draft.Settings.BackgroundSource}" MinHeight="60" TextWrapping="Wrap" AcceptsReturn="True"/>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Header="接收平面和网格">
+            <StackPanel>
+                <UniformGrid Columns="2">
+                    <StackPanel Margin="0,0,8,0"><TextBlock Text="最小 X / m"/><TextBox Text="{ui:Edit Draft.Settings.MinX}"/></StackPanel>
+                    <StackPanel><TextBlock Text="最大 X / m"/><TextBox Text="{ui:Edit Draft.Settings.MaxX}"/></StackPanel>
+                    <StackPanel Margin="0,0,8,0"><TextBlock Text="最小 Y / m"/><TextBox Text="{ui:Edit Draft.Settings.MinY}"/></StackPanel>
+                    <StackPanel><TextBlock Text="最大 Y / m"/><TextBox Text="{ui:Edit Draft.Settings.MaxY}"/></StackPanel>
+                    <StackPanel Margin="0,0,8,0"><TextBlock Text="网格步长 / m（0.25～5）"/><TextBox Text="{ui:Edit Draft.Settings.Step}"/></StackPanel>
+                    <StackPanel><TextBlock Text="接收高度 / m（0～10）"/><TextBox Text="{ui:Edit Draft.Settings.ReceiverHeight}"/></StackPanel>
+                    <StackPanel Margin="0,0,8,0"><TextBlock Text="距离下限 / m（0.1～10）"/><TextBox Text="{ui:Edit Draft.Settings.MinimumDistance}"/></StackPanel>
+                    <StackPanel><TextBlock Text="车辆长度 / m（1～20）"/><TextBox Text="{ui:Edit Draft.Settings.VehicleLength}"/></StackPanel>
+                    <StackPanel Margin="0,0,8,0"><TextBlock Text="车辆宽度 / m（0.5～5）"/><TextBox Text="{ui:Edit Draft.Settings.VehicleWidth}"/></StackPanel>
+                </UniformGrid>
+                <CheckBox Content="排除车辆轮廓内部网格" IsChecked="{ui:Edit Draft.Settings.ExcludeVehicle}"/>
+                <TextBlock Text="坐标范围 -100～100m，最大值须大于最小值。距离下限只防止近源发散，不是近场模型。车辆轮廓仅示意和排除内部节点，不模拟车身遮挡。" Style="{StaticResource Hint}"/>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Header="显示口径和自定义工程目标">
+            <StackPanel>
+                <TextBlock Text="频带（0 = 七带合成）"/>
+                <ComboBox ItemsSource="{Binding MetricBands}" SelectedItem="{ui:Edit Draft.Settings.SelectedHz}"/>
+                <CheckBox Content="七带合成采用中心频率 A 计权近似" IsChecked="{ui:Edit Draft.Settings.AWeighted}"/>
+                <UniformGrid Columns="2">
+                    <StackPanel Margin="0,0,8,0"><TextBlock Text="声级目标 / dB（-60～140）"/><TextBox Text="{ui:Edit Draft.Settings.LevelTarget}"/></StackPanel>
+                    <StackPanel><TextBlock Text="信号背景差目标 / dB（-40～60）"/><TextBox Text="{ui:Edit Draft.Settings.MarginTarget}"/></StackPanel>
+                </UniformGrid>
+                <TextBlock Text="两个目标须同时满足。默认45dB和3dB仅为工程示例值，不是法规限值。单频带不使用A计权；七带合成不能称为全频积分。" Style="{StaticResource Hint}"/>
+            </StackPanel>
+        </GroupBox>
+    </StackPanel>
+</UserControl>

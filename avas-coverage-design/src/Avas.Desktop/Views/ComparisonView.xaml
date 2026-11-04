@@ -1,0 +1,44 @@
+<UserControl x:Class="Avas.Desktop.Views.ComparisonView" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <StackPanel>
+        <TextBlock Text="独立方案快照" Style="{StaticResource Heading}"/>
+        <TextBlock Text="先应用编辑并计算，再捕获方案。快照内嵌声源、背景、设置、观察点与音频，随项目保存。最大20个；快照不会随之后的输入编辑而改变。" Style="{StaticResource Hint}"/>
+        <TextBlock Text="快照名称（必填，最多100字符）"/>
+        <TextBox Text="{Binding SnapshotName, UpdateSourceTrigger=LostFocus}"/>
+        <Button Content="保存当前方案快照" Style="{StaticResource Primary}" Command="{Binding Commands[Capture]}"/>
+        <DataGrid ItemsSource="{Binding Project.Snapshots}" SelectedItem="{Binding SelectedSnapshot}" IsReadOnly="True" MaxHeight="210">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="方案" Binding="{Binding Name}" Width="*"/>
+                <DataGridTextColumn Header="创建时间" Binding="{Binding Created, StringFormat=yyyy-MM-dd HH:mm}" Width="145"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <WrapPanel>
+            <Button Content="恢复所选输入" Command="{Binding Commands[Restore]}"/>
+            <Button Content="删除所选快照" Command="{Binding Commands[DeleteSnapshot]}"/>
+        </WrapPanel>
+        <GroupBox Header="同条件比较 · 目标减基线">
+            <StackPanel>
+                <TextBlock Text="基线方案"/>
+                <ComboBox ItemsSource="{Binding Project.Snapshots}" DisplayMemberPath="Name" SelectedValuePath="Id" SelectedValue="{Binding BaselineId, Mode=TwoWay}"/>
+                <TextBlock Text="目标方案"/>
+                <ComboBox ItemsSource="{Binding Project.Snapshots}" DisplayMemberPath="Name" SelectedValuePath="Id" SelectedValue="{Binding TargetId, Mode=TwoWay}"/>
+                <Button Content="比较两方案" Command="{Binding Commands[Compare]}"/>
+                <TextBlock Text="计算区域、步长、背景、计权、工程目标、接收高度、观察点GUID和坐标以及数据来源类别须一致。不同条件会阻断比较；可以变化声源布局、朝向和增益。" Style="{StaticResource Hint}"/>
+                <TextBlock Text="{Binding Comparison.Comparable, StringFormat=可比较：{0}}" FontWeight="SemiBold"/>
+                <ItemsControl ItemsSource="{Binding Comparison.Reasons}">
+                    <ItemsControl.ItemTemplate><DataTemplate><TextBlock Text="{Binding}" Foreground="#A44222" Margin="0,5"/></DataTemplate></ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <TextBlock Text="{Binding Comparison.CoverageDifference, StringFormat=节点覆盖差：{0:F2} 个百分点}" Margin="0,8"/>
+                <DataGrid ItemsSource="{Binding Comparison.Points}" IsReadOnly="True">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="观察点" Binding="{Binding Name}" Width="*"/>
+                        <DataGridTextColumn Header="基线 dB" Binding="{Binding Baseline, StringFormat=F2}" Width="80"/>
+                        <DataGridTextColumn Header="目标 dB" Binding="{Binding Target, StringFormat=F2}" Width="80"/>
+                        <DataGridTextColumn Header="差 dB" Binding="{Binding Difference, StringFormat=F2}" Width="70"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <Button Content="保存比较 CSV…" Command="{Binding Commands[Export]}" CommandParameter="comparison"/>
+                <TextBlock Text="正差值表示目标方案更高，不能直接解释为更安全或更易听见；覆盖差是离散节点的百分点。" Style="{StaticResource Hint}"/>
+            </StackPanel>
+        </GroupBox>
+    </StackPanel>
+</UserControl>

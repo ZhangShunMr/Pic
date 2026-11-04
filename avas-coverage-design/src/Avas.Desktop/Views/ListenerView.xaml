@@ -1,0 +1,67 @@
+<UserControl x:Class="Avas.Desktop.Views.ListenerView" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ui="clr-namespace:Avas.Desktop">
+    <StackPanel>
+        <TextBlock Text="观察点与点频谱" Style="{StaticResource Heading}"/>
+        <WrapPanel>
+            <Button Content="添加观察点" Command="{Binding Commands[AddListener]}"/>
+            <Button Content="删除当前点" Command="{Binding Commands[DeleteListener]}"/>
+        </WrapPanel>
+        <ComboBox ItemsSource="{Binding Draft.Listeners}" SelectedItem="{Binding SelectedListener, Mode=TwoWay}" DisplayMemberPath="Name"/>
+        <TextBlock Text="点名称（必填，最多100字符）"/>
+        <TextBox Text="{ui:Edit ListenerDraft.Name}"/>
+        <UniformGrid Columns="2">
+            <StackPanel Margin="0,0,8,0"><TextBlock Text="X / m（-100～100）"/><TextBox Text="{ui:Edit ListenerDraft.X}"/></StackPanel>
+            <StackPanel><TextBlock Text="Y / m（-100～100）"/><TextBox Text="{ui:Edit ListenerDraft.Y}"/></StackPanel>
+        </UniformGrid>
+        <TextBlock Text="点备注"/>
+        <TextBox Text="{ui:Edit ListenerDraft.Note}" TextWrapping="Wrap"/>
+        <TextBlock Text="接收高度统一使用背景与网格设置。网格外的点仍独立计算，点值不影响区域节点覆盖率；车内点值也不能解释为车内声压。" Style="{StaticResource Hint}"/>
+        <GroupBox Header="等角环形点集（非标准测点）">
+            <StackPanel>
+                <UniformGrid Columns="2">
+                    <StackPanel Margin="0,0,8,0"><TextBlock Text="半径 / m（1～50）"/><TextBox Text="{ui:Edit RingRadius}"/></StackPanel>
+                    <StackPanel><TextBlock Text="点数（4～36）"/><TextBox Text="{ui:Edit RingCount}"/></StackPanel>
+                </UniformGrid>
+                <Button Content="追加环形点集" Command="{Binding Commands[Ring]}"/>
+                <TextBlock Text="以车辆中心(0,0)为圆心；项目最多100个观察点。" Style="{StaticResource Hint}"/>
+            </StackPanel>
+        </GroupBox>
+        <Expander Header="观察点 CSV 批量导入 / 导出" Margin="0,8">
+            <StackPanel>
+                <TextBlock Text="UTF-8，列 Name,X_m,Y_m,Note。读取后先预检，确认追加或替换后应用。交换文件不保留GUID和多行备注；完整保存用项目文件。" Style="{StaticResource Hint}"/>
+                <Button Content="读取观察点 CSV…" Command="{Binding Commands[ReadListeners]}"/>
+                <TextBox Text="{Binding ListenerText, UpdateSourceTrigger=LostFocus}" AcceptsReturn="True" Height="145" VerticalScrollBarVisibility="Auto" FontFamily="Consolas"/>
+                <CheckBox Content="整体替换原点集（否则追加）" IsChecked="{Binding ReplaceListeners}"/>
+                <WrapPanel>
+                    <Button Content="预检点集" Command="{Binding Commands[ListenerPreview]}"/>
+                    <Button Content="应用点集导入" Command="{Binding Commands[ListenerApply]}"/>
+                    <Button Content="导出点模板…" Command="{Binding Commands[Export]}" CommandParameter="listener-template"/>
+                    <Button Content="导出点输入…" Command="{Binding Commands[Export]}" CommandParameter="listeners"/>
+                </WrapPanel>
+                <TextBlock Text="{Binding ListenerPreview.Valid, StringFormat=预检通过：{0}}"/>
+                <ItemsControl ItemsSource="{Binding ListenerPreview.Errors}"/>
+            </StackPanel>
+        </Expander>
+        <GroupBox Header="当前点 · 七频带核对（未计权）">
+            <StackPanel>
+                <TextBlock Text="{Binding ResultState}" Style="{StaticResource Hint}"/>
+                <DataGrid ItemsSource="{Binding PointBands}" IsReadOnly="True">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Hz" Binding="{Binding Hz}" Width="65"/>
+                        <DataGridTextColumn Header="警示 dB" Binding="{Binding Signal, StringFormat=F2}" Width="*"/>
+                        <DataGridTextColumn Header="背景 dB" Binding="{Binding Background, StringFormat=F2}" Width="*"/>
+                        <DataGridTextColumn Header="差值 dB" Binding="{Binding Margin, StringFormat=F2}" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <TextBlock Text="当前点的源贡献；损益包含距离扩散和水平指向性，距离为截断前的三维距离。" Style="{StaticResource Hint}"/>
+                <DataGrid ItemsSource="{Binding SourceRows}" IsReadOnly="True" MaxHeight="180">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="源" Binding="{Binding Name}" Width="*"/>
+                        <DataGridTextColumn Header="距离 m" Binding="{Binding Distance, StringFormat=F2}" Width="70"/>
+                        <DataGridTextColumn Header="损益 dB" Binding="{Binding Loss, StringFormat=F2}" Width="75"/>
+                        <DataGridTextColumn Header="贡献 dB" Binding="{Binding Signal, StringFormat=F2}" Width="75"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+        </GroupBox>
+    </StackPanel>
+</UserControl>

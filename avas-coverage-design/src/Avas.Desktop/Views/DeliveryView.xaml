@@ -1,0 +1,55 @@
+<UserControl x:Class="Avas.Desktop.Views.DeliveryView" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <StackPanel>
+        <TextBlock Text="成果、复核与追溯" Style="{StaticResource Heading}"/>
+        <TextBlock Text="{Binding ResultState}" FontWeight="Bold"/>
+        <TextBlock Text="{Binding CurrentResult.Coverage, StringFormat=工程目标节点覆盖率：{0:F2}%}" Margin="0,8"/>
+        <TextBlock Text="{Binding CurrentResult.CoveredCount, StringFormat=满足目标节点数：{0}}"/>
+        <TextBlock Text="{Binding CurrentResult.Minimum, StringFormat=最低警示声级：{0:F2} dB}"/>
+        <TextBlock Text="{Binding CurrentResult.Maximum, StringFormat=最高警示声级：{0:F2} dB}"/>
+        <TextBlock Text="{Binding CurrentResult.MeanEnergy, StringFormat=节点能量平均声级：{0:F2} dB}"/>
+        <TextBlock Text="{Binding CurrentResult.ClampedCount, StringFormat=距离截断节点数：{0}}"/>
+        <TextBlock Text="覆盖率是离散有效节点比例，不能当作精确面积或人群可听率。所有声级都来自输入与简化模型计算。" Style="{StaticResource Hint}"/>
+        <ItemsControl ItemsSource="{Binding CurrentResult.Warnings}">
+            <ItemsControl.ItemTemplate><DataTemplate><TextBlock Text="{Binding}" Foreground="#8A5A20" Margin="0,4"/></DataTemplate></ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <GroupBox Header="选择路径保存成果">
+            <StackPanel>
+                <WrapPanel>
+                    <Button Content="完整项目 .avasproj" Command="{Binding Commands[Export]}" CommandParameter="project"/>
+                    <Button Content="工程报告 HTML" Command="{Binding Commands[Export]}" CommandParameter="report"/>
+                    <Button Content="网格 CSV" Command="{Binding Commands[Export]}" CommandParameter="grid"/>
+                    <Button Content="观察点结果 CSV" Command="{Binding Commands[Export]}" CommandParameter="points"/>
+                    <Button Content="声场图 SVG" Command="{Binding Commands[Export]}" CommandParameter="svg"/>
+                    <Button Content="计算依据 JSON" Command="{Binding Commands[Export]}" CommandParameter="json"/>
+                </WrapPanel>
+                <TextBlock Text="输出含单位、版本、来源、条件、输入哈希与模型边界。HTML是自包含静态成果文件。项目文件内嵌音频和快照，可搬迁后导入重开；结果须重新计算。" Style="{StaticResource Hint}"/>
+                <TextBlock Text="{Binding LastDownload, StringFormat=最近保存位置：{0}}" TextWrapping="Wrap"/>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Header="输入复核提示（不等同测试或认证）">
+            <ItemsControl ItemsSource="{Binding Review}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="#D7E2DC" BorderThickness="0,0,0,1" Padding="0,8">
+                            <StackPanel>
+                                <TextBlock Text="{Binding Severity}" Foreground="#9A641F" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding Object}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding Finding}" Margin="0,3"/>
+                                <TextBlock Text="{Binding Action}" Foreground="#526969"/>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </GroupBox>
+        <GroupBox Header="累计操作审计（最多1000条）">
+            <DataGrid ItemsSource="{Binding Project.Audit}" IsReadOnly="True" MaxHeight="250">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="修订" Binding="{Binding Revision}" Width="55"/>
+                    <DataGridTextColumn Header="时间" Binding="{Binding At, StringFormat=MM-dd HH:mm:ss}" Width="105"/>
+                    <DataGridTextColumn Header="操作" Binding="{Binding Action}" Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+    </StackPanel>
+</UserControl>

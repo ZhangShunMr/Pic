@@ -1,0 +1,20 @@
+{
+  "platform": "win-x64",
+  "self_contained": true,
+  "single_file": true,
+  "published_on": "Debian Linux 13 / .NET SDK10.0.403",
+  "windows_execution_verified": false,
+  "desktop_screenshots": 0,
+  "files": [
+    {
+      "path": "artifacts/AvasCoverage-win-x64/AvasCoverage.exe",
+      "bytes": 140048945,
+      "sha256": "e74eface670bdc9488648d092a51bf524afe4efde202c73f412c3a22ab300795"
+    },
+    {
+      "path": "artifacts/AvasCoverage-win-x64.zip",
+      "bytes": 58918863,
+      "sha256": "e85cf99f5a346f74dcf3617d8f666cc5f8733a703ec411c8775561578cab6e3f"
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+<UserControl x:Class="Avas.Desktop.Views.ScanView" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ui="clr-namespace:Avas.Desktop">
+    <StackPanel>
+        <TextBlock Text="参数扫描与方向剖面" Style="{StaticResource Heading}"/>
+        <GroupBox Header="单声源扫描（最多25组）">
+            <StackPanel>
+                <TextBlock Text="扫描扬声器"/>
+                <ComboBox ItemsSource="{Binding Draft.Speakers}" SelectedItem="{Binding SelectedSpeaker, Mode=TwoWay}" DisplayMemberPath="Name"/>
+                <TextBlock Text="参数：Heading=朝向°，Gain=增益dB，PositionX/Y=位置m"/>
+                <ComboBox ItemsSource="{Binding ScanParameters}" SelectedItem="{ui:Edit ScanRequest.Parameter}"/>
+                <UniformGrid Columns="3">
+                    <StackPanel Margin="0,0,8,0"><TextBlock Text="初值"/><TextBox Text="{ui:Edit ScanRequest.Start}"/></StackPanel>
+                    <StackPanel Margin="0,0,8,0"><TextBlock Text="终值"/><TextBox Text="{ui:Edit ScanRequest.End}"/></StackPanel>
+                    <StackPanel><TextBlock Text="正步长"/><TextBox Text="{ui:Edit ScanRequest.Step}"/></StackPanel>
+                </UniformGrid>
+                <Button Content="运行参数扫描" Command="{Binding Commands[Scan]}"/>
+                <TextBlock Text="每组取值均执行完整输入校验。扫描不改变原项目；选行后点击应用才替换参数。朝向范围±360°、增益±40dB、位置±100m。" Style="{StaticResource Hint}"/>
+                <DataGrid ItemsSource="{Binding Scan.Rows}" SelectedItem="{Binding SelectedScan}" IsReadOnly="True" MaxHeight="240">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="取值" Binding="{Binding Value, StringFormat=F2}" Width="65"/>
+                        <DataGridTextColumn Header="覆盖 %" Binding="{Binding Coverage, StringFormat=F2}" Width="75"/>
+                        <DataGridTextColumn Header="最低 dB" Binding="{Binding Minimum, StringFormat=F2}" Width="75"/>
+                        <DataGridTextColumn Header="最大 dB" Binding="{Binding Maximum, StringFormat=F2}" Width="75"/>
+                        <DataGridTextColumn Header="最低背景差" Binding="{Binding WorstMargin, StringFormat=F2}" Width="95"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <WrapPanel>
+                    <Button Content="应用所选扫描值" Command="{Binding Commands[ApplyScan]}"/>
+                    <Button Content="保存扫描 CSV…" Command="{Binding Commands[Export]}" CommandParameter="scan"/>
+                </WrapPanel>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Header="方向剖面（独立采样，不改变观察点）">
+            <StackPanel>
+                <UniformGrid Columns="2">
+                    <StackPanel Margin="0,0,8,0"><TextBlock Text="起点 X / m（±100）"/><TextBox Text="{ui:Edit TransectRequest.StartX}"/></StackPanel>
+                    <StackPanel><TextBlock Text="起点 Y / m（±100）"/><TextBox Text="{ui:Edit TransectRequest.StartY}"/></StackPanel>
+                    <StackPanel Margin="0,0,8,0"><TextBlock Text="方向 / °（±360）"/><TextBox Text="{ui:Edit TransectRequest.Heading}"/></StackPanel>
+                    <StackPanel><TextBlock Text="长度 / m（大于0，至100）"/><TextBox Text="{ui:Edit TransectRequest.Length}"/></StackPanel>
+                    <StackPanel Margin="0,0,8,0"><TextBlock Text="步长 / m（0.1～10）"/><TextBox Text="{ui:Edit TransectRequest.Step}"/></StackPanel>
+                </UniformGrid>
+                <Button Content="计算方向剖面" Command="{Binding Commands[Transect]}"/>
+                <TextBlock Text="{Binding Transect.LastCovered, StringFormat=最后满足目标的采样距离：{0:F2} m}"/>
+                <TextBlock Text="{Binding Transect.Transitions, StringFormat=满足状态转换次数：{0}}"/>
+                <TextBlock Text="最多501点。末端不足一步时不追加点；最后满足距离是离散采样值，可能存在中间缺口，不代表连续覆盖半径。空值表示没有点满足工程目标。" Style="{StaticResource Hint}"/>
+                <DataGrid ItemsSource="{Binding Transect.Points}" IsReadOnly="True" MaxHeight="230">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="距离 m" Binding="{Binding Distance, StringFormat=F2}" Width="*"/>
+                        <DataGridTextColumn Header="警示 dB" Binding="{Binding Result.Signal, StringFormat=F2}" Width="*"/>
+                        <DataGridTextColumn Header="背景差 dB" Binding="{Binding Result.Margin, StringFormat=F2}" Width="*"/>
+                        <DataGridCheckBoxColumn Header="满足目标" Binding="{Binding Result.Covered}" Width="75"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <Button Content="保存剖面 CSV…" Command="{Binding Commands[Export]}" CommandParameter="transect"/>
+            </StackPanel>
+        </GroupBox>
+    </StackPanel>
+</UserControl>

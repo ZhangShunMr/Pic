@@ -1,0 +1,18 @@
+<Window x:Class="Avas.Desktop.HelpWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="操作帮助与模型边界" Width="750" Height="740" MinWidth="550" MinHeight="450" WindowStartupLocation="CenterOwner">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="28">
+        <StackPanel>
+            <TextBlock Text="软件介绍" Style="{StaticResource Heading}"/>
+            <TextBlock Text="本软件面向车外行人警示声音的工程方案人员，在有明确来源的参考频带条件下，检查声源布局、方向、背景和接收位置对自由场近似结果的影响。软件为离线Windows桌面应用，所有项目、音频与结果均保存在本机。" Style="{StaticResource Hint}"/>
+            <TextBlock Text="从空白项目开始" Style="{StaticResource Heading}"/>
+            <TextBlock Text="1. 在项目页填写名称、负责人和目的，点击应用编辑。2. 到扬声器页添加声源，输入坐标、高度、参考距离和七带轴向声级，填写来源后应用。3. 到背景与网格填写背景频带、区域、接收高度及工程目标，应用。4. 到观察点添加点并应用。5. 点击计算当前输入，核对地图、点声级和复核提示。6. 保存到项目库，再关闭重开；搬迁时导出完整项目。" Style="{StaticResource Hint}"/>
+            <TextBlock Text="可独立核对的解析案例" Style="{StaticResource Heading}"/>
+            <TextBlock Text="声源坐标(0,0)m、高度1.5m、全向指数0、参考距离1m、各带60dB、增益和修正0。观察点(2,0)m，接收高度1.5m；显示频带选1000Hz。计算应为60−20log10(2)=53.9794dB。背景每带35dB时，信号背景差为18.9794dB。默认45dB/3dB两个工程目标同时满足。全向双源同位置时，非相干能量和增加3.0103dB。" Style="{StaticResource Hint}"/>
+            <TextBlock Text="计算口径" Style="{StaticResource Heading}"/>
+            <TextBlock Text="每带 L=Lref+修正+增益−20log10(max(r,rmin)/r0)+20log10(D)。r是含高度差的距离，r0是轴向参考距离。D=floor+(1−floor)×max(0,cosθ)^n；n=0时D=1。多源逐带按能量叠加。125～8000Hz七频带采用中心频率A计权时属于工程近似。背景全区域均匀。覆盖率是满足声级目标且满足背景差目标的有效网格节点比例。" Style="{StaticResource Hint}"/>
+            <TextBlock Text="常见错误与恢复" Style="{StaticResource Heading}"/>
+            <TextBlock Text="红框表示数字格式无法读取：在该框填有限数字，使用小数点，不能留空；数值超范围则在应用时提示字段路径和允许范围。未应用草稿会阻止计算、保存和切换对象，请应用或放弃。结果过期时重新计算。CSV错误包含行号，不会部分导入。保存冲突时先导入磁盘版或复制为独立项目保存。归档项目须先解除归档才能编辑。试听峰值过高时提高数字播放参考，程序不会自动归一化。" Style="{StaticResource Hint}"/>
+            <TextBlock Text="使用边界" Style="{StaticResource Heading}"/>
+            <TextBlock Text="不模拟车身遮挡、反射、衍射、地面、气象、相干干涉、到达时延或双耳线索。车辆仅示意，距离截断不是真实近场解。所有默认值为工程示例，无实车验证或法规合规结论。数字音频未建立声压标定链路；试听不能证明可听性。必须用真实测试与适当专业模型核查工程决策。" Style="{StaticResource Hint}"/>
+        </StackPanel>
+    </ScrollViewer>
+</Window>

@@ -1,0 +1,287 @@
+{
+  "scope": "参与构建的手写生产 .cs/.xaml 非空行，排除注释专用行、测试、工具、文档、依赖、bin/obj及自动生成文件",
+  "legacy_reported_baseline": 3680,
+  "minimum": 3500,
+  "rationale": "本次为原生宿主迁移，不以功能扩充为目标；采用规范第10条最低3500行，保留旧基线，不以零基线掩盖承继。",
+  "total": 4216,
+  "csharp": 3523,
+  "xaml": 693,
+  "files": [
+    {
+      "path": "src/Avas.Core/Analysis/Acoustics.cs",
+      "nonempty_lines": 162,
+      "sha256": "ab6567ba6e117983655b5caa8cbc23ad990126bd2a6c06e7dfdcc02dd8f9a285",
+      "purpose": "模型、计算、音频、文件验证与静态成果"
+    },
+    {
+      "path": "src/Avas.Core/Analysis/ChartRenderer.cs",
+      "nonempty_lines": 113,
+      "sha256": "c4a81aee7438e42752f160530e4b94d7d11e0c028af00f840003493012972c60",
+      "purpose": "模型、计算、音频、文件验证与静态成果"
+    },
+    {
+      "path": "src/Avas.Core/Analysis/ReviewEngine.cs",
+      "nonempty_lines": 127,
+      "sha256": "df6c7b7a7919b6283680bb474d71d13ceb862716cc3dcaf30b4eeab4f0e4f98b",
+      "purpose": "模型、计算、音频、文件验证与静态成果"
+    },
+    {
+      "path": "src/Avas.Core/Analysis/Scenarios.cs",
+      "nonempty_lines": 185,
+      "sha256": "1b56065598b73102d3b3a38ed7034c633fd9cf6e0aa39a44a8d910d5e0c83352",
+      "purpose": "模型、计算、音频、文件验证与静态成果"
+    },
+    {
+      "path": "src/Avas.Core/Audio/AuditionEngine.cs",
+      "nonempty_lines": 94,
+      "sha256": "abcac15771e39a17f229aa4c0bbd09b020de06229bfd123ca159819eee9cc9d9",
+      "purpose": "模型、计算、音频、文件验证与静态成果"
+    },
+    {
+      "path": "src/Avas.Core/Audio/SpectralAudio.cs",
+      "nonempty_lines": 138,
+      "sha256": "61521b40440d5081bf3d3523d968b3c905483c75340725440f998a46b387f70c",
+      "purpose": "模型、计算、音频、文件验证与静态成果"
+    },
+    {
+      "path": "src/Avas.Core/Audio/WaveCodec.cs",
+      "nonempty_lines": 125,
+      "sha256": "015249a1d353aea7c2636d6effd574029d022a2b3ba2ee19f65af8b43d85accb",
+      "purpose": "模型、计算、音频、文件验证与静态成果"
+    },
+    {
+      "path": "src/Avas.Core/Domain/Demonstration.cs",
+      "nonempty_lines": 50,
+      "sha256": "8282fa8faa0f30b46e68f9dabdb57317132f92c46092d8b098e8a3a9a0f69a10",
+      "purpose": "模型、计算、音频、文件验证与静态成果"
+    },
+    {
+      "path": "src/Avas.Core/Domain/Project.cs",
+      "nonempty_lines": 128,
+      "sha256": "6f246c8e75d5d4326408a9a948dbb9c0ee76777f85a1a64a0ba0b8ba22da8b7f",
+      "purpose": "模型、计算、音频、文件验证与静态成果"
+    },
+    {
+      "path": "src/Avas.Core/Domain/Validation.cs",
+      "nonempty_lines": 158,
+      "sha256": "b8ddc727bf609a7f407f59ca5d67db9451de3d64ea8c42894fa1fc5a13c2b2c7",
+      "purpose": "模型、计算、音频、文件验证与静态成果"
+    },
+    {
+      "path": "src/Avas.Core/IO/ListenerCsv.cs",
+      "nonempty_lines": 126,
+      "sha256": "dd56cf5076990310e9361379f09d4e48235b62141272c89211500b686563f6a3",
+      "purpose": "模型、计算、音频、文件验证与静态成果"
+    },
+    {
+      "path": "src/Avas.Core/IO/ProjectCodec.cs",
+      "nonempty_lines": 161,
+      "sha256": "e7c3af3ecbee3e9b6122e337294d5e06292fd6f0090b2dc30e67de1803976ee6",
+      "purpose": "模型、计算、音频、文件验证与静态成果"
+    },
+    {
+      "path": "src/Avas.Core/IO/ProjectStore.cs",
+      "nonempty_lines": 79,
+      "sha256": "585c869a9ce2bce8e55595b83cc329d0ef281a2883260994dd8a186e16d0c335",
+      "purpose": "模型、计算、音频、文件验证与静态成果"
+    },
+    {
+      "path": "src/Avas.Core/IO/ResultExport.cs",
+      "nonempty_lines": 104,
+      "sha256": "f62752ed41c7cbe20ad4349efe6599abd22c4dec21a4adfecc16d4d3e878a2f5",
+      "purpose": "模型、计算、音频、文件验证与静态成果"
+    },
+    {
+      "path": "src/Avas.Core/IO/SpectrumCsv.cs",
+      "nonempty_lines": 79,
+      "sha256": "4c052df0121c1c1ede950746938f5ffdd3b7872b96a10a1ad7e73744aed5cf0b",
+      "purpose": "模型、计算、音频、文件验证与静态成果"
+    },
+    {
+      "path": "src/Avas.Desktop/App.xaml",
+      "nonempty_lines": 82,
+      "sha256": "65e3616e56d13fce4ec7c07e3333d9110139cbf17b565466b0c8b6c00746f37c",
+      "purpose": "WPF原生视图、绘图与系统交互"
+    },
+    {
+      "path": "src/Avas.Desktop/App.xaml.cs",
+      "nonempty_lines": 26,
+      "sha256": "ce8c9d03ed328da3081df70dfddecb9d777fc88cc9c332a821b6ee4295b0fbc3",
+      "purpose": "WPF原生视图、绘图与系统交互"
+    },
+    {
+      "path": "src/Avas.Desktop/Controls/FieldView.cs",
+      "nonempty_lines": 189,
+      "sha256": "da2ec388a55ac5107363c632f992f19f48b8abd3e447fae843d27a8fda7d559b",
+      "purpose": "WPF原生视图、绘图与系统交互"
+    },
+    {
+      "path": "src/Avas.Desktop/DesktopServices.cs",
+      "nonempty_lines": 103,
+      "sha256": "adfe7d67334339f60089c3f809c22d93b594f3d2b2427c6251d478482b312400",
+      "purpose": "WPF原生视图、绘图与系统交互"
+    },
+    {
+      "path": "src/Avas.Desktop/Edit.cs",
+      "nonempty_lines": 14,
+      "sha256": "99d545ddffbeadb2c23822aef52defffa035799424534b741328673321d991aa",
+      "purpose": "WPF原生视图、绘图与系统交互"
+    },
+    {
+      "path": "src/Avas.Desktop/HelpWindow.xaml",
+      "nonempty_lines": 18,
+      "sha256": "d985875eacb1874033848522e4fb8669c3369c8272ac7ac6b432eca31d534c93",
+      "purpose": "WPF原生视图、绘图与系统交互"
+    },
+    {
+      "path": "src/Avas.Desktop/HelpWindow.xaml.cs",
+      "nonempty_lines": 6,
+      "sha256": "f1e90971514f108c64af23ef7f23309178d2df4395070ac242ace741823d5f43",
+      "purpose": "WPF原生视图、绘图与系统交互"
+    },
+    {
+      "path": "src/Avas.Desktop/MainWindow.xaml",
+      "nonempty_lines": 164,
+      "sha256": "bdbfce821a794392e08a6c1997069ba6c2ab689635cc52964f6520360cdf8a89",
+      "purpose": "WPF原生视图、绘图与系统交互"
+    },
+    {
+      "path": "src/Avas.Desktop/MainWindow.xaml.cs",
+      "nonempty_lines": 85,
+      "sha256": "3f09d0b292f2e2a0efffc919bc9bd5cdfd71e85b8f4369f3aa985d912b2cbd6d",
+      "purpose": "WPF原生视图、绘图与系统交互"
+    },
+    {
+      "path": "src/Avas.Desktop/Views/AudioView.xaml",
+      "nonempty_lines": 57,
+      "sha256": "60daa2ed4d0046e45a258f3f80275e8258fda8aecc9b811a88826e68159a93e2",
+      "purpose": "WPF原生视图、绘图与系统交互"
+    },
+    {
+      "path": "src/Avas.Desktop/Views/AudioView.xaml.cs",
+      "nonempty_lines": 6,
+      "sha256": "578a6e5e2e97189115723ea7ff9fb7e36c1993f8e93ee22118f4b96529cae45c",
+      "purpose": "WPF原生视图、绘图与系统交互"
+    },
+    {
+      "path": "src/Avas.Desktop/Views/ComparisonView.xaml",
+      "nonempty_lines": 44,
+      "sha256": "e6d51007c93aaf40bf7223f400d4fd43591d44e8e2463513df4126d8cc0b6b50",
+      "purpose": "WPF原生视图、绘图与系统交互"
+    },
+    {
+      "path": "src/Avas.Desktop/Views/ComparisonView.xaml.cs",
+      "nonempty_lines": 6,
+      "sha256": "036da5a9deae938194e0f0a927ece1b99a7597e23ed5995bc4f50aa333291561",
+      "purpose": "WPF原生视图、绘图与系统交互"
+    },
+    {
+      "path": "src/Avas.Desktop/Views/DeliveryView.xaml",
+      "nonempty_lines": 55,
+      "sha256": "7af8c3d185f84ba336213c2d5ab0a724a3253da02e620db24a636d1aa71ab450",
+      "purpose": "WPF原生视图、绘图与系统交互"
+    },
+    {
+      "path": "src/Avas.Desktop/Views/DeliveryView.xaml.cs",
+      "nonempty_lines": 6,
+      "sha256": "5762be28ad7521fcb566b5f70120bf051c9f46ee57cf61e6fa62bda960070942",
+      "purpose": "WPF原生视图、绘图与系统交互"
+    },
+    {
+      "path": "src/Avas.Desktop/Views/ListenerView.xaml",
+      "nonempty_lines": 67,
+      "sha256": "92376ace1fed6c6446d67ebe120138e63401705409488d6eefd305505e4577a7",
+      "purpose": "WPF原生视图、绘图与系统交互"
+    },
+    {
+      "path": "src/Avas.Desktop/Views/ListenerView.xaml.cs",
+      "nonempty_lines": 6,
+      "sha256": "836c071cb3a0675099409b974e279169cc3e5958162401d63dcad672a35946da",
+      "purpose": "WPF原生视图、绘图与系统交互"
+    },
+    {
+      "path": "src/Avas.Desktop/Views/ProjectView.xaml",
+      "nonempty_lines": 40,
+      "sha256": "59cc22a8986355d3c1964a50b0c8721091377106e19b4771a98ff2a5631eecdf",
+      "purpose": "WPF原生视图、绘图与系统交互"
+    },
+    {
+      "path": "src/Avas.Desktop/Views/ProjectView.xaml.cs",
+      "nonempty_lines": 6,
+      "sha256": "2a1893f185ddb0d0f0e4dea709faa8b611f2af7746360f8b76c9586d7e1ac9a7",
+      "purpose": "WPF原生视图、绘图与系统交互"
+    },
+    {
+      "path": "src/Avas.Desktop/Views/ScanView.xaml",
+      "nonempty_lines": 57,
+      "sha256": "3615b21f960fd6d4fe2ef3883974dbbf556255e07309f5fc3b1d181d1f6ac217",
+      "purpose": "WPF原生视图、绘图与系统交互"
+    },
+    {
+      "path": "src/Avas.Desktop/Views/ScanView.xaml.cs",
+      "nonempty_lines": 6,
+      "sha256": "e79092d244fcf9547d71cc25058bdb58e0df18083b8b4fb9e689e647e5595ff8",
+      "purpose": "WPF原生视图、绘图与系统交互"
+    },
+    {
+      "path": "src/Avas.Desktop/Views/SettingsView.xaml",
+      "nonempty_lines": 49,
+      "sha256": "2038b71088fed8e131a45dca7aa193bb83814001689517cea6f932e7f581863c",
+      "purpose": "WPF原生视图、绘图与系统交互"
+    },
+    {
+      "path": "src/Avas.Desktop/Views/SettingsView.xaml.cs",
+      "nonempty_lines": 6,
+      "sha256": "3d74290ffcdabc6a958df111752b23c5b509a59b11244b02f28980dc868220be",
+      "purpose": "WPF原生视图、绘图与系统交互"
+    },
+    {
+      "path": "src/Avas.Desktop/Views/SpeakerView.xaml",
+      "nonempty_lines": 60,
+      "sha256": "23bdd3c67b400885f60e1e7f296462711414f013ab4f7122192d830713a2b34b",
+      "purpose": "WPF原生视图、绘图与系统交互"
+    },
+    {
+      "path": "src/Avas.Desktop/Views/SpeakerView.xaml.cs",
+      "nonempty_lines": 6,
+      "sha256": "62ecc4f687ee75bbdc2f522cac992aa0c65b1a453a04efe073720d90a4ed43cb",
+      "purpose": "WPF原生视图、绘图与系统交互"
+    },
+    {
+      "path": "src/Avas.Workspace/DesktopCommands.cs",
+      "nonempty_lines": 331,
+      "sha256": "11f8399f4b1afd716929108b0d3045794b78ee8a8d061bb82c81f2d9d2ebc0c7",
+      "purpose": "MVVM状态、命令和流程"
+    },
+    {
+      "path": "src/Avas.Workspace/FileCommands.cs",
+      "nonempty_lines": 244,
+      "sha256": "3fd06b01737538665982ee712cfb118cf8ae5b27f4a27caed7cd4022fbd4b9e1",
+      "purpose": "MVVM状态、命令和流程"
+    },
+    {
+      "path": "src/Avas.Workspace/ListenerImportCommands.cs",
+      "nonempty_lines": 54,
+      "sha256": "fc41e981efc96c2a95c3a9c404d5cc3b7952ff7d9f5f3dd192ab29a96c98f183",
+      "purpose": "MVVM状态、命令和流程"
+    },
+    {
+      "path": "src/Avas.Workspace/ObjectCommands.cs",
+      "nonempty_lines": 214,
+      "sha256": "7af1e290740a1eed13747f54d839c1ce6013ad8ac571436de99cb29bf5ce86ae",
+      "purpose": "MVVM状态、命令和流程"
+    },
+    {
+      "path": "src/Avas.Workspace/ReviewCommands.cs",
+      "nonempty_lines": 32,
+      "sha256": "47e810feceee95eb05901404935ce6868b9b2c32294a9337d60c629e214c8fc3",
+      "purpose": "MVVM状态、命令和流程"
+    },
+    {
+      "path": "src/Avas.Workspace/WorkspaceViewModel.cs",
+      "nonempty_lines": 348,
+      "sha256": "ff5de74783ad1085e501c91f25069385f1dbf6756a969801323afff3279f7de6",
+      "purpose": "MVVM状态、命令和流程"
+    }
+  ]
+}
