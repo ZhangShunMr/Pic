@@ -74,21 +74,38 @@ internal static class NativeDialogVerification
     {
         Exception? failure = null;
         nint handle = 0;
+        using var finished = new ManualResetEventSlim(false);
+        var watchdog = new Thread(() =>
+        {
+            if (!finished.Wait(TimeSpan.FromSeconds(30)))
+            {
+                var modal = FindWindow(null, title);
+                if (modal != 0)
+                {
+                    GetWindowThreadProcessId(modal, out var process);
+                    if (process == Environment.ProcessId) PostMessage(modal, 0x0010, 0, 0);
+                }
+            }
+        }) { IsBackground = true };
+        watchdog.Start();
         var worker = new Thread(() =>
         {
             try
             {
-                AutomationElement? dialog = null;
+                Console.WriteLine("Native dialog: waiting for " + title);
                 for (var attempt = 0; attempt < 200; attempt++)
                 {
-                    dialog = AutomationElement.RootElement.FindFirst(TreeScope.Children, new AndCondition(
-                        new PropertyCondition(AutomationElement.ProcessIdProperty, Environment.ProcessId),
-                        new PropertyCondition(AutomationElement.NameProperty, title)));
-                    if (dialog is not null) break;
+                    var candidate = FindWindow(null, title);
+                    if (candidate != 0)
+                    {
+                        GetWindowThreadProcessId(candidate, out var process);
+                        if (process == Environment.ProcessId) { handle = candidate; break; }
+                    }
                     Thread.Sleep(100);
                 }
-                Require(dialog is not null, "Native dialog not found: " + title);
-                handle = new nint(dialog!.Current.NativeWindowHandle);
+                Require(handle != 0, "Native dialog not found: " + title);
+                var dialog = AutomationElement.FromHandle(handle);
+                Console.WriteLine("Native dialog: found owned window");
                 var edits = dialog.FindAll(TreeScope.Descendants, new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Edit));
                 AutomationElement? fileName = null;
                 foreach (AutomationElement edit in edits)
@@ -115,9 +132,11 @@ internal static class NativeDialogVerification
                 if (handle != 0) PostMessage(handle, 0x0010, 0, 0);
             }
         }) { IsBackground = true };
-        worker.SetApartmentState(ApartmentState.STA);
+        worker.SetApartmentState(ApartmentState.MTA);
         worker.Start();
-        var result = operation();
+        string? result;
+        try { result = operation(); }
+        finally { finished.Set(); watchdog.Join(1000); }
         if (!worker.Join(25000)) throw new TimeoutException("Native dialog automation did not finish");
         if (failure is not null) throw new InvalidOperationException("Native dialog automation failed", failure);
         Require(result is not null && Path.GetFullPath(result) == Path.GetFullPath(path), "Native selected path differs");
@@ -136,6 +155,7 @@ internal static class NativeDialogVerification
         try
         {
             Require(PrintWindow(window, memory, 2), "PrintWindow did not capture native dialog");
+            SelectObject(memory, previous);
             var info = new BitmapInfo
             {
                 Size = (uint)Marshal.SizeOf<BitmapInfo>(), Width = width, Height = -height,
@@ -171,6 +191,8 @@ internal static class NativeDialogVerification
         public int XPixelsPerMeter, YPixelsPerMeter;
         public uint ColorsUsed, ColorsImportant;
     }
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern nint FindWindow(string? className, string title);
+    [DllImport("user32.dll")] private static extern uint GetWindowThreadProcessId(nint window, out int processId);
     [DllImport("user32.dll")] private static extern bool GetWindowRect(nint window, out WindowRect rectangle);
     [DllImport("user32.dll")] private static extern nint GetDC(nint window);
     [DllImport("user32.dll")] private static extern int ReleaseDC(nint window, nint dc);
