@@ -44,6 +44,7 @@ jobs:
           git diff --cached --quiet
           if ($LASTEXITCODE -eq 1) {
             git commit -m 'Record actual Windows verification evidence [skip ci]'
+            git pull --rebase origin windows-native/trim-contact-design-20261104
             git push origin HEAD:windows-native/trim-contact-design-20261104
             if ($LASTEXITCODE -ne 0) { throw 'Could not preserve evidence on the independent branch' }
           }

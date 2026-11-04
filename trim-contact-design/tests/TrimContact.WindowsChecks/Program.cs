@@ -131,6 +131,7 @@ internal static class Program
         vm.ImportCsvText = LayoutCsv.Template;
         vm.ImportReplace = true;
         vm.SectionIndex = 5;
+        await Render(window);
         vm.PreviewImportCommand.Execute(null);
         await Capture(window, "12a-csv-preview", Descendants<GroupBox>(window).Single(g => (g.Header as string)?.StartsWith("CSV布置交换") == true));
         vm.BatchRequest.PreloadDeltaMm = 0.05;
@@ -146,6 +147,7 @@ internal static class Program
         vm.ExportReportCommand.Execute(null);
         vm.SaveLibraryCommand.Execute(null);
         vm.SectionIndex = 0;
+        await Render(window);
         await Capture(window, "13a-project-library", Descendants<GroupBox>(window).Single(g => (g.Header as string)?.StartsWith("本机项目库") == true));
         Record("native report export contains source hash", File.ReadAllText(ui.ExportPath).Contains(ProjectCodec.InputHash(vm.Applied)));
         vm.NewCommand.Execute(null);

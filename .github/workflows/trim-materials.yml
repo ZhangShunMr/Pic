@@ -1,0 +1,47 @@
+name: Trim contact document preview
+on:
+  push:
+    branches: ['windows-native/trim-contact-design-20261104']
+    paths:
+      - 'trim-contact-design/docs/*.docx'
+      - 'trim-contact-design/tools/pdf_preview.py'
+      - '.github/workflows/trim-materials.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: trim-contact-design
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install document preview tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends libreoffice-writer fonts-noto-cjk
+          python3 -m pip install pymupdf
+      - name: Render actual DOCX files with LibreOffice
+        run: |
+          mkdir -p docs/preview
+          libreoffice -env:UserInstallation=file:///tmp/trim-lo-profile --headless --convert-to pdf --outdir docs/preview docs/操作说明书-待Windows核验.docx docs/软著信息采集表-草稿.docx
+          python3 tools/pdf_preview.py
+      - name: Retain previews
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trim-document-previews
+          path: trim-contact-design/docs/preview
+      - name: Preserve actual preview evidence on existing branch
+        if: success()
+        run: |
+          git config user.name 'Trim material preview'
+          git config user.email 'codex@openai.com'
+          git add docs/preview
+          if ! git diff --cached --quiet; then
+            git commit -m 'Record actual LibreOffice PDF preview evidence [skip ci]'
+            git pull --rebase origin windows-native/trim-contact-design-20261104
+            git push origin HEAD:windows-native/trim-contact-design-20261104
+          fi
