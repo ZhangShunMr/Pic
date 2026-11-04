@@ -121,10 +121,11 @@ internal static class NativeDialogVerification
                 File.WriteAllText(screenshot + ".controls.json", System.Text.Json.JsonSerializer.Serialize(controls,
                     new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
                 AutomationElement? fileName = edits.Cast<AutomationElement>().FirstOrDefault(edit =>
-                    edit.Current.AutomationId == "1001" && edit.Current.ControlType == ControlType.Edit
+                    (edit.Current.AutomationId is "1001" or "1148") && edit.Current.ControlType == ControlType.Edit
                     && edit.TryGetCurrentPattern(ValuePattern.Pattern, out _));
                 fileName ??= edits.Cast<AutomationElement>().FirstOrDefault(edit =>
-                    (edit.Current.Name.Contains("File name", StringComparison.OrdinalIgnoreCase)
+                    edit.Current.ControlType == ControlType.Edit
+                    && (edit.Current.Name.Contains("File name", StringComparison.OrdinalIgnoreCase)
                     || edit.Current.Name.Contains("文件名"))
                     && edit.TryGetCurrentPattern(ValuePattern.Pattern, out _));
                 Require(fileName is not null && fileName.TryGetCurrentPattern(ValuePattern.Pattern, out _), "Native filename edit not found");
