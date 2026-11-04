@@ -24,6 +24,12 @@ internal static class Program
         var nativeDialogsRequested = args.Contains("--native-dialogs");
         var output = Path.GetFullPath(args.FirstOrDefault(x => !x.StartsWith("--", StringComparison.Ordinal)) ?? "docs/windows-evidence");
         Directory.CreateDirectory(output);
+        foreach (var name in new[] { "result.json", "failure.txt", "native-dialogs.json",
+            "dialog-01-save.png.failure.txt", "dialog-02-open.png.failure.txt", "dialog-03-export.png.failure.txt" })
+        {
+            var previous = Path.Combine(output, name);
+            if (File.Exists(previous)) File.Delete(previous);
+        }
         var errors = new BindingErrors();
         PresentationTraceSources.DataBindingSource.Listeners.Add(errors);
         PresentationTraceSources.DataBindingSource.Switch.Level = SourceLevels.Error;
