@@ -1,6 +1,6 @@
 ﻿{
   "schema": 1,
-  "id": "492ca7d9-0405-4d0b-81ca-504dc0ca5126",
+  "id": "e7c47f4f-12ee-4219-b94e-0701179fc97c",
   "name": "\u95E8\u677F\u56DB\u5361\u6263\u63A5\u89E6\u5E03\u7F6E\u6F14\u793A",
   "revision": "A",
   "owner": "\u6F14\u793A\u5DE5\u7A0B\u5E08",
@@ -8,8 +8,8 @@
   "origin": "Simulation",
   "source": "\u5185\u7F6E\u56FA\u5B9A\u6A21\u62DF\u53C2\u6570\uFF1B\u975E\u5B9E\u6D4B\uFF0C\u4E0D\u8BC1\u660E\u5B9E\u8F66\u6548\u679C",
   "archived": false,
-  "createdUtc": "2026-11-04T16:13:01.5922946+00:00",
-  "modifiedUtc": "2026-11-04T16:13:14.5041878+00:00",
+  "createdUtc": "2026-11-04T16:20:58.9112828+00:00",
+  "modifiedUtc": "2026-11-04T16:21:10.4541534+00:00",
   "panel": {
     "name": "400\u00D7300 mm\u521A\u6027\u9970\u677F\u793A\u4F8B",
     "massKg": 1,
@@ -40,12 +40,12 @@
   },
   "variants": [
     {
-      "id": "1c77aa25-8cf3-491c-9166-764558ef2902",
+      "id": "f2239a0e-853b-4d98-aa3b-31506a3daad2",
       "name": "A \u57FA\u51C6\u63A5\u89E6\u5E03\u7F6E",
       "note": "",
       "clips": [
         {
-          "id": "735697f0-084b-401d-8453-e9106c530c9c",
+          "id": "a1dfe8fc-2015-4ad1-9840-6e74f92e5082",
           "name": "\u5DE6\u4E0B\u5361\u6263",
           "xmm": 40,
           "ymm": 40,
@@ -54,7 +54,7 @@
           "forceLimitN": 80
         },
         {
-          "id": "514c516e-b038-4825-93eb-4b63f1ca6a35",
+          "id": "8c65019c-669d-4038-9eeb-7d1107bb704f",
           "name": "\u53F3\u4E0B\u5361\u6263",
           "xmm": 360,
           "ymm": 40,
@@ -63,7 +63,7 @@
           "forceLimitN": 80
         },
         {
-          "id": "32d07d9c-5477-47f5-98c5-1e5b98a89c00",
+          "id": "ee9e4be5-4ca7-4a1e-838e-18b387bfb002",
           "name": "\u53F3\u4E0A\u5361\u6263",
           "xmm": 360,
           "ymm": 260,
@@ -72,7 +72,7 @@
           "forceLimitN": 80
         },
         {
-          "id": "e1f6ac1c-3430-4c2a-8754-da9b9cfe5af0",
+          "id": "5526a221-decd-4b23-9b34-1173842ea99d",
           "name": "\u5DE6\u4E0A\u5361\u6263",
           "xmm": 40,
           "ymm": 260,
@@ -83,7 +83,7 @@
       ],
       "contacts": [
         {
-          "id": "d67bc847-9354-45e8-a9fc-e284bcaaeaf9",
+          "id": "2f0cd230-04b7-4c08-af2e-24bd6926a13b",
           "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
           "material": "\u7F13\u51B2\u5757\uFF08\u5F85\u6807\u5B9A\uFF09",
           "xmm": 200,
@@ -99,12 +99,12 @@
       ]
     },
     {
-      "id": "eb3a5a01-8582-45c4-9191-5ca88a6191ff",
+      "id": "a9784c9e-c332-4a4f-acdb-81393162dfc3",
       "name": "A \u57FA\u51C6\u63A5\u89E6\u5E03\u7F6E \u526F\u672C",
       "note": "",
       "clips": [
         {
-          "id": "a182c7f9-4d7c-49a7-9109-a9efcf18564f",
+          "id": "21160143-ece6-4497-ab2d-9b0d8bb4d481",
           "name": "\u5DE6\u4E0B\u5361\u6263",
           "xmm": 40,
           "ymm": 40,
@@ -113,7 +113,7 @@
           "forceLimitN": 80
         },
         {
-          "id": "99e08492-ca90-494d-8bac-dd9f10f28c51",
+          "id": "c6a197d2-121b-4dcd-a67e-d1d5697d2706",
           "name": "\u53F3\u4E0B\u5361\u6263",
           "xmm": 360,
           "ymm": 40,
@@ -122,7 +122,7 @@
           "forceLimitN": 80
         },
         {
-          "id": "63b54711-b60d-4011-8ce5-c464c7b73158",
+          "id": "6c207dfd-43bd-4d2a-a272-1cd81b2cd5d1",
           "name": "\u53F3\u4E0A\u5361\u6263",
           "xmm": 360,
           "ymm": 260,
@@ -131,7 +131,7 @@
           "forceLimitN": 80
         },
         {
-          "id": "9a3cfd1b-4293-41cc-934c-7624c1f4ec6c",
+          "id": "e82f0fba-b6d6-4221-853c-ea22331f5ed2",
           "name": "\u5DE6\u4E0A\u5361\u6263",
           "xmm": 40,
           "ymm": 260,
@@ -142,7 +142,7 @@
       ],
       "contacts": [
         {
-          "id": "731fa4f8-47a5-4146-b763-40e9a8b86d90",
+          "id": "25cb1089-5223-47c8-9988-61acd7174710",
           "name": "\u4E2D\u5FC3\u7F13\u51B2\u5757",
           "material": "\u7F13\u51B2\u5757\uFF08\u5F85\u6807\u5B9A\uFF09",
           "xmm": 200,
@@ -160,7 +160,7 @@
   ],
   "loads": [
     {
-      "id": "8700970f-1c5f-46d1-9a94-fc97812398ea",
+      "id": "bd302237-35e1-42bb-93fb-d61b3784430e",
       "name": "\u4E00\u500D\u91CD\u529B\u5468\u671F\u6F14\u793A",
       "normalBiasG": 0,
       "normalAmplitudeG": 1,
@@ -173,7 +173,7 @@
   ],
   "tasks": [
     {
-      "id": "33eb3159-ee11-4239-ab58-49e80ea1d518",
+      "id": "1af126ab-5bd6-44c3-97b6-cc49dcb94e80",
       "pointId": null,
       "title": "\u53C2\u6570\u8BC6\u522B\u4E0E\u6A21\u578B\u590D\u6838",
       "method": "\u6D4B\u91CF\u88C5\u914D\u95F4\u9699\u3001\u516C\u5DEE\u3001\u5361\u6263\u521A\u5EA6\u3001\u63A5\u89E6\u538B\u7F29\u66F2\u7EBF\u548C\u6750\u6599\u6469\u64E6\uFF1B\u8BB0\u5F55\u6E29\u5EA6\u4E0E\u52A0\u8F7D\u6761\u4EF6\u3002",
@@ -183,8 +183,8 @@
       "evidence": ""
     },
     {
-      "id": "6668d836-210e-4591-8f05-25e8b21ed429",
-      "pointId": "d67bc847-9354-45e8-a9fc-e284bcaaeaf9",
+      "id": "14cc382c-d188-43af-b5fb-c6335c9277b4",
+      "pointId": "2f0cd230-04b7-4c08-af2e-24bd6926a13b",
       "title": "\u4E2D\u5FC3\u7F13\u51B2\u5757\u63A5\u89E6\u4FDD\u6301\u6838\u67E5",
       "method": "\u6309\u63A7\u5236\u5DE5\u51B5\u88C5\u914D\u4E0A\u4E0B\u9650\u6837\u4EF6\uFF0C\u6D4B\u91CF\u95F4\u9699\u548C\u5206\u79BB\uFF1B\u63A7\u5236\u5DE5\u51B5\uFF1A\u4E00\u500D\u91CD\u529B\u5468\u671F\u6F14\u793A / \u89D2\u70B92[0.15]mm / 0.0\u00B0",
       "acceptance": "\u8BB0\u5F55\u5141\u8BB8\u5206\u79BB\u6761\u4EF6\u53CA\u5B9E\u6D4B\u8BC1\u636E\uFF0C\u7ED3\u5408\u9053\u8DEF\u6216\u53F0\u67B6\u4EBA\u5DE5\u542C\u8FA8\u786E\u8BA4\u3002",
@@ -195,19 +195,19 @@
   ],
   "audit": [
     {
-      "utc": "2026-11-04T16:13:01.5935275+00:00",
+      "utc": "2026-11-04T16:20:58.9128596+00:00",
       "action": "\u8F7D\u5165\u5185\u7F6E\u6A21\u62DF\u6F14\u793A"
     },
     {
-      "utc": "2026-11-04T16:13:01.6138729+00:00",
+      "utc": "2026-11-04T16:20:58.9389158+00:00",
       "action": "\u5EFA\u7ACB\u72EC\u7ACB\u6A21\u62DF\u5DE5\u4F5C\u526F\u672C"
     },
     {
-      "utc": "2026-11-04T16:13:06.0152987+00:00",
+      "utc": "2026-11-04T16:21:02.9850324+00:00",
       "action": "\u5E94\u7528\u684C\u9762\u7F16\u8F91"
     },
     {
-      "utc": "2026-11-04T16:13:14.5041887+00:00",
+      "utc": "2026-11-04T16:21:10.454154+00:00",
       "action": "\u4ECE\u6709\u6548\u7ED3\u679C\u751F\u6210\u9A8C\u8BC1\u4EFB\u52A1"
     }
   ]

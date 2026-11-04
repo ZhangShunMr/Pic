@@ -1,9 +1,9 @@
   Determining projects to restore...
-  Restored D:\a\Pic\Pic\trim-contact-design\tests\TrimContact.DesktopWorkflow\TrimContact.DesktopWorkflow.csproj (in 247 ms).
-  Restored D:\a\Pic\Pic\trim-contact-design\tests\TrimContact.Verification\TrimContact.Verification.csproj (in 247 ms).
-  Restored D:\a\Pic\Pic\trim-contact-design\src\TrimContact.Desktop\TrimContact.Desktop.csproj (in 247 ms).
-  Restored D:\a\Pic\Pic\trim-contact-design\tests\TrimContact.WindowsChecks\TrimContact.WindowsChecks.csproj (in 247 ms).
-  Restored D:\a\Pic\Pic\trim-contact-design\src\TrimContact.Core\TrimContact.Core.csproj (in 57 ms).
+  Restored D:\a\Pic\Pic\trim-contact-design\src\TrimContact.Core\TrimContact.Core.csproj (in 743 ms).
+  Restored D:\a\Pic\Pic\trim-contact-design\tests\TrimContact.WindowsChecks\TrimContact.WindowsChecks.csproj (in 96 ms).
+  Restored D:\a\Pic\Pic\trim-contact-design\src\TrimContact.Desktop\TrimContact.Desktop.csproj (in 856 ms).
+  Restored D:\a\Pic\Pic\trim-contact-design\tests\TrimContact.DesktopWorkflow\TrimContact.DesktopWorkflow.csproj (in 861 ms).
+  Restored D:\a\Pic\Pic\trim-contact-design\tests\TrimContact.Verification\TrimContact.Verification.csproj (in 4 ms).
   TrimContact.Core -> D:\a\Pic\Pic\trim-contact-design\src\TrimContact.Core\bin\Release\net10.0\TrimContact.Core.dll
   TrimContact.DesktopWorkflow -> D:\a\Pic\Pic\trim-contact-design\tests\TrimContact.DesktopWorkflow\bin\Release\net10.0\TrimContact.DesktopWorkflow.dll
   TrimContact.Verification -> D:\a\Pic\Pic\trim-contact-design\tests\TrimContact.Verification\bin\Release\net10.0\TrimContact.Verification.dll
@@ -14,4 +14,4 @@ Build succeeded.
     0 Warning(s)
     0 Error(s)
 
-Time Elapsed 00:00:46.29
+Time Elapsed 00:00:18.63
