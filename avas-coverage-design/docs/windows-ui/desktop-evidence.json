@@ -1,5 +1,5 @@
 {
-  "at": "2026-11-04T15:52:10.6431972+00:00",
+  "at": "2026-11-04T15:54:08.75935+00:00",
   "os": "Microsoft Windows 10.0.26100",
   "runtime": ".NET 10.0.14",
   "status": "passed",
@@ -29,6 +29,7 @@
     "03b-\u4E03\u5E26\u4E0E\u6765\u6E90\uFF1A\u5C40\u90E8\u56FE\u5305\u542B\u5B9E\u9645\u53EF\u89C1\u63A7\u4EF6",
     "\u6B63\u5E38\u8F93\u5165\u9636\u6BB5\u6CA1\u6709WPF\u7ED1\u5B9A\u9519\u8BEF",
     "\u539F\u751F\u6570\u503C\u7ED1\u5B9A\u62D2\u7EDD\u6587\u5B57\u8F93\u5165",
+    "\u683C\u5F0F\u9519\u8BEF\u65F6\u9690\u85CF\u65E7\u7ED3\u679C\u5E76\u663E\u793A\u5F85\u5904\u7406\u72B6\u6001",
     "\u683C\u5F0F\u9519\u8BEF\u963B\u6B62\u5E94\u7528\u65E7\u6570\u503C\u5E76\u4FDD\u7559\u5F85\u4FEE\u6B63\u6587\u5B57",
     "04-\u6570\u503C\u6821\u9A8C\uFF1A\u539F\u751F\u80CC\u666F\u4E0D\u900F\u660E",
     "04-\u6570\u503C\u6821\u9A8C\uFF1A\u5305\u542B\u5B9E\u9645\u6E32\u67D3\u5185\u5BB9",
@@ -143,7 +144,7 @@
     },
     {
       "file": "04-\u6570\u503C\u6821\u9A8C.png",
-      "sha256": "3f9148af86249fd873bf8a86856392bee0ed480a06f723a9a7edd323adc63277",
+      "sha256": "893e217ef825278ae65fc526eb6b2e0d3a5e937016db310794b920e04516eaa2",
       "width": 1104,
       "height": 749,
       "provenance": "live Windows WPF client visual, shown MainWindow"
@@ -213,14 +214,14 @@
     },
     {
       "file": "07-\u65B9\u6848\u6BD4\u8F83.png",
-      "sha256": "283c7c7d3654a4ea5bfafdad28a7e7e4f83bb33ba055aa3907b15a519ac61078",
+      "sha256": "2da383a9568999d2cfbbb7c3d2c13b7e8c1174656c756621e04016f6449aeba7",
       "width": 1104,
       "height": 749,
       "provenance": "live Windows WPF client visual, shown MainWindow"
     },
     {
       "file": "07-\u65B9\u6848\u6BD4\u8F83-editor.png",
-      "sha256": "1788d1d76541e3673ecbce3183c298f0b02cf6bb2fc100b22299d63fbb286c0f",
+      "sha256": "4a563ace42edd680bed70d7b32ca3f9106280f53a19f9c628131d615f2002813",
       "width": 470,
       "height": 632,
       "provenance": "live, visible WPF Inspector panel from the same shown MainWindow; original pixels"

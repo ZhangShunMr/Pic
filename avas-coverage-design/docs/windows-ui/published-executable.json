@@ -1,14 +1,14 @@
 {
-  "width": 1120,
-  "executable_sha256": "ea9e37a1b4b0d775e6c002bff0f228e19b50baaf993e13ef788391a47963c2cc",
-  "process_id": 1336,
-  "exit_code": 0,
-  "screenshot": "12-published-native-window.png",
   "height": 788,
-  "title": "车外行人警示声音传播与覆盖设计软件 V2.0",
-  "os": "Microsoft Windows NT 10.0.26100.0",
-  "at": "2026-11-04T15:52:33.9135254Z",
+  "at": "2026-11-04T15:54:31.4119668Z",
   "status": "passed",
+  "exit_code": 0,
+  "screenshot_sha256": "4f246caa804cce46ed3edf64c4fe7d7d249549ab51371e88f09300ffcaad53fb",
+  "width": 1120,
   "capture": "user32 PrintWindow of directly launched self-contained executable",
-  "screenshot_sha256": "4f246caa804cce46ed3edf64c4fe7d7d249549ab51371e88f09300ffcaad53fb"
+  "title": "车外行人警示声音传播与覆盖设计软件 V2.0",
+  "screenshot": "12-published-native-window.png",
+  "process_id": 8776,
+  "executable_sha256": "ab9aa3085a03b3896c24e985eb91fb64227090005f4831aed9db986913a20532",
+  "os": "Microsoft Windows NT 10.0.26100.0"
 }
