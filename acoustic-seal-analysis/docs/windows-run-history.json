@@ -31,7 +31,7 @@
       "id": 41861712287,
       "url": "https://github.com/ZhangShunMr/Pic/actions/runs/41861712287",
       "sourceCommit": "4d05a94c55c0a6fc9ac994bde6f0a18e1a421844",
-      "result": "success",
+      "result": "all_reported_steps_success_run_finalization_pending",
       "platform": "Microsoft Windows Server 2025 10.0.26100",
       "coreAndMvvm": "65 + 10 passed, 0 failed",
       "nativeWindowChecks": 51,
@@ -43,7 +43,11 @@
       "wordAvailable": false,
       "wordPageCount": null,
       "wordReason": "Word COM REGDB_E_CLASSNOTREG 0x80040154",
-      "permissionsDenied": false
+      "permissionsDenied": false,
+      "observedRunStatus": "in_progress",
+      "observedRunConclusion": null,
+      "statusObservedUtc": "2026-11-04T15:55:48Z",
+      "note": "All 21 reported job steps completed successfully, including upload and branch commit; job and run overall API fields still in_progress. Actual output evidence and archived tested exe are verified. Prior run 41860892390 concluded success."
     }
   ]
 }
