@@ -1,0 +1,222 @@
+{
+  "scope": "16 images actually included in manual; inspected source images and all LibreOffice preview pages via overview plus automated bounds checks",
+  "at": "2026-11-04T16:05:31.639590+00:00",
+  "run": "https://github.com/ZhangShunMr/Pic/actions/runs/41862276093",
+  "source_sha": "cb9f5c99b2f96f5917d4899ac0543db0b2cef3dc",
+  "note": "Native window/client/visible panel captures; no browser or generated mock screenshots. Scrolled panel images intentionally show the visible task region. Original bytes embedded in DOCX.",
+  "reviewed_manual_images": [
+    {
+      "figure": 1,
+      "file": "12-published-native-window.png",
+      "sha256": "4f246caa804cce46ed3edf64c4fe7d7d249549ab51371e88f09300ffcaad53fb",
+      "caption": "直接启动自包含程序的真实Windows窗口",
+      "status": "reviewed",
+      "checks": [
+        "text readable in source image",
+        "actual task controls loaded",
+        "caption and operation match",
+        "simulation or manual-input scope retained"
+      ]
+    },
+    {
+      "figure": 2,
+      "file": "01-空白项目-editor.png",
+      "sha256": "437eae7b5a11421e89b766e74803cbf0802344e76855230f6ca34c986e4d3a93",
+      "caption": "项目档案编辑器，真实WPF窗口局部",
+      "status": "reviewed",
+      "checks": [
+        "text readable in source image",
+        "actual task controls loaded",
+        "caption and operation match",
+        "simulation or manual-input scope retained"
+      ]
+    },
+    {
+      "figure": 3,
+      "file": "03-扬声器频带-editor.png",
+      "sha256": "72010e6258d91bf9f61429b13d447dabac508fe97b72f6c57e2be6c92b1dc850",
+      "caption": "扬声器位置与方向输入",
+      "status": "reviewed",
+      "checks": [
+        "text readable in source image",
+        "actual task controls loaded",
+        "caption and operation match",
+        "simulation or manual-input scope retained"
+      ]
+    },
+    {
+      "figure": 4,
+      "file": "03b-七带与来源-editor.png",
+      "sha256": "217b1e57f2a0d20e69018f519796c3253520234f3c2191cf580d7a7497c23734",
+      "caption": "七频带、修正和数据来源",
+      "status": "reviewed",
+      "checks": [
+        "text readable in source image",
+        "actual task controls loaded",
+        "caption and operation match",
+        "simulation or manual-input scope retained"
+      ]
+    },
+    {
+      "figure": 5,
+      "file": "05-背景网格-editor.png",
+      "sha256": "88d61f2d2ef8ded37113e5b1547bb9b0f84df0aab386dfecf5408b83ba9d1095",
+      "caption": "均匀背景频谱与来源",
+      "status": "reviewed",
+      "checks": [
+        "text readable in source image",
+        "actual task controls loaded",
+        "caption and operation match",
+        "simulation or manual-input scope retained"
+      ]
+    },
+    {
+      "figure": 6,
+      "file": "05b-工程目标-editor.png",
+      "sha256": "6612103fc70b6f44a7d178b29f4974b9232c40d9479eb8680949b2d3494e9a26",
+      "caption": "网格、指标口径与自定义工程目标",
+      "status": "reviewed",
+      "checks": [
+        "text readable in source image",
+        "actual task controls loaded",
+        "caption and operation match",
+        "simulation or manual-input scope retained"
+      ]
+    },
+    {
+      "figure": 7,
+      "file": "06-观察点频谱-editor.png",
+      "sha256": "72b1caa7eb4264f3589b511df22e0cd0623bacc8ba3103181de28dc4816d58ca",
+      "caption": "观察点和环形点集输入",
+      "status": "reviewed",
+      "checks": [
+        "text readable in source image",
+        "actual task controls loaded",
+        "caption and operation match",
+        "simulation or manual-input scope retained"
+      ]
+    },
+    {
+      "figure": 8,
+      "file": "02-模拟声场.png",
+      "sha256": "6ecc75f5e3148e791de8a89faedf317d8746c967d2340272b3233ce1fd647f81",
+      "caption": "模拟输入的原生声场与观察点结果",
+      "status": "reviewed",
+      "checks": [
+        "text readable in source image",
+        "actual task controls loaded",
+        "caption and operation match",
+        "simulation or manual-input scope retained"
+      ]
+    },
+    {
+      "figure": 9,
+      "file": "06b-点频谱贡献-editor.png",
+      "sha256": "7ed828fe9059d8bb1377642ed9bd4aac68f0d7085fab6e01c53cafedb420df53",
+      "caption": "当前观察点七带结果和声源贡献",
+      "status": "reviewed",
+      "checks": [
+        "text readable in source image",
+        "actual task controls loaded",
+        "caption and operation match",
+        "simulation or manual-input scope retained"
+      ]
+    },
+    {
+      "figure": 10,
+      "file": "07b-方案差值-editor.png",
+      "sha256": "661855c74e8ae62e5e70ade5555eae23191cd5cff1c3a25b89a6764312acc06e",
+      "caption": "同条件快照比较结果，目标减基线",
+      "status": "reviewed",
+      "checks": [
+        "text readable in source image",
+        "actual task controls loaded",
+        "caption and operation match",
+        "simulation or manual-input scope retained"
+      ]
+    },
+    {
+      "figure": 11,
+      "file": "08-扫描剖面-editor.png",
+      "sha256": "c39d3337120db9ec6a8884713a97b24e6c56891479d705b98002b80e14dac817",
+      "caption": "单声源参数扫描结果",
+      "status": "reviewed",
+      "checks": [
+        "text readable in source image",
+        "actual task controls loaded",
+        "caption and operation match",
+        "simulation or manual-input scope retained"
+      ]
+    },
+    {
+      "figure": 12,
+      "file": "08b-方向剖面-editor.png",
+      "sha256": "166c6d859ddc59cc0b67f3811931c3f53c016313457f91cc7725930f09154457",
+      "caption": "方向剖面的离散点值",
+      "status": "reviewed",
+      "checks": [
+        "text readable in source image",
+        "actual task controls loaded",
+        "caption and operation match",
+        "simulation or manual-input scope retained"
+      ]
+    },
+    {
+      "figure": 13,
+      "file": "09b-相对试听结果-editor.png",
+      "sha256": "0486c8dcb3a9751fa8f94a2a62bbb331dd275c2ba4b560ef2060d4e66f68b70d",
+      "caption": "观察点相对试听参数与制作结果",
+      "status": "reviewed",
+      "checks": [
+        "text readable in source image",
+        "actual task controls loaded",
+        "caption and operation match",
+        "simulation or manual-input scope retained"
+      ]
+    },
+    {
+      "figure": 14,
+      "file": "10-成果复核-editor.png",
+      "sha256": "42f67ba3af854a167f219251a570b984ed2b8e841f0c50dbb748e9f1c6ea14a0",
+      "caption": "成果导出及输入复核",
+      "status": "reviewed",
+      "checks": [
+        "text readable in source image",
+        "actual task controls loaded",
+        "caption and operation match",
+        "simulation or manual-input scope retained"
+      ]
+    },
+    {
+      "figure": 15,
+      "file": "04-数值校验-editor.png",
+      "sha256": "195659fd475aa3e341f5c60b1379304b42de1bbdb7a5a7e6ac49d86d52ff59c2",
+      "caption": "真实数值格式错误及应用阻断",
+      "status": "reviewed",
+      "checks": [
+        "text readable in source image",
+        "actual task controls loaded",
+        "caption and operation match",
+        "simulation or manual-input scope retained"
+      ]
+    },
+    {
+      "figure": 16,
+      "file": "11-最小窗口.png",
+      "sha256": "2d0d02eb381a8d89a4c4bef18210a29cdf4e1b6fae4a0450dab21fde3faf84fa",
+      "caption": "最小尺寸的实际WPF窗口",
+      "status": "reviewed",
+      "checks": [
+        "text readable in source image",
+        "actual task controls loaded",
+        "caption and operation match",
+        "simulation or manual-input scope retained"
+      ]
+    }
+  ],
+  "preview_word_pagination_verified": false,
+  "remaining": [
+    "Microsoft Word pagination and final visual review",
+    "actual file pickers, sound card, keyboard, accessibility and high DPI on target Windows 10/11 hardware"
+  ]
+}

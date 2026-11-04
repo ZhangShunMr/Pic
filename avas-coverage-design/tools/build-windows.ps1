@@ -11,6 +11,8 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Desktop verification failed; inspect docs/windows-ui/desktop-evidence.json' }
     dotnet publish src/Avas.Desktop -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o artifacts/AvasCoverage-win-x64
     if ($LASTEXITCODE -ne 0) { throw 'Publish failed' }
+    ./tools/smoke-published.ps1
+    ./tools/check-word.ps1
     Copy-Item README.md artifacts/AvasCoverage-win-x64/README.md -Force
     Compress-Archive -Path artifacts/AvasCoverage-win-x64/* -DestinationPath artifacts/AvasCoverage-win-x64.zip -Force
     Write-Host 'Windows package: artifacts/AvasCoverage-win-x64.zip'

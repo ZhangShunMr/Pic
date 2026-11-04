@@ -1,29 +1,127 @@
 {
-  "status": "draft-windows-screenshots-and-word-pagination-pending",
+  "status": "draft-word-pagination-pending",
   "manual_sections": 15,
   "manual_actual_word_pages": null,
   "source_actual_word_pages": null,
   "word_pagination_verified": false,
-  "screenshots_in_manual": 0,
-  "reason": "Linux cannot execute WPF; no actual Windows images provided. No browser or mock screenshots substituted.",
+  "screenshots_in_manual": 16,
+  "figures": [
+    {
+      "figure": 1,
+      "file": "12-published-native-window.png",
+      "sha256": "4f246caa804cce46ed3edf64c4fe7d7d249549ab51371e88f09300ffcaad53fb",
+      "caption": "直接启动自包含程序的真实Windows窗口"
+    },
+    {
+      "figure": 2,
+      "file": "01-空白项目-editor.png",
+      "sha256": "437eae7b5a11421e89b766e74803cbf0802344e76855230f6ca34c986e4d3a93",
+      "caption": "项目档案编辑器，真实WPF窗口局部"
+    },
+    {
+      "figure": 3,
+      "file": "03-扬声器频带-editor.png",
+      "sha256": "72010e6258d91bf9f61429b13d447dabac508fe97b72f6c57e2be6c92b1dc850",
+      "caption": "扬声器位置与方向输入"
+    },
+    {
+      "figure": 4,
+      "file": "03b-七带与来源-editor.png",
+      "sha256": "217b1e57f2a0d20e69018f519796c3253520234f3c2191cf580d7a7497c23734",
+      "caption": "七频带、修正和数据来源"
+    },
+    {
+      "figure": 5,
+      "file": "05-背景网格-editor.png",
+      "sha256": "88d61f2d2ef8ded37113e5b1547bb9b0f84df0aab386dfecf5408b83ba9d1095",
+      "caption": "均匀背景频谱与来源"
+    },
+    {
+      "figure": 6,
+      "file": "05b-工程目标-editor.png",
+      "sha256": "6612103fc70b6f44a7d178b29f4974b9232c40d9479eb8680949b2d3494e9a26",
+      "caption": "网格、指标口径与自定义工程目标"
+    },
+    {
+      "figure": 7,
+      "file": "06-观察点频谱-editor.png",
+      "sha256": "72b1caa7eb4264f3589b511df22e0cd0623bacc8ba3103181de28dc4816d58ca",
+      "caption": "观察点和环形点集输入"
+    },
+    {
+      "figure": 8,
+      "file": "02-模拟声场.png",
+      "sha256": "6ecc75f5e3148e791de8a89faedf317d8746c967d2340272b3233ce1fd647f81",
+      "caption": "模拟输入的原生声场与观察点结果"
+    },
+    {
+      "figure": 9,
+      "file": "06b-点频谱贡献-editor.png",
+      "sha256": "7ed828fe9059d8bb1377642ed9bd4aac68f0d7085fab6e01c53cafedb420df53",
+      "caption": "当前观察点七带结果和声源贡献"
+    },
+    {
+      "figure": 10,
+      "file": "07b-方案差值-editor.png",
+      "sha256": "661855c74e8ae62e5e70ade5555eae23191cd5cff1c3a25b89a6764312acc06e",
+      "caption": "同条件快照比较结果，目标减基线"
+    },
+    {
+      "figure": 11,
+      "file": "08-扫描剖面-editor.png",
+      "sha256": "c39d3337120db9ec6a8884713a97b24e6c56891479d705b98002b80e14dac817",
+      "caption": "单声源参数扫描结果"
+    },
+    {
+      "figure": 12,
+      "file": "08b-方向剖面-editor.png",
+      "sha256": "166c6d859ddc59cc0b67f3811931c3f53c016313457f91cc7725930f09154457",
+      "caption": "方向剖面的离散点值"
+    },
+    {
+      "figure": 13,
+      "file": "09b-相对试听结果-editor.png",
+      "sha256": "0486c8dcb3a9751fa8f94a2a62bbb331dd275c2ba4b560ef2060d4e66f68b70d",
+      "caption": "观察点相对试听参数与制作结果"
+    },
+    {
+      "figure": 14,
+      "file": "10-成果复核-editor.png",
+      "sha256": "42f67ba3af854a167f219251a570b984ed2b8e841f0c50dbb748e9f1c6ea14a0",
+      "caption": "成果导出及输入复核"
+    },
+    {
+      "figure": 15,
+      "file": "04-数值校验-editor.png",
+      "sha256": "195659fd475aa3e341f5c60b1379304b42de1bbdb7a5a7e6ac49d86d52ff59c2",
+      "caption": "真实数值格式错误及应用阻断"
+    },
+    {
+      "figure": 16,
+      "file": "11-最小窗口.png",
+      "sha256": "2d0d02eb381a8d89a4c4bef18210a29cdf4e1b6fae4a0450dab21fde3faf84fa",
+      "caption": "最小尺寸的实际WPF窗口"
+    }
+  ],
+  "reason": "Actual WPF screenshots are admitted only with passing Windows evidence and matching hashes; Microsoft Word pagination remains unverified.",
   "major_function_unicode_han": 947,
   "minimum_han_exclusive": 500,
-  "production_nonempty_lines": 4216,
+  "production_nonempty_lines": 4247,
   "files": [
     {
       "file": "全部生产源码排印稿.docx",
-      "sha256": "6ade595b6e1a45d75126cfea696445b849d5403017076fcf0424d1a5a56f731b",
-      "bytes": 96800
+      "sha256": "0d0b3584dd39163202b58fcddb7a798c92f9f6f79ab66e5161c18cd33c8cd0ce",
+      "bytes": 97063
     },
     {
       "file": "操作说明书-草稿.docx",
-      "sha256": "f36eb1b37a53178025c22eb8668d01bab5f76ed788ef72889bd538ee188e047f",
-      "bytes": 48727
+      "sha256": "70c4f4d01b44b3222a506cf660caf73fc75cf9aaf6fc714c0a53ee2119058d3d",
+      "bytes": 1008264
     },
     {
       "file": "软著信息采集表.docx",
-      "sha256": "53ce00903e0b403db7bd500c9570a27a121909cd276f34f0aa902f10a6d8e93d",
-      "bytes": 41133
+      "sha256": "b5a421da74602669db38ab2353008f6d781e99a7d1aeb096b64afee0a3b3bc32",
+      "bytes": 41201
     }
   ]
 }

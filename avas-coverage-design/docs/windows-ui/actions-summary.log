@@ -1,0 +1,8 @@
+﻿2026-11-04T15:53:06.1368415Z Current runner version: '2.338.2'
+2026-11-04T15:53:06.1403474Z Microsoft Windows Server 2025
+2026-11-04T15:53:45.1766101Z Build succeeded.
+2026-11-04T15:53:48.1536602Z 66/66 passed. Evidence: D:\a\Pic\Pic\avas-coverage-design\docs\windows-ui\core-verification.json
+2026-11-04T15:53:50.1637064Z 18/18 passed
+2026-11-04T15:54:31.6748749Z PASS published self-contained executable showed and closed its real native window
+2026-11-04T15:54:42.1745199Z Post job cleanup.
+2026-11-04T15:54:42.3534681Z Post job cleanup.

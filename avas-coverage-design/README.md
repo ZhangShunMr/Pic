@@ -18,7 +18,7 @@ dotnet run --project src/Avas.Desktop -c Release
 powershell -ExecutionPolicy Bypass -File tools/build-windows.ps1
 ```
 
-输出 `artifacts/AvasCoverage-win-x64/` 和相应 ZIP。生产程序无需管理员权限，项目库存于 `%LOCALAPPDATA%\AvasCoverage\Projects`；制作试听时临时 WAV 位于当前用户临时目录，关闭时清理。
+脚本还会直接启动发布后的EXE检查真实窗口，并记录Word可用性；Word未安装时不会虚构分页结果。输出 `artifacts/AvasCoverage-win-x64/` 和相应 ZIP。生产程序无需管理员权限，项目库存于 `%LOCALAPPDATA%\AvasCoverage\Projects`；制作试听时临时 WAV 位于当前用户临时目录，关闭时清理。
 
 ## 一次完整操作
 
@@ -51,8 +51,10 @@ dotnet run --project tests/Avas.WorkspaceVerification -c Release -- docs/workspa
 dotnet run --project tests/Avas.DesktopVerification -c Release -- docs/windows-ui
 ```
 
-当前在 Debian Linux、.NET SDK10.0.403 完成交叉编译；66项内核测试和18项命令层测试通过。Windows界面检查器已编译，尚未执行。无真实WPF截图、未验证原生文件选择器/声卡播放/缩放/键盘和辅助功能。未声称界面验收通过。详细状态见 `docs/验证记录.md`。
+已在 Debian Linux 和 GitHub Actions Windows Server 2025 构建，66项内核测试、18项命令层测试通过。Windows检查器已实际启动WPF窗口，验证八个工作区、错误数字保留、比较、扫描、剖面、试听制作及成果；自包含EXE也已直接启动并正常关闭。真实窗口、可见编辑区及Win32窗口截图和精确检查数见 `docs/windows-ui/desktop-evidence.json`、`published-executable.json` 和 `run-context.json`。原生文件选择器、实际声卡播放、目标机高DPI、键盘和辅助功能仍待人工验证。
 
-`docs/materials/` 提供操作说明书草稿、信息采集表、全部生产源码排印稿和源码清单。主要功能汉字计数有机器证据。当前缺Windows真实截图和Microsoft Word实际分页检查，手册不标终稿、不声称满足10页终稿门槛。无专用模板，先采用通用A4；申请人、权属、开发及发表日期均待本人核实。
+`docs/materials/` 提供操作说明书草稿、信息采集表、全部生产源码排印稿和源码清单。主要功能汉字计数有机器证据。已按真实截图和对应操作补充手册。Microsoft Word未安装，实际Word分页仍待检查；LibreOffice PDF仅用于版面预览，手册不标终稿，不声称满足Word实际10页终稿门槛。无专用模板，先采用通用A4；申请人、权属、开发及发表日期均待本人核实。
 
-两份原始规范在 `docs/specifications/`，完整保留备份原文。仅本项目路径在新分支新增；main和其他软件没有修改。旧功能对照、工程结构、统计口径与交接见 `docs/原生重做方案.md`。
+两份原始规范在 `docs/specifications/`，完整保留备份原文。本分支仅修改本项目及专用 `.github/workflows/avas-native-windows.yml`；main和其他软件没有修改。旧功能对照、工程结构、统计口径与交接见 `docs/原生重做方案.md`。
+
+材料维护使用 `python tools/build_materials.py`，只在Windows证据通过且截图哈希一致时插入真实图片；用LibreOffice将两份DOCX渲染到 `artifacts/material-layout/` 后运行 `python tools/verify_materials.py`，核对图片原始字节、正文引用、边界、空白页和源码与Windows验证提交的一致性。当前预览为说明书30页、采集表2页，属于LibreOffice结果，Word实际页数仍未知。最终Windows包可从[验证任务制品](https://github.com/ZhangShunMr/Pic/actions/runs/41862276093/artifacts/13340497064)下载；到期后可用本项目脚本重新构建。

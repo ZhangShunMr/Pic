@@ -1,0 +1,220 @@
+{
+  "renderer": "LibreOfficeDev 26.8.0.0.alpha0, Linux, font substitution possible",
+  "scope": "Preview PDF body/image bounds, no blank pages, DOCX original image bytes, captions and source provenance; not Microsoft Word pagination",
+  "source_matches_windows_verified_commit": true,
+  "verified_source_commit": "cb9f5c99b2f96f5917d4899ac0543db0b2cef3dc",
+  "windows_run": "https://github.com/ZhangShunMr/Pic/actions/runs/41862276093",
+  "native_window_checks": 72,
+  "original_images_in_manual": 16,
+  "major_function_unicode_han": 947,
+  "word_actual_pages": null,
+  "word_pagination_verified": false,
+  "previews": [
+    {
+      "file": "docs/materials/操作说明书-LibreOffice预览.pdf",
+      "sha256": "3b2e7ea925885b4db1fbf727fe77c7a1f7ca6730f832094ce900e5ee44ecf20d",
+      "rendered_pages": 30,
+      "pages": [
+        {
+          "page": 1,
+          "body_characters": 883,
+          "visible_images": 0,
+          "blank": false
+        },
+        {
+          "page": 2,
+          "body_characters": 659,
+          "visible_images": 0,
+          "blank": false
+        },
+        {
+          "page": 3,
+          "body_characters": 90,
+          "visible_images": 1,
+          "blank": false
+        },
+        {
+          "page": 4,
+          "body_characters": 455,
+          "visible_images": 0,
+          "blank": false
+        },
+        {
+          "page": 5,
+          "body_characters": 82,
+          "visible_images": 1,
+          "blank": false
+        },
+        {
+          "page": 6,
+          "body_characters": 477,
+          "visible_images": 0,
+          "blank": false
+        },
+        {
+          "page": 7,
+          "body_characters": 66,
+          "visible_images": 1,
+          "blank": false
+        },
+        {
+          "page": 8,
+          "body_characters": 612,
+          "visible_images": 0,
+          "blank": false
+        },
+        {
+          "page": 9,
+          "body_characters": 68,
+          "visible_images": 1,
+          "blank": false
+        },
+        {
+          "page": 10,
+          "body_characters": 471,
+          "visible_images": 0,
+          "blank": false
+        },
+        {
+          "page": 11,
+          "body_characters": 64,
+          "visible_images": 1,
+          "blank": false
+        },
+        {
+          "page": 12,
+          "body_characters": 467,
+          "visible_images": 0,
+          "blank": false
+        },
+        {
+          "page": 13,
+          "body_characters": 76,
+          "visible_images": 1,
+          "blank": false
+        },
+        {
+          "page": 14,
+          "body_characters": 490,
+          "visible_images": 0,
+          "blank": false
+        },
+        {
+          "page": 15,
+          "body_characters": 66,
+          "visible_images": 1,
+          "blank": false
+        },
+        {
+          "page": 16,
+          "body_characters": 546,
+          "visible_images": 1,
+          "blank": false
+        },
+        {
+          "page": 17,
+          "body_characters": 74,
+          "visible_images": 1,
+          "blank": false
+        },
+        {
+          "page": 18,
+          "body_characters": 717,
+          "visible_images": 0,
+          "blank": false
+        },
+        {
+          "page": 19,
+          "body_characters": 476,
+          "visible_images": 0,
+          "blank": false
+        },
+        {
+          "page": 20,
+          "body_characters": 78,
+          "visible_images": 1,
+          "blank": false
+        },
+        {
+          "page": 21,
+          "body_characters": 527,
+          "visible_images": 0,
+          "blank": false
+        },
+        {
+          "page": 22,
+          "body_characters": 66,
+          "visible_images": 1,
+          "blank": false
+        },
+        {
+          "page": 23,
+          "body_characters": 66,
+          "visible_images": 1,
+          "blank": false
+        },
+        {
+          "page": 24,
+          "body_characters": 780,
+          "visible_images": 0,
+          "blank": false
+        },
+        {
+          "page": 25,
+          "body_characters": 76,
+          "visible_images": 1,
+          "blank": false
+        },
+        {
+          "page": 26,
+          "body_characters": 718,
+          "visible_images": 0,
+          "blank": false
+        },
+        {
+          "page": 27,
+          "body_characters": 66,
+          "visible_images": 1,
+          "blank": false
+        },
+        {
+          "page": 28,
+          "body_characters": 658,
+          "visible_images": 0,
+          "blank": false
+        },
+        {
+          "page": 29,
+          "body_characters": 74,
+          "visible_images": 1,
+          "blank": false
+        },
+        {
+          "page": 30,
+          "body_characters": 74,
+          "visible_images": 1,
+          "blank": false
+        }
+      ]
+    },
+    {
+      "file": "docs/materials/软著信息采集表-LibreOffice预览.pdf",
+      "sha256": "0edf1b998a0d07503e8c1fd88978b1a96fb214c79c1a44a9096e3675ceeb075f",
+      "rendered_pages": 2,
+      "pages": [
+        {
+          "page": 1,
+          "body_characters": 748,
+          "visible_images": 0,
+          "blank": false
+        },
+        {
+          "page": 2,
+          "body_characters": 1087,
+          "visible_images": 0,
+          "blank": false
+        }
+      ]
+    }
+  ]
+}

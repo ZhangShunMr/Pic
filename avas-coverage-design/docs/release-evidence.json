@@ -1,20 +1,42 @@
 {
-  "platform": "win-x64",
-  "self_contained": true,
-  "single_file": true,
-  "published_on": "Debian Linux 13 / .NET SDK10.0.403",
-  "windows_execution_verified": false,
-  "desktop_screenshots": 0,
-  "files": [
-    {
-      "path": "artifacts/AvasCoverage-win-x64/AvasCoverage.exe",
-      "bytes": 140048945,
-      "sha256": "e74eface670bdc9488648d092a51bf524afe4efde202c73f412c3a22ab300795"
-    },
-    {
-      "path": "artifacts/AvasCoverage-win-x64.zip",
-      "bytes": 58918863,
-      "sha256": "e85cf99f5a346f74dcf3617d8f666cc5f8733a703ec411c8775561578cab6e3f"
-    }
-  ]
+  "verified_source_sha": "cb9f5c99b2f96f5917d4899ac0543db0b2cef3dc",
+  "windows_verified_artifact": {
+    "run_url": "https://github.com/ZhangShunMr/Pic/actions/runs/41862276093",
+    "artifact_url": "https://github.com/ZhangShunMr/Pic/actions/runs/41862276093/artifacts/13340497064",
+    "artifact_id": 13340497064,
+    "artifact_bytes": 64449374,
+    "artifact_sha256": "f45b8bcb632b80442457cb3d55928589adb3c63df1ab3bd32b884ffdfd3f593c",
+    "expires_at": "2027-02-02T15:53:00Z",
+    "self_contained": true,
+    "platform": "win-x64",
+    "direct_executable_run_passed": true,
+    "executable_sha256": "ab9aa3085a03b3896c24e985eb91fb64227090005f4831aed9db986913a20532",
+    "exit_code": 0
+  },
+  "local_package": {
+    "published_on": "Debian Linux / .NET SDK10.0.403",
+    "source_matches_verified_windows_source": true,
+    "this_binary_run_on_windows": false,
+    "self_contained": true,
+    "files": [
+      {
+        "path": "artifacts/AvasCoverage-win-x64/AvasCoverage.exe",
+        "bytes": 140049969,
+        "sha256": "2fed9fa42c52119cd6b85befd58092af96862f5a3a67ed0e47ef38dab060a99c"
+      },
+      {
+        "path": "artifacts/AvasCoverage-win-x64.zip",
+        "bytes": 58919997,
+        "sha256": "061274f9f0836038c416c47052fb89e6f01dfcbf443ccb049f92ac6f4c98ffbb"
+      }
+    ]
+  },
+  "local_copy_of_windows_artifact": {
+    "status": "denied",
+    "action": "copy connector-returned artifact file URL into local executor",
+    "reason": "execution environment proxy denied oaiusercontent download host with 403 Forbidden",
+    "retried_after_denial": false,
+    "alternative": "download retained artifact in an authorized GitHub session"
+  },
+  "word_pagination_verified": false
 }
