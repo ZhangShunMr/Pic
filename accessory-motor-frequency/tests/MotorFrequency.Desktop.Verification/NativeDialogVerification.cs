@@ -1,5 +1,6 @@
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Media;
@@ -119,20 +120,20 @@ internal static class NativeDialogVerification
                 }
                 File.WriteAllText(screenshot + ".controls.json", System.Text.Json.JsonSerializer.Serialize(controls,
                     new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
-                AutomationElement? fileName = null;
-                foreach (AutomationElement edit in edits)
-                {
-                    if ((edit.Current.AutomationId is "1001" or "FileNameControlHost"
-                        || edit.Current.Name.Contains("File name", StringComparison.OrdinalIgnoreCase)
-                        || edit.Current.Name.Contains("文件名"))
-                        && edit.TryGetCurrentPattern(ValuePattern.Pattern, out _))
-                    {
-                        fileName = edit;
-                        break;
-                    }
-                }
+                AutomationElement? fileName = edits.Cast<AutomationElement>().FirstOrDefault(edit =>
+                    edit.Current.AutomationId == "1001" && edit.Current.ControlType == ControlType.Edit
+                    && edit.TryGetCurrentPattern(ValuePattern.Pattern, out _));
+                fileName ??= edits.Cast<AutomationElement>().FirstOrDefault(edit =>
+                    (edit.Current.Name.Contains("File name", StringComparison.OrdinalIgnoreCase)
+                    || edit.Current.Name.Contains("文件名"))
+                    && edit.TryGetCurrentPattern(ValuePattern.Pattern, out _));
                 Require(fileName is not null && fileName.TryGetCurrentPattern(ValuePattern.Pattern, out _), "Native filename edit not found");
-                ((ValuePattern)fileName!.GetCurrentPattern(ValuePattern.Pattern)).SetValue(path);
+                fileName!.SetFocus();
+                var filenameValue = (ValuePattern)fileName.GetCurrentPattern(ValuePattern.Pattern);
+                filenameValue.SetValue(path);
+                Require(filenameValue.Current.Value == path, "Native filename edit did not retain entered path");
+                Thread.Sleep(150);
+                CaptureDialog(handle, screenshot);
                 Console.WriteLine("Native dialog: filename set through ValuePattern");
                 var accept = dialog.FindFirst(TreeScope.Descendants, new AndCondition(
                     new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Button),
@@ -155,8 +156,23 @@ internal static class NativeDialogVerification
         finally { finished.Set(); watchdog.Join(1000); }
         if (!worker.Join(25000)) throw new TimeoutException("Native dialog automation did not finish");
         if (failure is not null) throw new InvalidOperationException("Native dialog automation failed", failure);
-        Require(result is not null && Path.GetFullPath(result) == Path.GetFullPath(path), "Native selected path differs");
+        File.WriteAllText(screenshot + ".selection.json", System.Text.Json.JsonSerializer.Serialize(new
+        {
+            expected = path, actual = result,
+            expectedCanonical = CanonicalPath(path), actualCanonical = result is null ? null : CanonicalPath(result)
+        }, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+        Require(result is not null && string.Equals(CanonicalPath(result), CanonicalPath(path),
+            StringComparison.OrdinalIgnoreCase), "Native selected path differs; see selection.json");
         return result;
+    }
+
+    private static string CanonicalPath(string path)
+    {
+        var full = Path.GetFullPath(path);
+        var directory = Path.GetDirectoryName(full)!;
+        var buffer = new StringBuilder(32768);
+        var length = GetLongPathName(directory, buffer, (uint)buffer.Capacity);
+        return Path.Combine(length > 0 && length < buffer.Capacity ? buffer.ToString() : directory, Path.GetFileName(full));
     }
 
     private static void CaptureDialog(nint window, string path)
@@ -207,6 +223,7 @@ internal static class NativeDialogVerification
         public int XPixelsPerMeter, YPixelsPerMeter;
         public uint ColorsUsed, ColorsImportant;
     }
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode)] private static extern uint GetLongPathName(string shortPath, StringBuilder longPath, uint capacity);
     [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern nint FindWindow(string? className, string title);
     [DllImport("user32.dll")] private static extern uint GetWindowThreadProcessId(nint window, out int processId);
     [DllImport("user32.dll")] private static extern bool GetWindowRect(nint window, out WindowRect rectangle);
