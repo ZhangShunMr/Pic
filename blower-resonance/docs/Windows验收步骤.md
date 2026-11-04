@@ -16,3 +16,5 @@
 12. 用tools/capture-windows.ps1捕获真实WPF窗口，逐图核对无遮挡、清晰度、文字与手册引用。将截图加入操作说明书，再用Microsoft Word逐页检查并导出PDF，确认至少10个有效页面。没有Word时不得写成已确认页数。
 
 每项记录“输入／预期／实际／证据路径／通过或失败”，由实际执行者填写；自动执行结果见windows-ui-evidence.json；本文件不替未执行的目标硬件检查预填通过结果。
+
+已安装Microsoft Word的Windows电脑可执行 `./tools/verify-word.ps1`。脚本实际用Word COM打开手册、重新分页、取得Word页数并导出PDF，少于10页会失败；未安装Word时记录未执行并停止。脚本完成后仍必须逐页查看PDF中的文字、表格、截图、图注和断页，不能把脚本通过当成逐页人工审查。

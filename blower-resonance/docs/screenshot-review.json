@@ -1,98 +1,98 @@
 {
-  "sourceCommit": "2c88f6c9cb270cdd2482f86b6ddf77b117f76d69",
-  "workflowRun": "https://github.com/ZhangShunMr/Pic/actions/runs/41861131666",
+  "sourceCommit": "9aea7e2a9d73c6a24afb45647d45f64bc920bd79",
+  "workflowRun": "https://github.com/ZhangShunMr/Pic/actions/runs/41862041559",
   "count": 18,
   "method": "Actual production WPF MainWindow shown on Windows; native Window client content captured with RenderTargetBitmap after layout/render. No browser or mock-up. Test dialog adapter is used for confirmations and file paths.",
   "images": [
     {
       "path": "01-empty.png",
-      "sha256": "dbcd7191743610a144251b1d9ab89798af7d08e7991f42e30741588b3d1e24aa",
-      "review": "Actual native content checked; tables may scroll horizontally, long editors vertically; simulation markers and caption match manual."
+      "sha256": "1ca6af1c0333dfb49402e70a4ab883fdf7d95351ef5320e8001d8dd0903ae5c3",
+      "review": "Native production content inspected; simulation markers, actual graphs, captions, table and editor scrolling match the manual."
     },
     {
       "path": "02-project.png",
-      "sha256": "d6d117a68ed43ba68c31392d355853c2ff6495eb475a15d11ede4ff17ec7f9ab",
-      "review": "Actual native content checked; tables may scroll horizontally, long editors vertically; simulation markers and caption match manual."
+      "sha256": "0c96fdf90fc76883bd6a1a00fb49a78377e472a9b56f4495324e579f7122aa17",
+      "review": "Native production content inspected; simulation markers, actual graphs, captions, table and editor scrolling match the manual."
     },
     {
       "path": "03-settings.png",
       "sha256": "205b1e83e3a7d258e3bb8087035cd92c567086767e5aef3c0218c3d66e15f461",
-      "review": "Actual native content checked; tables may scroll horizontally, long editors vertically; simulation markers and caption match manual."
+      "review": "Native production content inspected; simulation markers, actual graphs, captions, table and editor scrolling match the manual."
     },
     {
       "path": "04-orders.png",
       "sha256": "8c2c83cb36b9d31bb8b6c3947b959cf1cdcd3e48f8ae517d329f4f69c9edf3bc",
-      "review": "Actual native content checked; tables may scroll horizontally, long editors vertically; simulation markers and caption match manual."
+      "review": "Native production content inspected; simulation markers, actual graphs, captions, table and editor scrolling match the manual."
     },
     {
       "path": "05-modes.png",
       "sha256": "996ce0fcce3e0edaafa81a7bb30828f457e0bbf38fddadbd7788b6db69d12e46",
-      "review": "Actual native content checked; tables may scroll horizontally, long editors vertically; simulation markers and caption match manual."
+      "review": "Native production content inspected; simulation markers, actual graphs, captions, table and editor scrolling match the manual."
     },
     {
       "path": "06-plans.png",
       "sha256": "9037bedc4d782fe944943d4bf53d1f331648015878e7b75a266ec34685412221",
-      "review": "Actual native content checked; tables may scroll horizontally, long editors vertically; simulation markers and caption match manual."
+      "review": "Native production content inspected; simulation markers, actual graphs, captions, table and editor scrolling match the manual."
     },
     {
       "path": "07-frequency-plot.png",
-      "sha256": "a35081a2ebde6cb459d080e9a9b25c86c66e71875ac963450fedbb37c684af3a",
-      "review": "Actual native content checked; tables may scroll horizontally, long editors vertically; simulation markers and caption match manual."
+      "sha256": "f5e891763aef4f431fb0ea51aac8cd13a68050d234a3ada178044fbde43cf279",
+      "review": "Native production content inspected; simulation markers, actual graphs, captions, table and editor scrolling match the manual."
     },
     {
       "path": "08-crossings.png",
-      "sha256": "596dd663704d973525ae2f6e772a03fecaf9917dacdee83926b9e79b16b4dd2b",
-      "review": "Actual native content checked; tables may scroll horizontally, long editors vertically; simulation markers and caption match manual."
+      "sha256": "cbecc579b46b5f8d95e87f27ddbb38f8c010b63fc3dd239fcfd32eda549ecff1",
+      "review": "Native production content inspected; simulation markers, actual graphs, captions, table and editor scrolling match the manual."
     },
     {
       "path": "09-contacts.png",
-      "sha256": "f42215c07baede1d52a112704844952974bdc35fcda1384e0a0dc4575390923f",
-      "review": "Actual native content checked; tables may scroll horizontally, long editors vertically; simulation markers and caption match manual."
+      "sha256": "ab6c2edf9205d27ada3f30009171cb6adc73b0261ec9ea21896cbd076563ed1a",
+      "review": "Native production content inspected; simulation markers, actual graphs, captions, table and editor scrolling match the manual."
     },
     {
       "path": "10-scan.png",
-      "sha256": "cf0291f90bf3c23a192728943749662642ed864162385932d2abd09fb8264f3b",
-      "review": "Actual native content checked; tables may scroll horizontally, long editors vertically; simulation markers and caption match manual."
+      "sha256": "06f3dc3b6bc58534946f392bcd5eafea86cb72ea7ce55152074e4dbd4c891132",
+      "review": "Native production content inspected; simulation markers, actual graphs, captions, table and editor scrolling match the manual."
     },
     {
       "path": "11-comparison.png",
-      "sha256": "7d0a49d525c154cbfd46e82486cc9864ef4702ba330dd178d67920dd91072183",
-      "review": "Actual native content checked; tables may scroll horizontally, long editors vertically; simulation markers and caption match manual."
+      "sha256": "00f42a3a6f778167229b788dc91546316462941612b5c132e7ebeebaf685f239",
+      "review": "Native production content inspected; simulation markers, actual graphs, captions, table and editor scrolling match the manual."
     },
     {
       "path": "12-rule-study.png",
-      "sha256": "2df4b767943d380706a1e9d592fb57fc4bf3d1bfa075c174cb59353a5bc30f68",
-      "review": "Actual native content checked; tables may scroll horizontally, long editors vertically; simulation markers and caption match manual."
+      "sha256": "7ef2c9557df88e448505ecfd0f5c4923c4104f3901b77d7361b10970774d735e",
+      "review": "Native production content inspected; simulation markers, actual graphs, captions, table and editor scrolling match the manual."
     },
     {
       "path": "13-checks.png",
-      "sha256": "154757a7de141b96d32743534d46199811901bbca0362a23a65351717f5899f2",
-      "review": "Actual native content checked; tables may scroll horizontally, long editors vertically; simulation markers and caption match manual."
+      "sha256": "dabb2ba9accb1b69ad45e45acca1f2d4c2a9e45a4c640178464bc0ae0be37450",
+      "review": "Native production content inspected; simulation markers, actual graphs, captions, table and editor scrolling match the manual."
     },
     {
       "path": "14-review.png",
-      "sha256": "36e5cdcd83669f91cb08d7b8ae00c13d4d61813d4b58ab4dacdc0c10cda84dab",
-      "review": "Actual native content checked; tables may scroll horizontally, long editors vertically; simulation markers and caption match manual."
+      "sha256": "ad43799d319dc4b2a629ce3d7c49ea7b113bacc4a07aac5ce6abafbebac2dd94",
+      "review": "Native production content inspected; simulation markers, actual graphs, captions, table and editor scrolling match the manual."
     },
     {
       "path": "15-csv-error.png",
-      "sha256": "0b1bfe2efe9910f8b772911ce347f2dcdc74eed4dc5c4a3e6be2ff60e5a6a513",
-      "review": "Actual native content checked; tables may scroll horizontally, long editors vertically; simulation markers and caption match manual."
+      "sha256": "3a5f40e60ba7000e2e037b9b83f6231d59f76927569517cc72b5ddfe2d10768a",
+      "review": "Native production content inspected; simulation markers, actual graphs, captions, table and editor scrolling match the manual."
     },
     {
       "path": "16-invalid-input.png",
       "sha256": "71896267f1c550f94c81379c7ce34cf1e7f2a638a618206de7fa6b3b29ff7c6e",
-      "review": "Actual native content checked; tables may scroll horizontally, long editors vertically; simulation markers and caption match manual."
+      "review": "Native production content inspected; simulation markers, actual graphs, captions, table and editor scrolling match the manual."
     },
     {
       "path": "17-minimum-window.png",
-      "sha256": "dd762d38e926eddeeafb24d1acb4022635d0d94e18bbc24dc098ce6083f6745e",
-      "review": "Actual native content checked; tables may scroll horizontally, long editors vertically; simulation markers and caption match manual."
+      "sha256": "2b2bb63c56d8821736aa6f413d648553f8df8b7fee212b5acf47b6b86a616ed7",
+      "review": "Native production content inspected; simulation markers, actual graphs, captions, table and editor scrolling match the manual."
     },
     {
       "path": "18-help.png",
-      "sha256": "3caa06ca00cb69b434c95dd37fda4a5c428eff9963fe8f34573e441e5e0769b9",
-      "review": "Actual native content checked; tables may scroll horizontally, long editors vertically; simulation markers and caption match manual."
+      "sha256": "f7b3e21a8b0a0f8724da8b526eab1fe46ed3ad5b475db21895960cda015433e3",
+      "review": "Native production content inspected; simulation markers, actual graphs, captions, table and editor scrolling match the manual."
     }
   ]
 }
