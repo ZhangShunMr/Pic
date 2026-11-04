@@ -1,11 +1,16 @@
 {
-  "executedUtc": "2026-11-04T15:16:53.0594301+00:00",
-  "sourceCommit": "2dcf2120ef295a04c1e865022b00b79648295a46",
+  "executedUtc": "2026-11-04T15:23:32.9504493+00:00",
+  "sourceCommit": "41057cded7c9acac2197b320cfdea3ff28f9377f",
   "platform": "Microsoft Windows NT 10.0.26100.0",
   "framework": ".NET 8.0.33",
   "rendering": "Actual WPF MainWindow shown on Windows. PNG files captured from the actual rendered native Window client content using RenderTargetBitmap; not browser or mock-up images.",
   "failed": 0,
   "checks": [
+    {
+      "name": "01-empty has opaque native window background",
+      "status": "passed",
+      "detail": ""
+    },
     {
       "name": "01-empty contains rendered pixels",
       "status": "passed",
@@ -27,7 +32,17 @@
       "detail": ""
     },
     {
+      "name": "02-project has opaque native window background",
+      "status": "passed",
+      "detail": ""
+    },
+    {
       "name": "02-project contains rendered pixels",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "03-points has opaque native window background",
       "status": "passed",
       "detail": ""
     },
@@ -42,7 +57,17 @@
       "detail": ""
     },
     {
+      "name": "04a-field-settings has opaque native window background",
+      "status": "passed",
+      "detail": ""
+    },
+    {
       "name": "04a-field-settings contains rendered pixels",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "04-response-field has opaque native window background",
       "status": "passed",
       "detail": ""
     },
@@ -52,7 +77,17 @@
       "detail": ""
     },
     {
+      "name": "05-mode-shape has opaque native window background",
+      "status": "passed",
+      "detail": ""
+    },
+    {
       "name": "05-mode-shape contains rendered pixels",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "06-seat-spectrum has opaque native window background",
       "status": "passed",
       "detail": ""
     },
@@ -62,7 +97,17 @@
       "detail": ""
     },
     {
+      "name": "07-modes has opaque native window background",
+      "status": "passed",
+      "detail": ""
+    },
+    {
       "name": "07-modes contains rendered pixels",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "08-coupling has opaque native window background",
       "status": "passed",
       "detail": ""
     },
@@ -77,12 +122,22 @@
       "detail": ""
     },
     {
+      "name": "09-comparison has opaque native window background",
+      "status": "passed",
+      "detail": ""
+    },
+    {
       "name": "09-comparison contains rendered pixels",
       "status": "passed",
       "detail": ""
     },
     {
       "name": "native scan completed",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "10-scan has opaque native window background",
       "status": "passed",
       "detail": ""
     },
@@ -97,7 +152,17 @@
       "detail": ""
     },
     {
+      "name": "11-diagnostics has opaque native window background",
+      "status": "passed",
+      "detail": ""
+    },
+    {
       "name": "11-diagnostics contains rendered pixels",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "12-reviews has opaque native window background",
       "status": "passed",
       "detail": ""
     },
@@ -117,12 +182,22 @@
       "detail": ""
     },
     {
+      "name": "13-minimum-window has opaque native window background",
+      "status": "passed",
+      "detail": ""
+    },
+    {
       "name": "13-minimum-window contains rendered pixels",
       "status": "passed",
       "detail": ""
     },
     {
       "name": "minimum native window rendered",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "14-invalid-input has opaque native window background",
       "status": "passed",
       "detail": ""
     },
@@ -142,7 +217,17 @@
       "detail": ""
     },
     {
+      "name": "15-help has opaque native window background",
+      "status": "passed",
+      "detail": ""
+    },
+    {
       "name": "15-help contains rendered pixels",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "16-invalid-csv-dialog has opaque native window background",
       "status": "passed",
       "detail": ""
     },
@@ -153,6 +238,11 @@
     },
     {
       "name": "native import dialog is rendered",
+      "status": "passed",
+      "detail": ""
+    },
+    {
+      "name": "17-example-dialog has opaque native window background",
       "status": "passed",
       "detail": ""
     },
