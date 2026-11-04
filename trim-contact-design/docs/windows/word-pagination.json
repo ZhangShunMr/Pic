@@ -1,0 +1,9 @@
+{
+  "executedUtc": "2026-11-04T15:43:22.2471256+00:00",
+  "sourceCommit": "b4f44812dece2637e808e9094b1082cc7efbd4bf",
+  "wordAvailable": false,
+  "actualWordPageCount": null,
+  "actualWordPdfPageCount": null,
+  "verified": false,
+  "reason": "Microsoft Word COM application is not installed on this Windows runner."
+}

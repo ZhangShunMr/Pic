@@ -1,0 +1,133 @@
+{
+  "utc": "2026-11-04T15:43:18.8626436+00:00",
+  "environment": "Microsoft Windows 10.0.26100",
+  "scope": "production ViewModel and Core; no WPF window, dialog, binding or rendering runtime verification",
+  "count": 31,
+  "failures": 0,
+  "checks": [
+    {
+      "name": "ordinary startup blank and demo explicit",
+      "passed": true
+    },
+    {
+      "name": "draft validation rolls back applied input",
+      "passed": true
+    },
+    {
+      "name": "nonfinite draft remains inspectable and rejected",
+      "passed": true
+    },
+    {
+      "name": "binding conversion errors block saving and calculation",
+      "passed": true
+    },
+    {
+      "name": "draft apply undo redo",
+      "passed": true
+    },
+    {
+      "name": "new rectangle blank workflow supports collections",
+      "passed": true
+    },
+    {
+      "name": "selected point clears on new blank project",
+      "passed": true
+    },
+    {
+      "name": "save reopen preserves applied model and source",
+      "passed": true
+    },
+    {
+      "name": "native file overwrite backup and external change protection",
+      "passed": true
+    },
+    {
+      "name": "missing native file and corrupt native JSON rejected",
+      "passed": true
+    },
+    {
+      "name": "cancel save dialog prevents close",
+      "passed": true
+    },
+    {
+      "name": "cancel unsaved prompt preserves project",
+      "passed": true
+    },
+    {
+      "name": "invalid draft cannot be silently saved before closing",
+      "passed": true
+    },
+    {
+      "name": "archive read only and copied project editable",
+      "passed": true
+    },
+    {
+      "name": "copy and delete scheme maintain independent identity",
+      "passed": true
+    },
+    {
+      "name": "CSV preview applies transaction and undo restores",
+      "passed": true
+    },
+    {
+      "name": "CSV preview text edit cannot apply stale content",
+      "passed": true
+    },
+    {
+      "name": "CSV target change blocked after preview",
+      "passed": true
+    },
+    {
+      "name": "batch request changes blocked after preview",
+      "passed": true
+    },
+    {
+      "name": "batch updates and undo",
+      "passed": true
+    },
+    {
+      "name": "calculate valid results and dirty edit hides old output",
+      "passed": true
+    },
+    {
+      "name": "valid result exports include actual source hash and units",
+      "passed": true
+    },
+    {
+      "name": "generated tasks preserve result freshness",
+      "passed": true
+    },
+    {
+      "name": "scan preserves base design and invalidates with input edits",
+      "passed": true
+    },
+    {
+      "name": "invalid scan reports error without partial output",
+      "passed": true
+    },
+    {
+      "name": "inflight close and cancellation",
+      "passed": true
+    },
+    {
+      "name": "reference compare detects shared condition mismatch",
+      "passed": true
+    },
+    {
+      "name": "native library store open and backup recovery copies identity",
+      "passed": true
+    },
+    {
+      "name": "native library corrupt item remains visible for recovery",
+      "passed": true
+    },
+    {
+      "name": "batch target switch requires a fresh preview",
+      "passed": true
+    },
+    {
+      "name": "scan ignores unrelated verification task references in its working subset",
+      "passed": true
+    }
+  ]
+}

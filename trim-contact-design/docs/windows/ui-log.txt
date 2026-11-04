@@ -1,0 +1,5 @@
+Unhandled exception. System.ArgumentNullException: Value cannot be null. (Parameter 'value')
+   at System.ArgumentNullException.Throw(String paramName)
+   at System.ArgumentNullException.ThrowIfNull(Object argument, String paramName)
+   at System.Windows.Application.set_StartupUri(Uri value)
+   at TrimContact.WindowsChecks.Program.Main(String[] args) in D:\a\Pic\Pic\trim-contact-design\tests\TrimContact.WindowsChecks\Program.cs:line 34
