@@ -1,3 +1,0 @@
-System.InvalidOperationException: Native filename edit did not retain entered path
-   at MotorFrequency.Desktop.Verification.NativeDialogVerification.Require(Boolean condition, String message) in D:\a\Pic\Pic\accessory-motor-frequency\tests\MotorFrequency.Desktop.Verification\NativeDialogVerification.cs:line 54
-   at MotorFrequency.Desktop.Verification.NativeDialogVerification.<>c__DisplayClass3_0.<Dialog>b__1() in D:\a\Pic\Pic\accessory-motor-frequency\tests\MotorFrequency.Desktop.Verification\NativeDialogVerification.cs:line 147

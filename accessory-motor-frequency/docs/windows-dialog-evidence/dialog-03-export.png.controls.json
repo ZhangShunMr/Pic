@@ -1,0 +1,50 @@
+[
+  {
+    "Name": "Name",
+    "AutomationId": "System.ItemNameDisplay",
+    "type": "ControlType.Edit",
+    "valuePattern": true
+  },
+  {
+    "Name": "Date modified",
+    "AutomationId": "System.DateModified",
+    "type": "ControlType.Edit",
+    "valuePattern": true
+  },
+  {
+    "Name": "Type",
+    "AutomationId": "System.ItemTypeText",
+    "type": "ControlType.Edit",
+    "valuePattern": true
+  },
+  {
+    "Name": "Size",
+    "AutomationId": "System.Size",
+    "type": "ControlType.Edit",
+    "valuePattern": true
+  },
+  {
+    "Name": "File name:",
+    "AutomationId": "FileNameControlHost",
+    "type": "ControlType.ComboBox",
+    "valuePattern": true
+  },
+  {
+    "Name": "File name:",
+    "AutomationId": "1001",
+    "type": "ControlType.Edit",
+    "valuePattern": true
+  },
+  {
+    "Name": "Save as type:",
+    "AutomationId": "FileTypeControlHost",
+    "type": "ControlType.ComboBox",
+    "valuePattern": false
+  },
+  {
+    "Name": "Search Box",
+    "AutomationId": "SearchEditBox",
+    "type": "ControlType.Edit",
+    "valuePattern": true
+  }
+]
