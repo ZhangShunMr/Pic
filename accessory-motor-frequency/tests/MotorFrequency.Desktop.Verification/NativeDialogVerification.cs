@@ -107,7 +107,9 @@ internal static class NativeDialogVerification
                 Require(handle != 0, "Native dialog not found: " + title);
                 var dialog = AutomationElement.FromHandle(handle);
                 Console.WriteLine("Native dialog: found owned window");
-                CaptureDialog(handle, screenshot);
+                if (dialog.TryGetCurrentPattern(WindowPattern.Pattern, out var ready))
+                    ((WindowPattern)ready).WaitForInputIdle(3000);
+                Thread.Sleep(250);
                 var edits = dialog.FindAll(TreeScope.Descendants, new OrCondition(
                     new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Edit),
                     new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.ComboBox)));
@@ -204,6 +206,19 @@ internal static class NativeDialogVerification
     }
 
     private static void CaptureDialog(nint window, string path)
+    {
+        for (var attempt = 0; ; attempt++)
+        {
+            try { CaptureDialogOnce(window, path); return; }
+            catch (InvalidOperationException error) when (attempt < 15
+                && (error.Message.Contains("capture is unexpectedly blank") || error.Message.Contains("PrintWindow")))
+            {
+                Thread.Sleep(100);
+            }
+        }
+    }
+
+    private static void CaptureDialogOnce(nint window, string path)
     {
         Require(GetWindowRect(window, out var rectangle), "Cannot read native window rectangle");
         var width = rectangle.Right - rectangle.Left;
