@@ -74,8 +74,8 @@ report = inventory()
 manual = document('操作说明 · 待Microsoft Word核验草稿')
 markdown = '# 操作说明书 V2.0（待Microsoft Word核验草稿）\n\n'
 for i, (title, body) in enumerate(CHAPTERS):
-    if i: manual.add_page_break()
-    manual.add_heading(f'{i+1} {title}', 1)
+    heading = manual.add_heading(f'{i+1} {title}', 1)
+    if i: heading.paragraph_format.page_break_before = True
     if native_ok:
         body = body.replace('当前版本完成Linux交叉编译和自动化业务测试，尚未取得真实WPF运行截图，原生界面绑定、布局和对话框仍须在Windows验证。本文没有用浏览器截图或绘制图代替桌面证据，不能直接作为已完成验收的申报终稿。',
             '当前版本已在Windows Server 2025 runner实际显示WPF窗口并执行输入、命令和业务流程，截图来自该真实原生窗口及其控件。原生文件与确认接口在自动流程中使用替身，真实系统对话框、高DPI及Windows10/11人工兼容检查仍待完成。runner没有Microsoft Word，本文仍需Word实际分页和版式核验，不能直接作为申报终稿。')
@@ -88,12 +88,15 @@ for i, (title, body) in enumerate(CHAPTERS):
             if not image.exists():
                 continue
             number = len(figure_records) + 1
-            paragraph(manual, f'图{number}对应上述操作。图内参数均为模拟；若列未完全显示，可在程序中横向或纵向滚动。')
+            introduction = paragraph(manual, f'图{number}对应上述操作。图内参数均为模拟；若列未完全显示，可在程序中横向或纵向滚动。')
+            introduction.paragraph_format.keep_with_next = True
             picture = manual.add_paragraph()
             picture.paragraph_format.keep_with_next = True
-            picture.add_run().add_picture(str(image), width=Inches(6.3))
-            paragraph(manual, f'图{number} {caption}（真实Windows WPF运行界面）').style = 'Caption'
             width, height = struct.unpack('>II', image.read_bytes()[16:24])
+            picture.add_run().add_picture(str(image), width=Inches(5.5 if height / width > 0.8 else 6.3))
+            caption_paragraph = paragraph(manual, f'图{number} {caption}（真实Windows WPF运行界面）')
+            caption_paragraph.style = 'Caption'
+            caption_paragraph.paragraph_format.keep_with_next = False
             figure_records.append({'figure': number, 'file': image.relative_to(ROOT).as_posix(), 'caption': caption,
                                    'sha256': hashlib.sha256(image.read_bytes()).hexdigest(), 'width': width, 'height': height,
                                    'sourceCommit': ui.get('sourceCommit'), 'runUrl': ui.get('runUrl')})
@@ -118,9 +121,12 @@ fields = [
 ('模板与申报范围', '沿用备份版采集表字段顺序、A4页幅与边框；未收到申请人专用模板。Word跨页版式、签章、正式源码范围与页数待申请人核实。材料为待Word核验草稿，真实截图状态以同目录Windows证据和材料检查表为准。')]
 collection = document('软著信息采集表 · 草稿')
 collection.add_heading(NAME + ' ' + VERSION, 1)
-paragraph(collection, '以下程序事实可由代码与证据核对；申请人事实必须本人核实。Windows实机与Word分页尚未完成。')
+paragraph(collection, '程序事实可由代码和运行证据核对；申请人事实须本人核实。Windows Server运行已验证，Windows10/11与DPI人工复核、Microsoft Word分页仍待完成。' if native_ok else '以下程序事实可由代码与证据核对；申请人事实必须本人核实。Windows实机与Word分页尚未完成。')
 t = collection.add_table(rows=0, cols=2)
 t.style = 'Table Grid'
+t.autofit = False
+t.columns[0].width = Emu(1550000)
+t.columns[1].width = Emu(4500000)
 for key, value in fields:
     cells = t.add_row().cells
     cells[0].text, cells[1].text = key, value
