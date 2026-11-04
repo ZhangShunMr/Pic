@@ -1,5 +1,5 @@
 {
-  "at": "2026-11-04T15:43:25.745902+00:00",
+  "at": "2026-11-04T15:48:58.1574241+00:00",
   "os": "Microsoft Windows 10.0.26100",
   "runtime": ".NET 10.0.14",
   "status": "failed",
@@ -22,7 +22,19 @@
     "03-\u626C\u58F0\u5668\u9891\u5E26\uFF1A\u539F\u751F\u80CC\u666F\u4E0D\u900F\u660E",
     "03-\u626C\u58F0\u5668\u9891\u5E26\uFF1A\u5305\u542B\u5B9E\u9645\u6E32\u67D3\u5185\u5BB9",
     "\u6B63\u5E38\u8F93\u5165\u9636\u6BB5\u6CA1\u6709WPF\u7ED1\u5B9A\u9519\u8BEF",
-    "FAILED: System.InvalidOperationException: \u539F\u751F\u6570\u503C\u7ED1\u5B9A\u62D2\u7EDD\u6587\u5B57\u8F93\u5165\r\n   at Program.\u003C\u003Ec__DisplayClass0_0.\u003CMain\u003Eg__Assert|0(Boolean value, String message) in D:\\a\\Pic\\Pic\\avas-coverage-design\\tests\\Avas.DesktopVerification\\Program.cs:line 38\r\n   at Program.\u003C\u003Ec__DisplayClass0_0.\u003C\u003CMain\u003Eb__4\u003Ed.MoveNext() in D:\\a\\Pic\\Pic\\avas-coverage-design\\tests\\Avas.DesktopVerification\\Program.cs:line 102",
+    "\u539F\u751F\u6570\u503C\u7ED1\u5B9A\u62D2\u7EDD\u6587\u5B57\u8F93\u5165",
+    "\u683C\u5F0F\u9519\u8BEF\u963B\u6B62\u5E94\u7528\u65E7\u6570\u503C\u5E76\u4FDD\u7559\u5F85\u4FEE\u6B63\u6587\u5B57",
+    "04-\u6570\u503C\u6821\u9A8C\uFF1A\u539F\u751F\u80CC\u666F\u4E0D\u900F\u660E",
+    "04-\u6570\u503C\u6821\u9A8C\uFF1A\u5305\u542B\u5B9E\u9645\u6E32\u67D3\u5185\u5BB9",
+    "\u653E\u5F03\u7F16\u8F91\u6062\u590D\u6709\u6548\u6570\u503C",
+    "\u8FDB\u5165\u5DE5\u4F5C\u533A\uFF1A\u80CC\u666F\u4E0E\u7F51\u683C",
+    "05-\u80CC\u666F\u7F51\u683C\uFF1A\u539F\u751F\u80CC\u666F\u4E0D\u900F\u660E",
+    "05-\u80CC\u666F\u7F51\u683C\uFF1A\u5305\u542B\u5B9E\u9645\u6E32\u67D3\u5185\u5BB9",
+    "\u8FDB\u5165\u5DE5\u4F5C\u533A\uFF1A\u89C2\u5BDF\u70B9",
+    "06-\u89C2\u5BDF\u70B9\u9891\u8C31\uFF1A\u539F\u751F\u80CC\u666F\u4E0D\u900F\u660E",
+    "06-\u89C2\u5BDF\u70B9\u9891\u8C31\uFF1A\u5305\u542B\u5B9E\u9645\u6E32\u67D3\u5185\u5BB9",
+    "\u8FDB\u5165\u5DE5\u4F5C\u533A\uFF1A\u65B9\u6848\u6BD4\u8F83",
+    "FAILED: System.FormatException: Unrecognized Guid format.\r\n   at System.Guid.GuidResult.SetFailure(ParseFailure failureKind)\r\n   at System.Guid.TryParseGuid[TChar](ReadOnlySpan\u00601 guidString, GuidResult\u0026 result)\r\n   at System.Guid..ctor(String g)\r\n   at System.ComponentModel.GuidConverter.ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, Object value)\r\n   at MS.Internal.Data.DefaultValueConverter.ConvertHelper(Object o, Type destinationType, DependencyObject targetElement, CultureInfo culture, Boolean isForward)\r\n   at MS.Internal.Data.TargetDefaultValueConverter.Convert(Object o, Type type, Object parameter, CultureInfo culture)\r\n   at MS.Internal.Data.DynamicValueConverter.Convert(Object value, Type targetType, Object parameter, CultureInfo culture)\r\n   at System.Windows.Controls.Primitives.Selector.VerifyEqual(Object knownValue, Type knownType, Object itemValue, DynamicValueConverter converter)\r\n   at System.Windows.Controls.Primitives.Selector.FindItemWithValue(Object value, Int32\u0026 index)\r\n   at System.Windows.Controls.Primitives.Selector.SelectItemWithValue(Object value, Boolean selectNow)\r\n   at System.Windows.Controls.Primitives.Selector.OnItemsChanged(NotifyCollectionChangedEventArgs e)\r\n   at System.Windows.Data.CollectionView.OnCollectionChanged(NotifyCollectionChangedEventArgs args)\r\n   at System.Windows.Controls.ItemCollection.SetCollectionView(CollectionView view)\r\n   at System.Windows.Controls.ItemsControl.OnItemsSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)\r\n   at System.Windows.FrameworkElement.OnPropertyChanged(DependencyPropertyChangedEventArgs e)\r\n   at System.Windows.DependencyObject.NotifyPropertyChange(DependencyPropertyChangedEventArgs args)\r\n   at System.Windows.DependencyObject.UpdateEffectiveValue(EntryIndex entryIndex, DependencyProperty dp, PropertyMetadata metadata, EffectiveValueEntry oldEntry, EffectiveValueEntry\u0026 newEntry, Boolean coerceWithDeferredReference, Boolean coerceWithCurrentValue, OperationType operationType)\r\n   at System.Windows.Data.BindingExpression.TransferValue(Object newValue, Boolean isASubPropertyChange)\r\n   at MS.Internal.Data.PropertyPathWorker.UpdateSourceValueState(Int32 k, ICollectionView collectionView, Object newValue, Boolean isASubPropertyChange)\r\n   at MS.Internal.Data.ClrBindingWorker.OnSourcePropertyChanged(Object o, String propName)\r\n   at MS.Internal.Data.PropertyPathWorker.OnPropertyChanged(Object sender, PropertyChangedEventArgs e)\r\n   at System.Windows.WeakEventManager.ListenerList\u00601.DeliverEvent(Object sender, EventArgs e, Type managerType)\r\n   at System.ComponentModel.PropertyChangedEventManager.OnPropertyChanged(Object sender, PropertyChangedEventArgs args)\r\n   at Avas.Workspace.WorkspaceViewModel.Notify() in D:\\a\\Pic\\Pic\\avas-coverage-design\\src\\Avas.Workspace\\WorkspaceViewModel.cs:line 134\r\n   at Avas.Workspace.WorkspaceViewModel.Execute(Action action) in D:\\a\\Pic\\Pic\\avas-coverage-design\\src\\Avas.Workspace\\WorkspaceViewModel.cs:line 365\r\n   at Avas.Workspace.WorkspaceViewModel.CaptureSnapshot() in D:\\a\\Pic\\Pic\\avas-coverage-design\\src\\Avas.Workspace\\ObjectCommands.cs:line 132\r\n   at Program.\u003C\u003Ec__DisplayClass0_0.\u003C\u003CMain\u003Eb__4\u003Ed.MoveNext() in D:\\a\\Pic\\Pic\\avas-coverage-design\\tests\\Avas.DesktopVerification\\Program.cs:line 126",
     "failure\uFF1A\u539F\u751F\u80CC\u666F\u4E0D\u900F\u660E",
     "failure\uFF1A\u5305\u542B\u5B9E\u9645\u6E32\u67D3\u5185\u5BB9"
   ],
@@ -31,31 +43,101 @@
   "images": [
     {
       "file": "01-\u7A7A\u767D\u9879\u76EE.png",
-      "sha256": "c34ed93b8ad253c5463dd82dd2ce14d4e013ba7174a6261ddcea2c33ada0ef6a",
+      "sha256": "0c5c9ab7d555a218d1156ed6ebcdcb9cd34d8feb82778eef8e295b560b885f1d",
       "width": 1104,
       "height": 749,
       "provenance": "live Windows WPF client visual, shown MainWindow"
+    },
+    {
+      "file": "01-\u7A7A\u767D\u9879\u76EE-editor.png",
+      "sha256": "b1e56f23934fa7ab3e65959b31bf53b4e444562d1e10f2de5b1454b3c2d17145",
+      "width": 470,
+      "height": 632,
+      "provenance": "live, visible WPF Inspector panel from the same shown MainWindow; original pixels"
     },
     {
       "file": "02-\u6A21\u62DF\u58F0\u573A.png",
-      "sha256": "3446ed009e7a39fb2631b2da3e663e5edaa04eb4dc49b317da7ac57252683e7c",
+      "sha256": "6ecc75f5e3148e791de8a89faedf317d8746c967d2340272b3233ce1fd647f81",
       "width": 1104,
       "height": 749,
       "provenance": "live Windows WPF client visual, shown MainWindow"
+    },
+    {
+      "file": "02-\u6A21\u62DF\u58F0\u573A-editor.png",
+      "sha256": "b1e56f23934fa7ab3e65959b31bf53b4e444562d1e10f2de5b1454b3c2d17145",
+      "width": 470,
+      "height": 632,
+      "provenance": "live, visible WPF Inspector panel from the same shown MainWindow; original pixels"
     },
     {
       "file": "03-\u626C\u58F0\u5668\u9891\u5E26.png",
-      "sha256": "19eda948c749c02f4668b5dfae74b46cd9caf20dcc55a197e8567cd52b528861",
+      "sha256": "a62f2d75ea9fb8a7a2df892e3b9b8ff16dc8ed47eb14edf3a0a5dd47f1b9ea9b",
       "width": 1104,
       "height": 749,
       "provenance": "live Windows WPF client visual, shown MainWindow"
     },
     {
-      "file": "failure.png",
-      "sha256": "a1e975beb3f2faa4c89e3a00ad34d69d6891661a76da21fdb97d44f7aafa43e8",
+      "file": "03-\u626C\u58F0\u5668\u9891\u5E26-editor.png",
+      "sha256": "b1e56f23934fa7ab3e65959b31bf53b4e444562d1e10f2de5b1454b3c2d17145",
+      "width": 470,
+      "height": 632,
+      "provenance": "live, visible WPF Inspector panel from the same shown MainWindow; original pixels"
+    },
+    {
+      "file": "04-\u6570\u503C\u6821\u9A8C.png",
+      "sha256": "3f9148af86249fd873bf8a86856392bee0ed480a06f723a9a7edd323adc63277",
       "width": 1104,
       "height": 749,
       "provenance": "live Windows WPF client visual, shown MainWindow"
+    },
+    {
+      "file": "04-\u6570\u503C\u6821\u9A8C-editor.png",
+      "sha256": "53943e6f504a2ae76c38b780a43e1dc765b8809f4bd842a8c8b15f8285b1e656",
+      "width": 470,
+      "height": 612,
+      "provenance": "live, visible WPF Inspector panel from the same shown MainWindow; original pixels"
+    },
+    {
+      "file": "05-\u80CC\u666F\u7F51\u683C.png",
+      "sha256": "ce3ee33415693f2ee75a7dccfc0382ece5007df2e05b28e50be0b8b65e9f526c",
+      "width": 1104,
+      "height": 749,
+      "provenance": "live Windows WPF client visual, shown MainWindow"
+    },
+    {
+      "file": "05-\u80CC\u666F\u7F51\u683C-editor.png",
+      "sha256": "b1e56f23934fa7ab3e65959b31bf53b4e444562d1e10f2de5b1454b3c2d17145",
+      "width": 470,
+      "height": 632,
+      "provenance": "live, visible WPF Inspector panel from the same shown MainWindow; original pixels"
+    },
+    {
+      "file": "06-\u89C2\u5BDF\u70B9\u9891\u8C31.png",
+      "sha256": "20ac32de867f64a52e3ece19e379d8c6cc1973efb0c5fd7565696f883585fa42",
+      "width": 1104,
+      "height": 749,
+      "provenance": "live Windows WPF client visual, shown MainWindow"
+    },
+    {
+      "file": "06-\u89C2\u5BDF\u70B9\u9891\u8C31-editor.png",
+      "sha256": "b1e56f23934fa7ab3e65959b31bf53b4e444562d1e10f2de5b1454b3c2d17145",
+      "width": 470,
+      "height": 632,
+      "provenance": "live, visible WPF Inspector panel from the same shown MainWindow; original pixels"
+    },
+    {
+      "file": "failure.png",
+      "sha256": "65929f0cae7b2788feac18dd0a824ac4c2f7e2f6700dc12942337722d322dbec",
+      "width": 1104,
+      "height": 749,
+      "provenance": "live Windows WPF client visual, shown MainWindow"
+    },
+    {
+      "file": "failure-editor.png",
+      "sha256": "b1e56f23934fa7ab3e65959b31bf53b4e444562d1e10f2de5b1454b3c2d17145",
+      "width": 470,
+      "height": 632,
+      "provenance": "live, visible WPF Inspector panel from the same shown MainWindow; original pixels"
     }
   ]
 }
