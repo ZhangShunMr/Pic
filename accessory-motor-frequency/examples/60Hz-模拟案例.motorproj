@@ -1,0 +1,3125 @@
+{
+  "formatVersion": 1,
+  "softwareVersion": "V2.0",
+  "id": "e5f70496-7d5c-4e3f-8b74-ef153550875f",
+  "name": "附件电机 · 60 Hz 候选核对（模拟）",
+  "owner": "示例工程师",
+  "purpose": "用固定模拟样例核对 1800 r/min 下转频 30 Hz、电气基频 60 Hz；验证候选同频不等于因果。",
+  "demonstration": true,
+  "archived": false,
+  "createdAt": "2026-11-04T15:12:43.9250453+00:00",
+  "modifiedAt": "2026-11-04T15:12:43.9250457+00:00",
+  "motor": {
+    "name": "两极对十二槽无刷示例",
+    "topology": "BrushlessPermanentMagnet",
+    "polePairs": 2,
+    "slots": 12,
+    "commutatorSegments": 10,
+    "minimumRpm": 0,
+    "maximumRpm": 6000,
+    "stepRpm": 100,
+    "inspectRpm": 1800,
+    "maximumHz": 1500,
+    "includeSlotPass": true,
+    "includeIdealCogging": true,
+    "symmetricUnskewedAssumption": true,
+    "assumptionNotes": "仅示例：等槽、对称永磁、无偏心的理想周期，不作幅值预测。",
+    "hiddenCandidates": []
+  },
+  "customOrders": [
+    {
+      "id": "edff23b6-6a9c-45b8-b257-2eba544897d6",
+      "name": "二倍转频待验证",
+      "order": 2,
+      "basis": "模拟工程假设，与电气基频同频；通过变转速和电流/振动同步采集进一步区分。",
+      "enabled": true
+    }
+  ],
+  "bands": [
+    {
+      "id": "babf5f8b-55ed-4d54-9ed2-6a6537ef7946",
+      "name": "60 Hz 附近关注带",
+      "lowerHz": 55,
+      "upperHz": 65,
+      "origin": "Simulated",
+      "basis": "人为设定的示例频段，不代表结构模态实测值。",
+      "enabled": true
+    },
+    {
+      "id": "aae545dc-207b-4afe-bce7-4b116eff457f",
+      "name": "结构观察带（模拟）",
+      "lowerHz": 340,
+      "upperHz": 380,
+      "origin": "Simulated",
+      "basis": "用于交叠区间计算示范，非实测结构模态。",
+      "enabled": true
+    }
+  ],
+  "spectra": [
+    {
+      "id": "29ab00a9-21e1-474d-a0ab-2d998e458165",
+      "name": "1800 转模拟频谱",
+      "fileName": "内置确定性公式",
+      "rpm": 1800,
+      "unit": "dB",
+      "reference": "模拟 dB 标度，无实际声学校准",
+      "condition": "固定算式生成，非真实采集",
+      "origin": "Simulated",
+      "importedAt": "2026-11-04T15:12:43.9254797+00:00",
+      "inputSha256": "2106380b4970f3397ce7e718cd322a91b641374332c563d0329d08ba66ee0fa5",
+      "visible": true,
+      "points": [
+        {
+          "frequencyHz": 0,
+          "amplitude": 23
+        },
+        {
+          "frequencyHz": 2,
+          "amplitude": 23.257617045807457
+        },
+        {
+          "frequencyHz": 4,
+          "amplitude": 23.45997066941854
+        },
+        {
+          "frequencyHz": 6,
+          "amplitude": 23.605291977143985
+        },
+        {
+          "frequencyHz": 8,
+          "amplitude": 23.6943660333994
+        },
+        {
+          "frequencyHz": 10,
+          "amplitude": 23.73032734997323
+        },
+        {
+          "frequencyHz": 12,
+          "amplitude": 23.71834617594707
+        },
+        {
+          "frequencyHz": 14,
+          "amplitude": 23.665224649161047
+        },
+        {
+          "frequencyHz": 16,
+          "amplitude": 23.578926184781764
+        },
+        {
+          "frequencyHz": 18,
+          "amplitude": 23.468064545244268
+        },
+        {
+          "frequencyHz": 20,
+          "amplitude": 23.341380709109437
+        },
+        {
+          "frequencyHz": 22,
+          "amplitude": 23.20723585669774
+        },
+        {
+          "frequencyHz": 24,
+          "amplitude": 23.073147516001203
+        },
+        {
+          "frequencyHz": 26,
+          "amplitude": 22.945393237302184
+        },
+        {
+          "frequencyHz": 28,
+          "amplitude": 22.82870223485429
+        },
+        {
+          "frequencyHz": 30,
+          "amplitude": 22.72605045876419
+        },
+        {
+          "frequencyHz": 32,
+          "amplitude": 22.63856880297892
+        },
+        {
+          "frequencyHz": 34,
+          "amplitude": 22.56556791888924
+        },
+        {
+          "frequencyHz": 36,
+          "amplitude": 22.504676717842987
+        },
+        {
+          "frequencyHz": 38,
+          "amplitude": 22.45208553401897
+        },
+        {
+          "frequencyHz": 40,
+          "amplitude": 22.402881735998605
+        },
+        {
+          "frequencyHz": 42,
+          "amplitude": 22.351507368665377
+        },
+        {
+          "frequencyHz": 44,
+          "amplitude": 22.29295950342023
+        },
+        {
+          "frequencyHz": 46,
+          "amplitude": 22.230385533323272
+        },
+        {
+          "frequencyHz": 48,
+          "amplitude": 22.22105355283283
+        },
+        {
+          "frequencyHz": 50,
+          "amplitude": 22.561319637354824
+        },
+        {
+          "frequencyHz": 52,
+          "amplitude": 24.191312447787897
+        },
+        {
+          "frequencyHz": 54,
+          "amplitude": 28.814679572560003
+        },
+        {
+          "frequencyHz": 56,
+          "amplitude": 37.33597149959243
+        },
+        {
+          "frequencyHz": 58,
+          "amplitude": 46.87088528921212
+        },
+        {
+          "frequencyHz": 60,
+          "amplitude": 51.08029440549545
+        },
+        {
+          "frequencyHz": 62,
+          "amplitude": 46.40983078515657
+        },
+        {
+          "frequencyHz": 64,
+          "amplitude": 36.42970746137014
+        },
+        {
+          "frequencyHz": 66,
+          "amplitude": 27.4942431463855
+        },
+        {
+          "frequencyHz": 68,
+          "amplitude": 22.501657488259056
+        },
+        {
+          "frequencyHz": 70,
+          "amplitude": 20.559477333693067
+        },
+        {
+          "frequencyHz": 72,
+          "amplitude": 19.97381370114024
+        },
+        {
+          "frequencyHz": 74,
+          "amplitude": 19.811604670850844
+        },
+        {
+          "frequencyHz": 76,
+          "amplitude": 19.780618618731783
+        },
+        {
+          "frequencyHz": 78,
+          "amplitude": 19.824652444049427
+        },
+        {
+          "frequencyHz": 80,
+          "amplitude": 19.93858447350935
+        },
+        {
+          "frequencyHz": 82,
+          "amplitude": 20.12255909337236
+        },
+        {
+          "frequencyHz": 84,
+          "amplitude": 20.374672311534006
+        },
+        {
+          "frequencyHz": 86,
+          "amplitude": 20.690163146742947
+        },
+        {
+          "frequencyHz": 88,
+          "amplitude": 21.061438445250065
+        },
+        {
+          "frequencyHz": 90,
+          "amplitude": 21.478286176761102
+        },
+        {
+          "frequencyHz": 92,
+          "amplitude": 21.928221050108196
+        },
+        {
+          "frequencyHz": 94,
+          "amplitude": 22.39695134749598
+        },
+        {
+          "frequencyHz": 96,
+          "amplitude": 22.86898256305756
+        },
+        {
+          "frequencyHz": 98,
+          "amplitude": 23.328517693127097
+        },
+        {
+          "frequencyHz": 100,
+          "amplitude": 23.76138751988416
+        },
+        {
+          "frequencyHz": 102,
+          "amplitude": 24.16039255088274
+        },
+        {
+          "frequencyHz": 104,
+          "amplitude": 24.539459863800477
+        },
+        {
+          "frequencyHz": 106,
+          "amplitude": 24.963338314943428
+        },
+        {
+          "frequencyHz": 108,
+          "amplitude": 25.588666031270893
+        },
+        {
+          "frequencyHz": 110,
+          "amplitude": 26.67777576474279
+        },
+        {
+          "frequencyHz": 112,
+          "amplitude": 28.507674334632235
+        },
+        {
+          "frequencyHz": 114,
+          "amplitude": 31.128747909432924
+        },
+        {
+          "frequencyHz": 116,
+          "amplitude": 34.09118777440837
+        },
+        {
+          "frequencyHz": 118,
+          "amplitude": 36.43212579855246
+        },
+        {
+          "frequencyHz": 120,
+          "amplitude": 37.118227963046586
+        },
+        {
+          "frequencyHz": 122,
+          "amplitude": 35.70679428188069
+        },
+        {
+          "frequencyHz": 124,
+          "amplitude": 32.66666644519435
+        },
+        {
+          "frequencyHz": 126,
+          "amplitude": 29.05620699268445
+        },
+        {
+          "frequencyHz": 128,
+          "amplitude": 25.861138469793612
+        },
+        {
+          "frequencyHz": 130,
+          "amplitude": 23.550990925963948
+        },
+        {
+          "frequencyHz": 132,
+          "amplitude": 22.09115410264257
+        },
+        {
+          "frequencyHz": 134,
+          "amplitude": 21.215823425939046
+        },
+        {
+          "frequencyHz": 136,
+          "amplitude": 20.668879037002174
+        },
+        {
+          "frequencyHz": 138,
+          "amplitude": 20.294721254532007
+        },
+        {
+          "frequencyHz": 140,
+          "amplitude": 20.02451749679074
+        },
+        {
+          "frequencyHz": 142,
+          "amplitude": 19.835419663258595
+        },
+        {
+          "frequencyHz": 144,
+          "amplitude": 19.721370355113105
+        },
+        {
+          "frequencyHz": 146,
+          "amplitude": 19.679637552095894
+        },
+        {
+          "frequencyHz": 148,
+          "amplitude": 19.706318769107433
+        },
+        {
+          "frequencyHz": 150,
+          "amplitude": 19.795368683038568
+        },
+        {
+          "frequencyHz": 152,
+          "amplitude": 19.938720734412183
+        },
+        {
+          "frequencyHz": 154,
+          "amplitude": 20.126718871368983
+        },
+        {
+          "frequencyHz": 156,
+          "amplitude": 20.348648975470145
+        },
+        {
+          "frequencyHz": 158,
+          "amplitude": 20.593306088387067
+        },
+        {
+          "frequencyHz": 160,
+          "amplitude": 20.84956254016963
+        },
+        {
+          "frequencyHz": 162,
+          "amplitude": 21.106907405470544
+        },
+        {
+          "frequencyHz": 164,
+          "amplitude": 21.355930309358246
+        },
+        {
+          "frequencyHz": 166,
+          "amplitude": 21.588725992230724
+        },
+        {
+          "frequencyHz": 168,
+          "amplitude": 21.799200547967015
+        },
+        {
+          "frequencyHz": 170,
+          "amplitude": 21.98326568910283
+        },
+        {
+          "frequencyHz": 172,
+          "amplitude": 22.138913487246654
+        },
+        {
+          "frequencyHz": 174,
+          "amplitude": 22.266170468562077
+        },
+        {
+          "frequencyHz": 176,
+          "amplitude": 22.366936378750992
+        },
+        {
+          "frequencyHz": 178,
+          "amplitude": 22.444719036311202
+        },
+        {
+          "frequencyHz": 180,
+          "amplitude": 22.504282151644265
+        },
+        {
+          "frequencyHz": 182,
+          "amplitude": 22.551227521724574
+        },
+        {
+          "frequencyHz": 184,
+          "amplitude": 22.591536382881287
+        },
+        {
+          "frequencyHz": 186,
+          "amplitude": 22.631096745542607
+        },
+        {
+          "frequencyHz": 188,
+          "amplitude": 22.675244141450516
+        },
+        {
+          "frequencyHz": 190,
+          "amplitude": 22.72834235715941
+        },
+        {
+          "frequencyHz": 192,
+          "amplitude": 22.79342845466767
+        },
+        {
+          "frequencyHz": 194,
+          "amplitude": 22.87194281121586
+        },
+        {
+          "frequencyHz": 196,
+          "amplitude": 22.963560233148183
+        },
+        {
+          "frequencyHz": 198,
+          "amplitude": 23.066132658258784
+        },
+        {
+          "frequencyHz": 200,
+          "amplitude": 23.175747847065235
+        },
+        {
+          "frequencyHz": 202,
+          "amplitude": 23.28690209575013
+        },
+        {
+          "frequencyHz": 204,
+          "amplitude": 23.392778715376153
+        },
+        {
+          "frequencyHz": 206,
+          "amplitude": 23.485618143064432
+        },
+        {
+          "frequencyHz": 208,
+          "amplitude": 23.55716039018597
+        },
+        {
+          "frequencyHz": 210,
+          "amplitude": 23.599136362788354
+        },
+        {
+          "frequencyHz": 212,
+          "amplitude": 23.603781632418087
+        },
+        {
+          "frequencyHz": 214,
+          "amplitude": 23.564344651087353
+        },
+        {
+          "frequencyHz": 216,
+          "amplitude": 23.475561281863605
+        },
+        {
+          "frequencyHz": 218,
+          "amplitude": 23.33406887079912
+        },
+        {
+          "frequencyHz": 220,
+          "amplitude": 23.138735855015522
+        },
+        {
+          "frequencyHz": 222,
+          "amplitude": 22.890886951036812
+        },
+        {
+          "frequencyHz": 224,
+          "amplitude": 22.59440909594269
+        },
+        {
+          "frequencyHz": 226,
+          "amplitude": 22.255729264431306
+        },
+        {
+          "frequencyHz": 228,
+          "amplitude": 21.88366175709874
+        },
+        {
+          "frequencyHz": 230,
+          "amplitude": 21.489129220879512
+        },
+        {
+          "frequencyHz": 232,
+          "amplitude": 21.084768182093903
+        },
+        {
+          "frequencyHz": 234,
+          "amplitude": 20.684435912374383
+        },
+        {
+          "frequencyHz": 236,
+          "amplitude": 20.30264069736815
+        },
+        {
+          "frequencyHz": 238,
+          "amplitude": 19.95392176588486
+        },
+        {
+          "frequencyHz": 240,
+          "amplitude": 19.652208044211882
+        },
+        {
+          "frequencyHz": 242,
+          "amplitude": 19.410186371822682
+        },
+        {
+          "frequencyHz": 244,
+          "amplitude": 19.238709767874447
+        },
+        {
+          "frequencyHz": 246,
+          "amplitude": 19.146274766367558
+        },
+        {
+          "frequencyHz": 248,
+          "amplitude": 19.138593812178385
+        },
+        {
+          "frequencyHz": 250,
+          "amplitude": 19.21828437445521
+        },
+        {
+          "frequencyHz": 252,
+          "amplitude": 19.38469099855059
+        },
+        {
+          "frequencyHz": 254,
+          "amplitude": 19.633850249105418
+        },
+        {
+          "frequencyHz": 256,
+          "amplitude": 19.958601703997296
+        },
+        {
+          "frequencyHz": 258,
+          "amplitude": 20.34884117754961
+        },
+        {
+          "frequencyHz": 260,
+          "amplitude": 20.7919055277379
+        },
+        {
+          "frequencyHz": 262,
+          "amplitude": 21.273072074918822
+        },
+        {
+          "frequencyHz": 264,
+          "amplitude": 21.776150143291797
+        },
+        {
+          "frequencyHz": 266,
+          "amplitude": 22.284137805143196
+        },
+        {
+          "frequencyHz": 268,
+          "amplitude": 22.779913782167288
+        },
+        {
+          "frequencyHz": 270,
+          "amplitude": 23.24693279294653
+        },
+        {
+          "frequencyHz": 272,
+          "amplitude": 23.669892513225154
+        },
+        {
+          "frequencyHz": 274,
+          "amplitude": 24.035341741087887
+        },
+        {
+          "frequencyHz": 276,
+          "amplitude": 24.332202260429888
+        },
+        {
+          "frequencyHz": 278,
+          "amplitude": 24.55218112741014
+        },
+        {
+          "frequencyHz": 280,
+          "amplitude": 24.69005545389675
+        },
+        {
+          "frequencyHz": 282,
+          "amplitude": 24.743817961681565
+        },
+        {
+          "frequencyHz": 284,
+          "amplitude": 24.71467832188308
+        },
+        {
+          "frequencyHz": 286,
+          "amplitude": 24.606922239502765
+        },
+        {
+          "frequencyHz": 288,
+          "amplitude": 24.427637048137953
+        },
+        {
+          "frequencyHz": 290,
+          "amplitude": 24.18631890694212
+        },
+        {
+          "frequencyHz": 292,
+          "amplitude": 23.894382228572237
+        },
+        {
+          "frequencyHz": 294,
+          "amplitude": 23.564596441247147
+        },
+        {
+          "frequencyHz": 296,
+          "amplitude": 23.210478382623258
+        },
+        {
+          "frequencyHz": 298,
+          "amplitude": 22.845670385589216
+        },
+        {
+          "frequencyHz": 300,
+          "amplitude": 22.483334366602726
+        },
+        {
+          "frequencyHz": 302,
+          "amplitude": 22.13559096270467
+        },
+        {
+          "frequencyHz": 304,
+          "amplitude": 21.813030057229355
+        },
+        {
+          "frequencyHz": 306,
+          "amplitude": 21.524315032469712
+        },
+        {
+          "frequencyHz": 308,
+          "amplitude": 21.2758980011456
+        },
+        {
+          "frequencyHz": 310,
+          "amplitude": 21.07185736258513
+        },
+        {
+          "frequencyHz": 312,
+          "amplitude": 20.91386260969981
+        },
+        {
+          "frequencyHz": 314,
+          "amplitude": 20.80126470961699
+        },
+        {
+          "frequencyHz": 316,
+          "amplitude": 20.73130393270578
+        },
+        {
+          "frequencyHz": 318,
+          "amplitude": 20.699421040891593
+        },
+        {
+          "frequencyHz": 320,
+          "amplitude": 20.69965256986338
+        },
+        {
+          "frequencyHz": 322,
+          "amplitude": 20.72508681407646
+        },
+        {
+          "frequencyHz": 324,
+          "amplitude": 20.768354267360625
+        },
+        {
+          "frequencyHz": 326,
+          "amplitude": 20.82212491795778
+        },
+        {
+          "frequencyHz": 328,
+          "amplitude": 20.879585595899105
+        },
+        {
+          "frequencyHz": 330,
+          "amplitude": 20.934876669470004
+        },
+        {
+          "frequencyHz": 332,
+          "amplitude": 20.98349298003954
+        },
+        {
+          "frequencyHz": 334,
+          "amplitude": 21.022751650003013
+        },
+        {
+          "frequencyHz": 336,
+          "amplitude": 21.052752418019228
+        },
+        {
+          "frequencyHz": 338,
+          "amplitude": 21.079122234424528
+        },
+        {
+          "frequencyHz": 340,
+          "amplitude": 21.12056640070445
+        },
+        {
+          "frequencyHz": 342,
+          "amplitude": 21.226256150891928
+        },
+        {
+          "frequencyHz": 344,
+          "amplitude": 21.506993181606838
+        },
+        {
+          "frequencyHz": 346,
+          "amplitude": 22.173015766835945
+        },
+        {
+          "frequencyHz": 348,
+          "amplitude": 23.54594667449176
+        },
+        {
+          "frequencyHz": 350,
+          "amplitude": 25.986639843796247
+        },
+        {
+          "frequencyHz": 352,
+          "amplitude": 29.6959103477689
+        },
+        {
+          "frequencyHz": 354,
+          "amplitude": 34.439095557605626
+        },
+        {
+          "frequencyHz": 356,
+          "amplitude": 39.37986081749814
+        },
+        {
+          "frequencyHz": 358,
+          "amplitude": 43.24315504685093
+        },
+        {
+          "frequencyHz": 360,
+          "amplitude": 44.84164031330948
+        },
+        {
+          "frequencyHz": 362,
+          "amplitude": 43.68664715753732
+        },
+        {
+          "frequencyHz": 364,
+          "amplitude": 40.26012110821693
+        },
+        {
+          "frequencyHz": 366,
+          "amplitude": 35.74269944646748
+        },
+        {
+          "frequencyHz": 368,
+          "amplitude": 31.402784391849828
+        },
+        {
+          "frequencyHz": 370,
+          "amplitude": 28.07015210764366
+        },
+        {
+          "frequencyHz": 372,
+          "amplitude": 25.97304981291207
+        },
+        {
+          "frequencyHz": 374,
+          "amplitude": 24.904459930373164
+        },
+        {
+          "frequencyHz": 376,
+          "amplitude": 24.49762746455599
+        },
+        {
+          "frequencyHz": 378,
+          "amplitude": 24.425437366248374
+        },
+        {
+          "frequencyHz": 380,
+          "amplitude": 24.472692388897187
+        },
+        {
+          "frequencyHz": 382,
+          "amplitude": 24.524303695126946
+        },
+        {
+          "frequencyHz": 384,
+          "amplitude": 24.527632497687627
+        },
+        {
+          "frequencyHz": 386,
+          "amplitude": 24.461476417912515
+        },
+        {
+          "frequencyHz": 388,
+          "amplitude": 24.318828764221287
+        },
+        {
+          "frequencyHz": 390,
+          "amplitude": 24.09946235500249
+        },
+        {
+          "frequencyHz": 392,
+          "amplitude": 23.807299819725504
+        },
+        {
+          "frequencyHz": 394,
+          "amplitude": 23.449540068474235
+        },
+        {
+          "frequencyHz": 396,
+          "amplitude": 23.036241765570985
+        },
+        {
+          "frequencyHz": 398,
+          "amplitude": 22.579931754817846
+        },
+        {
+          "frequencyHz": 400,
+          "amplitude": 22.095130838181554
+        },
+        {
+          "frequencyHz": 402,
+          "amplitude": 21.597788832851307
+        },
+        {
+          "frequencyHz": 404,
+          "amplitude": 21.10464846633445
+        },
+        {
+          "frequencyHz": 406,
+          "amplitude": 20.63256598116169
+        },
+        {
+          "frequencyHz": 408,
+          "amplitude": 20.197819399119826
+        },
+        {
+          "frequencyHz": 410,
+          "amplitude": 19.815436275932843
+        },
+        {
+          "frequencyHz": 412,
+          "amplitude": 19.498572001183486
+        },
+        {
+          "frequencyHz": 414,
+          "amplitude": 19.25796739204712
+        },
+        {
+          "frequencyHz": 416,
+          "amplitude": 19.101510617297865
+        },
+        {
+          "frequencyHz": 418,
+          "amplitude": 19.033923553782493
+        },
+        {
+          "frequencyHz": 420,
+          "amplitude": 19.056586764744278
+        },
+        {
+          "frequencyHz": 422,
+          "amplitude": 19.16751069038109
+        },
+        {
+          "frequencyHz": 424,
+          "amplitude": 19.361453682376293
+        },
+        {
+          "frequencyHz": 426,
+          "amplitude": 19.630180540143524
+        },
+        {
+          "frequencyHz": 428,
+          "amplitude": 19.96284856191697
+        },
+        {
+          "frequencyHz": 430,
+          "amplitude": 20.346502136446603
+        },
+        {
+          "frequencyHz": 432,
+          "amplitude": 20.766651865411617
+        },
+        {
+          "frequencyHz": 434,
+          "amplitude": 21.20791036909757
+        },
+        {
+          "frequencyHz": 436,
+          "amplitude": 21.654654474276825
+        },
+        {
+          "frequencyHz": 438,
+          "amplitude": 22.091682529734296
+        },
+        {
+          "frequencyHz": 440,
+          "amplitude": 22.50483618216962
+        },
+        {
+          "frequencyHz": 442,
+          "amplitude": 22.881558036580024
+        },
+        {
+          "frequencyHz": 444,
+          "amplitude": 23.211360108604982
+        },
+        {
+          "frequencyHz": 446,
+          "amplitude": 23.48618267005542
+        },
+        {
+          "frequencyHz": 448,
+          "amplitude": 23.70062875108166
+        },
+        {
+          "frequencyHz": 450,
+          "amplitude": 23.85206590341479
+        },
+        {
+          "frequencyHz": 452,
+          "amplitude": 23.940593526007703
+        },
+        {
+          "frequencyHz": 454,
+          "amplitude": 23.968880767695453
+        },
+        {
+          "frequencyHz": 456,
+          "amplitude": 23.941886412257123
+        },
+        {
+          "frequencyHz": 458,
+          "amplitude": 23.86647789832023
+        },
+        {
+          "frequencyHz": 460,
+          "amplitude": 23.750971442753038
+        },
+        {
+          "frequencyHz": 462,
+          "amplitude": 23.604618882905378
+        },
+        {
+          "frequencyHz": 464,
+          "amplitude": 23.437069152184442
+        },
+        {
+          "frequencyHz": 466,
+          "amplitude": 23.25783314632177
+        },
+        {
+          "frequencyHz": 468,
+          "amplitude": 23.07578009043958
+        },
+        {
+          "frequencyHz": 470,
+          "amplitude": 22.898691422133425
+        },
+        {
+          "frequencyHz": 472,
+          "amplitude": 22.732894779718368
+        },
+        {
+          "frequencyHz": 474,
+          "amplitude": 22.5829961118663
+        },
+        {
+          "frequencyHz": 476,
+          "amplitude": 22.451722447708605
+        },
+        {
+          "frequencyHz": 478,
+          "amplitude": 22.33988177345304
+        },
+        {
+          "frequencyHz": 480,
+          "amplitude": 22.246440071910314
+        },
+        {
+          "frequencyHz": 482,
+          "amplitude": 22.168709228748003
+        },
+        {
+          "frequencyHz": 484,
+          "amplitude": 22.102633524798073
+        },
+        {
+          "frequencyHz": 486,
+          "amplitude": 22.043157128670124
+        },
+        {
+          "frequencyHz": 488,
+          "amplitude": 21.98465065393349
+        },
+        {
+          "frequencyHz": 490,
+          "amplitude": 21.921371676103327
+        },
+        {
+          "frequencyHz": 492,
+          "amplitude": 21.847932281094277
+        },
+        {
+          "frequencyHz": 494,
+          "amplitude": 21.759746333375357
+        },
+        {
+          "frequencyHz": 496,
+          "amplitude": 21.653430228793532
+        },
+        {
+          "frequencyHz": 498,
+          "amplitude": 21.527133378255563
+        },
+        {
+          "frequencyHz": 500,
+          "amplitude": 21.38077842565283
+        },
+        {
+          "frequencyHz": 502,
+          "amplitude": 21.216196041801204
+        },
+        {
+          "frequencyHz": 504,
+          "amplitude": 21.03714480469076
+        },
+        {
+          "frequencyHz": 506,
+          "amplitude": 20.849212880526487
+        },
+        {
+          "frequencyHz": 508,
+          "amplitude": 20.659604637109908
+        },
+        {
+          "frequencyHz": 510,
+          "amplitude": 20.47682161653384
+        },
+        {
+          "frequencyHz": 512,
+          "amplitude": 20.310253138836384
+        },
+        {
+          "frequencyHz": 514,
+          "amplitude": 20.169696895433976
+        },
+        {
+          "frequencyHz": 516,
+          "amplitude": 20.064833952211035
+        },
+        {
+          "frequencyHz": 518,
+          "amplitude": 20.00468540047211
+        },
+        {
+          "frequencyHz": 520,
+          "amplitude": 19.99707931616518
+        },
+        {
+          "frequencyHz": 522,
+          "amplitude": 20.04815663169101
+        },
+        {
+          "frequencyHz": 524,
+          "amplitude": 20.161942983649837
+        },
+        {
+          "frequencyHz": 526,
+          "amplitude": 20.340010643598863
+        },
+        {
+          "frequencyHz": 528,
+          "amplitude": 20.58125040961626
+        },
+        {
+          "frequencyHz": 530,
+          "amplitude": 20.881768042198793
+        },
+        {
+          "frequencyHz": 532,
+          "amplitude": 21.234913732015826
+        },
+        {
+          "frequencyHz": 534,
+          "amplitude": 21.63144649454554
+        },
+        {
+          "frequencyHz": 536,
+          "amplitude": 22.059828629427493
+        },
+        {
+          "frequencyHz": 538,
+          "amplitude": 22.506638802026664
+        },
+        {
+          "frequencyHz": 540,
+          "amplitude": 22.95708623519305
+        },
+        {
+          "frequencyHz": 542,
+          "amplitude": 23.3956032499383
+        },
+        {
+          "frequencyHz": 544,
+          "amplitude": 23.806489233864433
+        },
+        {
+          "frequencyHz": 546,
+          "amplitude": 24.174576260759338
+        },
+        {
+          "frequencyHz": 548,
+          "amplitude": 24.48588518387369
+        },
+        {
+          "frequencyHz": 550,
+          "amplitude": 24.728241156296022
+        },
+        {
+          "frequencyHz": 552,
+          "amplitude": 24.891819195006004
+        },
+        {
+          "frequencyHz": 554,
+          "amplitude": 24.9695935240849
+        },
+        {
+          "frequencyHz": 556,
+          "amplitude": 24.95766885740738
+        },
+        {
+          "frequencyHz": 558,
+          "amplitude": 24.855477296327386
+        },
+        {
+          "frequencyHz": 560,
+          "amplitude": 24.665830852752965
+        },
+        {
+          "frequencyHz": 562,
+          "amplitude": 24.394826450457284
+        },
+        {
+          "frequencyHz": 564,
+          "amplitude": 24.051607269565487
+        },
+        {
+          "frequencyHz": 566,
+          "amplitude": 23.647991134140923
+        },
+        {
+          "frequencyHz": 568,
+          "amplitude": 23.197982962534343
+        },
+        {
+          "frequencyHz": 570,
+          "amplitude": 22.71719379214595
+        },
+        {
+          "frequencyHz": 572,
+          "amplitude": 22.222193283306336
+        },
+        {
+          "frequencyHz": 574,
+          "amplitude": 21.72982568489853
+        },
+        {
+          "frequencyHz": 576,
+          "amplitude": 21.256520856726084
+        },
+        {
+          "frequencyHz": 578,
+          "amplitude": 20.81763201342536
+        },
+        {
+          "frequencyHz": 580,
+          "amplitude": 20.426830382032854
+        },
+        {
+          "frequencyHz": 582,
+          "amplitude": 20.095584027335615
+        },
+        {
+          "frequencyHz": 584,
+          "amplitude": 19.832743846152475
+        },
+        {
+          "frequencyHz": 586,
+          "amplitude": 19.644254379460413
+        },
+        {
+          "frequencyHz": 588,
+          "amplitude": 19.533000910023688
+        },
+        {
+          "frequencyHz": 590,
+          "amplitude": 19.49879761391902
+        },
+        {
+          "frequencyHz": 592,
+          "amplitude": 19.53851465312179
+        },
+        {
+          "frequencyHz": 594,
+          "amplitude": 19.646335377209603
+        },
+        {
+          "frequencyHz": 596,
+          "amplitude": 19.814128579984764
+        },
+        {
+          "frequencyHz": 598,
+          "amplitude": 20.03191533992485
+        },
+        {
+          "frequencyHz": 600,
+          "amplitude": 20.28840562858622
+        },
+        {
+          "frequencyHz": 602,
+          "amplitude": 20.5715768100082
+        },
+        {
+          "frequencyHz": 604,
+          "amplitude": 20.869264522669607
+        },
+        {
+          "frequencyHz": 606,
+          "amplitude": 21.169736306565063
+        },
+        {
+          "frequencyHz": 608,
+          "amplitude": 21.462219707975752
+        },
+        {
+          "frequencyHz": 610,
+          "amplitude": 21.7373593839173
+        },
+        {
+          "frequencyHz": 612,
+          "amplitude": 21.987581785644668
+        },
+        {
+          "frequencyHz": 614,
+          "amplitude": 22.207351110639184
+        },
+        {
+          "frequencyHz": 616,
+          "amplitude": 22.39330610705937
+        },
+        {
+          "frequencyHz": 618,
+          "amplitude": 22.544273686573618
+        },
+        {
+          "frequencyHz": 620,
+          "amplitude": 22.661161820455966
+        },
+        {
+          "frequencyHz": 622,
+          "amplitude": 22.74674052316172
+        },
+        {
+          "frequencyHz": 624,
+          "amplitude": 22.805325541585642
+        },
+        {
+          "frequencyHz": 626,
+          "amplitude": 22.842384368685828
+        },
+        {
+          "frequencyHz": 628,
+          "amplitude": 22.86408813176257
+        },
+        {
+          "frequencyHz": 630,
+          "amplitude": 22.876835568836654
+        },
+        {
+          "frequencyHz": 632,
+          "amplitude": 22.886776567632246
+        },
+        {
+          "frequencyHz": 634,
+          "amplitude": 22.899362539693136
+        },
+        {
+          "frequencyHz": 636,
+          "amplitude": 22.91894925193059
+        },
+        {
+          "frequencyHz": 638,
+          "amplitude": 22.94847472909377
+        },
+        {
+          "frequencyHz": 640,
+          "amplitude": 22.98923063315409
+        },
+        {
+          "frequencyHz": 642,
+          "amplitude": 23.04074034123374
+        },
+        {
+          "frequencyHz": 644,
+          "amplitude": 23.100751054816985
+        },
+        {
+          "frequencyHz": 646,
+          "amplitude": 23.165340988369923
+        },
+        {
+          "frequencyHz": 648,
+          "amplitude": 23.229136334554823
+        },
+        {
+          "frequencyHz": 650,
+          "amplitude": 23.285626618988097
+        },
+        {
+          "frequencyHz": 652,
+          "amplitude": 23.327561559481747
+        },
+        {
+          "frequencyHz": 654,
+          "amplitude": 23.34740792249483
+        },
+        {
+          "frequencyHz": 656,
+          "amplitude": 23.33784136778697
+        },
+        {
+          "frequencyHz": 658,
+          "amplitude": 23.29224607816901
+        },
+        {
+          "frequencyHz": 660,
+          "amplitude": 23.205194204724855
+        },
+        {
+          "frequencyHz": 662,
+          "amplitude": 23.072877865375027
+        },
+        {
+          "frequencyHz": 664,
+          "amplitude": 22.89346858660938
+        },
+        {
+          "frequencyHz": 666,
+          "amplitude": 22.66738257044182
+        },
+        {
+          "frequencyHz": 668,
+          "amplitude": 22.397434827509027
+        },
+        {
+          "frequencyHz": 670,
+          "amplitude": 22.088870808434432
+        },
+        {
+          "frequencyHz": 672,
+          "amplitude": 21.749270405971508
+        },
+        {
+          "frequencyHz": 674,
+          "amplitude": 21.38832577244619
+        },
+        {
+          "frequencyHz": 676,
+          "amplitude": 21.017500964759922
+        },
+        {
+          "frequencyHz": 678,
+          "amplitude": 20.649587655644098
+        },
+        {
+          "frequencyHz": 680,
+          "amplitude": 20.298176713948653
+        },
+        {
+          "frequencyHz": 682,
+          "amplitude": 19.977070069919066
+        },
+        {
+          "frequencyHz": 684,
+          "amplitude": 19.699660702316645
+        },
+        {
+          "frequencyHz": 686,
+          "amplitude": 19.478310631154415
+        },
+        {
+          "frequencyHz": 688,
+          "amplitude": 19.323757360084535
+        },
+        {
+          "frequencyHz": 690,
+          "amplitude": 19.24457824835132
+        },
+        {
+          "frequencyHz": 692,
+          "amplitude": 19.2467398430325
+        },
+        {
+          "frequencyHz": 694,
+          "amplitude": 19.333255382587925
+        },
+        {
+          "frequencyHz": 696,
+          "amplitude": 19.503968676694623
+        },
+        {
+          "frequencyHz": 698,
+          "amplitude": 19.755476619598852
+        },
+        {
+          "frequencyHz": 700,
+          "amplitude": 20.08119599760107
+        },
+        {
+          "frequencyHz": 702,
+          "amplitude": 20.47157333216331
+        },
+        {
+          "frequencyHz": 704,
+          "amplitude": 20.91442960194581
+        },
+        {
+          "frequencyHz": 706,
+          "amplitude": 21.39542515309577
+        },
+        {
+          "frequencyHz": 708,
+          "amplitude": 21.898624263079814
+        },
+        {
+          "frequencyHz": 710,
+          "amplitude": 22.407133961087236
+        },
+        {
+          "frequencyHz": 712,
+          "amplitude": 22.90378807067463
+        },
+        {
+          "frequencyHz": 714,
+          "amplitude": 23.371845210065594
+        },
+        {
+          "frequencyHz": 716,
+          "amplitude": 23.79566877438434
+        },
+        {
+          "frequencyHz": 718,
+          "amplitude": 24.161357768285086
+        },
+        {
+          "frequencyHz": 720,
+          "amplitude": 24.457299715457104
+        },
+        {
+          "frequencyHz": 722,
+          "amplitude": 24.67462062626448
+        },
+        {
+          "frequencyHz": 724,
+          "amplitude": 24.807511969550227
+        },
+        {
+          "frequencyHz": 726,
+          "amplitude": 24.853420522341114
+        },
+        {
+          "frequencyHz": 728,
+          "amplitude": 24.813093566955366
+        },
+        {
+          "frequencyHz": 730,
+          "amplitude": 24.690478840995723
+        },
+        {
+          "frequencyHz": 732,
+          "amplitude": 24.49248557762297
+        },
+        {
+          "frequencyHz": 734,
+          "amplitude": 24.22861955796203
+        },
+        {
+          "frequencyHz": 736,
+          "amplitude": 23.910511009286115
+        },
+        {
+          "frequencyHz": 738,
+          "amplitude": 23.551359131065865
+        },
+        {
+          "frequencyHz": 740,
+          "amplitude": 23.165320774480552
+        },
+        {
+          "frequencyHz": 742,
+          "amplitude": 22.76687315917323
+        },
+        {
+          "frequencyHz": 744,
+          "amplitude": 22.370181373662884
+        },
+        {
+          "frequencyHz": 746,
+          "amplitude": 21.988500738246195
+        },
+        {
+          "frequencyHz": 748,
+          "amplitude": 21.63364195392361
+        },
+        {
+          "frequencyHz": 750,
+          "amplitude": 21.31552343517958
+        },
+        {
+          "frequencyHz": 752,
+          "amplitude": 21.041830514340482
+        },
+        {
+          "frequencyHz": 754,
+          "amplitude": 20.817795555835563
+        },
+        {
+          "frequencyHz": 756,
+          "amplitude": 20.64610672162425
+        },
+        {
+          "frequencyHz": 758,
+          "amplitude": 20.526946507565988
+        },
+        {
+          "frequencyHz": 760,
+          "amplitude": 20.45815456293396
+        },
+        {
+          "frequencyHz": 762,
+          "amplitude": 20.435503047820823
+        },
+        {
+          "frequencyHz": 764,
+          "amplitude": 20.453067192821788
+        },
+        {
+          "frequencyHz": 766,
+          "amplitude": 20.503669083746463
+        },
+        {
+          "frequencyHz": 768,
+          "amplitude": 20.579369233244993
+        },
+        {
+          "frequencyHz": 770,
+          "amplitude": 20.671978391850363
+        },
+        {
+          "frequencyHz": 772,
+          "amplitude": 20.773561393858213
+        },
+        {
+          "frequencyHz": 774,
+          "amplitude": 20.87690565461102
+        },
+        {
+          "frequencyHz": 776,
+          "amplitude": 20.975929184988665
+        },
+        {
+          "frequencyHz": 778,
+          "amplitude": 21.066006542750046
+        },
+        {
+          "frequencyHz": 780,
+          "amplitude": 21.1441958084588
+        },
+        {
+          "frequencyHz": 782,
+          "amplitude": 21.209355208693157
+        },
+        {
+          "frequencyHz": 784,
+          "amplitude": 21.262144119493623
+        },
+        {
+          "frequencyHz": 786,
+          "amplitude": 21.30490954776034
+        },
+        {
+          "frequencyHz": 788,
+          "amplitude": 21.341465474117005
+        },
+        {
+          "frequencyHz": 790,
+          "amplitude": 21.37677831863441
+        },
+        {
+          "frequencyHz": 792,
+          "amplitude": 21.416576953176094
+        },
+        {
+          "frequencyHz": 794,
+          "amplitude": 21.466909860632192
+        },
+        {
+          "frequencyHz": 796,
+          "amplitude": 21.533675012705324
+        },
+        {
+          "frequencyHz": 798,
+          "amplitude": 21.622149647382038
+        },
+        {
+          "frequencyHz": 800,
+          "amplitude": 21.736547288436906
+        },
+        {
+          "frequencyHz": 802,
+          "amplitude": 21.879628050934777
+        },
+        {
+          "frequencyHz": 804,
+          "amplitude": 22.052385583000294
+        },
+        {
+          "frequencyHz": 806,
+          "amplitude": 22.25383004177946
+        },
+        {
+          "frequencyHz": 808,
+          "amplitude": 22.48088149264267
+        },
+        {
+          "frequencyHz": 810,
+          "amplitude": 22.728382312524328
+        },
+        {
+          "frequencyHz": 812,
+          "amplitude": 22.989230870128992
+        },
+        {
+          "frequencyHz": 814,
+          "amplitude": 23.25463227353025
+        },
+        {
+          "frequencyHz": 816,
+          "amplitude": 23.514455655450238
+        },
+        {
+          "frequencyHz": 818,
+          "amplitude": 23.75768163704988
+        },
+        {
+          "frequencyHz": 820,
+          "amplitude": 23.972918577136216
+        },
+        {
+          "frequencyHz": 822,
+          "amplitude": 24.148962240334246
+        },
+        {
+          "frequencyHz": 824,
+          "amplitude": 24.275370816618423
+        },
+        {
+          "frequencyHz": 826,
+          "amplitude": 24.343025942953574
+        },
+        {
+          "frequencyHz": 828,
+          "amplitude": 24.344650590923486
+        },
+        {
+          "frequencyHz": 830,
+          "amplitude": 24.275256391327545
+        },
+        {
+          "frequencyHz": 832,
+          "amplitude": 24.13249609077788
+        },
+        {
+          "frequencyHz": 834,
+          "amplitude": 23.91690122679955
+        },
+        {
+          "frequencyHz": 836,
+          "amplitude": 23.631990552202666
+        },
+        {
+          "frequencyHz": 838,
+          "amplitude": 23.284240967589536
+        },
+        {
+          "frequencyHz": 840,
+          "amplitude": 22.882919422978954
+        },
+        {
+          "frequencyHz": 842,
+          "amplitude": 22.4397810906629
+        },
+        {
+          "frequencyHz": 844,
+          "amplitude": 21.96864574824959
+        },
+        {
+          "frequencyHz": 846,
+          "amplitude": 21.48487040915988
+        },
+        {
+          "frequencyHz": 848,
+          "amplitude": 21.004741489406545
+        },
+        {
+          "frequencyHz": 850,
+          "amplitude": 20.54481393771383
+        },
+        {
+          "frequencyHz": 852,
+          "amplitude": 20.121227569540075
+        },
+        {
+          "frequencyHz": 854,
+          "amplitude": 19.74903218891707
+        },
+        {
+          "frequencyHz": 856,
+          "amplitude": 19.44155288319351
+        },
+        {
+          "frequencyHz": 858,
+          "amplitude": 19.20982513988273
+        },
+        {
+          "frequencyHz": 860,
+          "amplitude": 19.06212624396765
+        },
+        {
+          "frequencyHz": 862,
+          "amplitude": 19.003624923239865
+        },
+        {
+          "frequencyHz": 864,
+          "amplitude": 19.0361656387696
+        },
+        {
+          "frequencyHz": 866,
+          "amplitude": 19.15819754180037
+        },
+        {
+          "frequencyHz": 868,
+          "amplitude": 19.364851251999283
+        },
+        {
+          "frequencyHz": 870,
+          "amplitude": 19.648159594399463
+        },
+        {
+          "frequencyHz": 872,
+          "amplitude": 19.997411610377615
+        },
+        {
+          "frequencyHz": 874,
+          "amplitude": 20.399622868521543
+        },
+        {
+          "frequencyHz": 876,
+          "amplitude": 20.840099654296495
+        },
+        {
+          "frequencyHz": 878,
+          "amplitude": 21.3030702806248
+        },
+        {
+          "frequencyHz": 880,
+          "amplitude": 21.772353746599705
+        },
+        {
+          "frequencyHz": 882,
+          "amplitude": 22.23203442386978
+        },
+        {
+          "frequencyHz": 884,
+          "amplitude": 22.667111441386698
+        },
+        {
+          "frequencyHz": 886,
+          "amplitude": 23.06409296366097
+        },
+        {
+          "frequencyHz": 888,
+          "amplitude": 23.411508533105366
+        },
+        {
+          "frequencyHz": 890,
+          "amplitude": 23.700316918654696
+        },
+        {
+          "frequencyHz": 892,
+          "amplitude": 23.924192261284773
+        },
+        {
+          "frequencyHz": 894,
+          "amplitude": 24.079677459610547
+        },
+        {
+          "frequencyHz": 896,
+          "amplitude": 24.166200383259167
+        },
+        {
+          "frequencyHz": 898,
+          "amplitude": 24.18595530241968
+        },
+        {
+          "frequencyHz": 900,
+          "amplitude": 24.14365853652635
+        },
+        {
+          "frequencyHz": 902,
+          "amplitude": 24.046193421869308
+        },
+        {
+          "frequencyHz": 904,
+          "amplitude": 23.902164973007242
+        },
+        {
+          "frequencyHz": 906,
+          "amplitude": 23.72138880502605
+        },
+        {
+          "frequencyHz": 908,
+          "amplitude": 23.514341787800422
+        },
+        {
+          "frequencyHz": 910,
+          "amplitude": 23.29160338061543
+        },
+        {
+          "frequencyHz": 912,
+          "amplitude": 23.063316580107124
+        },
+        {
+          "frequencyHz": 914,
+          "amplitude": 22.838695917117818
+        },
+        {
+          "frequencyHz": 916,
+          "amplitude": 22.62560704495085
+        },
+        {
+          "frequencyHz": 918,
+          "amplitude": 22.430238329861183
+        },
+        {
+          "frequencyHz": 920,
+          "amplitude": 22.25687970443968
+        },
+        {
+          "frequencyHz": 922,
+          "amplitude": 22.10781814725439
+        },
+        {
+          "frequencyHz": 924,
+          "amplitude": 21.983352816531156
+        },
+        {
+          "frequencyHz": 926,
+          "amplitude": 21.88192642214211
+        },
+        {
+          "frequencyHz": 928,
+          "amplitude": 21.80036320364319
+        },
+        {
+          "frequencyHz": 930,
+          "amplitude": 21.734198214861877
+        },
+        {
+          "frequencyHz": 932,
+          "amplitude": 21.678077790752205
+        },
+        {
+          "frequencyHz": 934,
+          "amplitude": 21.626207338933593
+        },
+        {
+          "frequencyHz": 936,
+          "amplitude": 21.57282014866272
+        },
+        {
+          "frequencyHz": 938,
+          "amplitude": 21.512639869398196
+        },
+        {
+          "frequencyHz": 940,
+          "amplitude": 21.441309731963372
+        },
+        {
+          "frequencyHz": 942,
+          "amplitude": 21.355763444195613
+        },
+        {
+          "frequencyHz": 944,
+          "amplitude": 21.254515891981704
+        },
+        {
+          "frequencyHz": 946,
+          "amplitude": 21.137856148334976
+        },
+        {
+          "frequencyHz": 948,
+          "amplitude": 21.007930609427927
+        },
+        {
+          "frequencyHz": 950,
+          "amplitude": 20.868710059874907
+        },
+        {
+          "frequencyHz": 952,
+          "amplitude": 20.725840807794334
+        },
+        {
+          "frequencyHz": 954,
+          "amplitude": 20.586386392158047
+        },
+        {
+          "frequencyHz": 956,
+          "amplitude": 20.45847241771368
+        },
+        {
+          "frequencyHz": 958,
+          "amplitude": 20.350852498695126
+        },
+        {
+          "frequencyHz": 960,
+          "amplitude": 20.272417805612164
+        },
+        {
+          "frequencyHz": 962,
+          "amplitude": 20.231676070023074
+        },
+        {
+          "frequencyHz": 964,
+          "amplitude": 20.236227929514406
+        },
+        {
+          "frequencyHz": 966,
+          "amplitude": 20.292269076493
+        },
+        {
+          "frequencyHz": 968,
+          "amplitude": 20.40414577128645
+        },
+        {
+          "frequencyHz": 970,
+          "amplitude": 20.573988930144264
+        },
+        {
+          "frequencyHz": 972,
+          "amplitude": 20.80144831421393
+        },
+        {
+          "frequencyHz": 974,
+          "amplitude": 21.08354350755278
+        },
+        {
+          "frequencyHz": 976,
+          "amplitude": 21.414642621688703
+        },
+        {
+          "frequencyHz": 978,
+          "amplitude": 21.786573289818225
+        },
+        {
+          "frequencyHz": 980,
+          "amplitude": 22.188863837180428
+        },
+        {
+          "frequencyHz": 982,
+          "amplitude": 22.609105873990302
+        },
+        {
+          "frequencyHz": 984,
+          "amplitude": 23.033423291663528
+        },
+        {
+          "frequencyHz": 986,
+          "amplitude": 23.44702707239391
+        },
+        {
+          "frequencyHz": 988,
+          "amplitude": 23.83483073297963
+        },
+        {
+          "frequencyHz": 990,
+          "amplitude": 24.182097854057492
+        },
+        {
+          "frequencyHz": 992,
+          "amplitude": 24.475091172734015
+        },
+        {
+          "frequencyHz": 994,
+          "amplitude": 24.70169224722356
+        },
+        {
+          "frequencyHz": 996,
+          "amplitude": 24.85196176823612
+        },
+        {
+          "frequencyHz": 998,
+          "amplitude": 24.918613147945713
+        },
+        {
+          "frequencyHz": 1000,
+          "amplitude": 24.89737594272588
+        },
+        {
+          "frequencyHz": 1002,
+          "amplitude": 24.787230770590554
+        },
+        {
+          "frequencyHz": 1004,
+          "amplitude": 24.59050341883202
+        },
+        {
+          "frequencyHz": 1006,
+          "amplitude": 24.312812504879858
+        },
+        {
+          "frequencyHz": 1008,
+          "amplitude": 23.96287202475287
+        },
+        {
+          "frequencyHz": 1010,
+          "amplitude": 23.552157053683857
+        },
+        {
+          "frequencyHz": 1012,
+          "amplitude": 23.094447409159105
+        },
+        {
+          "frequencyHz": 1014,
+          "amplitude": 22.60526992316706
+        },
+        {
+          "frequencyHz": 1016,
+          "amplitude": 22.101264808501607
+        },
+        {
+          "frequencyHz": 1018,
+          "amplitude": 21.59950520387027
+        },
+        {
+          "frequencyHz": 1020,
+          "amplitude": 21.116801166476456
+        },
+        {
+          "frequencyHz": 1022,
+          "amplitude": 20.669020041575088
+        },
+        {
+          "frequencyHz": 1024,
+          "amplitude": 20.27045424525721
+        },
+        {
+          "frequencyHz": 1026,
+          "amplitude": 19.933265096042373
+        },
+        {
+          "frequencyHz": 1028,
+          "amplitude": 19.66702754463053
+        },
+        {
+          "frequencyHz": 1030,
+          "amplitude": 19.4783956703078
+        },
+        {
+          "frequencyHz": 1032,
+          "amplitude": 19.370902887301582
+        },
+        {
+          "frequencyHz": 1034,
+          "amplitude": 19.344904231824188
+        },
+        {
+          "frequencyHz": 1036,
+          "amplitude": 19.397661209293076
+        },
+        {
+          "frequencyHz": 1038,
+          "amplitude": 19.523562815013264
+        },
+        {
+          "frequencyHz": 1040,
+          "amplitude": 19.714469841925492
+        },
+        {
+          "frequencyHz": 1042,
+          "amplitude": 19.960163777855335
+        },
+        {
+          "frequencyHz": 1044,
+          "amplitude": 20.248876758351436
+        },
+        {
+          "frequencyHz": 1046,
+          "amplitude": 20.567875415925663
+        },
+        {
+          "frequencyHz": 1048,
+          "amplitude": 20.904069226674455
+        },
+        {
+          "frequencyHz": 1050,
+          "amplitude": 21.244613204693504
+        },
+        {
+          "frequencyHz": 1052,
+          "amplitude": 21.577475561599165
+        },
+        {
+          "frequencyHz": 1054,
+          "amplitude": 21.891943184184882
+        },
+        {
+          "frequencyHz": 1056,
+          "amplitude": 22.179041364925727
+        },
+        {
+          "frequencyHz": 1058,
+          "amplitude": 22.431848957101405
+        },
+        {
+          "frequencyHz": 1060,
+          "amplitude": 22.645695770245254
+        },
+        {
+          "frequencyHz": 1062,
+          "amplitude": 22.818235278848892
+        },
+        {
+          "frequencyHz": 1064,
+          "amplitude": 22.949392264129273
+        },
+        {
+          "frequencyHz": 1066,
+          "amplitude": 23.041191508091273
+        },
+        {
+          "frequencyHz": 1068,
+          "amplitude": 23.097479777751772
+        },
+        {
+          "frequencyHz": 1070,
+          "amplitude": 23.12355876264987
+        },
+        {
+          "frequencyHz": 1072,
+          "amplitude": 23.125751084771
+        },
+        {
+          "frequencyHz": 1074,
+          "amplitude": 23.11092476159542
+        },
+        {
+          "frequencyHz": 1076,
+          "amplitude": 23.08600340712774
+        },
+        {
+          "frequencyHz": 1078,
+          "amplitude": 23.057489909838473
+        },
+        {
+          "frequencyHz": 1080,
+          "amplitude": 23.03103031281394
+        },
+        {
+          "frequencyHz": 1082,
+          "amplitude": 23.01104219823049
+        },
+        {
+          "frequencyHz": 1084,
+          "amplitude": 23.000428176400376
+        },
+        {
+          "frequencyHz": 1086,
+          "amplitude": 23.000390295835228
+        },
+        {
+          "frequencyHz": 1088,
+          "amplitude": 23.01035557750473
+        },
+        {
+          "frequencyHz": 1090,
+          "amplitude": 23.028016728892272
+        },
+        {
+          "frequencyHz": 1092,
+          "amplitude": 23.049485734207817
+        },
+        {
+          "frequencyHz": 1094,
+          "amplitude": 23.069551779727043
+        },
+        {
+          "frequencyHz": 1096,
+          "amplitude": 23.082029184909164
+        },
+        {
+          "frequencyHz": 1098,
+          "amplitude": 23.08017597479412
+        },
+        {
+          "frequencyHz": 1100,
+          "amplitude": 23.05715971248458
+        },
+        {
+          "frequencyHz": 1102,
+          "amplitude": 23.006544425099758
+        },
+        {
+          "frequencyHz": 1104,
+          "amplitude": 22.922771051796673
+        },
+        {
+          "frequencyHz": 1106,
+          "amplitude": 22.80160389641729
+        },
+        {
+          "frequencyHz": 1108,
+          "amplitude": 22.640517082840724
+        },
+        {
+          "frequencyHz": 1110,
+          "amplitude": 22.438997915415797
+        },
+        {
+          "frequencyHz": 1112,
+          "amplitude": 22.198748195173646
+        },
+        {
+          "frequencyHz": 1114,
+          "amplitude": 21.92376972545759
+        },
+        {
+          "frequencyHz": 1116,
+          "amplitude": 21.620326194700166
+        },
+        {
+          "frequencyHz": 1118,
+          "amplitude": 21.2967800452163
+        },
+        {
+          "frequencyHz": 1120,
+          "amplitude": 20.963309495798615
+        },
+        {
+          "frequencyHz": 1122,
+          "amplitude": 20.63151724497622
+        },
+        {
+          "frequencyHz": 1124,
+          "amplitude": 20.313948212302783
+        },
+        {
+          "frequencyHz": 1126,
+          "amplitude": 20.023538673969973
+        },
+        {
+          "frequencyHz": 1128,
+          "amplitude": 19.77302305465363
+        },
+        {
+          "frequencyHz": 1130,
+          "amplitude": 19.574327242776597
+        },
+        {
+          "frequencyHz": 1132,
+          "amplitude": 19.437978459718003
+        },
+        {
+          "frequencyHz": 1134,
+          "amplitude": 19.372561366126817
+        },
+        {
+          "frequencyHz": 1136,
+          "amplitude": 19.38424823811938
+        },
+        {
+          "frequencyHz": 1138,
+          "amplitude": 19.476427776775452
+        },
+        {
+          "frequencyHz": 1140,
+          "amplitude": 19.649452582252106
+        },
+        {
+          "frequencyHz": 1142,
+          "amplitude": 19.90051974975788
+        },
+        {
+          "frequencyHz": 1144,
+          "amplitude": 20.223692702782024
+        },
+        {
+          "frequencyHz": 1146,
+          "amplitude": 20.61006558326597
+        },
+        {
+          "frequencyHz": 1148,
+          "amplitude": 21.04806460666145
+        },
+        {
+          "frequencyHz": 1150,
+          "amplitude": 21.523874106749076
+        },
+        {
+          "frequencyHz": 1152,
+          "amplitude": 22.02196887489345
+        },
+        {
+          "frequencyHz": 1154,
+          "amplitude": 22.525729147898822
+        },
+        {
+          "frequencyHz": 1156,
+          "amplitude": 23.01811048170353
+        },
+        {
+          "frequencyHz": 1158,
+          "amplitude": 23.482337972459053
+        },
+        {
+          "frequencyHz": 1160,
+          "amplitude": 23.902592992926273
+        },
+        {
+          "frequencyHz": 1162,
+          "amplitude": 24.264660867498755
+        },
+        {
+          "frequencyHz": 1164,
+          "amplitude": 24.55650970306067
+        },
+        {
+          "frequencyHz": 1166,
+          "amplitude": 24.768773837949592
+        },
+        {
+          "frequencyHz": 1168,
+          "amplitude": 24.89511990764265
+        },
+        {
+          "frequencyHz": 1170,
+          "amplitude": 24.93247912903543
+        },
+        {
+          "frequencyHz": 1172,
+          "amplitude": 24.88113579774636
+        },
+        {
+          "frequencyHz": 1174,
+          "amplitude": 24.74466885791607
+        },
+        {
+          "frequencyHz": 1176,
+          "amplitude": 24.52975040134866
+        },
+        {
+          "frequencyHz": 1178,
+          "amplitude": 24.24581173624534
+        },
+        {
+          "frequencyHz": 1180,
+          "amplitude": 23.90459390013904
+        },
+        {
+          "frequencyHz": 1182,
+          "amplitude": 23.51960486996133
+        },
+        {
+          "frequencyHz": 1184,
+          "amplitude": 23.10550998096404
+        },
+        {
+          "frequencyHz": 1186,
+          "amplitude": 22.677484998672334
+        },
+        {
+          "frequencyHz": 1188,
+          "amplitude": 22.250562754373384
+        },
+        {
+          "frequencyHz": 1190,
+          "amplitude": 21.839004188985474
+        },
+        {
+          "frequencyHz": 1192,
+          "amplitude": 21.455723063758914
+        },
+        {
+          "frequencyHz": 1194,
+          "amplitude": 21.11179057675993
+        },
+        {
+          "frequencyHz": 1196,
+          "amplitude": 20.81604183088746
+        },
+        {
+          "frequencyHz": 1198,
+          "amplitude": 20.574800755236332
+        },
+        {
+          "frequencyHz": 1200,
+          "amplitude": 20.391733962031946
+        },
+        {
+          "frequencyHz": 1202,
+          "amplitude": 20.267837439275926
+        },
+        {
+          "frequencyHz": 1204,
+          "amplitude": 20.20155326990849
+        },
+        {
+          "frequencyHz": 1206,
+          "amplitude": 20.189007072006653
+        },
+        {
+          "frequencyHz": 1208,
+          "amplitude": 20.224350899342205
+        },
+        {
+          "frequencyHz": 1210,
+          "amplitude": 20.300191226678
+        },
+        {
+          "frequencyHz": 1212,
+          "amplitude": 20.408077624623072
+        },
+        {
+          "frequencyHz": 1214,
+          "amplitude": 20.539025002929723
+        },
+        {
+          "frequencyHz": 1216,
+          "amplitude": 20.684041000179533
+        },
+        {
+          "frequencyHz": 1218,
+          "amplitude": 20.834630279850934
+        },
+        {
+          "frequencyHz": 1220,
+          "amplitude": 20.98324913960209
+        },
+        {
+          "frequencyHz": 1222,
+          "amplitude": 21.123686858969716
+        },
+        {
+          "frequencyHz": 1224,
+          "amplitude": 21.251354437178076
+        },
+        {
+          "frequencyHz": 1226,
+          "amplitude": 21.363466582341925
+        },
+        {
+          "frequencyHz": 1228,
+          "amplitude": 21.459108731022322
+        },
+        {
+          "frequencyHz": 1230,
+          "amplitude": 21.53918719205335
+        },
+        {
+          "frequencyHz": 1232,
+          "amplitude": 21.606266890213796
+        },
+        {
+          "frequencyHz": 1234,
+          "amplitude": 21.66430730029954
+        },
+        {
+          "frequencyHz": 1236,
+          "amplitude": 21.718312691436914
+        },
+        {
+          "frequencyHz": 1238,
+          "amplitude": 21.773917456780126
+        },
+        {
+          "frequencyHz": 1240,
+          "amplitude": 21.836930842307623
+        },
+        {
+          "frequencyHz": 1242,
+          "amplitude": 21.912867625535142
+        },
+        {
+          "frequencyHz": 1244,
+          "amplitude": 22.006492113351097
+        },
+        {
+          "frequencyHz": 1246,
+          "amplitude": 22.121402184144497
+        },
+        {
+          "frequencyHz": 1248,
+          "amplitude": 22.25967802501701
+        },
+        {
+          "frequencyHz": 1250,
+          "amplitude": 22.421616816411166
+        },
+        {
+          "frequencyHz": 1252,
+          "amplitude": 22.605570068966117
+        },
+        {
+          "frequencyHz": 1254,
+          "amplitude": 22.80789485566045
+        },
+        {
+          "frequencyHz": 1256,
+          "amplitude": 23.023024088949796
+        },
+        {
+          "frequencyHz": 1258,
+          "amplitude": 23.243654583609644
+        },
+        {
+          "frequencyHz": 1260,
+          "amplitude": 23.461045254443608
+        },
+        {
+          "frequencyHz": 1262,
+          "amplitude": 23.665411757054635
+        },
+        {
+          "frequencyHz": 1264,
+          "amplitude": 23.846398505588343
+        },
+        {
+          "frequencyHz": 1266,
+          "amplitude": 23.993604576522237
+        },
+        {
+          "frequencyHz": 1268,
+          "amplitude": 24.09713676708784
+        },
+        {
+          "frequencyHz": 1270,
+          "amplitude": 24.148161195645976
+        },
+        {
+          "frequencyHz": 1272,
+          "amplitude": 24.139424415037425
+        },
+        {
+          "frequencyHz": 1274,
+          "amplitude": 24.065716089646887
+        },
+        {
+          "frequencyHz": 1276,
+          "amplitude": 23.92424781721185
+        },
+        {
+          "frequencyHz": 1278,
+          "amplitude": 23.71492653748511
+        },
+        {
+          "frequencyHz": 1280,
+          "amplitude": 23.440505973473048
+        },
+        {
+          "frequencyHz": 1282,
+          "amplitude": 23.106605449845883
+        },
+        {
+          "frequencyHz": 1284,
+          "amplitude": 22.72159193336013
+        },
+        {
+          "frequencyHz": 1286,
+          "amplitude": 22.296327916084852
+        },
+        {
+          "frequencyHz": 1288,
+          "amplitude": 21.843794472891535
+        },
+        {
+          "frequencyHz": 1290,
+          "amplitude": 21.378605131021466
+        },
+        {
+          "frequencyHz": 1292,
+          "amplitude": 20.916431771697685
+        },
+        {
+          "frequencyHz": 1294,
+          "amplitude": 20.47336835721268
+        },
+        {
+          "frequencyHz": 1296,
+          "amplitude": 20.065261607097487
+        },
+        {
+          "frequencyHz": 1298,
+          "amplitude": 19.707039661106382
+        },
+        {
+          "frequencyHz": 1300,
+          "amplitude": 19.41207016279337
+        },
+        {
+          "frequencyHz": 1302,
+          "amplitude": 19.191578049354256
+        },
+        {
+          "frequencyHz": 1304,
+          "amplitude": 19.054150692547193
+        },
+        {
+          "frequencyHz": 1306,
+          "amplitude": 19.005354028227845
+        },
+        {
+          "frequencyHz": 1308,
+          "amplitude": 19.04747813338684
+        },
+        {
+          "frequencyHz": 1310,
+          "amplitude": 19.17942461355455
+        },
+        {
+          "frequencyHz": 1312,
+          "amplitude": 19.396741450264766
+        },
+        {
+          "frequencyHz": 1314,
+          "amplitude": 19.69180395932098
+        },
+        {
+          "frequencyHz": 1316,
+          "amplitude": 20.05413357176712
+        },
+        {
+          "frequencyHz": 1318,
+          "amplitude": 20.470839613722937
+        },
+        {
+          "frequencyHz": 1320,
+          "amplitude": 20.927163451465464
+        },
+        {
+          "frequencyHz": 1322,
+          "amplitude": 21.40709957082963
+        },
+        {
+          "frequencyHz": 1324,
+          "amplitude": 21.894064610915063
+        },
+        {
+          "frequencyHz": 1326,
+          "amplitude": 22.37158324440763
+        },
+        {
+          "frequencyHz": 1328,
+          "amplitude": 22.823959192495202
+        },
+        {
+          "frequencyHz": 1330,
+          "amplitude": 23.236900607035402
+        },
+        {
+          "frequencyHz": 1332,
+          "amplitude": 23.598071494473103
+        },
+        {
+          "frequencyHz": 1334,
+          "amplitude": 23.897544668381205
+        },
+        {
+          "frequencyHz": 1336,
+          "amplitude": 24.128136705494693
+        },
+        {
+          "frequencyHz": 1338,
+          "amplitude": 24.28561129044244
+        },
+        {
+          "frequencyHz": 1340,
+          "amplitude": 24.368743868290277
+        },
+        {
+          "frequencyHz": 1342,
+          "amplitude": 24.379247352401553
+        },
+        {
+          "frequencyHz": 1344,
+          "amplitude": 24.321565415245143
+        },
+        {
+          "frequencyHz": 1346,
+          "amplitude": 24.202546282575863
+        },
+        {
+          "frequencyHz": 1348,
+          "amplitude": 24.03101563862481
+        },
+        {
+          "frequencyHz": 1350,
+          "amplitude": 23.817271950180093
+        },
+        {
+          "frequencyHz": 1352,
+          "amplitude": 23.572531000333928
+        },
+        {
+          "frequencyHz": 1354,
+          "amplitude": 23.308348520400525
+        },
+        {
+          "frequencyHz": 1356,
+          "amplitude": 23.03605042415377
+        },
+        {
+          "frequencyHz": 1358,
+          "amplitude": 22.766199260813632
+        },
+        {
+          "frequencyHz": 1360,
+          "amplitude": 22.508123167359614
+        },
+        {
+          "frequencyHz": 1362,
+          "amplitude": 22.269529945509706
+        },
+        {
+          "frequencyHz": 1364,
+          "amplitude": 22.056224109567378
+        },
+        {
+          "frequencyHz": 1366,
+          "amplitude": 21.871939100424886
+        },
+        {
+          "frequencyHz": 1368,
+          "amplitude": 21.718290634050728
+        },
+        {
+          "frequencyHz": 1370,
+          "amplitude": 21.594850673920103
+        },
+        {
+          "frequencyHz": 1372,
+          "amplitude": 21.49933512198414
+        },
+        {
+          "frequencyHz": 1374,
+          "amplitude": 21.4278923423849
+        },
+        {
+          "frequencyHz": 1376,
+          "amplitude": 21.375474374329606
+        },
+        {
+          "frequencyHz": 1378,
+          "amplitude": 21.33626842534884
+        },
+        {
+          "frequencyHz": 1380,
+          "amplitude": 21.304163181708194
+        },
+        {
+          "frequencyHz": 1382,
+          "amplitude": 21.27322278413785
+        },
+        {
+          "frequencyHz": 1384,
+          "amplitude": 21.238141078515092
+        },
+        {
+          "frequencyHz": 1386,
+          "amplitude": 21.19464997176922
+        },
+        {
+          "frequencyHz": 1388,
+          "amplitude": 21.13985833661612
+        },
+        {
+          "frequencyHz": 1390,
+          "amplitude": 21.07250177624246
+        },
+        {
+          "frequencyHz": 1392,
+          "amplitude": 20.993088478296844
+        },
+        {
+          "frequencyHz": 1394,
+          "amplitude": 20.903932098629497
+        },
+        {
+          "frequencyHz": 1396,
+          "amplitude": 20.809068820111648
+        },
+        {
+          "frequencyHz": 1398,
+          "amplitude": 20.714062105738325
+        },
+        {
+          "frequencyHz": 1400,
+          "amplitude": 20.62570487418188
+        },
+        {
+          "frequencyHz": 1402,
+          "amplitude": 20.551634544225795
+        },
+        {
+          "frequencyHz": 1404,
+          "amplitude": 20.499881321155
+        },
+        {
+          "frequencyHz": 1406,
+          "amplitude": 20.478373972675122
+        },
+        {
+          "frequencyHz": 1408,
+          "amplitude": 20.49442995758013
+        },
+        {
+          "frequencyHz": 1410,
+          "amplitude": 20.554257985023398
+        },
+        {
+          "frequencyHz": 1412,
+          "amplitude": 20.662500825667166
+        },
+        {
+          "frequencyHz": 1414,
+          "amplitude": 20.821844473675867
+        },
+        {
+          "frequencyHz": 1416,
+          "amplitude": 21.032716651536756
+        },
+        {
+          "frequencyHz": 1418,
+          "amplitude": 21.293093310666826
+        },
+        {
+          "frequencyHz": 1420,
+          "amplitude": 21.59842642625507
+        },
+        {
+          "frequencyHz": 1422,
+          "amplitude": 21.941700284338012
+        },
+        {
+          "frequencyHz": 1424,
+          "amplitude": 22.3136169215983
+        },
+        {
+          "frequencyHz": 1426,
+          "amplitude": 22.70290473635579
+        },
+        {
+          "frequencyHz": 1428,
+          "amplitude": 23.09673788196878
+        },
+        {
+          "frequencyHz": 1430,
+          "amplitude": 23.481248210126388
+        },
+        {
+          "frequencyHz": 1432,
+          "amplitude": 23.842106552710575
+        },
+        {
+          "frequencyHz": 1434,
+          "amplitude": 24.16514627573035
+        },
+        {
+          "frequencyHz": 1436,
+          "amplitude": 24.436999509964483
+        },
+        {
+          "frequencyHz": 1438,
+          "amplitude": 24.64571539663863
+        },
+        {
+          "frequencyHz": 1440,
+          "amplitude": 24.781330145425724
+        },
+        {
+          "frequencyHz": 1442,
+          "amplitude": 24.836360672126013
+        },
+        {
+          "frequencyHz": 1444,
+          "amplitude": 24.806196974036602
+        },
+        {
+          "frequencyHz": 1446,
+          "amplitude": 24.689373049799535
+        },
+        {
+          "frequencyHz": 1448,
+          "amplitude": 24.487701851081308
+        },
+        {
+          "frequencyHz": 1450,
+          "amplitude": 24.206266186873236
+        },
+        {
+          "frequencyHz": 1452,
+          "amplitude": 23.853264370011715
+        },
+        {
+          "frequencyHz": 1454,
+          "amplitude": 23.439716359563835
+        },
+        {
+          "frequencyHz": 1456,
+          "amplitude": 22.97904286635168
+        },
+        {
+          "frequencyHz": 1458,
+          "amplitude": 22.486536018325538
+        },
+        {
+          "frequencyHz": 1460,
+          "amplitude": 21.978745422681953
+        },
+        {
+          "frequencyHz": 1462,
+          "amplitude": 21.472807551578512
+        },
+        {
+          "frequencyHz": 1464,
+          "amplitude": 20.985749114299047
+        },
+        {
+          "frequencyHz": 1466,
+          "amplitude": 20.533796324572354
+        },
+        {
+          "frequencyHz": 1468,
+          "amplitude": 20.13172166562882
+        },
+        {
+          "frequencyHz": 1470,
+          "amplitude": 19.7922579131955
+        },
+        {
+          "frequencyHz": 1472,
+          "amplitude": 19.525605890374557
+        },
+        {
+          "frequencyHz": 1474,
+          "amplitude": 19.33905786265674
+        },
+        {
+          "frequencyHz": 1476,
+          "amplitude": 19.236752864338595
+        },
+        {
+          "frequencyHz": 1478,
+          "amplitude": 19.219573859695377
+        },
+        {
+          "frequencyHz": 1480,
+          "amplitude": 19.285189801810954
+        },
+        {
+          "frequencyHz": 1482,
+          "amplitude": 19.42823869936805
+        },
+        {
+          "frequencyHz": 1484,
+          "amplitude": 19.640641082171573
+        },
+        {
+          "frequencyHz": 1486,
+          "amplitude": 19.91202710236278
+        },
+        {
+          "frequencyHz": 1488,
+          "amplitude": 20.230255223535224
+        },
+        {
+          "frequencyHz": 1490,
+          "amplitude": 20.581996293104194
+        },
+        {
+          "frequencyHz": 1492,
+          "amplitude": 20.95335396563389
+        },
+        {
+          "frequencyHz": 1494,
+          "amplitude": 21.3304910801835
+        },
+        {
+          "frequencyHz": 1496,
+          "amplitude": 21.700231752754068
+        },
+        {
+          "frequencyHz": 1498,
+          "amplitude": 22.050610608288423
+        },
+        {
+          "frequencyHz": 1500,
+          "amplitude": 22.37134365217879
+        }
+      ]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "8a5f58f9-0904-4d08-9a32-d98e0b7d78f5",
+      "name": "三极对参考（模拟）",
+      "capturedAt": "2026-11-04T15:12:44.0104099+00:00",
+      "motor": {
+        "name": "三极对方案（模拟）",
+        "topology": "BrushlessPermanentMagnet",
+        "polePairs": 3,
+        "slots": 12,
+        "commutatorSegments": 10,
+        "minimumRpm": 0,
+        "maximumRpm": 6000,
+        "stepRpm": 100,
+        "inspectRpm": 1800,
+        "maximumHz": 1500,
+        "includeSlotPass": true,
+        "includeIdealCogging": true,
+        "symmetricUnskewedAssumption": true,
+        "assumptionNotes": "仅示例：等槽、对称永磁、无偏心的理想周期，不作幅值预测。",
+        "hiddenCandidates": []
+      },
+      "customOrders": [
+        {
+          "id": "edff23b6-6a9c-45b8-b257-2eba544897d6",
+          "name": "二倍转频待验证",
+          "order": 2,
+          "basis": "模拟工程假设，与电气基频同频；通过变转速和电流/振动同步采集进一步区分。",
+          "enabled": true
+        }
+      ],
+      "demonstration": true
+    }
+  ],
+  "history": [
+    {
+      "at": "2026-11-04T15:12:44.0175464+00:00",
+      "action": "载入独立示例",
+      "detail": "固定模拟公式；非实测；1800 r/min、p=2、Q=12"
+    }
+  ],
+  "review": {
+    "matchToleranceHz": 3,
+    "maximumPeaks": 10,
+    "notes": ""
+  }
+}

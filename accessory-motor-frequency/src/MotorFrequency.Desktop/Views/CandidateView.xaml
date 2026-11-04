@@ -1,0 +1,70 @@
+<UserControl x:Class="MotorFrequency.Desktop.Views.CandidateView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:charts="clr-namespace:MotorFrequency.Desktop.Controls"
+    xmlns:conv="clr-namespace:MotorFrequency.Desktop.Services">
+    <UserControl.Resources><conv:CandidateBrushConverter x:Key="CandidateBrush"/></UserControl.Resources>
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel>
+            <TextBlock Text="候选与频率—转速图" Style="{StaticResource Heading}"/>
+            <TextBlock Text="实线为当前候选，虚线为所选快照，琥珀带为敏感频带，圆点为输入频谱内部峰点。横向点击图中位置可移动观察转速。" Style="{StaticResource Hint}"/>
+            <charts:FrequencyPlot Project="{Binding Current}" Snapshot="{Binding SelectedScenario}" InspectCommand="{Binding InspectRpmCommand}" Height="340" MinWidth="350"/>
+            <ItemsControl ItemsSource="{Binding Candidates}" Margin="0,10,0,0">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Margin="0,3,16,3" Opacity="0.9">
+                            <Rectangle Width="15" Height="4" Fill="{Binding Id, Converter={StaticResource CandidateBrush}}" Margin="0,0,6,0"/>
+                            <TextBlock Text="{Binding Name}" FontSize="11"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <DataGrid ItemsSource="{Binding Candidates}" SelectedItem="{Binding SelectedCandidate}" Height="180" Margin="0,12,0,8">
+                <DataGrid.Columns>
+                    <DataGridCheckBoxColumn Header="参与" Binding="{Binding Visible}" Width="45"/>
+                    <DataGridTextColumn Header="候选" Binding="{Binding Name}" Width="190"/>
+                    <DataGridTextColumn Header="机械阶次" Binding="{Binding Order, StringFormat=G7}" Width="80"/>
+                    <DataGridTextColumn Header="公式" Binding="{Binding Formula}" Width="190"/>
+                    <DataGridTextColumn Header="类别" Binding="{Binding Category}" Width="100"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <Button Content="切换所选候选参与状态" Command="{Binding ToggleCandidateCommand}" HorizontalAlignment="Left"/>
+            <TextBlock Text="{Binding SelectedBasis}" Style="{StaticResource Hint}"/>
+            <TextBlock Text="当前观察转速下的频率 / Hz" Style="{StaticResource Subheading}"/>
+            <DataGrid ItemsSource="{Binding FrequencyRows}" Height="140">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="候选" Binding="{Binding Name}" Width="200"/>
+                    <DataGridTextColumn Header="阶次" Binding="{Binding Order, StringFormat=G7}" Width="80"/>
+                    <DataGridTextColumn Header="转速 r/min" Binding="{Binding Rpm, StringFormat=G7}" Width="100"/>
+                    <DataGridTextColumn Header="频率 Hz" Binding="{Binding FrequencyHz, StringFormat=G9}" Width="120"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <GroupBox Header="有依据的自定义机械阶次" IsEnabled="{Binding Editable}">
+                <StackPanel>
+                    <TextBlock Text="仅用于与机械转速成正比的候选 f=k×n/60。固定PWM载波不能用一个恒定机械阶次代替。" Style="{StaticResource Hint}"/>
+                    <UniformGrid Columns="2">
+                        <StackPanel Margin="0,0,10,0">
+                            <TextBlock Text="候选名称" Style="{StaticResource FieldLabel}"/>
+                            <TextBox Text="{Binding Order.Name, UpdateSourceTrigger=PropertyChanged}" MaxLength="100"/>
+                        </StackPanel>
+                        <StackPanel>
+                            <TextBlock Text="阶次 k（0.001～10000，可小数）" Style="{StaticResource FieldLabel}"/>
+                            <TextBox Text="{Binding Order.Order, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+                    </UniformGrid>
+                    <TextBlock Text="依据（必填，说明推导、假设或试验来源）" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding Order.Basis, UpdateSourceTrigger=PropertyChanged}" Height="65" TextWrapping="Wrap" AcceptsReturn="True" MaxLength="2000"/>
+                    <Button Content="添加自定义候选" Command="{Binding AddOrderCommand}" HorizontalAlignment="Left"/>
+                    <DataGrid ItemsSource="{Binding Current.CustomOrders}" SelectedItem="{Binding SelectedOrder}" Height="130">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="名称" Binding="{Binding Name}" Width="180"/>
+                            <DataGridTextColumn Header="阶次" Binding="{Binding Order, StringFormat=G7}" Width="80"/>
+                            <DataGridTextColumn Header="依据" Binding="{Binding Basis}" Width="300"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Button Content="删除所选自定义候选…" Command="{Binding RemoveOrderCommand}" HorizontalAlignment="Left"/>
+                </StackPanel>
+            </GroupBox>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

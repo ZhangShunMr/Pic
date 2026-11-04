@@ -1,0 +1,31 @@
+<UserControl x:Class="MotorFrequency.Desktop.Views.CompareView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:charts="clr-namespace:MotorFrequency.Desktop.Controls">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel>
+            <TextBlock Text="方案快照与频率比较" Style="{StaticResource Heading}"/>
+            <TextBlock Text="快照保存当时的电机和自定义候选副本，不跟随当前修改。最多12个快照；当前频谱不复制进快照。" Style="{StaticResource Hint}"/>
+            <DockPanel Margin="0,8,0,12">
+                <Button DockPanel.Dock="Right" Content="记录当前已应用方案" Command="{Binding CaptureCommand}"/>
+                <TextBox Text="{Binding ScenarioName, UpdateSourceTrigger=PropertyChanged}" MaxLength="100" ToolTip="填写快照名称后记录" VerticalAlignment="Center"/>
+            </DockPanel>
+            <TextBlock Text="比较基准（选择后叠加到频率图）" Style="{StaticResource FieldLabel}"/>
+            <ComboBox ItemsSource="{Binding Current.Scenarios}" SelectedItem="{Binding SelectedScenario}" DisplayMemberPath="Name"/>
+            <Border Background="#FFF3D8" Padding="12" Margin="0,12,0,12"><TextBlock Text="{Binding ComparisonStatement}"/></Border>
+            <charts:FrequencyPlot Project="{Binding Current}" Snapshot="{Binding SelectedScenario}" InspectCommand="{Binding InspectRpmCommand}" Height="280"/>
+            <DataGrid ItemsSource="{Binding Comparison}" Height="230" Margin="0,12,0,8">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="候选" Binding="{Binding Name}" Width="180"/>
+                    <DataGridTextColumn Header="当前阶次" Binding="{Binding CurrentOrder, StringFormat=G7}" Width="85"/>
+                    <DataGridTextColumn Header="快照阶次" Binding="{Binding SnapshotOrder, StringFormat=G7}" Width="85"/>
+                    <DataGridTextColumn Header="当前 Hz" Binding="{Binding CurrentHz, StringFormat=G8}" Width="90"/>
+                    <DataGridTextColumn Header="快照 Hz" Binding="{Binding SnapshotHz, StringFormat=G8}" Width="90"/>
+                    <DataGridTextColumn Header="当前−快照 Hz" Binding="{Binding DifferenceHz, StringFormat=G8}" Width="115"/>
+                    <DataGridTextColumn Header="解释" Binding="{Binding Statement}" Width="360"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <Button Content="删除所选快照…" Command="{Binding RemoveScenarioCommand}" HorizontalAlignment="Left"/>
+            <TextBlock Text="比较只给参数候选频率差，不代表改善量。拓扑或扫描范围变化会显著提示；相同候选按稳定标识对应，新增或未启用项保留空值。" Style="{StaticResource Hint}"/>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

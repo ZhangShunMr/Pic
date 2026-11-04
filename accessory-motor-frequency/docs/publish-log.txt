@@ -1,0 +1,8 @@
+  Determining projects to restore...
+  Restored /workspace/Pic/accessory-motor-frequency/src/MotorFrequency.Application/MotorFrequency.Application.csproj (in 241 ms).
+  Restored /workspace/Pic/accessory-motor-frequency/src/MotorFrequency.Core/MotorFrequency.Core.csproj (in 233 ms).
+  Restored /workspace/Pic/accessory-motor-frequency/src/MotorFrequency.Desktop/MotorFrequency.Desktop.csproj (in 241 ms).
+  MotorFrequency.Core -> /workspace/Pic/accessory-motor-frequency/src/MotorFrequency.Core/bin/Release/net10.0/MotorFrequency.Core.dll
+  MotorFrequency.Application -> /workspace/Pic/accessory-motor-frequency/src/MotorFrequency.Application/bin/Release/net10.0/MotorFrequency.Application.dll
+  MotorFrequency.Desktop -> /workspace/Pic/accessory-motor-frequency/src/MotorFrequency.Desktop/bin/Release/net10.0-windows/win-x64/MotorFrequency.dll
+  MotorFrequency.Desktop -> /workspace/Pic/accessory-motor-frequency/artifacts/win-x64/

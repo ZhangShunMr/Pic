@@ -1,0 +1,58 @@
+PASS 示例项目全量校验
+PASS 人工手算1800转机械30电气60槽360齿槽360
+PASS 多转速手算 n=0
+PASS 多转速手算 n=600
+PASS 多转速手算 n=1800
+PASS 多转速手算 n=3600
+PASS 多转速手算 n=100000
+PASS 12槽10极理想齿槽60阶
+PASS 分数阶次0.5
+PASS 非法负阶与负转速
+PASS 非有限数值
+PASS 有刷单刷10片300Hz且不输出同步电频槽齿槽
+PASS 齿槽假设缺失拒绝
+PASS 未启用齿槽不自动提供候选
+PASS 输入边界 reversed
+PASS 输入边界 step
+PASS 输入边界 inspect
+PASS 输入边界 zeroPole
+PASS 输入边界 slots
+PASS 输入边界 NaN
+PASS 输入边界 tooManySteps
+PASS 输入边界 negative
+PASS 合法参数上下限
+PASS 扫描非整步长终点纳入
+PASS 解析频段转速1650至1950
+PASS 单点频段边界包含
+PASS 同频多候选均保留
+PASS 比较统一1800转当前60快照90差负30
+PASS CSV有效与BOM
+PASS CSV整批拒绝 坏表头
+PASS CSV整批拒绝 重复频率
+PASS CSV整批拒绝 降序
+PASS CSV整批拒绝 坏数字
+PASS CSV整批拒绝 NaN
+PASS CSV整批拒绝 额外列
+PASS CSV整批拒绝 中间空行
+PASS CSV整批拒绝 负频率
+PASS CSV整批拒绝 仅一行
+PASS CSV线性幅值拒负数
+PASS CSV负dB可接受
+PASS 元信息缺参考量拒绝
+PASS 项目序列化完整往返
+PASS 损坏JSON拒绝
+PASS 未知版本拒绝
+PASS 未知字段拒绝
+PASS 缺少motor字段不静默默认
+PASS 重复标识与空对象拒绝
+PASS CSV公式注入转义
+PASS HTML用户文本编码
+PASS 导出频率CSV来源版本单位哈希
+PASS SVG含真实候选路径
+PASS 扫查9组含二极对60Hz
+PASS 扫查重复值和超限拒绝
+PASS 反算60Hz电频对应1800转
+PASS 输入复核表与JSON包含来源边界
+PASS 频谱网格统计2Hz与最大幅值范围
+PASS 扫查上下文哈希稳定且响应参数变化
+TOTAL 57; PASS 57; FAIL 0

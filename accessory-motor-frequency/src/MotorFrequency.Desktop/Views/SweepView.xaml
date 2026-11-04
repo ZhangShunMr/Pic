@@ -1,0 +1,56 @@
+<UserControl x:Class="MotorFrequency.Desktop.Views.SweepView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel>
+            <TextBlock Text="参数研究" Style="{StaticResource Heading}"/>
+            <TextBlock Text="无刷枚举极对数与槽数组合，有刷枚举换向片数。沿用当前已应用候选、启用状态和假设，不评估绕组、磁力、制造可行性或声压优劣。" Style="{StaticResource Hint}"/>
+            <UniformGrid Columns="2">
+                <StackPanel Margin="0,0,10,0">
+                    <TextBlock Text="无刷极对数 p（英文逗号分隔）" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding Sweep.Poles, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Text="有刷换向片 K（英文逗号分隔）" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding Sweep.Segments, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Text="目标观察频率 Hz（0～1000000）" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding Sweep.Frequency, UpdateSourceTrigger=PropertyChanged}"/>
+                </StackPanel>
+                <StackPanel>
+                    <TextBlock Text="无刷槽数 Q（英文逗号分隔）" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding Sweep.Slots, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Text="参考转速 r/min（0～100000）" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding Sweep.Rpm, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Text="反算 / 频差容差 Hz（0～1000）" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding Sweep.Tolerance, UpdateSourceTrigger=PropertyChanged}"/>
+                </StackPanel>
+            </UniformGrid>
+            <TextBlock Text="每组1～12个不同整数；p=1～64，Q=1～512，K=2～512。只校验当前拓扑适用的列表。" Style="{StaticResource Hint}"/>
+            <Button Content="运行参数扫查与反算" Command="{Binding SweepCommand}" HorizontalAlignment="Left" Style="{StaticResource PrimaryButton}"/>
+            <Border Background="#FFF3D8" Padding="12" Margin="0,10,0,5"><TextBlock Text="{Binding SweepStatement}"/></Border>
+            <TextBlock Text="整数参数枚举结果" Style="{StaticResource Subheading}"/>
+            <DataGrid ItemsSource="{Binding SweepRows}" Height="260">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="p" Binding="{Binding PolePairs}" Width="45"/>
+                    <DataGridTextColumn Header="Q" Binding="{Binding Slots}" Width="45"/>
+                    <DataGridTextColumn Header="K" Binding="{Binding Segments}" Width="45"/>
+                    <DataGridTextColumn Header="候选" Binding="{Binding Candidate}" Width="180"/>
+                    <DataGridTextColumn Header="阶次" Binding="{Binding Order, StringFormat=G7}" Width="80"/>
+                    <DataGridTextColumn Header="频率 Hz" Binding="{Binding FrequencyHz, StringFormat=G8}" Width="90"/>
+                    <DataGridTextColumn Header="计算−目标 Hz" Binding="{Binding DifferenceHz, StringFormat=G7}" Width="115"/>
+                    <DataGridCheckBoxColumn Header="容差内" Binding="{Binding WithinTolerance}" Width="65"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <TextBlock Text="当前候选的转速反算" Style="{StaticResource Subheading}"/>
+            <TextBlock Text="中心转速=60×目标频率/阶次；区间由目标频率±容差换算，下限频率截零。表中区间不裁切到扫描范围，范围内标记仅检查中心。" Style="{StaticResource Hint}"/>
+            <DataGrid ItemsSource="{Binding ReverseRows}" Height="220">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="候选" Binding="{Binding Candidate}" Width="180"/>
+                    <DataGridTextColumn Header="阶次" Binding="{Binding Order, StringFormat=G7}" Width="70"/>
+                    <DataGridTextColumn Header="中心 r/min" Binding="{Binding CenterRpm, StringFormat=G8}" Width="100"/>
+                    <DataGridTextColumn Header="下限 r/min" Binding="{Binding LowerRpm, StringFormat=G8}" Width="100"/>
+                    <DataGridTextColumn Header="上限 r/min" Binding="{Binding UpperRpm, StringFormat=G8}" Width="100"/>
+                    <DataGridCheckBoxColumn Header="中心范围内" Binding="{Binding WithinScan}" Width="90"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <TextBlock Text="在成果输出页分别选择“本次参数扫查”和“本次转速反算”保存。会话结果不随项目保存；重开后需按记录的条件重新运行。" Style="{StaticResource Hint}"/>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

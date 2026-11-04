@@ -1,0 +1,21 @@
+<UserControl x:Class="MotorFrequency.Desktop.Views.HistoryView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid>
+        <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+        <TextBlock Text="输入变更与操作记录" Style="{StaticResource Heading}"/>
+        <TextBlock Grid.Row="1" Text="时间为UTC。撤销重做恢复输入状态，已有操作记录继续保留；最多保留最近2000条。此记录用于工程追溯，不是不可篡改审计。" Style="{StaticResource Hint}"/>
+        <WrapPanel Grid.Row="2" Margin="0,4,0,10">
+            <Button Content="撤销输入修改" Command="{Binding UndoCommand}"/>
+            <Button Content="重做输入修改" Command="{Binding RedoCommand}"/>
+            <Button Content="归档 / 取消归档…" Command="{Binding ArchiveCommand}"/>
+        </WrapPanel>
+        <DataGrid Grid.Row="3" ItemsSource="{Binding Current.History}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="UTC时间" Binding="{Binding At, StringFormat=yyyy-MM-dd HH:mm:ss}" Width="170"/>
+                <DataGridTextColumn Header="操作" Binding="{Binding Action}" Width="160"/>
+                <DataGridTextColumn Header="详情" Binding="{Binding Detail}" Width="450"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <TextBlock Grid.Row="4" Text="归档暂停内容修改，仍可保存、导出与复制。撤销栈只在当前会话内有效，最多30步；项目重开后操作记录保留，撤销栈重新开始。" Style="{StaticResource Hint}"/>
+    </Grid>
+</UserControl>

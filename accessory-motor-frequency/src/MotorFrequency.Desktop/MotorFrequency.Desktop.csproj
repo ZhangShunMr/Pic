@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <AssemblyName>MotorFrequency</AssemblyName>
+    <Product>汽车附件电机电磁激励频率设计软件</Product>
+    <Version>2.0.0</Version>
+  </PropertyGroup>
+  <ItemGroup><ProjectReference Include="../MotorFrequency.Application/MotorFrequency.Application.csproj" /></ItemGroup>
+</Project>

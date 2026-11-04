@@ -1,0 +1,36 @@
+<UserControl x:Class="MotorFrequency.Desktop.Views.OutputView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="clr-namespace:MotorFrequency.Application;assembly=MotorFrequency.Application">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel>
+            <TextBlock Text="保存与成果输出" Style="{StaticResource Heading}"/>
+            <TextBlock Text="项目文件保存全部已应用参数、频带、原始频点、快照和历史，可搬迁重开。成果文件是静态输出，不承担软件界面。" Style="{StaticResource Hint}"/>
+            <GroupBox Header="项目文件 · .motorproj">
+                <StackPanel>
+                    <TextBlock Text="{Binding FilePath}" TextWrapping="Wrap"/>
+                    <WrapPanel Margin="0,10,0,5">
+                        <Button Content="保存" Command="{Binding SaveCommand}" Style="{StaticResource PrimaryButton}"/>
+                        <Button Content="另存为…" Command="{Binding SaveAsCommand}"/>
+                        <Button Content="复制为新项目" Command="{Binding DuplicateCommand}"/>
+                    </WrapPanel>
+                    <TextBlock Text="再次保存已有文件会生成上一版.bak。打开备份会建立新副本。磁盘文件被外部修改、移动或删除时拒绝覆盖，请另存或重新打开核对。" Style="{StaticResource Hint}"/>
+                    <TextBlock Text="保存会校验并应用档案、电机和复核草稿。新增候选、频带、CSV和快照请先完成或重置。未保存退出会出现保存、放弃与取消选项。" Style="{StaticResource Hint}"/>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="可追溯成果">
+                <StackPanel>
+                    <TextBlock Text="选择输出内容" Style="{StaticResource FieldLabel}"/>
+                    <ComboBox ItemsSource="{x:Static vm:WorkspaceViewModel.ExportOptions}" SelectedItem="{Binding SelectedExport}" DisplayMemberPath="Label"/>
+                    <Button Content="选择位置并导出…" Command="{Binding ExportCommand}" HorizontalAlignment="Left" Margin="0,15,0,10" Style="{StaticResource PrimaryButton}"/>
+                    <TextBlock Text="频率扫描、交叠、谱峰核对与比较提供CSV；报告为自包含HTML，图为SVG，核对清单为JSON。静态HTML报告可在阅读工具中打开，软件自身不启动浏览器或服务。" Style="{StaticResource Hint}"/>
+                    <TextBlock Text="原始点CSV仅含频率与幅值，必须与项目或报告配套保存其转速、单位、参考量和来源。参数研究结果为本次会话工具，需单独导出。" Style="{StaticResource Hint}"/>
+                    <TextBlock Text="SVG只包含当前候选与频带；频谱峰点及快照虚线保留在桌面查看中。图表裁切不影响完整数据表。CSV采用UTF-8 BOM，文字字段防止公式起始字符。" Style="{StaticResource Hint}"/>
+                </StackPanel>
+            </GroupBox>
+            <TextBlock Text="最近成功写入的位置" Style="{StaticResource Subheading}"/>
+            <TextBox Text="{Binding LastOutput, Mode=OneWay}" IsReadOnly="True" TextWrapping="Wrap"/>
+            <Button Content="在资源管理器中定位" Command="{Binding RevealCommand}" HorizontalAlignment="Left"/>
+            <TextBlock Text="{Binding Boundary}" Style="{StaticResource Hint}" Margin="0,24,0,0"/>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

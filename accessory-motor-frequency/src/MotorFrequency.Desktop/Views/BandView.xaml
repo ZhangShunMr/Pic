@@ -1,0 +1,56 @@
+<UserControl x:Class="MotorFrequency.Desktop.Views.BandView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="clr-namespace:MotorFrequency.Application;assembly=MotorFrequency.Application">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel>
+            <TextBlock Text="敏感频带与交叠" Style="{StaticResource Heading}"/>
+            <TextBlock Text="记录模态、关注频率或其他敏感区及来源。解析计算候选进入和离开频带的转速闭区间；交叠不证明实际共振。" Style="{StaticResource Hint}"/>
+            <DataGrid ItemsSource="{Binding Current.Bands}" SelectedItem="{Binding SelectedBand}" Height="170">
+                <DataGrid.Columns>
+                    <DataGridCheckBoxColumn Header="启用" Binding="{Binding Enabled}" Width="45"/>
+                    <DataGridTextColumn Header="频带名称" Binding="{Binding Name}" Width="160"/>
+                    <DataGridTextColumn Header="下限 Hz" Binding="{Binding LowerHz, StringFormat=G8}" Width="90"/>
+                    <DataGridTextColumn Header="上限 Hz" Binding="{Binding UpperHz, StringFormat=G8}" Width="90"/>
+                    <DataGridTextColumn Header="来源" Binding="{Binding Origin}" Width="120"/>
+                    <DataGridTextColumn Header="依据" Binding="{Binding Basis}" Width="240"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <WrapPanel>
+                <Button Content="切换所选频带启用" Command="{Binding ToggleBandCommand}"/>
+                <Button Content="删除所选频带…" Command="{Binding RemoveBandCommand}"/>
+            </WrapPanel>
+            <GroupBox Header="新增敏感频带" IsEnabled="{Binding Editable}">
+                <StackPanel>
+                    <TextBlock Text="名称" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding Band.Name, UpdateSourceTrigger=PropertyChanged}" MaxLength="100"/>
+                    <UniformGrid Columns="2">
+                        <StackPanel Margin="0,0,10,0">
+                            <TextBlock Text="下限 Hz（0～1000000）" Style="{StaticResource FieldLabel}"/>
+                            <TextBox Text="{Binding Band.Lower, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+                        <StackPanel>
+                            <TextBlock Text="上限 Hz（≥下限，可零宽度）" Style="{StaticResource FieldLabel}"/>
+                            <TextBox Text="{Binding Band.Upper, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+                    </UniformGrid>
+                    <TextBlock Text="来源类型" Style="{StaticResource FieldLabel}"/>
+                    <ComboBox ItemsSource="{x:Static vm:WorkspaceViewModel.Origins}" DisplayMemberPath="Label" SelectedValuePath="Value" SelectedValue="{Binding Band.Origin}"/>
+                    <TextBlock Text="来源与边界条件（必填）" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding Band.Basis, UpdateSourceTrigger=PropertyChanged}" Height="65" TextWrapping="Wrap" AcceptsReturn="True" MaxLength="2000"/>
+                    <Button Content="添加频带" Command="{Binding AddBandCommand}" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Left"/>
+                </StackPanel>
+            </GroupBox>
+            <TextBlock Text="交叠转速区间（含端点）" Style="{StaticResource Subheading}"/>
+            <TextBlock Text="没有行表示当前启用候选与频带在扫描范围内无几何交叠。隐藏候选、停用频带不参与。" Style="{StaticResource Hint}"/>
+            <DataGrid ItemsSource="{Binding Crossings}" SelectedItem="{Binding SelectedCrossing}" Height="200">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="候选" Binding="{Binding CandidateName}" Width="180"/>
+                    <DataGridTextColumn Header="频带" Binding="{Binding BandName}" Width="150"/>
+                    <DataGridTextColumn Header="进入 r/min" Binding="{Binding LowerRpm, StringFormat=G8}" Width="110"/>
+                    <DataGridTextColumn Header="离开 r/min" Binding="{Binding UpperRpm, StringFormat=G8}" Width="110"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <Button Content="在所选区间中点观察" Command="{Binding InspectCrossingCommand}" HorizontalAlignment="Left"/>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

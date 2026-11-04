@@ -1,0 +1,17 @@
+{
+  "major_functions_hanzi": 1279,
+  "manual_first_section": "软件介绍，含应用背景和软件概述",
+  "manual_characters": 11824,
+  "production_files": 47,
+  "production_nonblank_lines": 4130,
+  "manual_actual_word_pages": null,
+  "word_pagination_verified": false,
+  "real_windows_screenshots": 0,
+  "template": "沿用备份说明书A4、2.1/2.0厘米页边距、18/14/10.5pt层级；用户专用登记模板未提供",
+  "status": "Draft; DOCX structures/text checked, visual layout and Word pagination NOT executed",
+  "pending": [
+    "Windows实际运行和截图",
+    "Microsoft Word分页不少于10页及逐页排版",
+    "申请人信息/权属/日期/模板核实"
+  ]
+}

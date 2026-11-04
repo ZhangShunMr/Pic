@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 516" role="img">
+<rect width="900" height="516" fill="#faf9f4"/>
+<path d="M 68 316 H 860" stroke="#dddcd3"/>
+<text x="58" y="320" text-anchor="end" font-size="12">0</text>
+<path d="M 68 257.6 H 860" stroke="#dddcd3"/>
+<text x="58" y="261.6" text-anchor="end" font-size="12">300</text>
+<path d="M 68 199.2 H 860" stroke="#dddcd3"/>
+<text x="58" y="203.2" text-anchor="end" font-size="12">600</text>
+<path d="M 68 140.8 H 860" stroke="#dddcd3"/>
+<text x="58" y="144.8" text-anchor="end" font-size="12">900</text>
+<path d="M 68 82.4 H 860" stroke="#dddcd3"/>
+<text x="58" y="86.4" text-anchor="end" font-size="12">1200</text>
+<path d="M 68 24 H 860" stroke="#dddcd3"/>
+<text x="58" y="28" text-anchor="end" font-size="12">1500</text>
+<path d="M 68 24 V 316" stroke="#e7e5dc"/>
+<text x="68" y="337" text-anchor="middle" font-size="12">0</text>
+<path d="M 200 24 V 316" stroke="#e7e5dc"/>
+<text x="200" y="337" text-anchor="middle" font-size="12">1000</text>
+<path d="M 332 24 V 316" stroke="#e7e5dc"/>
+<text x="332" y="337" text-anchor="middle" font-size="12">2000</text>
+<path d="M 464 24 V 316" stroke="#e7e5dc"/>
+<text x="464" y="337" text-anchor="middle" font-size="12">3000</text>
+<path d="M 596 24 V 316" stroke="#e7e5dc"/>
+<text x="596" y="337" text-anchor="middle" font-size="12">4000</text>
+<path d="M 728 24 V 316" stroke="#e7e5dc"/>
+<text x="728" y="337" text-anchor="middle" font-size="12">5000</text>
+<path d="M 860 24 V 316" stroke="#e7e5dc"/>
+<text x="860" y="337" text-anchor="middle" font-size="12">6000</text>
+<rect x="68" y="303.347" width="792" height="1.947" fill="#b19136" opacity="0.16"/>
+<rect x="68" y="242.027" width="792" height="7.787" fill="#b19136" opacity="0.16"/>
+<path d="M 68 316 L 860 296.533" stroke="#85608b" fill="none" stroke-width="2"/>
+<path d="M 68 316 L 860 277.067" stroke="#1d6860" fill="none" stroke-width="2"/>
+<path d="M 68 316 L 860 82.4" stroke="#566da1" fill="none" stroke-width="2"/>
+<path d="M 68 316 L 860 82.4" stroke="#85608b" fill="none" stroke-width="2"/>
+<path d="M 68 316 L 860 277.067" stroke="#4b7c8b" fill="none" stroke-width="2"/>
+<path d="M 305.6 24 V 316" stroke="#333" stroke-dasharray="5 5"/>
+<text x="10" y="18" font-size="12">Hz</text><text x="790" y="357" font-size="12">r/min</text>
+<text x="68" y="380" font-size="14">附件电机 &#183; 60 Hz 候选核对（模拟） · V2.0</text>
+<text x="68" y="403" font-size="12">候选频率参考；模拟演示；非声压预测</text>
+<path d="M 68 434 h 20" stroke="#85608b" stroke-width="3"/>
+<text x="96" y="438" font-size="12">机械转频 · 1阶</text>
+<path d="M 463 434 h 20" stroke="#1d6860" stroke-width="3"/>
+<text x="491" y="438" font-size="12">电气基频 · 2阶</text>
+<path d="M 68 456 h 20" stroke="#566da1" stroke-width="3"/>
+<text x="96" y="460" font-size="12">槽通过参考 · 12阶</text>
+<path d="M 463 456 h 20" stroke="#85608b" stroke-width="3"/>
+<text x="491" y="460" font-size="12">理想齿槽周期候选 · 12阶</text>
+<path d="M 68 478 h 20" stroke="#4b7c8b" stroke-width="3"/>
+<text x="96" y="482" font-size="12">二倍转频待验证 · 2阶</text>
+</svg>

@@ -1,0 +1,338 @@
+{
+  "scope": "Handwritten src/**/*.cs and src/**/*.xaml, nonblank lines; excludes tests, scripts, docs, obj/bin and dependencies",
+  "old_baseline_nonblank_lines": 3661,
+  "target": 3500,
+  "target_reason": "Native platform replacement, not feature-expansion reconstruction; see docs/开发方案.md",
+  "files": [
+    {
+      "path": "src/MotorFrequency.Application/DocumentFile.cs",
+      "purpose": "原生项目文件会话、冲突检测与备份写入",
+      "nonblank_lines": 109,
+      "physical_lines": 117,
+      "sha256": "bd5fc39fe5c3d248678cd0203fb4bc8b39db5f61ba0769ff71a3e915bf35dbf1"
+    },
+    {
+      "path": "src/MotorFrequency.Application/EntryDrafts.cs",
+      "purpose": "新增和条件草稿的绑定通知",
+      "nonblank_lines": 95,
+      "physical_lines": 106,
+      "sha256": "00583158cd400345b93f57395c52b2231f73733569bcb7ae12d42eb8a32516e0"
+    },
+    {
+      "path": "src/MotorFrequency.Application/MotorDraft.cs",
+      "purpose": "拓扑参数草稿与显式类型解析",
+      "nonblank_lines": 120,
+      "physical_lines": 128,
+      "sha256": "6476fa78e5fbce542b08657a12e09b65ef5f625bce3b4e3f23da831f4ef76aa9"
+    },
+    {
+      "path": "src/MotorFrequency.Application/ObservableObject.cs",
+      "purpose": "MVVM通知、命令与原生交互抽象",
+      "nonblank_lines": 67,
+      "physical_lines": 79,
+      "sha256": "324decc1812856b578427e1e35c6195ec764657cd1c839e43c1da27fffe437ab"
+    },
+    {
+      "path": "src/MotorFrequency.Application/WorkspaceAnalysis.cs",
+      "purpose": "候选频带频谱业务、快照、扫查与导出命令",
+      "nonblank_lines": 320,
+      "physical_lines": 342,
+      "sha256": "096911ba37eb5c0f0679a17e720fd59572b113f0efd9c44aeaf6a039482e4dfd"
+    },
+    {
+      "path": "src/MotorFrequency.Application/WorkspaceCommands.cs",
+      "purpose": "项目生命周期、草稿应用、历史与未保存保护",
+      "nonblank_lines": 343,
+      "physical_lines": 361,
+      "sha256": "af73e7544e79c5b4b0f560ee4eb5a25381b4ac982e12eb55eec987e0b9c129a8"
+    },
+    {
+      "path": "src/MotorFrequency.Application/WorkspaceViewModel.cs",
+      "purpose": "工作区状态、选择联动与有效结果读取",
+      "nonblank_lines": 253,
+      "physical_lines": 266,
+      "sha256": "269db607bbb6cbc0a3d7a588d4fc79c88e531f50a726acc3702bd13f5651f4de"
+    },
+    {
+      "path": "src/MotorFrequency.Core/Domain/Models.cs",
+      "purpose": "领域对象、参数、来源、候选与结果记录",
+      "nonblank_lines": 180,
+      "physical_lines": 200,
+      "sha256": "c7157ab5c735743385690be806c5fbba2622412059c058ca75c65e86497e6864"
+    },
+    {
+      "path": "src/MotorFrequency.Core/Services/ChartGeometry.cs",
+      "purpose": "独立SVG导出与保极值的绘图点抽稀",
+      "nonblank_lines": 137,
+      "physical_lines": 149,
+      "sha256": "d50a65d96c87c41a89e57a0418645d5f761e6b2e6ce6c07bb79b923254a510af"
+    },
+    {
+      "path": "src/MotorFrequency.Core/Services/Demonstration.cs",
+      "purpose": "明确标记来源的独立模拟示例",
+      "nonblank_lines": 84,
+      "physical_lines": 86,
+      "sha256": "353c3ed8069885d449cbba8e17e42f34b514607545dd8258c6cae5035f7d3b5e"
+    },
+    {
+      "path": "src/MotorFrequency.Core/Services/ExportService.cs",
+      "purpose": "可追溯CSV与静态HTML报告",
+      "nonblank_lines": 153,
+      "physical_lines": 162,
+      "sha256": "afa821a89098f6924e267790c4982801e06a017f1c17f706254ed6697a1f0942"
+    },
+    {
+      "path": "src/MotorFrequency.Core/Services/FrequencyEngine.cs",
+      "purpose": "候选周期、扫描、解析交叠、谱峰与比较",
+      "nonblank_lines": 197,
+      "physical_lines": 208,
+      "sha256": "7bb91e0e8d65bfc12e65e7e69c7fc583061206c3f5773030e7f29ecdd64cd8b9"
+    },
+    {
+      "path": "src/MotorFrequency.Core/Services/Labels.cs",
+      "purpose": "拓扑来源名称与数值呈现",
+      "nonblank_lines": 29,
+      "physical_lines": 34,
+      "sha256": "a0da3431937e8dae2f363fb6b5fa108cc731bb24f5fb1ad381b3d647d4e9ef26"
+    },
+    {
+      "path": "src/MotorFrequency.Core/Services/ParameterSweep.cs",
+      "purpose": "整数参数枚举与转速反算",
+      "nonblank_lines": 179,
+      "physical_lines": 189,
+      "sha256": "cb894ab3ef79517d6e9ab795d2b50421f0783b08f479682aba0207c938d78369"
+    },
+    {
+      "path": "src/MotorFrequency.Core/Services/ProjectCodec.cs",
+      "purpose": "严格项目编解码、克隆与文本哈希",
+      "nonblank_lines": 82,
+      "physical_lines": 89,
+      "sha256": "57d2ad47b8a05ffc99905269791cfe2c92835f922f4e4d8bc9297aeb2991fe77"
+    },
+    {
+      "path": "src/MotorFrequency.Core/Services/ProjectReview.cs",
+      "purpose": "输入证据与后续复核清单",
+      "nonblank_lines": 60,
+      "physical_lines": 64,
+      "sha256": "fde8cc164941e4d2a421ecc33b1b3933d7dd94f26fa1259057f26bf3b2fb3f6f"
+    },
+    {
+      "path": "src/MotorFrequency.Core/Services/ProjectValidator.cs",
+      "purpose": "领域数值边界、来源和引用验证",
+      "nonblank_lines": 319,
+      "physical_lines": 332,
+      "sha256": "af4a2e3e34e2eae15581e58092a04dad7b566dfdc7106794263100e4302f05ba"
+    },
+    {
+      "path": "src/MotorFrequency.Core/Services/RequiredSchema.cs",
+      "purpose": "必填字段、空值与重复JSON字段检查",
+      "nonblank_lines": 70,
+      "physical_lines": 73,
+      "sha256": "dcf7e82c5303114799fd7986c780d4a448977d16178103dffe4390eddce9661f"
+    },
+    {
+      "path": "src/MotorFrequency.Core/Services/SpectrumCsv.cs",
+      "purpose": "频谱全量预检、来源记录与原始点交换",
+      "nonblank_lines": 95,
+      "physical_lines": 100,
+      "sha256": "413aace4f53533d54996543f804fd0ab6ec447b5064e081e13f3dfe97b7391ea"
+    },
+    {
+      "path": "src/MotorFrequency.Core/Services/SpectrumStatistics.cs",
+      "purpose": "输入频率网格与幅值汇总",
+      "nonblank_lines": 64,
+      "physical_lines": 67,
+      "sha256": "e257e437183e1ea6c18277b884c4ce5679ccb4cd38acbf396a61fb0c527a3089"
+    },
+    {
+      "path": "src/MotorFrequency.Desktop/App.xaml",
+      "purpose": "原生应用资源、样式与控件约定",
+      "nonblank_lines": 101,
+      "physical_lines": 101,
+      "sha256": "82c1e5322df5bc505825e88218af3fb0808cc38ff27c12dbf702443461c2c505"
+    },
+    {
+      "path": "src/MotorFrequency.Desktop/App.xaml.cs",
+      "purpose": "WPF生命周期与未处理界面异常反馈",
+      "nonblank_lines": 15,
+      "physical_lines": 17,
+      "sha256": "9ca66c6e954f65594c4ce9e70254529b5c7827acb0d85b732ed57fcf29bc6042"
+    },
+    {
+      "path": "src/MotorFrequency.Desktop/Controls/FrequencyPlot.cs",
+      "purpose": "候选频率、频带、快照及谱峰WPF绘图",
+      "nonblank_lines": 100,
+      "physical_lines": 106,
+      "sha256": "363d41d409d008e37ba1fc332e5d144d27d07f4c8fe861f0f18ba2d91bf93363"
+    },
+    {
+      "path": "src/MotorFrequency.Desktop/Controls/PlotBase.cs",
+      "purpose": "原生图形坐标、文字、网格与空状态",
+      "nonblank_lines": 59,
+      "physical_lines": 66,
+      "sha256": "f56351fd4ca741c727e82125e158ec5d31da3a371a86f039a38bb2a73a92a584"
+    },
+    {
+      "path": "src/MotorFrequency.Desktop/Controls/SpectrumPlot.cs",
+      "purpose": "单条原始频谱WPF绘图与内部峰标记",
+      "nonblank_lines": 67,
+      "physical_lines": 70,
+      "sha256": "e3fc15d09abe49190bc8a5c0bba0cdec68af1d3c7f5f34504d15c6372dee1af2"
+    },
+    {
+      "path": "src/MotorFrequency.Desktop/MainWindow.xaml",
+      "purpose": "原生窗口菜单、纵向导航、工作区与条件检查器",
+      "nonblank_lines": 165,
+      "physical_lines": 165,
+      "sha256": "40e350942677f9150ae86c07d62592d67544807f28ff3ade7de162bc8c53b014"
+    },
+    {
+      "path": "src/MotorFrequency.Desktop/MainWindow.xaml.cs",
+      "purpose": "窗口初始化、关闭保护与本机帮助",
+      "nonblank_lines": 33,
+      "physical_lines": 39,
+      "sha256": "efcccda87a7e6948f8e7312c25da32b0d834540f9c179ffb0196cb324f183ba1"
+    },
+    {
+      "path": "src/MotorFrequency.Desktop/Services/CandidateBrushConverter.cs",
+      "purpose": "候选图例与轨迹的稳定颜色映射",
+      "nonblank_lines": 20,
+      "physical_lines": 23,
+      "sha256": "cb92c2ebf8c7f990186de904ab94ec1c6d1f294323d2ad8e781bc072d57fefa3"
+    },
+    {
+      "path": "src/MotorFrequency.Desktop/Services/NativeInteraction.cs",
+      "purpose": "Windows原生文件选择、确认与成果定位",
+      "nonblank_lines": 72,
+      "physical_lines": 79,
+      "sha256": "4a20f43e581cc99fe2668eee0acfcbb75c9ca4bb6a041b44ed8f47999a1df531"
+    },
+    {
+      "path": "src/MotorFrequency.Desktop/Views/BandView.xaml",
+      "purpose": "频带来源与解析交叠原生控件绑定",
+      "nonblank_lines": 56,
+      "physical_lines": 56,
+      "sha256": "a191709dc0a805464b38301cb67f2e9264c7e02b00a7a8b013dac1e590648f4f"
+    },
+    {
+      "path": "src/MotorFrequency.Desktop/Views/BandView.xaml.cs",
+      "purpose": "频带来源与解析交叠视图初始化",
+      "nonblank_lines": 9,
+      "physical_lines": 11,
+      "sha256": "00eeaa5239196e0e895bf819a040bda5b4c8a0b810f1eb9f7945722a959dcf9d"
+    },
+    {
+      "path": "src/MotorFrequency.Desktop/Views/CandidateView.xaml",
+      "purpose": "候选依据、频率图和自定义阶次原生控件绑定",
+      "nonblank_lines": 70,
+      "physical_lines": 70,
+      "sha256": "a9d06c126052cbe84aeb0764731d104c180b4292ee2bbd80fdcb193057908aef"
+    },
+    {
+      "path": "src/MotorFrequency.Desktop/Views/CandidateView.xaml.cs",
+      "purpose": "候选依据、频率图和自定义阶次视图初始化",
+      "nonblank_lines": 9,
+      "physical_lines": 11,
+      "sha256": "be2a51e415714493dbcb70cdc4704c0cbf6265b31169547fd120870dc7a34bcc"
+    },
+    {
+      "path": "src/MotorFrequency.Desktop/Views/CompareView.xaml",
+      "purpose": "方案快照与统一条件比较原生控件绑定",
+      "nonblank_lines": 31,
+      "physical_lines": 31,
+      "sha256": "3a79ba03229a8b92441ee8976a11fd5485f6ecb9160802a253d559599875e611"
+    },
+    {
+      "path": "src/MotorFrequency.Desktop/Views/CompareView.xaml.cs",
+      "purpose": "方案快照与统一条件比较视图初始化",
+      "nonblank_lines": 9,
+      "physical_lines": 11,
+      "sha256": "f11aa52b2c4ce230e6adfb90e6b458ded276a1769a1665eb24c567105ff97619"
+    },
+    {
+      "path": "src/MotorFrequency.Desktop/Views/HistoryView.xaml",
+      "purpose": "变更记录、撤销重做与归档原生控件绑定",
+      "nonblank_lines": 21,
+      "physical_lines": 21,
+      "sha256": "bee6347a595e0e45b6aa35bd7fc4abb1bb2bd01b1eaffc97848a6d678819d5c0"
+    },
+    {
+      "path": "src/MotorFrequency.Desktop/Views/HistoryView.xaml.cs",
+      "purpose": "变更记录、撤销重做与归档视图初始化",
+      "nonblank_lines": 9,
+      "physical_lines": 11,
+      "sha256": "7ed2422c1a9231a4d47b63f6bb7d8d743bf9b1a0c952acfa297d1594e78cacf6"
+    },
+    {
+      "path": "src/MotorFrequency.Desktop/Views/MotorView.xaml",
+      "purpose": "电机拓扑和转速输入原生控件绑定",
+      "nonblank_lines": 65,
+      "physical_lines": 65,
+      "sha256": "733710ec4423a235b8e6cf760bb35f31f722fba2e04a40f5c4dfc7ed7170894e"
+    },
+    {
+      "path": "src/MotorFrequency.Desktop/Views/MotorView.xaml.cs",
+      "purpose": "电机拓扑和转速输入视图初始化",
+      "nonblank_lines": 9,
+      "physical_lines": 11,
+      "sha256": "88eaf3a1b5947d7884f154c6a9084e20dd298e6ec38fb6d85af638735043d568"
+    },
+    {
+      "path": "src/MotorFrequency.Desktop/Views/OutputView.xaml",
+      "purpose": "原生文件保存和成果输出原生控件绑定",
+      "nonblank_lines": 36,
+      "physical_lines": 36,
+      "sha256": "6d29c51d70e246b449949c76b0e8f3be6361f64766b111092774240eadb3a295"
+    },
+    {
+      "path": "src/MotorFrequency.Desktop/Views/OutputView.xaml.cs",
+      "purpose": "原生文件保存和成果输出视图初始化",
+      "nonblank_lines": 9,
+      "physical_lines": 11,
+      "sha256": "8ca741691d0471e74c15d51b288a0d082a08d7ef37ea5bd68d1c3cc4895329b0"
+    },
+    {
+      "path": "src/MotorFrequency.Desktop/Views/OverviewView.xaml",
+      "purpose": "项目档案与输入核对原生控件绑定",
+      "nonblank_lines": 36,
+      "physical_lines": 36,
+      "sha256": "fe2098500c859ad28e0b652f8c88a8dfff84ec4e697f9b62b5667993f4e9f0ee"
+    },
+    {
+      "path": "src/MotorFrequency.Desktop/Views/OverviewView.xaml.cs",
+      "purpose": "项目档案与输入核对视图初始化",
+      "nonblank_lines": 9,
+      "physical_lines": 11,
+      "sha256": "d3eccfde79ae987dfefce3a3af3cc607bed8c265c7974fe2c5c9b6be40835d27"
+    },
+    {
+      "path": "src/MotorFrequency.Desktop/Views/SpectrumView.xaml",
+      "purpose": "频谱导入、预检、口径与邻近核对原生控件绑定",
+      "nonblank_lines": 90,
+      "physical_lines": 90,
+      "sha256": "3a59845e3f0bf8a6b1d6907f747fdc92fe88a83183f5b46659dc3f5191123e3b"
+    },
+    {
+      "path": "src/MotorFrequency.Desktop/Views/SpectrumView.xaml.cs",
+      "purpose": "频谱导入、预检、口径与邻近核对视图初始化",
+      "nonblank_lines": 9,
+      "physical_lines": 11,
+      "sha256": "3258e9f3e0f5a06a0116bdae9edabaea8e257597b1de5747e7cf20b290c92af2"
+    },
+    {
+      "path": "src/MotorFrequency.Desktop/Views/SweepView.xaml",
+      "purpose": "参数扫查和反算原生控件绑定",
+      "nonblank_lines": 56,
+      "physical_lines": 56,
+      "sha256": "6fcc0573021450a96435a326b1e59a11ecf00ed25f3ee15190667bfb5f01e9f3"
+    },
+    {
+      "path": "src/MotorFrequency.Desktop/Views/SweepView.xaml.cs",
+      "purpose": "参数扫查和反算视图初始化",
+      "nonblank_lines": 9,
+      "physical_lines": 11,
+      "sha256": "4ae5e28b96ca75ce67cb4b7ba86e21759c1f1d0393722ed78c09ce7275abf90f"
+    }
+  ],
+  "nonblank_lines": 4130
+}

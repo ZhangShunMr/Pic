@@ -1,0 +1,17 @@
+  Determining projects to restore...
+  Restored /workspace/Pic/accessory-motor-frequency/src/MotorFrequency.Core/MotorFrequency.Core.csproj (in 107 ms).
+  Restored /workspace/Pic/accessory-motor-frequency/src/MotorFrequency.Application/MotorFrequency.Application.csproj (in 68 ms).
+  Restored /workspace/Pic/accessory-motor-frequency/src/MotorFrequency.Desktop/MotorFrequency.Desktop.csproj (in 172 ms).
+  3 of 6 projects are up-to-date for restore.
+  MotorFrequency.Core -> /workspace/Pic/accessory-motor-frequency/src/MotorFrequency.Core/bin/Release/net10.0/MotorFrequency.Core.dll
+  MotorFrequency.Verification -> /workspace/Pic/accessory-motor-frequency/tests/MotorFrequency.Verification/bin/Release/net10.0/MotorFrequency.Verification.dll
+  MotorFrequency.Application -> /workspace/Pic/accessory-motor-frequency/src/MotorFrequency.Application/bin/Release/net10.0/MotorFrequency.Application.dll
+  MotorFrequency.Application.Verification -> /workspace/Pic/accessory-motor-frequency/tests/MotorFrequency.Application.Verification/bin/Release/net10.0/MotorFrequency.Application.Verification.dll
+  MotorFrequency.Desktop -> /workspace/Pic/accessory-motor-frequency/src/MotorFrequency.Desktop/bin/Release/net10.0-windows/MotorFrequency.dll
+  MotorFrequency.Desktop.Verification -> /workspace/Pic/accessory-motor-frequency/tests/MotorFrequency.Desktop.Verification/bin/Release/net10.0-windows/MotorFrequency.Desktop.Verification.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:09.66

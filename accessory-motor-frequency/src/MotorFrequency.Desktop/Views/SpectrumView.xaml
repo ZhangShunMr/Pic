@@ -1,0 +1,90 @@
+<UserControl x:Class="MotorFrequency.Desktop.Views.SpectrumView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="clr-namespace:MotorFrequency.Application;assembly=MotorFrequency.Application"
+    xmlns:charts="clr-namespace:MotorFrequency.Desktop.Controls">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel>
+            <TextBlock Text="频谱输入与邻近复核" Style="{StaticResource Heading}"/>
+            <TextBlock Text="每条频谱使用自己的采集转速和幅值单位。只进行离散内部局部极大点筛选与绝对频差比较，不混合不同频谱的幅值。" Style="{StaticResource Hint}"/>
+            <ComboBox ItemsSource="{Binding Current.Spectra}" SelectedItem="{Binding SelectedSpectrum}" DisplayMemberPath="Name"/>
+            <TextBlock Text="{Binding SpectrumSource}" Style="{StaticResource Hint}"/>
+            <charts:SpectrumPlot Spectrum="{Binding SelectedSpectrum}" MaximumHz="{Binding Current.Motor.MaximumHz}" Project="{Binding Current}" Height="250"/>
+            <TextBlock Text="{Binding SpectrumSummary.Statement}" Style="{StaticResource Hint}"/>
+            <WrapPanel>
+                <TextBlock Text="输入点数："/><TextBlock Text="{Binding SpectrumSummary.TotalPoints}" Margin="0,0,18,0"/>
+                <TextBlock Text="中位间距 Hz："/><TextBlock Text="{Binding SpectrumSummary.MedianSpacingHz, StringFormat=G6}"/>
+            </WrapPanel>
+            <WrapPanel>
+                <Button Content="切换峰点在频率图中叠加" Command="{Binding ToggleSpectrumCommand}"/>
+                <Button Content="删除所选频谱…" Command="{Binding RemoveSpectrumCommand}"/>
+            </WrapPanel>
+            <TextBlock Text="内部谱峰与全部邻近候选" Style="{StaticResource Subheading}"/>
+            <DataGrid ItemsSource="{Binding PeakMatches}" Height="180">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="谱峰 Hz" Binding="{Binding ObservedHz, StringFormat=G8}" Width="90"/>
+                    <DataGridTextColumn Header="幅值" Binding="{Binding Amplitude, StringFormat=G7}" Width="80"/>
+                    <DataGridTextColumn Header="单位" Binding="{Binding Unit}" Width="70"/>
+                    <DataGridTextColumn Header="邻近候选" Binding="{Binding CandidateName}" Width="190"/>
+                    <DataGridTextColumn Header="计算 Hz" Binding="{Binding ExpectedHz, StringFormat=G8}" Width="90"/>
+                    <DataGridTextColumn Header="观测−计算 Hz" Binding="{Binding DifferenceHz, StringFormat=G7}" Width="120"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            <TextBlock Text="无行表示没有符合规则的内部峰，不代表没有激励。端点不找峰，平台取左缘，不插值；频率邻近不能证明来源。" Style="{StaticResource Hint}"/>
+            <GroupBox Header="复核口径（应用后重新计算）" IsEnabled="{Binding Editable}">
+                <StackPanel>
+                    <UniformGrid Columns="2">
+                        <StackPanel Margin="0,0,10,0">
+                            <TextBlock Text="绝对频差容差 Hz（0～1000）" Style="{StaticResource FieldLabel}"/>
+                            <TextBox Text="{Binding Review.Tolerance, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+                        <StackPanel>
+                            <TextBlock Text="每谱最多内部峰数（1～50）" Style="{StaticResource FieldLabel}"/>
+                            <TextBox Text="{Binding Review.PeakCount, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+                    </UniformGrid>
+                    <TextBlock Text="复核备注" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding Review.Notes, UpdateSourceTrigger=PropertyChanged}" Height="70" TextWrapping="Wrap" AcceptsReturn="True" MaxLength="4000"/>
+                    <Button Content="应用复核口径及当前条件" Command="{Binding ApplyCommand}" HorizontalAlignment="Left"/>
+                </StackPanel>
+            </GroupBox>
+            <Expander Header="导入新频谱 · UTF-8 CSV，先预检再确认" IsExpanded="True" Margin="0,16,0,0" IsEnabled="{Binding Editable}">
+                <StackPanel Margin="0,10,0,0">
+                    <TextBlock Text="表头 frequency_hz,amplitude；英文逗号和小数点，无引号、千位分隔符或中间空行。2～10000点，频率严格递增且0～1000000 Hz；文件不超过1 MiB。" Style="{StaticResource Hint}"/>
+                    <WrapPanel>
+                        <Button Content="读取CSV文件…" Command="{Binding ReadCsvCommand}"/>
+                        <Button Content="保存CSV模板…" Command="{Binding TemplateCommand}"/>
+                    </WrapPanel>
+                    <TextBlock Text="{Binding Import.FileName}" Style="{StaticResource Hint}"/>
+                    <UniformGrid Columns="2">
+                        <StackPanel Margin="0,0,10,0">
+                            <TextBlock Text="频谱名称（必填）" Style="{StaticResource FieldLabel}"/>
+                            <TextBox Text="{Binding Import.Name, UpdateSourceTrigger=PropertyChanged}" MaxLength="100"/>
+                            <TextBlock Text="采集转速 r/min（0～100000）" Style="{StaticResource FieldLabel}"/>
+                            <TextBox Text="{Binding Import.Rpm, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock Text="幅值单位" Style="{StaticResource FieldLabel}"/>
+                            <ComboBox ItemsSource="{x:Static vm:WorkspaceViewModel.Units}" SelectedItem="{Binding Import.Unit}"/>
+                        </StackPanel>
+                        <StackPanel>
+                            <TextBlock Text="来源类型" Style="{StaticResource FieldLabel}"/>
+                            <ComboBox ItemsSource="{x:Static vm:WorkspaceViewModel.Origins}" SelectedValuePath="Value" DisplayMemberPath="Label" SelectedValue="{Binding Import.Origin}"/>
+                            <TextBlock Text="参考量 / 幅值口径（必填）" Style="{StaticResource FieldLabel}"/>
+                            <TextBox Text="{Binding Import.Reference, UpdateSourceTrigger=PropertyChanged}" MaxLength="200"/>
+                            <TextBlock Text="采集工况与来源（必填）" Style="{StaticResource FieldLabel}"/>
+                            <TextBox Text="{Binding Import.Condition, UpdateSourceTrigger=PropertyChanged}" MaxLength="1000"/>
+                        </StackPanel>
+                    </UniformGrid>
+                    <TextBlock Text="CSV内容（可粘贴或修改）" Style="{StaticResource FieldLabel}"/>
+                    <TextBox Text="{Binding Import.Csv, UpdateSourceTrigger=PropertyChanged}" Height="150" FontFamily="Consolas" FontSize="12" AcceptsReturn="True" AcceptsTab="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
+                    <WrapPanel>
+                        <Button Content="预检当前输入" Command="{Binding PreviewCsvCommand}"/>
+                        <Button Content="确认导入频谱" Command="{Binding ImportCsvCommand}" Style="{StaticResource PrimaryButton}"/>
+                    </WrapPanel>
+                    <TextBlock Text="{Binding PreviewStatement}" Style="{StaticResource Hint}"/>
+                    <ItemsControl ItemsSource="{Binding ImportIssues}">
+                        <ItemsControl.ItemTemplate><DataTemplate><TextBlock Foreground="#A12D22" Margin="0,3"><Run Text="{Binding Path}"/><Run Text="："/><Run Text="{Binding Message}"/></TextBlock></DataTemplate></ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Expander>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

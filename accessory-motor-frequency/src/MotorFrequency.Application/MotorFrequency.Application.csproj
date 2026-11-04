@@ -1,0 +1,3 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup><ProjectReference Include="../MotorFrequency.Core/MotorFrequency.Core.csproj" /></ItemGroup>
+</Project>

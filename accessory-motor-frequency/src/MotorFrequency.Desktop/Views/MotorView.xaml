@@ -1,0 +1,65 @@
+<UserControl x:Class="MotorFrequency.Desktop.Views.MotorView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="clr-namespace:MotorFrequency.Application;assembly=MotorFrequency.Application">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel>
+            <TextBlock Text="电机与转速条件" Style="{StaticResource Heading}"/>
+            <TextBlock Text="先选择结构类型。无刷仅适用于同步永磁运行；有刷采用换向片通过参考。草稿在应用前不影响已有结果。" Style="{StaticResource Hint}"/>
+            <StackPanel IsEnabled="{Binding Editable}">
+                <TextBlock Text="电机名称" Style="{StaticResource FieldLabel}"/>
+                <TextBox Text="{Binding Motor.Name, UpdateSourceTrigger=PropertyChanged}" MaxLength="100"/>
+                <TextBlock Text="结构与运行条件" Style="{StaticResource FieldLabel}"/>
+                <ComboBox ItemsSource="{x:Static vm:WorkspaceViewModel.Topologies}" DisplayMemberPath="Label" SelectedValuePath="Value" SelectedValue="{Binding Motor.Topology}"/>
+                <GroupBox Header="永磁无刷结构" IsEnabled="{Binding Motor.IsBrushless}">
+                    <StackPanel>
+                        <UniformGrid Columns="2">
+                            <StackPanel Margin="0,0,10,0">
+                                <TextBlock Text="极对数 p（1～64）" Style="{StaticResource FieldLabel}"/>
+                                <TextBox Text="{Binding Motor.PolePairs, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="定子槽数 Q（1～512）" Style="{StaticResource FieldLabel}"/>
+                                <TextBox Text="{Binding Motor.Slots, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+                        </UniformGrid>
+                        <CheckBox Content="生成槽通过运动学参考" IsChecked="{Binding Motor.IncludeSlotPass}"/>
+                        <CheckBox Content="生成理想齿槽周期候选" IsChecked="{Binding Motor.IncludeCogging}"/>
+                        <CheckBox Content="确认等槽、对称永磁、无斜槽的理想结构假设" IsChecked="{Binding Motor.Symmetric}"/>
+                        <TextBlock Text="假设依据（启用理想齿槽时必填，说明结构与证据来源）" Style="{StaticResource FieldLabel}"/>
+                        <TextBox Text="{Binding Motor.Assumptions, UpdateSourceTrigger=PropertyChanged}" Height="75" TextWrapping="Wrap" AcceptsReturn="True" MaxLength="2000" VerticalScrollBarVisibility="Auto"/>
+                        <TextBlock Text="电频 p×n/60 是电角周期，不能自动作为电磁力时间或空间阶次。理想齿槽周期也不提供力或噪声幅值。" Style="{StaticResource Hint}"/>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="永磁有刷结构" IsEnabled="{Binding Motor.IsBrushed}">
+                    <StackPanel>
+                        <TextBlock Text="换向片数 K（2～512）" Style="{StaticResource FieldLabel}"/>
+                        <TextBox Text="{Binding Motor.Segments, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="仅计算单刷等宽换向片通过 K×n/60，不乘电刷数，不自动生成同步电气基频。未使用拓扑的档案参数保留合法值。" Style="{StaticResource Hint}"/>
+                    </StackPanel>
+                </GroupBox>
+                <TextBlock Text="转速与图表范围" Style="{StaticResource Subheading}"/>
+                <UniformGrid Columns="2">
+                    <StackPanel Margin="0,0,10,0">
+                        <TextBlock Text="起始转速 r/min（0～100000）" Style="{StaticResource FieldLabel}"/>
+                        <TextBox Text="{Binding Motor.MinimumRpm, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="扫描步长 r/min（0.1～100000）" Style="{StaticResource FieldLabel}"/>
+                        <TextBox Text="{Binding Motor.StepRpm, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="频率图上限 Hz（1～1000000）" Style="{StaticResource FieldLabel}"/>
+                        <TextBox Text="{Binding Motor.MaximumHz, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="终止转速 r/min（大于起始）" Style="{StaticResource FieldLabel}"/>
+                        <TextBox Text="{Binding Motor.MaximumRpm, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBlock Text="观察转速 r/min（位于扫描范围内）" Style="{StaticResource FieldLabel}"/>
+                        <TextBox Text="{Binding Motor.InspectRpm, UpdateSourceTrigger=PropertyChanged}"/>
+                    </StackPanel>
+                </UniformGrid>
+                <TextBlock Text="扫描区间最多2000个步长，终点总是纳入。观察转速可不在网格上。交叠区间为解析计算，不受扫描步长限制。" Style="{StaticResource Hint}"/>
+                <WrapPanel>
+                    <Button Content="应用条件并重新计算" Command="{Binding ApplyCommand}" Style="{StaticResource PrimaryButton}"/>
+                    <Button Content="重置全部草稿" Command="{Binding ResetCommand}"/>
+                </WrapPanel>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
