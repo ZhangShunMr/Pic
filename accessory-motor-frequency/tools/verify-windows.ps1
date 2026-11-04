@@ -3,6 +3,10 @@ $ErrorActionPreference = "Stop"
 Set-Location (Split-Path $PSScriptRoot -Parent)
 if (-not $IsWindows -and $PSVersionTable.PSVersion.Major -ge 6) { throw "Run on Windows with an interactive desktop." }
 New-Item $Output -ItemType Directory -Force | Out-Null
+foreach ($record in @('result.json', 'published-exe.json', 'word-pagination.json', 'native-dialogs.json', 'failure.txt')) {
+    $path = Join-Path $Output $record
+    if (Test-Path $path) { Remove-Item $path -Force }
+}
 dotnet build MotorFrequency.sln -c Release | Tee-Object -FilePath (Join-Path $Output 'build-log.txt')
 if ($LASTEXITCODE -ne 0) { throw "Build failed" }
 dotnet run --project tests/MotorFrequency.Verification -c Release --no-build | Tee-Object -FilePath (Join-Path $Output 'core-log.txt')

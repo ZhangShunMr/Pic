@@ -2,17 +2,21 @@
 {
   "major_functions_hanzi": 1279,
   "manual_first_section": "软件介绍，含应用背景和软件概述",
-  "manual_characters": 11824,
+  "manual_characters": 13514,
   "production_files": 47,
   "production_nonblank_lines": 4130,
   "manual_actual_word_pages": null,
   "word_pagination_verified": false,
-  "real_windows_screenshots": 0,
+  "real_windows_screenshots": 12,
+  "manual_embedded_native_figures": 12,
+  "windows_verification_run": "41860507345",
+  "windows_source_commit": "21e81e15b4c47d1b120b325e84278ef798d48fae",
+  "word_com_available_on_runner": false,
   "template": "沿用备份说明书A4、2.1/2.0厘米页边距、18/14/10.5pt层级；用户专用登记模板未提供",
-  "status": "Draft; DOCX structures/text checked, visual layout and Word pagination NOT executed",
+  "status": "Draft; actual native screenshots embedded and references checked; Microsoft Word layout/pagination NOT executed",
   "pending": [
-    "Windows实际运行和截图",
     "Microsoft Word分页不少于10页及逐页排版",
+    "Windows10/11设备、高DPI及其余人工操作验收",
     "申请人信息/权属/日期/模板核实"
   ]
 }

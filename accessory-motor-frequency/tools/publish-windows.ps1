@@ -8,5 +8,16 @@ Copy-Item docs artifacts/win-x64/docs -Recurse -Force
 Get-ChildItem artifacts/win-x64 -Recurse -Filter *.pdb | Remove-Item -Force
 New-Item release -ItemType Directory -Force | Out-Null
 Compress-Archive -Path artifacts/win-x64/* -DestinationPath release/MotorFrequency-V2.0-win-x64.zip -Force
-Get-FileHash release/MotorFrequency-V2.0-win-x64.zip -Algorithm SHA256 | Format-List
+$archive = Get-Item release/MotorFrequency-V2.0-win-x64.zip
+$hash = Get-FileHash $archive.FullName -Algorithm SHA256
+@{
+    software = '汽车附件电机电磁激励频率设计软件'
+    version = 'V2.0'
+    archive = $archive.Name
+    archive_bytes = $archive.Length
+    archive_sha256 = $hash.Hash
+    windows_execution_verified = $false
+    note = 'Local publish rebuild only. The previous CI byte-level verification does not automatically apply to this newly rebuilt archive.'
+} | ConvertTo-Json | Set-Content release/发布清单.json -Encoding utf8
+$hash | Format-List
 Write-Host "Extract every file, then run MotorFrequency.exe on Windows. This publish script does not validate WPF execution."

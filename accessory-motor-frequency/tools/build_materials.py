@@ -5,12 +5,21 @@ import subprocess
 import sys
 from docx import Document
 from docx.shared import Cm, Pt
+from PIL import Image
+import hashlib
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 
 root = Path(__file__).resolve().parents[1]
 subprocess.run([sys.executable, str(root / 'tools/source_inventory.py')], check=True)
 name = '汽车附件电机电磁激励频率设计软件 V2.0'
+evidence_dir = root / 'docs/windows-evidence'
+run_path = evidence_dir / 'result.json'
+run = json.loads(run_path.read_text(encoding='utf-8-sig')) if run_path.exists() else {}
+windows_verified = run.get('result') == 'passed' and not run.get('bindingErrors')
+word_path = evidence_dir / 'word-pagination.json'
+word = json.loads(word_path.read_text(encoding='utf-8-sig')) if word_path.exists() else {}
+figures = []
 
 def setup(title, source=False):
     doc = Document()
@@ -34,9 +43,9 @@ def setup(title, source=False):
     field = OxmlElement('w:fldSimple')
     field.set(qn('w:instr'), 'PAGE')
     footer._p.append(field)
-    footer.add_run(' 页 | ' + ('实际生产源码，不含测试/生成文件' if source else 'Windows截图与Word分页待验收'))
+    footer.add_run(' 页 | ' + ('实际生产源码，不含测试/生成文件' if source else '已附真实WPF截图；Word分页待验收' if windows_verified else 'Windows截图与Word分页待验收'))
     doc.core_properties.title = name + ' ' + title
-    doc.core_properties.subject = '原生桌面版交付；未经Windows界面和Microsoft Word实际分页验收'
+    doc.core_properties.subject = '原生桌面版交付；Windows CI记录见正文；Microsoft Word实际分页待验收'
     return doc
 
 manual_text = (root / 'docs/操作说明书.md').read_text(encoding='utf-8')
@@ -46,7 +55,38 @@ manual = setup('操作说明书')
 for line in manual_text.splitlines():
     if not line.strip():
         continue
-    if line.startswith('# '):
+    picture = re.fullmatch(r'!\[(.+)\]\(((?:windows-evidence|screenshots/ci-\d+)/[^)]+\.png)\)', line)
+    if picture:
+        if not windows_verified:
+            raise RuntimeError('Cannot embed native capture without successful Windows evidence')
+        path = root / 'docs' / picture.group(2)
+        figure_run_path = path.parent / 'result.json'
+        figure_run = json.loads(figure_run_path.read_text(encoding='utf-8-sig'))
+        if figure_run.get('result') != 'passed':
+            raise RuntimeError('Figure does not have a passed real Windows source run')
+        with Image.open(path) as image:
+            width, height = image.size
+            rectangle = image.getbbox()
+        # Crop only the document picture frame; the original PNG bytes are retained unchanged.
+        # Central-workspace figures remain legible at print width and are explicitly labelled.
+        central = '工作区局部' in picture.group(1)
+        if central:
+            rectangle = (242, 38, min(806, width), min(703, height))
+        left, top, right, bottom = rectangle
+        frame_width = 12.5 if central else 16.8
+        shape = manual.add_picture(str(path), width=Cm(frame_width))
+        shape.height = Cm(frame_width * (bottom - top) / (right - left))
+        manual.paragraphs[-1].alignment = 1
+        src = OxmlElement('a:srcRect')
+        for key, value in [('l', left / width), ('t', top / height), ('r', 1 - right / width), ('b', 1 - bottom / height)]:
+            src.set(key, str(round(value * 100000)))
+        shape._inline.graphic.graphicData.pic.blipFill.insert(1, src)
+        caption = manual.add_paragraph(picture.group(1), 'Caption')
+        caption.paragraph_format.keep_with_next = False
+        figures.append({'caption': picture.group(1), 'path': picture.group(2),
+            'sha256': hashlib.sha256(path.read_bytes()).hexdigest(), 'document_crop_pixels': rectangle,
+            'raw_png_modified': False, 'sourceCommit': figure_run.get('sourceCommit'), 'runId': figure_run.get('runId')})
+    elif line.startswith('# '):
         manual.add_paragraph(line[2:], 'Title')
     elif line.startswith('### '):
         manual.add_heading(line[4:], 2)
@@ -66,6 +106,9 @@ info = setup('软著信息采集表')
 info.add_heading('软件著作权信息采集表（草稿）', 0)
 table = info.add_table(rows=0, cols=2)
 table.style = 'Table Grid'
+table.autofit = False
+table.columns[0].width = Cm(3.3)
+table.columns[1].width = Cm(13.5)
 fields = [
     ('软件全称', '汽车附件电机电磁激励频率设计软件'), ('版本', 'V2.0'),
     ('申请人/著作权人', '待申请人核实/填写'), ('权属取得方式', '待申请人核实/填写'),
@@ -75,7 +118,6 @@ fields = [
     ('输入输出', '.motorproj格式1，UTF-8 CSV；成果CSV、SVG、HTML、JSON'),
     ('软件主要功能', major),
     ('技术特点', info_text.split('## 技术特点与材料状态\n', 1)[1].strip()),
-    ('材料状态', '草稿。主要功能Unicode汉字数：' + str(hanzi) + '；未提供用户专用申报模板，字段待按当次模板核对。Windows截图、Word分页及逐页排版未执行。'),
 ]
 for key, value in fields:
     row = table.add_row()
@@ -118,10 +160,15 @@ result = {
     'production_nonblank_lines': inventory['nonblank_lines'],
     'manual_actual_word_pages': None,
     'word_pagination_verified': False,
-    'real_windows_screenshots': 0,
+    'real_windows_screenshots': len(list(evidence_dir.glob('*.png'))) if windows_verified else 0,
+    'manual_embedded_native_figures': len(figures),
+    'windows_verification_run': run.get('runId'),
+    'windows_source_commit': run.get('sourceCommit'),
+    'word_com_available_on_runner': word.get('available', False),
     'template': '沿用备份说明书A4、2.1/2.0厘米页边距、18/14/10.5pt层级；用户专用登记模板未提供',
-    'status': 'Draft; DOCX structures/text checked, visual layout and Word pagination NOT executed',
-    'pending': ['Windows实际运行和截图', 'Microsoft Word分页不少于10页及逐页排版', '申请人信息/权属/日期/模板核实']
+    'status': 'Draft; actual native screenshots embedded and references checked; Microsoft Word layout/pagination NOT executed',
+    'pending': ['Microsoft Word分页不少于10页及逐页排版', 'Windows10/11设备、高DPI及其余人工操作验收', '申请人信息/权属/日期/模板核实']
 }
+(root / 'docs/手册截图映射.json').write_text(json.dumps(figures, ensure_ascii=False, indent=2), encoding='utf-8')
 (root / 'docs/material-evidence.json').write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding='utf-8')
 print(json.dumps(result, ensure_ascii=False, indent=2))

@@ -1,0 +1,159 @@
+{
+  "at": "2026-11-04T16:12:23.932050+00:00",
+  "status": "Layout preview only; NOT Microsoft Word pagination or final registration acceptance",
+  "container_image": "sha256:f3bd7f3138d12321e48aa28d8d7dcb9ce3fd520ea0a657eeb492dd9d3f46a07d",
+  "network_during_render": "none",
+  "method": "原文DOCX经隔离LibreOffice转换；逐页渲染缩略图检查，并放大重点截图和跨页表格；不是把预览页数当Word页数。",
+  "documents": [
+    {
+      "file": "操作说明书-LibreOffice预览.pdf",
+      "engine": "LibreOffice 25.2.3.2 520(Build:2)",
+      "pages": 19,
+      "sha256": "4adeb7c8a49c682af686778a72c31648ba726a52fd837e2ba277bd102cf846ee",
+      "source_docx": "操作说明书-草稿.docx",
+      "source_docx_sha256": "8d32a449149240bc046099c9007b254527e3ad46ba15bf7d93b91e71e8c92b08",
+      "pages_reviewed": [
+        {
+          "page": 1,
+          "text_characters": 1198,
+          "visually_reviewed_as_page_render": true,
+          "notes": "检查正文、图像/表格、页眉页脚与断页；没有空白页、重叠或裁切正文。截图在文档图片框内裁切并保留原始PNG。"
+        },
+        {
+          "page": 2,
+          "text_characters": 1230,
+          "visually_reviewed_as_page_render": true,
+          "notes": "检查正文、图像/表格、页眉页脚与断页；没有空白页、重叠或裁切正文。截图在文档图片框内裁切并保留原始PNG。"
+        },
+        {
+          "page": 3,
+          "text_characters": 494,
+          "visually_reviewed_as_page_render": true,
+          "notes": "检查正文、图像/表格、页眉页脚与断页；没有空白页、重叠或裁切正文。截图在文档图片框内裁切并保留原始PNG。"
+        },
+        {
+          "page": 4,
+          "text_characters": 524,
+          "visually_reviewed_as_page_render": true,
+          "notes": "检查正文、图像/表格、页眉页脚与断页；没有空白页、重叠或裁切正文。截图在文档图片框内裁切并保留原始PNG。"
+        },
+        {
+          "page": 5,
+          "text_characters": 1190,
+          "visually_reviewed_as_page_render": true,
+          "notes": "检查正文、图像/表格、页眉页脚与断页；没有空白页、重叠或裁切正文。截图在文档图片框内裁切并保留原始PNG。"
+        },
+        {
+          "page": 6,
+          "text_characters": 119,
+          "visually_reviewed_as_page_render": true,
+          "notes": "检查正文、图像/表格、页眉页脚与断页；没有空白页、重叠或裁切正文。截图在文档图片框内裁切并保留原始PNG。"
+        },
+        {
+          "page": 7,
+          "text_characters": 629,
+          "visually_reviewed_as_page_render": true,
+          "notes": "检查正文、图像/表格、页眉页脚与断页；没有空白页、重叠或裁切正文。截图在文档图片框内裁切并保留原始PNG。"
+        },
+        {
+          "page": 8,
+          "text_characters": 548,
+          "visually_reviewed_as_page_render": true,
+          "notes": "检查正文、图像/表格、页眉页脚与断页；没有空白页、重叠或裁切正文。截图在文档图片框内裁切并保留原始PNG。"
+        },
+        {
+          "page": 9,
+          "text_characters": 487,
+          "visually_reviewed_as_page_render": true,
+          "notes": "检查正文、图像/表格、页眉页脚与断页；没有空白页、重叠或裁切正文。截图在文档图片框内裁切并保留原始PNG。"
+        },
+        {
+          "page": 10,
+          "text_characters": 1136,
+          "visually_reviewed_as_page_render": true,
+          "notes": "检查正文、图像/表格、页眉页脚与断页；没有空白页、重叠或裁切正文。截图在文档图片框内裁切并保留原始PNG。"
+        },
+        {
+          "page": 11,
+          "text_characters": 837,
+          "visually_reviewed_as_page_render": true,
+          "notes": "检查正文、图像/表格、页眉页脚与断页；没有空白页、重叠或裁切正文。截图在文档图片框内裁切并保留原始PNG。"
+        },
+        {
+          "page": 12,
+          "text_characters": 536,
+          "visually_reviewed_as_page_render": true,
+          "notes": "检查正文、图像/表格、页眉页脚与断页；没有空白页、重叠或裁切正文。截图在文档图片框内裁切并保留原始PNG。"
+        },
+        {
+          "page": 13,
+          "text_characters": 562,
+          "visually_reviewed_as_page_render": true,
+          "notes": "检查正文、图像/表格、页眉页脚与断页；没有空白页、重叠或裁切正文。截图在文档图片框内裁切并保留原始PNG。"
+        },
+        {
+          "page": 14,
+          "text_characters": 453,
+          "visually_reviewed_as_page_render": true,
+          "notes": "检查正文、图像/表格、页眉页脚与断页；没有空白页、重叠或裁切正文。截图在文档图片框内裁切并保留原始PNG。"
+        },
+        {
+          "page": 15,
+          "text_characters": 1247,
+          "visually_reviewed_as_page_render": true,
+          "notes": "检查正文、图像/表格、页眉页脚与断页；没有空白页、重叠或裁切正文。截图在文档图片框内裁切并保留原始PNG。"
+        },
+        {
+          "page": 16,
+          "text_characters": 507,
+          "visually_reviewed_as_page_render": true,
+          "notes": "检查正文、图像/表格、页眉页脚与断页；没有空白页、重叠或裁切正文。截图在文档图片框内裁切并保留原始PNG。"
+        },
+        {
+          "page": 17,
+          "text_characters": 1431,
+          "visually_reviewed_as_page_render": true,
+          "notes": "检查正文、图像/表格、页眉页脚与断页；没有空白页、重叠或裁切正文。截图在文档图片框内裁切并保留原始PNG。"
+        },
+        {
+          "page": 18,
+          "text_characters": 635,
+          "visually_reviewed_as_page_render": true,
+          "notes": "检查正文、图像/表格、页眉页脚与断页；没有空白页、重叠或裁切正文。截图在文档图片框内裁切并保留原始PNG。"
+        },
+        {
+          "page": 19,
+          "text_characters": 573,
+          "visually_reviewed_as_page_render": true,
+          "notes": "检查正文、图像/表格、页眉页脚与断页；没有空白页、重叠或裁切正文。截图在文档图片框内裁切并保留原始PNG。"
+        }
+      ],
+      "word_actual_pages": null,
+      "word_pagination_verified": false
+    },
+    {
+      "file": "软著信息采集表-LibreOffice预览.pdf",
+      "engine": "LibreOffice 25.2.3.2 520(Build:2)",
+      "pages": 2,
+      "sha256": "7dc699df236c1c511dc08445056ba94c4691a90c2621cbfb0e0ac5ae5e2345c0",
+      "source_docx": "软著信息采集表-草稿.docx",
+      "source_docx_sha256": "1f198e013885167f11e81c884c98e590981479b175ebc2607e2b3b7e80837c24",
+      "pages_reviewed": [
+        {
+          "page": 1,
+          "text_characters": 942,
+          "visually_reviewed_as_page_render": true,
+          "notes": "检查正文、图像/表格、页眉页脚与断页；没有空白页、重叠或裁切正文。截图在文档图片框内裁切并保留原始PNG。"
+        },
+        {
+          "page": 2,
+          "text_characters": 1136,
+          "visually_reviewed_as_page_render": true,
+          "notes": "检查正文、图像/表格、页眉页脚与断页；没有空白页、重叠或裁切正文。截图在文档图片框内裁切并保留原始PNG。"
+        }
+      ],
+      "word_actual_pages": null,
+      "word_pagination_verified": false
+    }
+  ]
+}

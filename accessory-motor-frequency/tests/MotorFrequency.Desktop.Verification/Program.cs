@@ -21,7 +21,8 @@ internal static class Program
             Console.Error.WriteLine("Requires Windows and a real WPF desktop. No screenshot or UI success is claimed.");
             return 2;
         }
-        var output = Path.GetFullPath(args.Length > 0 ? args[0] : "docs/windows-evidence");
+        var nativeDialogsRequested = args.Contains("--native-dialogs");
+        var output = Path.GetFullPath(args.FirstOrDefault(x => !x.StartsWith("--", StringComparison.Ordinal)) ?? "docs/windows-evidence");
         Directory.CreateDirectory(output);
         var errors = new BindingErrors();
         PresentationTraceSources.DataBindingSource.Listeners.Add(errors);
@@ -68,7 +69,7 @@ internal static class Program
             window.Height = 720;
             Pump();
             Capture(window, Path.Combine(output, "minimum-window.png"));
-            NativeDialogVerification.Run(window, output);
+            if (nativeDialogsRequested) NativeDialogVerification.Run(window, output);
             Require(errors.Errors.Count == 0, "WPF binding errors: " + string.Join(" | ", errors.Errors));
             File.WriteAllText(Path.Combine(output, "result.json"), System.Text.Json.JsonSerializer.Serialize(new
             {
@@ -78,7 +79,9 @@ internal static class Program
                 os = Environment.OSVersion.ToString(),
                 result = "passed",
                 source = "Live shown WPF window, RenderTargetBitmap capture, no browser",
-                nativeFileDialogs = "Real Windows SaveFileDialog/OpenFileDialog automated in own process; save, reopen, HTML export verified",
+                nativeFileDialogs = nativeDialogsRequested
+                    ? "Real Windows SaveFileDialog/OpenFileDialog automated in own process; save, reopen, HTML export verified"
+                    : "Not executed in basic WPF check; separate --native-dialogs verification required",
                 pages = WorkspaceViewModel.Navigation.Select(x => x.Key),
                 bindingErrors = errors.Errors
             }, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));

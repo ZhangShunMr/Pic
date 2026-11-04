@@ -1,0 +1,170 @@
+[
+  {
+    "caption": "图1 空白启动与独立示例入口",
+    "path": "screenshots/ci-41860507345/00-empty.png",
+    "sha256": "518d5dc7db710e7d5b3e390347bd4e744bf0087458e024f1617a6b93d76ec431",
+    "document_crop_pixels": [
+      0,
+      0,
+      1084,
+      749
+    ],
+    "raw_png_modified": false,
+    "sourceCommit": "21e81e15b4c47d1b120b325e84278ef798d48fae",
+    "runId": "41860507345"
+  },
+  {
+    "caption": "图2 项目档案与输入核对（工作区局部，模拟）",
+    "path": "screenshots/ci-41860507345/overview.png",
+    "sha256": "5a188a1c04eabb29d4d6fac605394cb74a33efb5a5c763e6fdf414e9ceafb51f",
+    "document_crop_pixels": [
+      242,
+      38,
+      806,
+      703
+    ],
+    "raw_png_modified": false,
+    "sourceCommit": "21e81e15b4c47d1b120b325e84278ef798d48fae",
+    "runId": "41860507345"
+  },
+  {
+    "caption": "图3 电机拓扑、参数与理想假设（工作区局部，模拟）",
+    "path": "screenshots/ci-41860507345/motor.png",
+    "sha256": "4f843ff0b7fce40a043f6fa49e086296a1d0dc15fae7fc6c57ae72f6f994aff5",
+    "document_crop_pixels": [
+      242,
+      38,
+      806,
+      703
+    ],
+    "raw_png_modified": false,
+    "sourceCommit": "21e81e15b4c47d1b120b325e84278ef798d48fae",
+    "runId": "41860507345"
+  },
+  {
+    "caption": "图4 极对数为零被拒绝，已应用观察条件保留",
+    "path": "screenshots/ci-41860507345/01-invalid-input.png",
+    "sha256": "6ccea1785da887a7edcece5770a59242b0160323ff263cf97015ac833aafa35b",
+    "document_crop_pixels": [
+      0,
+      0,
+      1084,
+      749
+    ],
+    "raw_png_modified": false,
+    "sourceCommit": "21e81e15b4c47d1b120b325e84278ef798d48fae",
+    "runId": "41860507345"
+  },
+  {
+    "caption": "图5 候选轨迹、频带与来源图例（工作区局部，模拟）",
+    "path": "screenshots/ci-41860507345/candidates.png",
+    "sha256": "d34cbdd0f97d1a37a301bda1c4d1e020b8ca86fc580700b8ab08dc6f0527eac0",
+    "document_crop_pixels": [
+      242,
+      38,
+      806,
+      703
+    ],
+    "raw_png_modified": false,
+    "sourceCommit": "21e81e15b4c47d1b120b325e84278ef798d48fae",
+    "runId": "41860507345"
+  },
+  {
+    "caption": "图6 敏感频带与来源输入（工作区局部，模拟）",
+    "path": "screenshots/ci-41860507345/bands.png",
+    "sha256": "99a4c0aa7294794a8daca906715dbf1464923e007882fd81bfa22a9f6b82fef0",
+    "document_crop_pixels": [
+      242,
+      38,
+      806,
+      703
+    ],
+    "raw_png_modified": false,
+    "sourceCommit": "21e81e15b4c47d1b120b325e84278ef798d48fae",
+    "runId": "41860507345"
+  },
+  {
+    "caption": "图7 原始频谱与来源、单位和网格（工作区局部，模拟）",
+    "path": "screenshots/ci-41860507345/spectrum.png",
+    "sha256": "b55ade2f58f21f388d253a2e2fbd3e9eb0fc8626b1cd5b348039017783f80f48",
+    "document_crop_pixels": [
+      242,
+      38,
+      806,
+      703
+    ],
+    "raw_png_modified": false,
+    "sourceCommit": "21e81e15b4c47d1b120b325e84278ef798d48fae",
+    "runId": "41860507345"
+  },
+  {
+    "caption": "图8 参数扫查的实际条件和结果（工作区局部，模拟）",
+    "path": "screenshots/ci-41860507345/sweep.png",
+    "sha256": "681781ac47da67498ba3ac6db92f381b74ef36f48c55fdec7e8e8cadc8142fc3",
+    "document_crop_pixels": [
+      242,
+      38,
+      806,
+      703
+    ],
+    "raw_png_modified": false,
+    "sourceCommit": "21e81e15b4c47d1b120b325e84278ef798d48fae",
+    "runId": "41860507345"
+  },
+  {
+    "caption": "图9 三极对快照与统一转速比较（工作区局部，模拟）",
+    "path": "screenshots/ci-41860507345/compare.png",
+    "sha256": "3be6676fa938619f458667db40abb1405eb9d233917fb83855f506dd73f88169",
+    "document_crop_pixels": [
+      242,
+      38,
+      806,
+      703
+    ],
+    "raw_png_modified": false,
+    "sourceCommit": "21e81e15b4c47d1b120b325e84278ef798d48fae",
+    "runId": "41860507345"
+  },
+  {
+    "caption": "图10 项目保存和成果导出入口（工作区局部，模拟）",
+    "path": "screenshots/ci-41860507345/output.png",
+    "sha256": "d083340207a800dfe40856a4024f60fbb3148be93f6487a7e4ec69f7596ae3a6",
+    "document_crop_pixels": [
+      242,
+      38,
+      806,
+      703
+    ],
+    "raw_png_modified": false,
+    "sourceCommit": "21e81e15b4c47d1b120b325e84278ef798d48fae",
+    "runId": "41860507345"
+  },
+  {
+    "caption": "图11 输入变更与UTC记录（工作区局部，模拟）",
+    "path": "screenshots/ci-41860507345/history.png",
+    "sha256": "29676263a581fb492a0cc79d4ce6b7f599e0b732c80f0944a82a8e84c515cb96",
+    "document_crop_pixels": [
+      242,
+      38,
+      806,
+      703
+    ],
+    "raw_png_modified": false,
+    "sourceCommit": "21e81e15b4c47d1b120b325e84278ef798d48fae",
+    "runId": "41860507345"
+  },
+  {
+    "caption": "图12 最小窗口的滚动布局（1100×720，模拟）",
+    "path": "screenshots/ci-41860507345/minimum-window.png",
+    "sha256": "b2df8838eebab473c8b04703459c5bcf2425cdca584eff7f43343c25b519421f",
+    "document_crop_pixels": [
+      0,
+      0,
+      1084,
+      681
+    ],
+    "raw_png_modified": false,
+    "sourceCommit": "21e81e15b4c47d1b120b325e84278ef798d48fae",
+    "runId": "41860507345"
+  }
+]

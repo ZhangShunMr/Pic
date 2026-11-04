@@ -19,6 +19,7 @@ try {
         executedUtc = [DateTimeOffset]::UtcNow.ToString('o')
         executable = 'artifacts/win-x64/MotorFrequency.exe'
         sha256 = (Get-FileHash $program -Algorithm SHA256).Hash
+        assemblies = @(Get-FileHash (Join-Path (Split-Path $program) 'MotorFrequency.dll'), (Join-Path (Split-Path $program) 'MotorFrequency.Application.dll'), (Join-Path (Split-Path $program) 'MotorFrequency.Core.dll') -Algorithm SHA256 | ForEach-Object { @{ file = (Split-Path $_.Path -Leaf); sha256 = $_.Hash } })
         sourceCommit = $env:GITHUB_SHA
         platform = [Environment]::OSVersion.ToString()
         actualProcessStarted = $true
@@ -30,7 +31,7 @@ try {
     if (-not $process.WaitForExit(10000)) { throw 'Published native window did not close normally' }
     if ($process.ExitCode -ne 0) { throw "Published exit code $($process.ExitCode)" }
     $record.normalExitCode = $process.ExitCode
-    $record | ConvertTo-Json | Set-Content 'docs/windows-evidence/published-exe.json' -Encoding utf8
+    $record | ConvertTo-Json -Depth 5 | Set-Content 'docs/windows-evidence/published-exe.json' -Encoding utf8
     Write-Host 'PASS actual self-contained EXE created expected native window and exited normally'
 }
 finally {

@@ -1,0 +1,10 @@
+{
+  "observedAt": "2026-11-04T16:12:23.932570+00:00",
+  "basic_success_run": "https://github.com/ZhangShunMr/Pic/actions/runs/41860507345",
+  "supplementary_native_dialog_run": "https://github.com/ZhangShunMr/Pic/actions/runs/41861404665",
+  "supplementary_observed_state": "in_progress; no completed native-dialog verification result",
+  "bounded_revision_run": "https://github.com/ZhangShunMr/Pic/actions/runs/41862034713",
+  "bounded_revision_observed_state": "queued",
+  "action_denied": false,
+  "conclusion": "Supplementary native file dialog test is pending/uncertain; it is not included in successful basic WPF checks. Future workflow separates its outcome and bounds execution."
+}

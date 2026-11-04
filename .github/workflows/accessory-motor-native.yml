@@ -31,6 +31,18 @@ jobs:
       - name: Build, core, MVVM and live native WPF window verification
         timeout-minutes: 4
         run: ./tools/verify-windows.ps1
+      - name: Supplementary real native dialog automation
+        id: native_dialogs
+        timeout-minutes: 2
+        continue-on-error: true
+        run: |
+          dotnet run --project tests/MotorFrequency.Desktop.Verification -c Release --no-build -- docs/windows-dialog-evidence --native-dialogs
+          if ($LASTEXITCODE -ne 0) { throw 'Supplementary native dialog automation failed; retained as a separate result' }
+      - name: Record supplementary dialog outcome without masking it
+        if: always()
+        run: |
+          New-Item docs/windows-dialog-evidence -ItemType Directory -Force | Out-Null
+          @{ outcome = '${{ steps.native_dialogs.outcome }}'; sourceCommit = $env:GITHUB_SHA; runId = $env:GITHUB_RUN_ID; limitation = 'Only a successful native-dialogs.json certifies dialog verification; basic WPF success is separate.' } | ConvertTo-Json | Set-Content docs/windows-dialog-evidence/workflow-state.json -Encoding utf8
       - name: Publish Windows self-contained folder
         run: |
           dotnet publish src/MotorFrequency.Desktop -c Release -r win-x64 --self-contained true -o artifacts/win-x64
@@ -39,6 +51,10 @@ jobs:
         run: ./tools/smoke-published.ps1
       - name: Check whether Microsoft Word pagination is available
         run: ./tools/verify-word.ps1
+      - name: Package the exact self-contained build that was started and checked
+        run: |
+          python tools/package_release.py
+          if ($LASTEXITCODE -ne 0) { throw 'Packaging failed' }
       - name: Retain native captures and verification evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -47,15 +63,17 @@ jobs:
           retention-days: 7
           path: |
             accessory-motor-frequency/docs/windows-evidence
+            accessory-motor-frequency/docs/windows-dialog-evidence
             accessory-motor-frequency/docs/core-evidence.json
             accessory-motor-frequency/docs/application-evidence.json
-            accessory-motor-frequency/artifacts/win-x64
+            accessory-motor-frequency/release/MotorFrequency-V2.0-win-x64.zip
+            accessory-motor-frequency/release/发布清单.json
       - name: Preserve successful native evidence on this software branch
         if: success() && github.ref == 'refs/heads/desktop/accessory-motor-frequency-wpf-20261104'
         run: |
           git config user.name 'Accessory motor Windows verification'
           git config user.email 'codex@openai.com'
-          git add docs/windows-evidence
+          git add docs/windows-evidence docs/windows-dialog-evidence release/MotorFrequency-V2.0-win-x64.zip release/发布清单.json
           git diff --cached --quiet
           if ($LASTEXITCODE -eq 1) {
             git commit -m 'Record actual Windows WPF verification and native captures [skip ci]'

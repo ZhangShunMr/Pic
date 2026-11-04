@@ -1,0 +1,69 @@
+{
+  "reviewedAt": "2026-11-04",
+  "run": "https://github.com/ZhangShunMr/Pic/actions/runs/41860507345",
+  "sourceCommit": "21e81e15b4c47d1b120b325e84278ef798d48fae",
+  "captureMethod": "Live shown WPF client visual captured by RenderTargetBitmap; native OS chrome is not included. Original RGBA files retain transparent outer margins.",
+  "scope": "逐张视觉检查实际PNG，不宣称高DPI、所有滚动位置、Win10/11设备或对话框已测。",
+  "images": [
+    {
+      "file": "00-empty.png",
+      "sha256": "518d5dc7db710e7d5b3e390347bd4e744bf0087458e024f1617a6b93d76ec431",
+      "review": "空白启动；无项目；保存与应用禁用；独立示例入口明确。"
+    },
+    {
+      "file": "01-invalid-input.png",
+      "sha256": "6ccea1785da887a7edcece5770a59242b0160323ff263cf97015ac833aafa35b",
+      "review": "极对数0草稿；底部红色字段原因；已应用观察条件1800转/30Hz保留。"
+    },
+    {
+      "file": "overview.png",
+      "sha256": "5a188a1c04eabb29d4d6fac605394cb74a33efb5a5c763e6fdf414e9ceafb51f",
+      "review": "项目档案、模拟来源及输入核对清单均显示。"
+    },
+    {
+      "file": "motor.png",
+      "sha256": "4f843ff0b7fce40a043f6fa49e086296a1d0dc15fae7fc6c57ae72f6f994aff5",
+      "review": "无刷p=2/Q=12与理想假设及依据显示；较长表单可滚动。"
+    },
+    {
+      "file": "candidates.png",
+      "sha256": "d34cbdd0f97d1a37a301bda1c4d1e020b8ca86fc580700b8ab08dc6f0527eac0",
+      "review": "解析轨迹、频带、峰点和图例已加载；同频候选分别列出。"
+    },
+    {
+      "file": "bands.png",
+      "sha256": "99a4c0aa7294794a8daca906715dbf1464923e007882fd81bfa22a9f6b82fef0",
+      "review": "两条示例频带及来源显示，新增表单可见；其余区间表在下方滚动。"
+    },
+    {
+      "file": "spectrum.png",
+      "sha256": "b55ade2f58f21f388d253a2e2fbd3e9eb0fc8626b1cd5b348039017783f80f48",
+      "review": "751点/2Hz网格、单位、来源与原始峰曲线已加载。"
+    },
+    {
+      "file": "sweep.png",
+      "sha256": "681781ac47da67498ba3ac6db92f381b74ef36f48c55fdec7e8e8cadc8142fc3",
+      "review": "扫查参数、实际采用条件、已计算结果表显示。"
+    },
+    {
+      "file": "compare.png",
+      "sha256": "3be6676fa938619f458667db40abb1405eb9d233917fb83855f506dd73f88169",
+      "review": "选中三极对模拟快照；限制提示、虚线及比较表显示。"
+    },
+    {
+      "file": "output.png",
+      "sha256": "d083340207a800dfe40856a4024f60fbb3148be93f6487a7e4ec69f7596ae3a6",
+      "review": "保存、另存、导出选择与本机流程说明显示。"
+    },
+    {
+      "file": "history.png",
+      "sha256": "29676263a581fb492a0cc79d4ce6b7f599e0b732c80f0944a82a8e84c515cb96",
+      "review": "UTC动作记录已加载；较宽详情有水平滚动条。"
+    },
+    {
+      "file": "minimum-window.png",
+      "sha256": "b2df8838eebab473c8b04703459c5bcf2425cdca584eff7f43343c25b519421f",
+      "review": "1100×720设置下中央及右侧均提供滚动；无叠盖，长表需滚动。"
+    }
+  ]
+}

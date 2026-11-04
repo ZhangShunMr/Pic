@@ -3,6 +3,7 @@ import hashlib
 import json
 import shutil
 import zipfile
+import os
 
 root = Path(__file__).resolve().parents[1]
 publish = root / 'artifacts/win-x64'
@@ -29,6 +30,14 @@ with zipfile.ZipFile(archive) as check:
     if bad:
         raise RuntimeError('Corrupt ZIP entry: ' + bad)
 source = json.loads((root / 'docs/source-inventory.json').read_text())
+proof_path = root / 'docs/windows-evidence/published-exe.json'
+proof = json.loads(proof_path.read_text(encoding='utf-8-sig')) if proof_path.exists() else {}
+verified = (os.name == 'nt' and os.environ.get('GITHUB_SHA') == proof.get('sourceCommit')
+    and proof.get('actualProcessStarted') and proof.get('normalExitCode') == 0
+    and proof.get('sha256', '').lower() == hashlib.sha256((publish/'MotorFrequency.exe').read_bytes()).hexdigest())
+assemblies = proof.get('assemblies', [])
+verified = bool(verified and len(assemblies) == 3 and all(
+    item['sha256'].lower() == hashlib.sha256((publish/item['file']).read_bytes()).hexdigest() for item in assemblies))
 manifest = {
     'software': '汽车附件电机电磁激励频率设计软件', 'version': 'V2.0',
     'branch': 'desktop/accessory-motor-frequency-wpf-20261104',
@@ -37,11 +46,15 @@ manifest = {
     'archive': archive.name, 'archive_bytes': archive.stat().st_size,
     'archive_sha256': hashlib.sha256(archive.read_bytes()).hexdigest(),
     'zip_integrity_verified': True, 'windows_pe_header_verified': True,
-    'windows_execution_verified': False, 'signed': False,
+    'windows_execution_verified': verified, 'signed': False,
+    'windows_execution_scope': 'Windows Server 2025 CI: native window startup and normal exit; byte hashes of EXE and three application assemblies matched' if verified else 'Package bytes not executed in this packaging environment',
+    'windows_ci_source_commit': proof.get('sourceCommit'),
+    'windows_ci_assembly_hashes': assemblies,
+    'windows_ci_run': 'https://github.com/ZhangShunMr/Pic/actions/runs/' + os.environ.get('GITHUB_RUN_ID', '41860507345'),
     'production_source_nonblank_lines': source['nonblank_lines'],
     'production_source_manifest_sha256': hashlib.sha256((root / 'docs/source-inventory.json').read_bytes()).hexdigest(),
-    'tests': {'core_passed': 57, 'application_passed': 23, 'failed': 0, 'wpf_runtime': 'not executed'},
-    'remaining': ['Windows实际运行/截图/对话框/缩放验收', 'Microsoft Word实际分页及逐页核对', '申请人事实与模板核实'],
+    'tests': {'core_passed': 57, 'application_passed': 23, 'failed': 0, 'wpf_runtime': 'passed on Windows Server 2025; scope see docs/windows-evidence'},
+    'remaining': ['Windows10/11目标设备、高DPI和其余人工路径验收', 'Microsoft Word实际分页及逐页核对', '申请人事实与模板核实'],
     'files': [{'path': f.relative_to(publish).as_posix(), 'bytes': f.stat().st_size,
         'sha256': hashlib.sha256(f.read_bytes()).hexdigest()} for f in files]
 }

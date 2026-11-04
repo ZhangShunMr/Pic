@@ -4,7 +4,7 @@ Windows 原生 C# WPF 桌面软件，采用 MVVM，真实解决方案入口 [Mot
 
 ## 直接运行（离线）
 
-下载本分支 `release/MotorFrequency-V2.0-win-x64.zip`，将整个压缩包解压到可读写的本机文件夹，双击 `MotorFrequency.exe`。不要只复制单个 EXE；运行时及WPF依赖都在同一目录。目标 Windows 10/11 x64，无需预装.NET、Node或Python，运行不需联网。Windows可能对下载文件显示来源提示；先核对本分支发布清单和SHA-256。当前包仅在Linux交叉发布，**未在Windows实际启动验收**。
+下载本分支 `release/MotorFrequency-V2.0-win-x64.zip`，将整个压缩包解压到可读写的本机文件夹，双击 `MotorFrequency.exe`。不要只复制单个 EXE；运行时及WPF依赖都在同一目录。目标 Windows 10/11 x64，无需预装.NET、Node或Python，运行不需联网。Windows可能对下载文件显示来源提示；先核对本分支发布清单和SHA-256。Windows Server 2025 CI已实际启动自包含程序并正常关闭，记录见[Windows运行证据](docs/windows-evidence/published-exe.json)。发布清单中`windows_execution_verified`只有在CI核对该包EXE与三个程序集字节哈希后才为true；不能把源代码级验证混同为不同二进制包的验证。Windows10/11实机、网络隔离和高DPI仍待补验。
 
 ## 构建与调试
 
@@ -58,4 +58,4 @@ python tools/build_materials.py
 
 最后两个Python脚本用于交付材料，不是生产运行依赖；文档生成需python-docx。Windows验证脚本必须在真实Windows交互桌面执行，会加载WPF界面、验证部分绑定并保存实时窗口渲染截图，仍需人工核对文件对话框、字体、高DPI和操作路径。
 
-[交付索引](docs/交付索引.md)汇总证据和未验收项。Linux已完成跨平台构建、核心与应用层测试、Windows自包含发布；**Windows界面运行、截图、Windows对话框、高DPI/缩放与最大负载性能未验证**。操作说明书及采集表是草稿：没有伪造截图，Microsoft Word真实分页与逐页检查尚未执行，不能声称已满足至少10页终稿。申请人权属、身份、开发及发表日期保留待核实。未宣称真实车辆试验效果。
+[交付索引](docs/交付索引.md)汇总证据和未验收项。已在Linux和Windows Server 2025完成构建及80项核心/MVVM检查，并在Windows实际运行WPF窗口、检查绑定、生成12张原生客户端截图、启动并正常关闭自包含EXE。截图已逐张检查并嵌入手册，原始字节与来源提交可追溯。原生文件对话框补测情况见单独的native-dialogs记录；没有通过记录时不视为已测。**Windows10/11目标设备、高DPI、网络隔离与最大负载性能仍待补验**。操作说明书及采集表仍为草稿：runner没有注册Microsoft Word COM；LibreOffice预览仅供排版检查，不能代替Word实际页数和逐页终稿验收。申请人权属、身份、开发及发表日期保留待核实。未宣称真实车辆试验效果。
