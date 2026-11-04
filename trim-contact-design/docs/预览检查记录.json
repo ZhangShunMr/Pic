@@ -1,0 +1,304 @@
+{
+  "reviewedUtc": "2026-11-04T16:29:47.854394+00:00",
+  "reviewer": "Codex visual inspection of the actual PNG page renders and native window captures",
+  "scope": "LibreOffice PDF page images, not Microsoft Word pagination; no Windows 10/11, high-DPI or shell-dialog certification",
+  "manualPdfPages": 16,
+  "collectionPdfPages": 2,
+  "manualDocxSha256": "86e8c832478718a5bee4244a23a15df759fe08056d2f48213fbd06b514dcba29",
+  "manualPdfSha256": "3de61bd4b91c6a8a9a6aa53fe0d82c8b13771371f42b93e0364f5c8e9b459bab",
+  "wordPaginationVerified": false,
+  "nativeRun": "https://github.com/ZhangShunMr/Pic/actions/runs/41866177256",
+  "zipSha256": "705a86f20c1f705b9c58d15ecf0aa6efbd924c1918de27a6be9b9e8eaddb3ef3",
+  "fixes": [
+    "Removed a blank page caused by standalone page-break paragraphs",
+    "Kept figure introductions, images and captions together",
+    "Reduced tall field captures while retaining readable text",
+    "Adjusted information table column widths and checked both pages"
+  ],
+  "pages": [
+    {
+      "file": "docs/preview/manual-page-01.png",
+      "sha256": "19d67ffe956ce45ead9fabeae1183fe503c95b7fd3d6c2aa715ac5f05df1cd92",
+      "visuallyInspected": true,
+      "blank": false,
+      "clippedTextObserved": false,
+      "overlapObserved": false,
+      "note": "软件介绍、背景、流程与边界齐全"
+    },
+    {
+      "file": "docs/preview/manual-page-02.png",
+      "sha256": "7f42504f435be3e7a1d7e97af2f2d3ab1b43a77a53d7ecfb4317ca5cc43a4383",
+      "visuallyInspected": true,
+      "blank": false,
+      "clippedTextObserved": false,
+      "overlapObserved": false,
+      "note": "启动步骤与空白窗口图1清晰，页脚完整"
+    },
+    {
+      "file": "docs/preview/manual-page-03.png",
+      "sha256": "0b0e1095d6af9be14da10ad87e3882ee879110c2bb534ee4031a5eb4bc07e272",
+      "visuallyInspected": true,
+      "blank": false,
+      "clippedTextObserved": false,
+      "overlapObserved": false,
+      "note": "项目字段图2与正文同页，字段可读"
+    },
+    {
+      "file": "docs/preview/manual-page-04.png",
+      "sha256": "5843005fbf173192c4474f81d95109dbc1cdc4d759459fc00d8622eced9fb4a8",
+      "visuallyInspected": true,
+      "blank": false,
+      "clippedTextObserved": false,
+      "overlapObserved": false,
+      "note": "布置图3标签无重叠，正文和图注完整"
+    },
+    {
+      "file": "docs/preview/manual-page-05.png",
+      "sha256": "718edf9a20e1f5cffb434448d2b0283b8631d4151d45677f692bde821d46eee2",
+      "visuallyInspected": true,
+      "blank": false,
+      "clippedTextObserved": false,
+      "overlapObserved": false,
+      "note": "接触字段图4单位明确，横向滚动说明保留"
+    },
+    {
+      "file": "docs/preview/manual-page-06.png",
+      "sha256": "ad6522320a032c50c9d35c096c5482aef3a97df0b19c1cfc10bf8cedc9b75d09",
+      "visuallyInspected": true,
+      "blank": false,
+      "clippedTextObserved": false,
+      "overlapObserved": false,
+      "note": "工况图5与参数范围一致"
+    },
+    {
+      "file": "docs/preview/manual-page-07.png",
+      "sha256": "96f740d5c7c98b5f7ebc5b00e6fe642ea2337a7b261986c50eb527dfdf2f1f7f",
+      "visuallyInspected": true,
+      "blank": false,
+      "clippedTextObserved": false,
+      "overlapObserved": false,
+      "note": "红框校验图6清晰，未与正文或页脚重叠"
+    },
+    {
+      "file": "docs/preview/manual-page-08.png",
+      "sha256": "c7cd1db08c55a39c037222c09a63007d3eaf171c2ec149ebc7c1ce7652c3733f",
+      "visuallyInspected": true,
+      "blank": false,
+      "clippedTextObserved": false,
+      "overlapObserved": false,
+      "note": "包络图7与状态解释对应"
+    },
+    {
+      "file": "docs/preview/manual-page-09.png",
+      "sha256": "dc68cef1cf211a21ee486315dfbe5af33b3ef925d7bc59d7a28ca41559b9240a",
+      "visuallyInspected": true,
+      "blank": false,
+      "clippedTextObserved": false,
+      "overlapObserved": false,
+      "note": "名义曲线图8完整，轴与单位可读，非空页"
+    },
+    {
+      "file": "docs/preview/manual-page-10.png",
+      "sha256": "0f0cd2628a54adb874f97348b8ee6b25d1af6bd006b7a450763cb682f7a1e301",
+      "visuallyInspected": true,
+      "blank": false,
+      "clippedTextObserved": false,
+      "overlapObserved": false,
+      "note": "平衡表图9完整，列滚动保留，非空页"
+    },
+    {
+      "file": "docs/preview/manual-page-11.png",
+      "sha256": "1551e4e74375300eeaf1a7d9ef3716077eabdaa753bb64f5475137bf5cc831aa",
+      "visuallyInspected": true,
+      "blank": false,
+      "clippedTextObserved": false,
+      "overlapObserved": false,
+      "note": "四值扫描图10与输入4及结果0/0.2/0.4/0.6一致"
+    },
+    {
+      "file": "docs/preview/manual-page-12.png",
+      "sha256": "f8c672bf68949b29db2e8cd0787f04820b59024e8311f543ab287dfc791d38a8",
+      "visuallyInspected": true,
+      "blank": false,
+      "clippedTextObserved": false,
+      "overlapObserved": false,
+      "note": "CSV预检图11完整，模式与字段说明一致"
+    },
+    {
+      "file": "docs/preview/manual-page-13.png",
+      "sha256": "5da7bf7524040f3cba79f47e90c2316a2ff9cee967aa4abd8f1314c34c8905d3",
+      "visuallyInspected": true,
+      "blank": false,
+      "clippedTextObserved": false,
+      "overlapObserved": false,
+      "note": "批量图12显示0.05增量及0.4到0.45，非空页"
+    },
+    {
+      "file": "docs/preview/manual-page-14.png",
+      "sha256": "e595c9236b41dd00ee41cb4944ea8e7c642074eb7577b115f49f7fd55491ee01",
+      "visuallyInspected": true,
+      "blank": false,
+      "clippedTextObserved": false,
+      "overlapObserved": false,
+      "note": "任务图13与证据说明对应"
+    },
+    {
+      "file": "docs/preview/manual-page-15.png",
+      "sha256": "90b3fdf2640d366baa01278f77ebc2085ec16b4d02fce073b0197c0addd30e49",
+      "visuallyInspected": true,
+      "blank": false,
+      "clippedTextObserved": false,
+      "overlapObserved": false,
+      "note": "项目库图14路径和恢复入口清楚"
+    },
+    {
+      "file": "docs/preview/manual-page-16.png",
+      "sha256": "d112c1e03622a56dd2d47654f90a0a19912d92feffe50831b9aa644e3a7ed8b3",
+      "visuallyInspected": true,
+      "blank": false,
+      "clippedTextObserved": false,
+      "overlapObserved": false,
+      "note": "两组手算案例、保存与导出说明齐全"
+    },
+    {
+      "file": "docs/preview/collection-page-01.png",
+      "sha256": "5093fb63a5cbec46a02167709e4f8913993b3536bb2e448e02befb499a08e48d",
+      "visuallyInspected": true,
+      "blank": false,
+      "clippedTextObserved": false,
+      "overlapObserved": false,
+      "note": "表格字段顺序、主要功能跨页衔接与边框完整"
+    },
+    {
+      "file": "docs/preview/collection-page-02.png",
+      "sha256": "4c9a8c23190cbfb14ab2f241f6e90748e69bb8eb852608f050b8f86735cf9e83",
+      "visuallyInspected": true,
+      "blank": false,
+      "clippedTextObserved": false,
+      "overlapObserved": false,
+      "note": "主要功能续文及源程序量、格式、模板说明完整"
+    }
+  ],
+  "nativeScreenshots": [
+    {
+      "file": "docs/windows/screenshots/00-published-exe.png",
+      "sha256": "4713c5d25076014e00357383394a99168f845a813ca0b7102d3c243439b5af21",
+      "visuallyInspected": true,
+      "note": "真实窗口/控件图，数据为模拟；宽表需要程序内滚动查看其余列"
+    },
+    {
+      "file": "docs/windows/screenshots/01-empty.png",
+      "sha256": "43a2df474823e7e69bd8f56894cc1085c7d0808c9802dac7e487c3151c534904",
+      "visuallyInspected": true,
+      "note": "真实窗口/控件图，数据为模拟；宽表需要程序内滚动查看其余列"
+    },
+    {
+      "file": "docs/windows/screenshots/02-project.png",
+      "sha256": "f4289e3ca0d4bb57f1f41eca5f5bae5bc7d454a0d12556acc5f1bdb2ec27a986",
+      "visuallyInspected": true,
+      "note": "真实窗口/控件图，数据为模拟；宽表需要程序内滚动查看其余列"
+    },
+    {
+      "file": "docs/windows/screenshots/02a-project-fields.png",
+      "sha256": "9cf077be214730940af445da711b471206d4047074f159974f6a84d2c888f46d",
+      "visuallyInspected": true,
+      "note": "真实窗口/控件图，数据为模拟；宽表需要程序内滚动查看其余列"
+    },
+    {
+      "file": "docs/windows/screenshots/03-invalid-number.png",
+      "sha256": "2d6e69aabdac55665f1274fc54927b071089566e6d800668b522f527729a3269",
+      "visuallyInspected": true,
+      "note": "真实窗口/控件图，数据为模拟；宽表需要程序内滚动查看其余列"
+    },
+    {
+      "file": "docs/windows/screenshots/04-layout.png",
+      "sha256": "4c4290cf2252480dffe596720badef91881d7128da912532301c978e4cec1948",
+      "visuallyInspected": true,
+      "note": "真实窗口/控件图，数据为模拟；宽表需要程序内滚动查看其余列"
+    },
+    {
+      "file": "docs/windows/screenshots/04a-contact-fields.png",
+      "sha256": "26ac82a8af044d866da2d3c4dfb607c05f9cf4c29d157e540797816fca412ac1",
+      "visuallyInspected": true,
+      "note": "真实窗口/控件图，数据为模拟；宽表需要程序内滚动查看其余列"
+    },
+    {
+      "file": "docs/windows/screenshots/05-loads.png",
+      "sha256": "7da0752f5dbe0cc55b500b661fafd42f68edab3ec4665bfc6cef76173637e510",
+      "visuallyInspected": true,
+      "note": "真实窗口/控件图，数据为模拟；宽表需要程序内滚动查看其余列"
+    },
+    {
+      "file": "docs/windows/screenshots/06-envelope.png",
+      "sha256": "43064e283126f12bdaae497fad66917fdefd0c28371873bb39f4bbc26e735ad6",
+      "visuallyInspected": true,
+      "note": "真实窗口/控件图，数据为模拟；宽表需要程序内滚动查看其余列"
+    },
+    {
+      "file": "docs/windows/screenshots/07-nominal-traces.png",
+      "sha256": "d9edb61690691764d0c2d55c602f3d2b6a4e556411c661cd889d10c32e8cbe7d",
+      "visuallyInspected": true,
+      "note": "真实窗口/控件图，数据为模拟；宽表需要程序内滚动查看其余列"
+    },
+    {
+      "file": "docs/windows/screenshots/08-force-balance.png",
+      "sha256": "06340beeee1dfe20f8a031a51c86892ca682401e24e51339fa431d5527b838ed",
+      "visuallyInspected": true,
+      "note": "真实窗口/控件图，数据为模拟；宽表需要程序内滚动查看其余列"
+    },
+    {
+      "file": "docs/windows/screenshots/09-quality-review.png",
+      "sha256": "0e69f2b1dddd42b7e9e4c08b8e6b59ee4bc3a33a25dd0ce9ac07035bf1462662",
+      "visuallyInspected": true,
+      "note": "真实窗口/控件图，数据为模拟；宽表需要程序内滚动查看其余列"
+    },
+    {
+      "file": "docs/windows/screenshots/10-comparison.png",
+      "sha256": "fc3dfcb587bc5763cc52c91e81b4b0c9289bcebeae7c9e90f171834776168c66",
+      "visuallyInspected": true,
+      "note": "真实窗口/控件图，数据为模拟；宽表需要程序内滚动查看其余列"
+    },
+    {
+      "file": "docs/windows/screenshots/11-scan.png",
+      "sha256": "39714347d95fe4c82e30b5281a8288975bbfa9a149c77ef6c110d7d4afab81c2",
+      "visuallyInspected": true,
+      "note": "真实窗口/控件图，数据为模拟；宽表需要程序内滚动查看其余列"
+    },
+    {
+      "file": "docs/windows/screenshots/12-batch.png",
+      "sha256": "f271c2135ebbe753a380e58befad875f4f237728236dbd3f2501bac8b0d03d07",
+      "visuallyInspected": true,
+      "note": "真实窗口/控件图，数据为模拟；宽表需要程序内滚动查看其余列"
+    },
+    {
+      "file": "docs/windows/screenshots/12a-csv-preview.png",
+      "sha256": "84e635e43229407bec0e879a9a85e2e1efc903c2ffd1e26fd658567410be4712",
+      "visuallyInspected": true,
+      "note": "真实窗口/控件图，数据为模拟；宽表需要程序内滚动查看其余列"
+    },
+    {
+      "file": "docs/windows/screenshots/13-verification-tasks.png",
+      "sha256": "e78b3ba3fcb0ad5a20bd6ad2e3fcd16f29536e1843dd76f34549379a7f8f62dc",
+      "visuallyInspected": true,
+      "note": "真实窗口/控件图，数据为模拟；宽表需要程序内滚动查看其余列"
+    },
+    {
+      "file": "docs/windows/screenshots/13a-project-library.png",
+      "sha256": "ac13487366c3ab020026b6521dc01414e300f1412d702ca1dd9c15a84da00a51",
+      "visuallyInspected": true,
+      "note": "真实窗口/控件图，数据为模拟；宽表需要程序内滚动查看其余列"
+    },
+    {
+      "file": "docs/windows/screenshots/14-help.png",
+      "sha256": "a74f4b278ca9e7953e7eb7332f1c4842d457a946effac18ff767806562fd403a",
+      "visuallyInspected": true,
+      "note": "真实窗口/控件图，数据为模拟；宽表需要程序内滚动查看其余列"
+    },
+    {
+      "file": "docs/windows/screenshots/15-minimum-window.png",
+      "sha256": "e4c4b96c68ad830cfdaa48010bd1f3f5a1b1b9305b9561a3302a744abedebf25",
+      "visuallyInspected": true,
+      "note": "真实窗口/控件图，数据为模拟；宽表需要程序内滚动查看其余列"
+    }
+  ]
+}
