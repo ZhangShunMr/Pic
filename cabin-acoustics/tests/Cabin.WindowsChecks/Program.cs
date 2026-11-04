@@ -28,7 +28,7 @@ internal static class Program
         Directory.CreateDirectory(directory);
         var app = new App();
         app.InitializeComponent();
-        app.StartupUri = null;
+        app.StartMainWindow = false;
         app.ShutdownMode = ShutdownMode.OnExplicitShutdown;
         var services = new Services(directory);
         var window = new MainWindow(services);
