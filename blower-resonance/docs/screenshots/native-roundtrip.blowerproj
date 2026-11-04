@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "id": "0b7ba855d3324e33acda022e47fe67a9",
+  "id": "e530f4139b194fcbb3e8a3712e4bdfa3",
   "name": "\u6A21\u62DF \u00B7 40\u53F6\u7247\u9F13\u98CE\u673A\u6321\u4F4D\u8BBE\u8BA1",
   "owner": "\u6F14\u793A\u5DE5\u7A0B\u5E08",
   "vehicle": "\u6F14\u793A\u5E73\u53F0 HVAC-A",
@@ -8,8 +8,8 @@
   "origin": "Simulation",
   "source": "\u5185\u7F6E\u53EF\u91CD\u590D\u6A21\u62DF\u53C2\u6570\uFF0C\u4E0D\u662F\u8BD5\u9A8C\u91C7\u96C6",
   "archived": false,
-  "created": "2026-11-04T15:46:48.8886344+00:00",
-  "modified": "2026-11-04T15:46:55.3399897+00:00",
+  "created": "2026-11-04T15:52:19.027692+00:00",
+  "modified": "2026-11-04T15:52:25.3850952+00:00",
   "revision": 2,
   "settings": {
     "blades": 40,
@@ -26,7 +26,7 @@
   },
   "orders": [
     {
-      "id": "d61bbe4345cf453b8caba421b549ba46",
+      "id": "dac6342cdf524ed79ecbeed39a0501a3",
       "name": "\u8F74\u9891 1X",
       "kind": "Shaft",
       "multiplier": 1,
@@ -34,7 +34,7 @@
       "evidence": "\u8BBE\u8BA1\u5019\u9009\uFF1B\u5F85\u9A8C\u8BC1\u6FC0\u52B1\u5B58\u5728\u6027"
     },
     {
-      "id": "6fd2d0346ef549a7a548a489caf4385e",
+      "id": "5cb1a752089446e593c597ad3dfa6f3f",
       "name": "\u8F74\u9891 2X",
       "kind": "Shaft",
       "multiplier": 2,
@@ -42,7 +42,7 @@
       "evidence": "\u8BBE\u8BA1\u5019\u9009\uFF1B\u5F85\u9A8C\u8BC1\u6FC0\u52B1\u5B58\u5728\u6027"
     },
     {
-      "id": "686109c32ac243cb809cc7906259fa37",
+      "id": "68f4f99d4eb14d7e8f996ecd552f2911",
       "name": "\u53F6\u7247\u901A\u8FC7 BPF",
       "kind": "Blade",
       "multiplier": 1,
@@ -50,7 +50,7 @@
       "evidence": "\u8BBE\u8BA1\u5019\u9009\uFF1B\u5F85\u9A8C\u8BC1\u6FC0\u52B1\u5B58\u5728\u6027"
     },
     {
-      "id": "a3270d310f064195bb9ba80ef00ff9fc",
+      "id": "766e77214b644225ae00a9b8bb2d6c00",
       "name": "\u53F6\u7247\u4E8C\u500D\u9891",
       "kind": "Blade",
       "multiplier": 2,
@@ -60,7 +60,7 @@
   ],
   "modes": [
     {
-      "id": "f9e74136419543249534e28940410092",
+      "id": "57913fc7633843808dbf8500b7c93f13",
       "name": "\u58F3\u4F53\u9762\u677F M1",
       "frequencyHz": 600,
       "dampingRatio": 0.02,
@@ -71,7 +71,7 @@
       "location": "\u9F13\u98CE\u673A\u58F3\u4F53\u5916\u4FA7"
     },
     {
-      "id": "e23d703dd4d2434ab24fe0be30be56ac",
+      "id": "56690311ff414e02b2d7cbd50ad7d08d",
       "name": "\u98CE\u9053\u5C40\u90E8 M2",
       "frequencyHz": 1200,
       "dampingRatio": 0.015,
@@ -82,7 +82,7 @@
       "location": "\u51FA\u53E3\u98CE\u9053\u8FDE\u63A5\u5904"
     },
     {
-      "id": "de512b9446894f0e911e8e522064532a",
+      "id": "3434afad96f9414fbbe31a0829516d64",
       "name": "\u652F\u67B6 M3",
       "frequencyHz": 90,
       "dampingRatio": null,
@@ -95,48 +95,48 @@
   ],
   "plans": [
     {
-      "id": "81512bf1bc6c4f75acf11de594190a9d",
+      "id": "0c7724548bd44e3285c93df9f7825e84",
       "name": "A \u00B7 \u521D\u59CB\u6321\u4F4D",
       "notes": "\u6A21\u62DF\u521D\u59CB\u8BBE\u5B9A",
       "locked": false,
       "gears": [
         {
-          "id": "7afae19e5bcc4b95b50b49aa374a17cd",
+          "id": "cc67e10dfe62487a92c25810e79439fc",
           "name": "1\u6321",
           "rpm": 900,
           "fixed": false,
           "notes": ""
         },
         {
-          "id": "af1e31ab78194f198b344b123f909737",
+          "id": "353f7c8523c5421895da95e3d70a4af8",
           "name": "2\u6321",
           "rpm": 1400,
           "fixed": false,
           "notes": ""
         },
         {
-          "id": "10995c1903de43379a6cad2809c97e4c",
+          "id": "df8a1f2830b4406db0ad6e8e5eaf2ed2",
           "name": "3\u6321",
           "rpm": 1800,
           "fixed": false,
           "notes": ""
         },
         {
-          "id": "bf87b43235ee42deb58d272a3341b757",
+          "id": "6810722faf624a99999b4aa92148821f",
           "name": "4\u6321",
           "rpm": 2600,
           "fixed": false,
           "notes": ""
         },
         {
-          "id": "b8a67ad79f5a40edb49e8ed918c063a8",
+          "id": "16343bdfd0a64cd9b7ae9b55e6e8bf27",
           "name": "5\u6321",
           "rpm": 3600,
           "fixed": false,
           "notes": ""
         },
         {
-          "id": "b53ebab74a59496ba80cdc588dece53a",
+          "id": "bdd1b618de754237926443f3afb782d7",
           "name": "6\u6321",
           "rpm": 4500,
           "fixed": false,
@@ -145,48 +145,48 @@
       ]
     },
     {
-      "id": "184db98346e84780aec19e2a59bb360c",
+      "id": "8860eb746e464eb8943d96a7bf1a4e60",
       "name": "B \u00B7 \u4EBA\u5DE5\u5019\u9009",
       "notes": "\u6A21\u62DF\u5019\u9009\uFF1B\u98CE\u91CF\u5F85\u9A8C\u8BC1",
       "locked": false,
       "gears": [
         {
-          "id": "d9aa65149528400a9e6bd553c6cd961a",
+          "id": "712efd549e3c46bb9b0d0142f8d4ced8",
           "name": "1\u6321",
           "rpm": 1000,
           "fixed": false,
           "notes": ""
         },
         {
-          "id": "c4d72f5c06994550a416d61923cfdc59",
+          "id": "e0d876691f484f30b70e7592c1ef7c59",
           "name": "2\u6321",
           "rpm": 1500,
           "fixed": false,
           "notes": ""
         },
         {
-          "id": "04e834d76b62443b9600833ce5bf5468",
+          "id": "e41a615f87a44d92a89139971bbb6bbe",
           "name": "3\u6321",
           "rpm": 1950,
           "fixed": false,
           "notes": ""
         },
         {
-          "id": "57297723995346d68cc92412e655b4c4",
+          "id": "bc1642b12b624d4b96a16ed7de6e1ff7",
           "name": "4\u6321",
           "rpm": 2800,
           "fixed": false,
           "notes": ""
         },
         {
-          "id": "14ecad7378974c0f8a7a649515935248",
+          "id": "92bfceb5b5e74b5496d4909bbfd039fb",
           "name": "5\u6321",
           "rpm": 3800,
           "fixed": false,
           "notes": ""
         },
         {
-          "id": "eb4930acd1c44db3bb98be7a3525a223",
+          "id": "4403eb1d56104e9d98916181540b2255",
           "name": "6\u6321",
           "rpm": 4600,
           "fixed": false,
@@ -195,48 +195,48 @@
       ]
     },
     {
-      "id": "fd2d458383fc47228869fdc2cc271511",
+      "id": "e625128378eb4a85a597a52427e8d2b8",
       "name": "A \u00B7 \u521D\u59CB\u6321\u4F4D \u00B7 \u626B\u63CF\u5019\u9009",
       "notes": "\u79BB\u6563\u626B\u63CF\u5019\u9009\uFF1B\u76EE\u6807=\u63A5\u8FD1\u7EC4\u5408\u6570\u002B\u504F\u79FB\u6743\u91CD\u00D7\u5F52\u4E00\u5316\u504F\u79FB\uFF1B\u98CE\u91CF\u53CA\u54CD\u5E94\u5F85\u9A8C\u8BC1",
       "locked": false,
       "gears": [
         {
-          "id": "674ab9a80345401496d069923e14d057",
+          "id": "b7f56a054f2a453298f9c01c639523ce",
           "name": "1\u6321",
           "rpm": 850,
           "fixed": false,
           "notes": ""
         },
         {
-          "id": "09db65fc7be747c098f5d1ab98f7c2f1",
+          "id": "75496f2dfa004b889d82138d235be0c9",
           "name": "2\u6321",
           "rpm": 1400,
           "fixed": false,
           "notes": ""
         },
         {
-          "id": "a7ddddc6b0684a29aed938fdd591c5d3",
+          "id": "57455de013e845c6ae27ac8f2bac3cee",
           "name": "3\u6321",
           "rpm": 1725,
           "fixed": false,
           "notes": ""
         },
         {
-          "id": "bc73bf0f0c3a4fa8bbac6e43bb5ba052",
+          "id": "e0164f80459f4137ba321a03a38116d7",
           "name": "4\u6321",
           "rpm": 2525,
           "fixed": false,
           "notes": ""
         },
         {
-          "id": "d45e2fdd786448489bf56aa806c09703",
+          "id": "21456c947dbe4736b32e481c39b697e0",
           "name": "5\u6321",
           "rpm": 3600,
           "fixed": false,
           "notes": ""
         },
         {
-          "id": "2b0da3c904c14df28caeee0fb667a9f9",
+          "id": "9dda4608fd164ac68666d35629842a7c",
           "name": "6\u6321",
           "rpm": 4500,
           "fixed": false,
@@ -247,77 +247,77 @@
   ],
   "checks": [
     {
-      "id": "5444676e3a87494ca285589365602971",
-      "key": "81512bf1bc6c4f75acf11de594190a9d/7afae19e5bcc4b95b50b49aa374a17cd/686109c32ac243cb809cc7906259fa37/f9e74136419543249534e28940410092",
-      "planId": "81512bf1bc6c4f75acf11de594190a9d",
-      "gearId": "7afae19e5bcc4b95b50b49aa374a17cd",
-      "modeId": "f9e74136419543249534e28940410092",
-      "orderId": "686109c32ac243cb809cc7906259fa37",
+      "id": "a32a74b9f42549e285f3bc008dc2f654",
+      "key": "0c7724548bd44e3285c93df9f7825e84/cc67e10dfe62487a92c25810e79439fc/68f4f99d4eb14d7e8f996ecd552f2911/57913fc7633843808dbf8500b7c93f13",
+      "planId": "0c7724548bd44e3285c93df9f7825e84",
+      "gearId": "cc67e10dfe62487a92c25810e79439fc",
+      "modeId": "57913fc7633843808dbf8500b7c93f13",
+      "orderId": "68f4f99d4eb14d7e8f996ecd552f2911",
       "title": "1\u6321 / \u53F6\u7247\u901A\u8FC7 BPF / \u58F3\u4F53\u9762\u677F M1",
       "method": "\u5728900rpm\u9644\u8FD1\u590D\u6838\u8F6C\u901F\u4E0E\u9636\u6B21\uFF1B\u6D4B\u91CF\u58F3\u4F53/\u98CE\u9053\u54CD\u5E94\u548C\u8F66\u5185\u58F0\u97F3\uFF1B\u8BB0\u5F55\u6E29\u5EA6\u3001\u5B89\u88C5\u3001\u6D4B\u70B9\u3001\u4EEA\u5668\u3001\u9891\u7387\u5206\u8FA8\u7387\u53CA\u76F8\u5E72\u6027\u3002\u5019\u9009\u9891\u7387600Hz\u3002\u6838\u5BF9\u98CE\u91CF\u4E0E\u6548\u7387\u3002",
       "owner": "",
       "evidence": "",
       "state": "Pending",
-      "updated": "2026-11-04T15:46:55.3397648+00:00"
+      "updated": "2026-11-04T15:52:25.3848791+00:00"
     },
     {
-      "id": "05e9f0c26f284eb68b372f63c98506de",
-      "key": "81512bf1bc6c4f75acf11de594190a9d/7afae19e5bcc4b95b50b49aa374a17cd/a3270d310f064195bb9ba80ef00ff9fc/e23d703dd4d2434ab24fe0be30be56ac",
-      "planId": "81512bf1bc6c4f75acf11de594190a9d",
-      "gearId": "7afae19e5bcc4b95b50b49aa374a17cd",
-      "modeId": "e23d703dd4d2434ab24fe0be30be56ac",
-      "orderId": "a3270d310f064195bb9ba80ef00ff9fc",
+      "id": "e67f12f20a7d47a7adc518e9ede29fa8",
+      "key": "0c7724548bd44e3285c93df9f7825e84/cc67e10dfe62487a92c25810e79439fc/766e77214b644225ae00a9b8bb2d6c00/56690311ff414e02b2d7cbd50ad7d08d",
+      "planId": "0c7724548bd44e3285c93df9f7825e84",
+      "gearId": "cc67e10dfe62487a92c25810e79439fc",
+      "modeId": "56690311ff414e02b2d7cbd50ad7d08d",
+      "orderId": "766e77214b644225ae00a9b8bb2d6c00",
       "title": "1\u6321 / \u53F6\u7247\u4E8C\u500D\u9891 / \u98CE\u9053\u5C40\u90E8 M2",
       "method": "\u5728900rpm\u9644\u8FD1\u590D\u6838\u8F6C\u901F\u4E0E\u9636\u6B21\uFF1B\u6D4B\u91CF\u58F3\u4F53/\u98CE\u9053\u54CD\u5E94\u548C\u8F66\u5185\u58F0\u97F3\uFF1B\u8BB0\u5F55\u6E29\u5EA6\u3001\u5B89\u88C5\u3001\u6D4B\u70B9\u3001\u4EEA\u5668\u3001\u9891\u7387\u5206\u8FA8\u7387\u53CA\u76F8\u5E72\u6027\u3002\u5019\u9009\u9891\u73871200Hz\u3002\u6838\u5BF9\u98CE\u91CF\u4E0E\u6548\u7387\u3002",
       "owner": "",
       "evidence": "",
       "state": "Pending",
-      "updated": "2026-11-04T15:46:55.3399666+00:00"
+      "updated": "2026-11-04T15:52:25.3850725+00:00"
     },
     {
-      "id": "0ba0d5fb3e4d4170bced80f8b5127a22",
-      "key": "81512bf1bc6c4f75acf11de594190a9d/10995c1903de43379a6cad2809c97e4c/686109c32ac243cb809cc7906259fa37/e23d703dd4d2434ab24fe0be30be56ac",
-      "planId": "81512bf1bc6c4f75acf11de594190a9d",
-      "gearId": "10995c1903de43379a6cad2809c97e4c",
-      "modeId": "e23d703dd4d2434ab24fe0be30be56ac",
-      "orderId": "686109c32ac243cb809cc7906259fa37",
+      "id": "ea5d97e03c9d4033b3feb7d5e849087b",
+      "key": "0c7724548bd44e3285c93df9f7825e84/df8a1f2830b4406db0ad6e8e5eaf2ed2/68f4f99d4eb14d7e8f996ecd552f2911/56690311ff414e02b2d7cbd50ad7d08d",
+      "planId": "0c7724548bd44e3285c93df9f7825e84",
+      "gearId": "df8a1f2830b4406db0ad6e8e5eaf2ed2",
+      "modeId": "56690311ff414e02b2d7cbd50ad7d08d",
+      "orderId": "68f4f99d4eb14d7e8f996ecd552f2911",
       "title": "3\u6321 / \u53F6\u7247\u901A\u8FC7 BPF / \u98CE\u9053\u5C40\u90E8 M2",
       "method": "\u57281800rpm\u9644\u8FD1\u590D\u6838\u8F6C\u901F\u4E0E\u9636\u6B21\uFF1B\u6D4B\u91CF\u58F3\u4F53/\u98CE\u9053\u54CD\u5E94\u548C\u8F66\u5185\u58F0\u97F3\uFF1B\u8BB0\u5F55\u6E29\u5EA6\u3001\u5B89\u88C5\u3001\u6D4B\u70B9\u3001\u4EEA\u5668\u3001\u9891\u7387\u5206\u8FA8\u7387\u53CA\u76F8\u5E72\u6027\u3002\u5019\u9009\u9891\u73871200Hz\u3002\u6838\u5BF9\u98CE\u91CF\u4E0E\u6548\u7387\u3002",
       "owner": "",
       "evidence": "",
       "state": "Pending",
-      "updated": "2026-11-04T15:46:55.3399735+00:00"
+      "updated": "2026-11-04T15:52:25.3850788+00:00"
     },
     {
-      "id": "e9be8cf0b49a4ce58cdd6441292735d6",
-      "key": "81512bf1bc6c4f75acf11de594190a9d/bf87b43235ee42deb58d272a3341b757/6fd2d0346ef549a7a548a489caf4385e/de512b9446894f0e911e8e522064532a",
-      "planId": "81512bf1bc6c4f75acf11de594190a9d",
-      "gearId": "bf87b43235ee42deb58d272a3341b757",
-      "modeId": "de512b9446894f0e911e8e522064532a",
-      "orderId": "6fd2d0346ef549a7a548a489caf4385e",
+      "id": "6d44f2d3837145388b5151ad687b5adc",
+      "key": "0c7724548bd44e3285c93df9f7825e84/6810722faf624a99999b4aa92148821f/5cb1a752089446e593c597ad3dfa6f3f/3434afad96f9414fbbe31a0829516d64",
+      "planId": "0c7724548bd44e3285c93df9f7825e84",
+      "gearId": "6810722faf624a99999b4aa92148821f",
+      "modeId": "3434afad96f9414fbbe31a0829516d64",
+      "orderId": "5cb1a752089446e593c597ad3dfa6f3f",
       "title": "4\u6321 / \u8F74\u9891 2X / \u652F\u67B6 M3",
       "method": "\u57282600rpm\u9644\u8FD1\u590D\u6838\u8F6C\u901F\u4E0E\u9636\u6B21\uFF1B\u6D4B\u91CF\u58F3\u4F53/\u98CE\u9053\u54CD\u5E94\u548C\u8F66\u5185\u58F0\u97F3\uFF1B\u8BB0\u5F55\u6E29\u5EA6\u3001\u5B89\u88C5\u3001\u6D4B\u70B9\u3001\u4EEA\u5668\u3001\u9891\u7387\u5206\u8FA8\u7387\u53CA\u76F8\u5E72\u6027\u3002\u5019\u9009\u9891\u738786.67Hz\u3002\u6838\u5BF9\u98CE\u91CF\u4E0E\u6548\u7387\u3002",
       "owner": "",
       "evidence": "",
       "state": "Pending",
-      "updated": "2026-11-04T15:46:55.3399759+00:00"
+      "updated": "2026-11-04T15:52:25.3850812+00:00"
     }
   ],
   "audit": [
     {
-      "time": "2026-11-04T15:46:48.8892596+00:00",
+      "time": "2026-11-04T15:52:19.0283525+00:00",
       "action": "\u8F7D\u5165\u6A21\u62DF\u793A\u4F8B",
       "detail": "40\u53F6\u7247\uFF0C\u4E09\u6A21\u6001\uFF0C\u53CC\u65B9\u6848",
       "revision": 0
     },
     {
-      "time": "2026-11-04T15:46:54.1554143+00:00",
+      "time": "2026-11-04T15:52:24.2285985+00:00",
       "action": "\u63A5\u7EB3\u626B\u63CF\u5019\u9009",
       "detail": "\u5DF2\u901A\u8FC7\u5B8C\u6574\u9879\u76EE\u6821\u9A8C\uFF1B\u8BA1\u7B97\u8F93\u5165\u53D8\u5316\uFF0C\u5DF2\u5B8C\u6210\u9A8C\u8BC1\u6807\u4E3A\u9700\u590D\u6838",
       "revision": 1
     },
     {
-      "time": "2026-11-04T15:46:55.3399906+00:00",
+      "time": "2026-11-04T15:52:25.3850955+00:00",
       "action": "\u751F\u6210\u9A8C\u8BC1\u6E05\u5355",
       "detail": "\u5DF2\u901A\u8FC7\u5B8C\u6574\u9879\u76EE\u6821\u9A8C",
       "revision": 2

@@ -1,6 +1,6 @@
 {
-  "date": "2026-11-04T15:46:41.6199502+00:00",
-  "platform": "Linux; linked production ViewModels and file service, no WPF runtime",
+  "date": "2026-11-04T15:52:11.8342367+00:00",
+  "platform": "Microsoft Windows 10.0.26100; linked production ViewModels and file service; this test does not instantiate WPF",
   "passed": 14,
   "failed": 0,
   "checks": [

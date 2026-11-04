@@ -1,6 +1,6 @@
 {
-  "executedUtc": "2026-11-04T15:46:57.5246924+00:00",
-  "sourceCommit": "2c88f6c9cb270cdd2482f86b6ddf77b117f76d69",
+  "executedUtc": "2026-11-04T15:52:27.7838683+00:00",
+  "sourceCommit": "9aea7e2a9d73c6a24afb45647d45f64bc920bd79",
   "platform": "Microsoft Windows NT 10.0.26100.0",
   "framework": ".NET 8.0.33",
   "screenshotMethod": "Actual production WPF MainWindow shown on Windows; native Window client content captured with RenderTargetBitmap after layout/render. No browser or mock-up. Test dialog adapter is used for confirmations and file paths.",
