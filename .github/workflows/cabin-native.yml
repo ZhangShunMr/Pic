@@ -5,7 +5,7 @@ on:
     paths: ['cabin-acoustics/**', '.github/workflows/cabin-native.yml']
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
   windows:
     runs-on: windows-latest
@@ -33,3 +33,15 @@ jobs:
             cabin-acoustics/docs/screenshots
             cabin-acoustics/docs/test-windows.json
             cabin-acoustics/artifacts/win-x64
+      - name: Preserve verified native captures on this software branch
+        if: success() && github.ref == 'refs/heads/windows-native/cabin-acoustics'
+        run: |
+          git config user.name 'Cabin Windows verification'
+          git config user.email 'codex@openai.com'
+          git add docs/screenshots docs/test-windows.json
+          git diff --cached --quiet
+          if ($LASTEXITCODE -eq 1) {
+            git commit -m 'Record actual Windows WPF verification and native captures [skip ci]'
+            git push origin HEAD:windows-native/cabin-acoustics
+            if ($LASTEXITCODE -ne 0) { throw 'Could not preserve verified captures on the independent branch' }
+          }
