@@ -164,10 +164,13 @@ internal static class Program
             (int)Math.Ceiling(visual.ActualHeight), 96, 96, PixelFormats.Pbgra32);
         var background = new DrawingVisual();
         using (var drawing = background.RenderOpen())
+        {
             drawing.DrawRectangle(window.Background ?? Brushes.White, null,
+                new Rect(0, 0, bitmap.PixelWidth, bitmap.PixelHeight));
+            drawing.DrawRectangle(new VisualBrush(visual), null,
                 new Rect(0, 0, visual.ActualWidth, visual.ActualHeight));
+        }
         bitmap.Render(background);
-        bitmap.Render(visual);
         var pixels = new byte[bitmap.PixelWidth * bitmap.PixelHeight * 4];
         bitmap.CopyPixels(pixels, bitmap.PixelWidth * 4, 0);
         Record(name + " has opaque native window background", pixels.Where((_, i) => i % 4 == 3).All(alpha => alpha == 255));
