@@ -1,0 +1,266 @@
+{
+  "executedUtc": "2026-11-04T15:45:45.8795173+00:00",
+  "sourceCommit": "e1e691f070d35b7e353584615228cdbadb6585e9",
+  "platform": "Microsoft Windows NT 10.0.26100.0",
+  "framework": ".NET 10.0.14",
+  "rendering": "Actual production WPF MainWindow shown on Windows. PNG captures of live native client visual using RenderTargetBitmap, not browser images or mock-ups.",
+  "dialogBoundary": "Automated window integration uses deterministic IUserDialogs paths and decisions; actual native file dialog mouse/keyboard operation is not tested.",
+  "failed": 0,
+  "checks": [
+    {
+      "name": "01-empty native rendered pixels",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "01-empty opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Ordinary startup empty",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Native blank project saved",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "02-location native rendered pixels",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "02-location opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "03-condition native rendered pixels",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "03-condition opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Native DataGrid edited 125",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "04-baseline native rendered pixels",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "04-baseline opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Native DataGrid edited 125",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "05-single native rendered pixels",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "05-single opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "06-pair native rendered pixels",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "06-pair opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Native paired result is 3dB",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "07-manual-result native rendered pixels",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "07-manual-result opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Native file workflow saved and exported",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Native save reopened same 3dB result",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "08-example-project native rendered pixels",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "08-example-project opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "09-combination native rendered pixels",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "09-combination opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Native CSV preview populated",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "10-import-preview native rendered pixels",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "10-import-preview opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "11-example-difference native rendered pixels",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "11-example-difference opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "12-original-spectrum native rendered pixels",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "12-original-spectrum opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Native displayed range filtered",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "13-quality native rendered pixels",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "13-quality opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "14-settings native rendered pixels",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "14-settings opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "15-review native rendered pixels",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "15-review opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Native review recorded",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "16-minimum-window native rendered pixels",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "16-minimum-window opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Minimum native result plot has usable dimensions",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Native invalid input rejected",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "17-invalid-draft native rendered pixels",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "17-invalid-draft opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Native missing condition blocks comparison",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "18-blocked-comparison native rendered pixels",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "18-blocked-comparison opaque background",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Native workflow no unexpected dialog errors",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "No WPF binding errors",
+      "passed": true,
+      "detail": ""
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 2,
+  "softwareVersion": "3.0.0",
+  "id": "9f2236cb-88b5-410d-a49c-e783ff064d0a",
+  "name": "手工模拟封堵案例",
+  "owner": "Windows验证人员",
+  "vehicleProgramme": "",
+  "objective": "",
+  "description": "",
+  "createdAt": "2026-11-04T15:45:28.6129876+00:00",
+  "updatedAt": "2026-11-04T15:45:30.7255324+00:00",
+  "revision": 1,
+  "status": "active",
+  "locations": [],
+  "conditions": [],
+  "trials": [],
+  "pairs": [],
+  "settings": {
+    "speedTolerance": 0.5,
+    "rpmTolerance": 20,
+    "temperatureTolerance": 2,
+    "durationTolerance": 0.01,
+    "driftThreshold": 1,
+    "recoveryThreshold": 1,
+    "repeatabilityThreshold": 1,
+    "minimumEffectDisplay": 0,
+    "requireSampleRateMatch": false,
+    "requireSynchronizationMatch": false
+  },
+  "audit": [
+    {
+      "id": "74d2b95b-25bc-4c52-83bf-40aefcab38c7",
+      "time": "2026-11-04T15:45:30.7256528+00:00",
+      "revision": 1,
+      "action": "应用项目档案",
+      "entity": "9f2236cb-88b5-410d-a49c-e783ff064d0a",
+      "detail": "修改字段/集合：name、owner",
+      "inputHash": "829a17ff22d8ba24ef836db0c292b04b1ec4577220c65f5d59fdbd29e5cf6788"
+    }
+  ],
+  "reviews": []
+}

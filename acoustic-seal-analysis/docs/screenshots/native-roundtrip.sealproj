@@ -1,0 +1,178 @@
+{
+  "schemaVersion": 2,
+  "softwareVersion": "3.0.0",
+  "id": "9f2236cb-88b5-410d-a49c-e783ff064d0a",
+  "name": "手工模拟封堵案例",
+  "owner": "Windows验证人员",
+  "vehicleProgramme": "",
+  "objective": "",
+  "description": "",
+  "createdAt": "2026-11-04T15:45:28.6129876+00:00",
+  "updatedAt": "2026-11-04T15:45:36.9018487+00:00",
+  "revision": 6,
+  "status": "active",
+  "locations": [
+    {
+      "id": "e1ba2703-1917-463d-9fa7-60ec6b42d6a8",
+      "name": "车门密封条",
+      "zone": "",
+      "material": "模拟胶带",
+      "extent": "",
+      "procedure": "",
+      "recoveryProcedure": "解除胶带后核对恢复",
+      "reference": "",
+      "notes": ""
+    }
+  ],
+  "conditions": [
+    {
+      "id": "8d4b60de-5d03-469a-abd5-2b5b4df5ba1d",
+      "name": "模拟工况",
+      "vehicle": "SIM-01",
+      "microphone": "驾驶员耳旁",
+      "excitation": "模拟声源",
+      "surface": "模拟台架",
+      "gear": "N",
+      "weighting": "Z",
+      "timeDefinition": "Leq",
+      "bandType": "octave",
+      "instrument": "SIM-MIC",
+      "calibration": "模拟链路",
+      "unit": "dB re 20 µPa",
+      "speed": 0,
+      "rpm": 0,
+      "temperature": 20,
+      "duration": 10,
+      "sampleRate": null,
+      "synchronization": "",
+      "nonOverlappingBands": false,
+      "notes": ""
+    }
+  ],
+  "trials": [
+    {
+      "id": "9ef73140-da84-42dc-b2f3-ecb617b3982b",
+      "name": "基线",
+      "kind": "baseline",
+      "conditionId": "8d4b60de-5d03-469a-abd5-2b5b4df5ba1d",
+      "locationIds": [],
+      "timestamp": "2026-11-04T15:45:33.5039386+00:00",
+      "repeatGroup": "",
+      "source": "manual",
+      "sourceNote": "人工填写的独立Windows验证数值",
+      "originalFile": "",
+      "operator": "",
+      "preparation": "",
+      "notes": "",
+      "bands": [
+        {
+          "frequency": 125,
+          "level": 70,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "0804e99f-1307-476b-81fd-f738e171ec95",
+      "name": "单项封堵",
+      "kind": "single",
+      "conditionId": "8d4b60de-5d03-469a-abd5-2b5b4df5ba1d",
+      "locationIds": [
+        "e1ba2703-1917-463d-9fa7-60ec6b42d6a8"
+      ],
+      "timestamp": "2026-11-04T15:45:35.0752149+00:00",
+      "repeatGroup": "",
+      "source": "manual",
+      "sourceNote": "人工填写的独立Windows验证数值",
+      "originalFile": "",
+      "operator": "",
+      "preparation": "",
+      "notes": "",
+      "bands": [
+        {
+          "frequency": 125,
+          "level": 67,
+          "note": ""
+        }
+      ]
+    }
+  ],
+  "pairs": [
+    {
+      "id": "beba987f-5276-44f0-89f5-0edb20f39687",
+      "baselineId": "9ef73140-da84-42dc-b2f3-ecb617b3982b",
+      "targetId": "0804e99f-1307-476b-81fd-f738e171ec95",
+      "purpose": "effect",
+      "notes": ""
+    }
+  ],
+  "settings": {
+    "speedTolerance": 0.5,
+    "rpmTolerance": 20,
+    "temperatureTolerance": 2,
+    "durationTolerance": 0.01,
+    "driftThreshold": 1,
+    "recoveryThreshold": 1,
+    "repeatabilityThreshold": 1,
+    "minimumEffectDisplay": 0,
+    "requireSampleRateMatch": false,
+    "requireSynchronizationMatch": false
+  },
+  "audit": [
+    {
+      "id": "74d2b95b-25bc-4c52-83bf-40aefcab38c7",
+      "time": "2026-11-04T15:45:30.7256528+00:00",
+      "revision": 1,
+      "action": "应用项目档案",
+      "entity": "9f2236cb-88b5-410d-a49c-e783ff064d0a",
+      "detail": "修改字段/集合：name、owner",
+      "inputHash": "829a17ff22d8ba24ef836db0c292b04b1ec4577220c65f5d59fdbd29e5cf6788"
+    },
+    {
+      "id": "de35c7a7-5363-4b0b-a5c3-c991ad930f97",
+      "time": "2026-11-04T15:45:31.3675824+00:00",
+      "revision": 2,
+      "action": "应用封堵位置",
+      "entity": "e1ba2703-1917-463d-9fa7-60ec6b42d6a8",
+      "detail": "修改字段/集合：locations",
+      "inputHash": "8be974824c786bab6af1747530761ecb33d22063173fe569fa8c13099b1ba5c8"
+    },
+    {
+      "id": "f46e166c-695a-4f26-987f-226312f591c7",
+      "time": "2026-11-04T15:45:32.5013971+00:00",
+      "revision": 3,
+      "action": "应用工况",
+      "entity": "8d4b60de-5d03-469a-abd5-2b5b4df5ba1d",
+      "detail": "修改字段/集合：conditions",
+      "inputHash": "7aa743e1c8af4d2463a0d2f8a8ca47d8f459289bedd78bffd2cc7a5a6800af8f"
+    },
+    {
+      "id": "3b9e008b-d245-413e-8e7a-d50c946b432a",
+      "time": "2026-11-04T15:45:34.1805950+00:00",
+      "revision": 4,
+      "action": "应用试验",
+      "entity": "9ef73140-da84-42dc-b2f3-ecb617b3982b",
+      "detail": "修改字段/集合：trials",
+      "inputHash": "f87d1f1bf8d380d3048f1ded1d68b980b1f254edea6fbf43c50974a578d691e8"
+    },
+    {
+      "id": "e9e180f7-f7f5-433e-a9bf-aa6fab5af8ea",
+      "time": "2026-11-04T15:45:35.7707561+00:00",
+      "revision": 5,
+      "action": "应用试验",
+      "entity": "0804e99f-1307-476b-81fd-f738e171ec95",
+      "detail": "修改字段/集合：trials",
+      "inputHash": "96e6271550a37d8c9ef753c919ce538fc631002f51ac069796e34c5f67496f91"
+    },
+    {
+      "id": "73eee043-a90c-49e9-86f6-7a69b4ed85a4",
+      "time": "2026-11-04T15:45:36.9018498+00:00",
+      "revision": 6,
+      "action": "应用显式配对",
+      "entity": "beba987f-5276-44f0-89f5-0edb20f39687",
+      "detail": "修改字段/集合：pairs",
+      "inputHash": "bf161661e991da93b738e9613f933ea2f20b584add81f9b7b21ae49893440904"
+    }
+  ],
+  "reviews": []
+}
