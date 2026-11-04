@@ -1,6 +1,6 @@
 {
-  "executedUtc": "2026-11-04T15:15:16.5600853+00:00",
-  "sourceCommit": "a557cbd26b17d240737b92531e5f71c369d599a2",
+  "executedUtc": "2026-11-04T15:16:53.0594301+00:00",
+  "sourceCommit": "2dcf2120ef295a04c1e865022b00b79648295a46",
   "platform": "Microsoft Windows NT 10.0.26100.0",
   "framework": ".NET 8.0.33",
   "rendering": "Actual WPF MainWindow shown on Windows. PNG files captured from the actual rendered native Window client content using RenderTargetBitmap; not browser or mock-up images.",

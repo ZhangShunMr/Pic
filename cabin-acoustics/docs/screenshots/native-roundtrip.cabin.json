@@ -1,14 +1,14 @@
 {
   "schema": 1,
-  "id": "0a23238d-d8b2-4f6e-84d4-b70daade83b4",
+  "id": "f017f37b-dca5-4ac7-9c00-74bed3075166",
   "name": "\u56DB\u5EA7\u77E9\u5F62\u5EA7\u8231 \u00B7 \u6A21\u62DF\u7814\u7A76",
   "revision": "A",
   "owner": "\u793A\u4F8B\u5DE5\u7A0B\u5E08",
   "dataSource": "\u53EF\u91CD\u590D\u6A21\u62DF\uFF1B\u77E9\u5F62\u7406\u60F3\u51E0\u4F55\uFF1B\u975E\u5B9E\u6D4B",
   "isDemo": true,
   "notes": "\u6BD4\u8F83\u524D\u540E\u6392\u8033\u70B9\u54CD\u5E94\uFF1B\u5C06\u58F0\u6E90\u79FB\u81F3x=Lx/2\u53EF\u89C2\u5BDF\u5947\u6570\u7EB5\u5411\u6A21\u6001\u8026\u5408\u51CF\u5F31\u3002",
-  "created": "2026-11-04T15:15:07.8609741+00:00",
-  "modified": "2026-11-04T15:15:14.5399954+00:00",
+  "created": "2026-11-04T15:16:44.9010658+00:00",
+  "modified": "2026-11-04T15:16:50.7764859+00:00",
   "model": {
     "length": 3.4,
     "width": 1.6,
@@ -23,7 +23,7 @@
   },
   "sources": [
     {
-      "id": "9c099dbf-0091-435f-b4ff-02e88b8b8ccc",
+      "id": "ca97c891-fe1d-47a1-914a-227d10a03a40",
       "name": "\u524D\u8231\u7B49\u6548\u58F0\u6E90",
       "point": {
         "x": 0.2,
@@ -37,7 +37,7 @@
   ],
   "seats": [
     {
-      "id": "231ac3fe-2821-4ab9-a3c5-6306c961a94e",
+      "id": "430db738-c9c3-4f7b-8069-8a3fd8aff7a6",
       "name": "\u9A7E\u9A76\u5458",
       "point": {
         "x": 1.05,
@@ -47,7 +47,7 @@
       "note": "\u6A21\u62DF\u8033\u70B9"
     },
     {
-      "id": "8531c638-e9c3-4e84-a7e7-a349b3edda4b",
+      "id": "e371076f-6185-495d-acb0-6e7b0cdda44e",
       "name": "\u524D\u6392\u4E58\u5458",
       "point": {
         "x": 1.05,
@@ -57,7 +57,7 @@
       "note": "\u6A21\u62DF\u8033\u70B9"
     },
     {
-      "id": "63453cd9-25b6-417c-b39f-0991fdf0eabd",
+      "id": "a64c65ac-dee3-4625-a29b-c7b95881c478",
       "name": "\u540E\u6392\u5DE6",
       "point": {
         "x": 2.55,
@@ -67,7 +67,7 @@
       "note": "\u6A21\u62DF\u8033\u70B9"
     },
     {
-      "id": "028f701a-1b16-48b3-b577-e532ce26f81b",
+      "id": "f8b24d73-761d-4dd1-85fe-e52f302cf074",
       "name": "\u540E\u6392\u53F3",
       "point": {
         "x": 2.55,
@@ -79,9 +79,9 @@
   ],
   "baselines": [
     {
-      "id": "61718d52-3afa-4e7e-82df-c07e618ff16a",
+      "id": "195aba49-c6b1-4108-b433-effda86c36df",
       "name": "\u539F\u59CB\u6A21\u62DF\u5E03\u7F6E",
-      "created": "2026-11-04T15:15:07.8616361+00:00",
+      "created": "2026-11-04T15:16:44.9014968+00:00",
       "model": {
         "length": 3.4,
         "width": 1.6,
@@ -96,7 +96,7 @@
       },
       "sources": [
         {
-          "id": "9c099dbf-0091-435f-b4ff-02e88b8b8ccc",
+          "id": "ca97c891-fe1d-47a1-914a-227d10a03a40",
           "name": "\u524D\u8231\u7B49\u6548\u58F0\u6E90",
           "point": {
             "x": 0.2,
@@ -110,7 +110,7 @@
       ],
       "seats": [
         {
-          "id": "231ac3fe-2821-4ab9-a3c5-6306c961a94e",
+          "id": "430db738-c9c3-4f7b-8069-8a3fd8aff7a6",
           "name": "\u9A7E\u9A76\u5458",
           "point": {
             "x": 1.05,
@@ -120,7 +120,7 @@
           "note": "\u6A21\u62DF\u8033\u70B9"
         },
         {
-          "id": "8531c638-e9c3-4e84-a7e7-a349b3edda4b",
+          "id": "e371076f-6185-495d-acb0-6e7b0cdda44e",
           "name": "\u524D\u6392\u4E58\u5458",
           "point": {
             "x": 1.05,
@@ -130,7 +130,7 @@
           "note": "\u6A21\u62DF\u8033\u70B9"
         },
         {
-          "id": "63453cd9-25b6-417c-b39f-0991fdf0eabd",
+          "id": "a64c65ac-dee3-4625-a29b-c7b95881c478",
           "name": "\u540E\u6392\u5DE6",
           "point": {
             "x": 2.55,
@@ -140,7 +140,7 @@
           "note": "\u6A21\u62DF\u8033\u70B9"
         },
         {
-          "id": "028f701a-1b16-48b3-b577-e532ce26f81b",
+          "id": "f8b24d73-761d-4dd1-85fe-e52f302cf074",
           "name": "\u540E\u6392\u53F3",
           "point": {
             "x": 2.55,
@@ -154,9 +154,9 @@
       "dataSource": "\u53EF\u91CD\u590D\u6A21\u62DF\uFF1B\u77E9\u5F62\u7406\u60F3\u51E0\u4F55\uFF1B\u975E\u5B9E\u6D4B"
     },
     {
-      "id": "3ed4469d-eb33-4c3c-8d41-6b4e2807469d",
+      "id": "c5529239-1ec4-42bb-a57c-3e6b44725d10",
       "name": "\u65B9\u6848\u57FA\u51C6",
-      "created": "2026-11-04T15:15:12.2196859+00:00",
+      "created": "2026-11-04T15:16:48.721949+00:00",
       "model": {
         "length": 3.4,
         "width": 1.6,
@@ -171,7 +171,7 @@
       },
       "sources": [
         {
-          "id": "9c099dbf-0091-435f-b4ff-02e88b8b8ccc",
+          "id": "ca97c891-fe1d-47a1-914a-227d10a03a40",
           "name": "\u524D\u8231\u7B49\u6548\u58F0\u6E90",
           "point": {
             "x": 0.2,
@@ -185,7 +185,7 @@
       ],
       "seats": [
         {
-          "id": "231ac3fe-2821-4ab9-a3c5-6306c961a94e",
+          "id": "430db738-c9c3-4f7b-8069-8a3fd8aff7a6",
           "name": "\u9A7E\u9A76\u5458",
           "point": {
             "x": 1.05,
@@ -195,7 +195,7 @@
           "note": "\u6A21\u62DF\u8033\u70B9"
         },
         {
-          "id": "8531c638-e9c3-4e84-a7e7-a349b3edda4b",
+          "id": "e371076f-6185-495d-acb0-6e7b0cdda44e",
           "name": "\u524D\u6392\u4E58\u5458",
           "point": {
             "x": 1.05,
@@ -205,7 +205,7 @@
           "note": "\u6A21\u62DF\u8033\u70B9"
         },
         {
-          "id": "63453cd9-25b6-417c-b39f-0991fdf0eabd",
+          "id": "a64c65ac-dee3-4625-a29b-c7b95881c478",
           "name": "\u540E\u6392\u5DE6",
           "point": {
             "x": 2.55,
@@ -215,7 +215,7 @@
           "note": "\u6A21\u62DF\u8033\u70B9"
         },
         {
-          "id": "028f701a-1b16-48b3-b577-e532ce26f81b",
+          "id": "f8b24d73-761d-4dd1-85fe-e52f302cf074",
           "name": "\u540E\u6392\u53F3",
           "point": {
             "x": 2.55,
@@ -231,7 +231,7 @@
   ],
   "reviews": [
     {
-      "id": "cf37737d-ea9c-4365-8382-fca9a9401b5d",
+      "id": "6a4b6327-68cf-44d5-9465-ee5999844a26",
       "target": "\u9996\u9636\u7EB5\u5411\u6A21\u6001\u7EA650.441Hz",
       "action": "\u6CBFx\u65B9\u5411\u5E03\u7F6E\u524D\u3001\u4E2D\u3001\u540E\u6D4B\u70B9\uFF0C\u4FDD\u6301y\u548Cz\u4E00\u81F4\uFF1B\u5B9E\u6D4B\u68C0\u67E5\u76F8\u4F4D\u548C\u5E45\u503C\u5206\u5E03\u3002",
       "owner": "",
@@ -240,12 +240,12 @@
   ],
   "journal": [
     {
-      "time": "2026-11-04T15:15:07.8615186+00:00",
+      "time": "2026-11-04T15:16:44.9013893+00:00",
       "action": "\u8F7D\u5165\u72EC\u7ACB\u793A\u4F8B",
       "detail": "\u6240\u6709\u5C3A\u5BF8\u53CA\u70B9\u4F4D\u5747\u4E3A\u6A21\u62DF"
     },
     {
-      "time": "2026-11-04T15:15:14.5403147+00:00",
+      "time": "2026-11-04T15:16:50.776823+00:00",
       "action": "\u4FDD\u5B58\u9879\u76EE",
       "detail": "\u7248\u672CA\uFF1B\u5185\u5D4C\u5168\u90E8\u70B9\u4F4D\u3001\u57FA\u51C6\u4E0E\u590D\u6838"
     }

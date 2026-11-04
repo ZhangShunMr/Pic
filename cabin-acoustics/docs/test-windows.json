@@ -1,5 +1,5 @@
 {
-  "executedUtc": "2026-11-04T15:14:58.6916447+00:00",
+  "executedUtc": "2026-11-04T15:16:37.91904+00:00",
   "framework": ".NET 8.0.33",
   "platform": "Microsoft Windows 10.0.26100",
   "note": "Core and shared MVVM logic executed on Linux. CommandManager shim is test-only. WPF bindings, dialogs, rendering and Windows executable were not executed by this suite.",

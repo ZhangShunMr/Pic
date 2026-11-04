@@ -1,8 +1,8 @@
 {
-  "executedUtc": "2026-11-04T15:15:29.5288409+00:00",
+  "executedUtc": "2026-11-04T15:17:07.1218665+00:00",
   "executable": "artifacts/win-x64/CabinAcoustics.exe",
-  "sha256": "B27216CA8A442D99CC4A014D7CFCC6527F4EE8FE8487F5D601C47C4BF0268AFB",
-  "sourceCommit": "a557cbd26b17d240737b92531e5f71c369d599a2",
+  "sha256": "8F6ECDD749CAF8B852C223972D63BAB205AC01F161468E22E508C40F67182D26",
+  "sourceCommit": "2dcf2120ef295a04c1e865022b00b79648295a46",
   "platform": "Microsoft Windows NT 10.0.26100.0",
   "actualProcessStarted": true,
   "nativeWindowTitle": "未建立项目 — 座舱模态工作台",
