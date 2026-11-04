@@ -1,0 +1,1 @@
+PASS live WPF page loading, editor binding, rejection, chart/table binding, minimum size capture

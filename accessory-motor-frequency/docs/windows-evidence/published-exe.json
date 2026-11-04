@@ -1,0 +1,12 @@
+{
+  "executedUtc": "2026-11-04T15:43:34.7338713+00:00",
+  "executable": "artifacts/win-x64/MotorFrequency.exe",
+  "sha256": "025C17EB69E0D5B2D4682E13989C1F77933EBC39053AF47263E31B2F1378E3E1",
+  "sourceCommit": "21e81e15b4c47d1b120b325e84278ef798d48fae",
+  "platform": "Microsoft Windows NT 10.0.26100.0",
+  "actualProcessStarted": true,
+  "nativeWindowTitle": "汽车附件电机电磁激励频率设计软件 V2.0 — 无项目",
+  "frameworkDependentRuntimeRequired": false,
+  "limitation": "Runner OS startup/normal close only; not Windows 10/11 hardware, offline network isolation, DPI or installer certification.",
+  "normalExitCode": 0
+}

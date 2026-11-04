@@ -1,0 +1,10 @@
+{
+  "executedUtc": "2026-11-04T15:43:35.4602702+00:00",
+  "platform": "Microsoft Windows NT 10.0.26100.0",
+  "sourceCommit": "21e81e15b4c47d1b120b325e84278ef798d48fae",
+  "engine": "Microsoft Word COM",
+  "available": false,
+  "actualPages": null,
+  "finalLayoutInspected": false,
+  "reason": "Microsoft Word COM is not registered on this Windows runner. No Word page count or PDF claimed."
+}
