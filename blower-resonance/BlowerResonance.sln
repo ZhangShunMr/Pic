@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blower.Verification", "test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blower.WorkflowVerification", "tests\Blower.WorkflowVerification\Blower.WorkflowVerification.csproj", "{141D6009-1FE4-4301-B650-1A5535635108}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blower.WindowsChecks", "tests\Blower.WindowsChecks\Blower.WindowsChecks.csproj", "{B67D7A6C-6ECC-4E74-A9B5-7C031458C282}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,11 +42,16 @@ Global
 		{141D6009-1FE4-4301-B650-1A5535635108}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{141D6009-1FE4-4301-B650-1A5535635108}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{141D6009-1FE4-4301-B650-1A5535635108}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B67D7A6C-6ECC-4E74-A9B5-7C031458C282}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B67D7A6C-6ECC-4E74-A9B5-7C031458C282}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B67D7A6C-6ECC-4E74-A9B5-7C031458C282}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B67D7A6C-6ECC-4E74-A9B5-7C031458C282}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{4B591BDD-ABC1-4DBC-B19E-26734846B7C6} = {CED4148D-E001-4A23-9ABD-372670AAE758}
 		{47CDE734-B427-4AD2-99E4-8DF2E9F30149} = {CED4148D-E001-4A23-9ABD-372670AAE758}
 		{950A6A8C-75EC-4A6E-8BB0-16F76482D6AB} = {F72FBF9F-2F18-42E2-875C-52026F31C72F}
 		{141D6009-1FE4-4301-B650-1A5535635108} = {F72FBF9F-2F18-42E2-875C-52026F31C72F}
+		{B67D7A6C-6ECC-4E74-A9B5-7C031458C282} = {F72FBF9F-2F18-42E2-875C-52026F31C72F}
 	EndGlobalSection
 EndGlobal

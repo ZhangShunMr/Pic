@@ -1,0 +1,64 @@
+name: Blower Windows native verification
+on:
+  push:
+    branches: ['windows-native/blower-resonance-20261104']
+    paths: ['blower-resonance/**', '.github/workflows/blower-native.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: blower-resonance
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Build and Windows core plus workflow tests
+        run: |
+          dotnet build BlowerResonance.sln -c Release
+          if ($LASTEXITCODE -ne 0) { throw 'Build failed' }
+          dotnet run --project tests/Blower.Verification -c Release -- docs/core-evidence-windows.json
+          if ($LASTEXITCODE -ne 0) { throw 'Core failed' }
+          dotnet run --project tests/Blower.WorkflowVerification -c Release -- docs/workflow-evidence-windows.json
+          if ($LASTEXITCODE -ne 0) { throw 'Workflow failed' }
+      - name: Show production WPF window and exercise actual bindings
+        run: |
+          dotnet run --project tests/Blower.WindowsChecks -c Release -- docs/screenshots
+          if ($LASTEXITCODE -ne 0) { throw 'WPF verification failed' }
+      - name: Publish self contained executable and launch directly
+        run: |
+          dotnet publish src/Blower.Desktop -c Release -r win-x64 --self-contained true -o release/win-x64
+          if ($LASTEXITCODE -ne 0) { throw 'Publish failed' }
+          ./tools/smoke-published.ps1
+      - name: Check whether Microsoft Word is actually installed
+        if: always()
+        run: |
+          $available = $null -ne [type]::GetTypeFromProgID('Word.Application')
+          @{ executedUtc=[DateTimeOffset]::UtcNow.ToString('o'); microsoftWordInstalled=$available; actualWordPageCount=$null; note='Detection only. No pagination claimed unless the document is opened and repaginated by Microsoft Word.' } | ConvertTo-Json | Set-Content docs/word-availability.json -Encoding utf8
+      - name: Retain Windows evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blower-windows-native
+          path: |
+            blower-resonance/docs/screenshots
+            blower-resonance/docs/*-windows.json
+            blower-resonance/docs/word-availability.json
+      - name: Preserve actual native evidence on this branch
+        if: success()
+        run: |
+          git config user.name 'Blower Windows verification'
+          git config user.email 'codex@openai.com'
+          git add docs/screenshots docs/*-windows.json docs/word-availability.json
+          git diff --cached --quiet
+          if ($LASTEXITCODE -eq 1) {
+            git commit -m 'Record actual Windows blower WPF verification [skip ci]'
+            git push origin HEAD:windows-native/blower-resonance-20261104
+            if ($LASTEXITCODE -ne 0) { throw 'Evidence push failed' }
+          }

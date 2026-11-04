@@ -10,10 +10,13 @@ namespace Blower.Desktop;
 public partial class MainWindow : Window
 {
     private readonly WorkspaceViewModel workspace;
-    public MainWindow()
+    public MainWindow() : this(new DesktopDialogs())
+    {
+    }
+    public MainWindow(IDesktopDialogs dialogs)
     {
         InitializeComponent();
-        workspace = new WorkspaceViewModel(new DesktopDialogs());
+        workspace = new WorkspaceViewModel(dialogs);
         DataContext = workspace;
     }
     private void WindowClosing(object? sender, CancelEventArgs e)
